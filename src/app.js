@@ -9,13 +9,14 @@ import { createEmLab } from './tools/emLab.js';
 
 const SECTIONS = ['topics', 'notes', 'tools', 'worksheets', 'flashcards', 'summary'];
 
-const TOOL_ORDER = ['reflection', 'refraction', 'tir', 'lens', 'em'];
+const TOOL_ORDER = ['reflection', 'refraction', 'tir', 'convexLens', 'concaveLens', 'em'];
 
 const TOOL_FACTORIES = {
   reflection: (tr) => createReflectionLab(tr),
   refraction: (tr) => createRefractionLab(tr),
   tir: (tr) => createTirLab(tr),
-  lens: (tr) => createLensLab(tr),
+  convexLens: (tr) => createLensLab(tr, { defaultKind: 'convex' }),
+  concaveLens: (tr) => createLensLab(tr, { defaultKind: 'concave' }),
   em: (tr) => createEmLab(tr),
 };
 
@@ -24,7 +25,8 @@ function toolLabel(id) {
     reflection: 'tools.reflection.title',
     refraction: 'tools.refraction.title',
     tir: 'tools.tir.title',
-    lens: 'tools.lens.title',
+    convexLens: 'tools.convexLens.title',
+    concaveLens: 'tools.concaveLens.title',
     em: 'tools.em.title',
   };
   return t(map[id] || id);
@@ -149,12 +151,13 @@ export function mountApp(root) {
         <div class="grid cols-2 topic-hub-grid">
           ${cards
             .map(([id, key]) => {
-              const tid = id === 'convex' || id === 'concave' ? 'lens' : id === 'em' ? 'em' : id;
+              const tid =
+                id === 'convex' ? 'convexLens' : id === 'concave' ? 'concaveLens' : id === 'em' ? 'em' : id;
               return `
             <div class="card">
               <h3>${t(key)}</h3>
               <p>${id === 'convex' || id === 'concave' ? t('tools.lens.note') : ''}</p>
-              <button class="btn primary" type="button" data-go-tool="${tid}" data-lens="${id === 'concave' ? 'concave' : 'convex'}">${t('topic.openTool')}</button>
+              <button class="btn primary" type="button" data-go-tool="${tid}">${t('topic.openTool')}</button>
             </div>`;
             })
             .join('')}
@@ -167,12 +170,7 @@ export function mountApp(root) {
     if (!b) return;
     section = 'tools';
     toolId = b.getAttribute('data-go-tool');
-    const lensPref = b.getAttribute('data-lens');
     render();
-    if (toolId === 'lens' && lensPref === 'concave') {
-      const sel = root.querySelector('[data-lens]');
-      if (sel) sel.value = 'concave';
-    }
   }
 
   function renderNotesShell() {
@@ -180,7 +178,8 @@ export function mountApp(root) {
       { key: 'reflection', fileEn: 'reflection-en.pdf', fileZh: 'reflection-zhHant.pdf' },
       { key: 'refraction', fileEn: 'refraction-en.pdf', fileZh: 'refraction-zhHant.pdf' },
       { key: 'tir', fileEn: 'tir-en.pdf', fileZh: 'tir-zhHant.pdf' },
-      { key: 'lenses', fileEn: 'lenses-en.pdf', fileZh: 'lenses-zhHant.pdf' },
+      { key: 'convexLens', fileEn: 'convex-lens-en.pdf', fileZh: 'convex-lens-zhHant.pdf' },
+      { key: 'concaveLens', fileEn: 'concave-lens-en.pdf', fileZh: 'concave-lens-zhHant.pdf' },
       { key: 'em', fileEn: 'emwaves-en.pdf', fileZh: 'emwaves-zhHant.pdf' },
     ];
     return `
@@ -208,7 +207,8 @@ export function mountApp(root) {
       { key: 'reflection', fileEn: 'reflection-en.pdf', fileZh: 'reflection-zhHant.pdf' },
       { key: 'refraction', fileEn: 'refraction-en.pdf', fileZh: 'refraction-zhHant.pdf' },
       { key: 'tir', fileEn: 'tir-en.pdf', fileZh: 'tir-zhHant.pdf' },
-      { key: 'lenses', fileEn: 'lenses-en.pdf', fileZh: 'lenses-zhHant.pdf' },
+      { key: 'convexLens', fileEn: 'convex-lens-en.pdf', fileZh: 'convex-lens-zhHant.pdf' },
+      { key: 'concaveLens', fileEn: 'concave-lens-en.pdf', fileZh: 'concave-lens-zhHant.pdf' },
       { key: 'em', fileEn: 'emwaves-en.pdf', fileZh: 'emwaves-zhHant.pdf' },
     ];
     const lk = langKey();

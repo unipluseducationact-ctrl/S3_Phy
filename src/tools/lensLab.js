@@ -1,6 +1,7 @@
 import { rad } from './rayMath.js';
 
-export function createLensLab(t) {
+/** @param {(key: string) => string} t @param {{ defaultKind?: 'convex' | 'concave' }} [opts] */
+export function createLensLab(t, opts = {}) {
   const wrap = document.createElement('div');
   wrap.innerHTML = `
     <canvas class="lab-canvas" width="900" height="480"></canvas>
@@ -34,6 +35,9 @@ export function createLensLab(t) {
   const canvas = wrap.querySelector('canvas');
   const ctx = canvas.getContext('2d');
   const lensSel = wrap.querySelector('[data-lens]');
+  if (opts.defaultKind === 'convex' || opts.defaultKind === 'concave') {
+    lensSel.value = opts.defaultKind;
+  }
 
   const bindDual = (rSel, nSel, lo, hi) => {
     const r = wrap.querySelector(rSel);
