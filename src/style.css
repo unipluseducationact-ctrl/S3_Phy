@@ -330,24 +330,6 @@ a {
   box-shadow: var(--shadow-lift);
 }
 
-.main-nav .num {
-  display: inline-flex;
-  width: 22px;
-  height: 22px;
-  align-items: center;
-  justify-content: center;
-  border-radius: 6px;
-  background: rgba(26, 28, 44, 0.06);
-  font-size: 0.78rem;
-  font-weight: 600;
-  color: var(--accent2);
-}
-
-.main-nav button.active .num {
-  background: var(--accent-soft);
-  color: var(--accent);
-}
-
 .panel {
   background: var(--surface);
   border: 1px solid var(--border);

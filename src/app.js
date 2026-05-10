@@ -101,7 +101,7 @@ export function mountApp(root) {
       });
     });
 
-    el.nav.innerHTML = SECTIONS.map((id, idx) => {
+    el.nav.innerHTML = SECTIONS.map((id) => {
       const labels = {
         topics: 'nav.topics',
         notes: 'nav.notes',
@@ -111,7 +111,7 @@ export function mountApp(root) {
         summary: 'nav.summary',
       };
       const active = section === id ? 'active' : '';
-      return `<button type="button" class="${active}" data-sec="${id}"><span class="num">${idx + 1}</span>${t(labels[id])}</button>`;
+      return `<button type="button" class="${active}" data-sec="${id}">${t(labels[id])}</button>`;
     }).join('');
     el.nav.querySelectorAll('button').forEach((btn) => {
       btn.addEventListener('click', () => {
