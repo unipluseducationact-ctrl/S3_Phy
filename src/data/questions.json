@@ -1,0 +1,32 @@
+[
+  {
+    "topic": "reflection",
+    "en": { "q": "For a plane mirror, the angle of incidence equals the angle of ____.", "choices": ["refraction", "reflection", "rotation", "deflection"], "a": 1, "exp": "The law of reflection states i = r for a plane mirror." },
+    "zhHant": { "q": "\u5e73\u9762\u93e1\u4e0a\uff0c\u5165\u5c04\u89d4\u7b49\u65bc\u54ea\u500b\u89d4\uff1f", "choices": ["\u6298\u5c04\u89d4", "\u53cd\u5c04\u89d4", "\u8f49\u52d5\u89d4", "\u504f\u8f49\u89d4"], "a": 1, "exp": "\u53cd\u5c04\u5b9a\u5f8b\uff1a\u5165\u5c04\u89d4 = \u53cd\u5c04\u89d4\u3002" }
+  },
+  {
+    "topic": "refraction",
+    "en": { "q": "Snell law connects n1, sin i and n2, sin r. If n2 > n1, the ray usually bends ____ the normal.", "choices": ["away from", "along", "toward", "parallel to"], "a": 2, "exp": "When entering a denser medium, the ray bends toward the normal (smaller angle in the denser side if measured from normal)." },
+    "zhHant": { "q": "\u53f8\u4e43\u8033\u5b9a\u5f8b\u9023\u7e6b n1 sin i \u8207 n2 sin r\u3002\u82e5 n2 > n1\uff0c\u5149\u7dda\u901a\u5e38\u5411\u6cd5\u7dda\u54ea\u65b9\u5f4e\u66f2\uff1f", "choices": ["\u9060\u96e2", "\u8cbc\u8457", "\u9760\u8fd1", "\u5e73\u884c"], "a": 2, "exp": "\u9032\u5165\u8f03\u5bc6\u4ecb\u8cea\u6642\uff0c\u5149\u7dda\u8f03\u9760\u8fd1\u6cd5\u7dda\u3002" }
+  },
+  {
+    "topic": "tir",
+    "en": { "q": "Total internal reflection can occur when light travels from a ____ medium to a ____ medium.", "choices": ["rare to dense", "dense to rare", "same to same", "opaque to clear"], "a": 1, "exp": "TIR requires the incident medium to be optically denser than the second medium, and the angle of incidence exceeds the critical angle." },
+    "zhHant": { "q": "\u5168\u5167\u53cd\u5c04\u767c\u751f\u6642\uff0c\u5149\u7531\u54ea\u985e\u578b\u4ecb\u8cea\u9032\u5165\u54ea\u985e\u578b\u4ecb\u8cea\uff1f", "choices": ["\u758f\u5230\u5bc6", "\u5bc6\u5230\u758f", "\u76f8\u540c\u5230\u76f8\u540c", "\u4e0d\u900f\u660e\u5230\u900f\u660e"], "a": 1, "exp": "\u5149\u5fc5\u9808\u5f9e\u5149\u5bc6\u9032\u5165\u5149\u758f\uff0c\u4e14\u5165\u5c04\u89d4\u5927\u65bc\u81e8\u754c\u89d4\u3002" }
+  },
+  {
+    "topic": "convex",
+    "en": { "q": "A real object outside 2f for a convex lens forms an image that is ____.", "choices": ["virtual and enlarged", "real and inverted between f and 2f", "real at infinity", "virtual at the focal point"], "a": 1, "exp": "For u > 2f with a convex lens, the real image lies between f and 2f on the opposite side (qualitative HKDSE level)." },
+    "zhHant": { "q": "\u5be6\u7269\u7f6e\u65bc\u51f8\u900f\u93e1 2f \u5916\u6642\uff0c\u50cf\u7684\u6027\u8cea\u70ba\uff1f", "choices": ["\u865b\u50cf\u653e\u5927", "\u5be6\u50cf\u5012\u7acb\u4f4d\u65bc f \u8207 2f \u4e4b\u9593", "\u5be6\u50cf\u5728\u7121\u7aae\u9060", "\u865b\u50cf\u5728\u7126\u9ede"], "a": 1, "exp": "u > 2f \u6642\uff0c\u5be6\u50cf\u7d04\u5728\u53e6\u4e00\u5074 f \u5230 2f \u4e4b\u9593\uff08\u5b9a\u6027\u8a8d\u8b58\uff09\u3002" }
+  },
+  {
+    "topic": "concave",
+    "en": { "q": "For a concave (diverging) lens, a real object always forms a ____ image.", "choices": ["real inverted", "virtual upright", "real upright", "no image"], "a": 1, "exp": "A diverging lens always forms a virtual upright diminished image for a real object." },
+    "zhHant": { "q": "\u5c0d\u51f9\u900f\u93e1\uff08\u767c\u6563\uff09\uff0c\u5be6\u7269\u7684\u50cf\u5fc5\u70ba\uff1f", "choices": ["\u5be6\u50cf\u5012\u7acb", "\u865b\u50cf\u6b63\u7acb", "\u5be6\u50cf\u6b63\u7acb", "\u7121\u50cf"], "a": 1, "exp": "\u767c\u6563\u900f\u93e1\u5c0d\u5be6\u7269\u7e3d\u6210\u865b\u50cf\u6b63\u7acb\u7e2e\u5c0f\u3002" }
+  },
+  {
+    "topic": "em",
+    "en": { "q": "Arrange by increasing wavelength: visible, X-ray, radio.", "choices": ["X-ray, visible, radio", "radio, visible, X-ray", "visible, radio, X-ray", "X-ray, radio, visible"], "a": 0, "exp": "X-rays have much shorter wavelength than visible light; radio waves have the longest among these." },
+    "zhHant": { "q": "\u6309\u6ce2\u9577\u7531\u77ed\u5230\u9577\u6392\u5e8f\uff1a\u53ef\u898b\u5149\u3001X \u5c04\u7dda\u3001\u7121\u7dda\u96fb\u3002", "choices": ["X \u5c04\u7dda\u3001\u53ef\u898b\u5149\u3001\u7121\u7dda\u96fb", "\u7121\u7dda\u96fb\u3001\u53ef\u898b\u5149\u3001X \u5c04\u7dda", "\u53ef\u898b\u5149\u3001\u7121\u7dda\u96fb\u3001X \u5c04\u7dda", "X \u5c04\u7dda\u3001\u7121\u7dda\u96fb\u3001\u53ef\u898b\u5149"], "a": 0, "exp": "X \u5c04\u7dda\u6ce2\u9577\u6700\u77ed\uff0c\u7121\u7dda\u96fb\u6700\u9577\u3002" }
+  }
+]
