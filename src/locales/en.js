@@ -2,6 +2,8 @@
 export const en = {
   'app.title': 'Uni+ HKDSE Physics Hub',
   'app.subtitle': 'Light and waves — S3 focus',
+  'splash.start': 'Start',
+  'splash.unitEducation': 'Unit Education',
   'lang.en': 'English',
   'lang.zhHant': 'Traditional Chinese',
   'nav.topics': 'Topics',

@@ -68,11 +68,19 @@ export function mountApp(root) {
   function render() {
     root.innerHTML = `
       <header class="site-header">
-        <div class="brand">
-          <h1>${t('app.title')}</h1>
-          <p>${t('app.subtitle')}</p>
+        <div class="site-header__brand">
+          <div class="brand-mark-mini" aria-hidden="true">
+            <span class="brand-uni-gradient">Uni</span>
+            <span class="brand-edu-orange">${t('splash.unitEducation')}</span>
+          </div>
+          <div class="brand-text-block">
+            <h1 class="site-title">${t('app.title')}</h1>
+            <p class="site-subtitle">${t('app.subtitle')}</p>
+          </div>
         </div>
-        <div class="lang-toggle" data-lang></div>
+        <div class="site-header__actions">
+          <div class="lang-toggle" data-lang></div>
+        </div>
       </header>
       <nav class="main-nav" data-nav></nav>
       <main data-main></main>

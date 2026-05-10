@@ -2,6 +2,8 @@
 export const zhHant = {
   'app.title': 'Uni+ HKDSE \u7269\u7406\u5b78\u7fd2\u4e2d\u5fc3',
   'app.subtitle': '\u5149\u8207\u6ce2\u52d5 \u2014 \u4e2d\u4e09\u91cd\u9ede',
+  'splash.start': '\u958b\u59cb',
+  'splash.unitEducation': 'Unit Education',
   'lang.en': 'English',
   'lang.zhHant': '\u7e41\u9ad4\u4e2d\u6587',
   'nav.topics': '\u8ab2\u984c',
