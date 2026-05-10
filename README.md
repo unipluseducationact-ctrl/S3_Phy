@@ -9,46 +9,40 @@ npm install
 npm run dev
 ```
 
-Open **http://localhost:5173/** (Vite dev uses `base: /`).
-
-Build for production:
+Open **http://localhost:5173/** (Vite dev).
 
 ```bash
 npm run build
 npm run preview
 ```
 
-After a build, preview uses the same URLs as GitHub Pages: open **http://localhost:4173/S3_PHY/** (trailing slash optional once `base` is set for build).
+Preview serves the production build (open the URL Vite prints, usually **http://localhost:4173/**).
 
-## GitHub Pages (fix blank white page)
+## GitHub Pages — why the page was blank
 
-The live site must serve the **Vite build** (`dist/`), not the repo-root `index.html` (that file only loads `/src/main.js` for local dev and will not run on Pages).
+GitHub was serving the **repository root** `index.html`, which only loads `/src/main.js` for Vite dev. That file is not bundled for the static host, so the app stayed empty.
 
-Choose **one** of these:
+**Fixes in this repo:**
 
-### Option A — GitHub Actions (recommended)
+1. **`dist/` is committed** with the production build. In Pages settings you can use **Deploy from a branch** → **main** → folder **`/dist`** so `https://unipluseducationact-ctrl.github.io/S3_PHY/` serves the built site.
+2. **Root `index.html`** includes a tiny script (stripped from the built `dist/index.html`) that redirects `*.github.io` visitors from `/S3_PHY/` to **`/S3_PHY/dist/`** until you point Pages at `/dist` or Actions.
+3. **`base: './'`** so `./assets/...` works under `/S3_PHY/dist/` as well as when `/dist` contents are mapped to the site root.
 
-1. Repo **Settings → Pages → Build and deployment**
-2. **Source**: **GitHub Actions** (not “Deploy from a branch”).
+**Option A — GitHub Actions:** Settings → Pages → **Source: GitHub Actions** (workflow `.github/workflows/deploy-pages.yml`).
 
-The workflow `.github/workflows/deploy-pages.yml` builds and publishes `dist/`. The production `base` is `/S3_PHY/` so assets load as `/S3_PHY/assets/...`.
-
-### Option B — Deploy from branch
-
-1. **Settings → Pages → Source**: **Deploy from a branch**
-2. Branch **main**, folder **`/dist`** (not `/ (root)`).
-
-This repository includes a committed `dist/` output so Pages can serve the built site from that folder without relying on Actions.
+**Option B — Branch + `/dist`:** Settings → Pages → **Deploy from a branch** → Branch **main**, folder **`/dist`** (not `/ (root)`).
 
 ## Live URL
 
 `https://unipluseducationact-ctrl.github.io/S3_PHY/`
 
+(If you still see a blank page, open `https://unipluseducationact-ctrl.github.io/S3_PHY/dist/` once, or switch Pages to the `/dist` folder as above.)
+
 ## Adding PDF notes
 
-Place files under `public/notes/` (see `public/notes/README.txt`). The app checks each URL and hides broken embeds if a file is missing.
+Place files under `public/notes/` (see `public/notes/README.txt`).
 
 ## Tech
 
-- [Vite](https://vitejs.dev/) with `base: '/S3_PHY/'` for production builds and `/` for local dev
-- Vanilla JavaScript modules (physics-only content)
+- [Vite](https://vitejs.dev/) with `base: './'`
+- Vanilla JavaScript (physics-only)
