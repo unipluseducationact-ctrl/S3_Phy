@@ -69,9 +69,8 @@ export function mountApp(root) {
     root.innerHTML = `
       <header class="site-header">
         <div class="site-header__brand">
-          <div class="brand-mark-mini" aria-hidden="true">
-            <span class="brand-uni-gradient">Uni</span>
-            <span class="brand-edu-orange">${t('splash.unitEducation')}</span>
+          <div class="brand-logo-wrap" aria-hidden="true">
+            <img class="brand-logo-img" src="${import.meta.env.BASE_URL}images/uniplus-logo.png" alt="" width="220" height="52" decoding="async" />
           </div>
           <div class="brand-text-block">
             <h1 class="site-title">${t('app.title')}</h1>
@@ -144,10 +143,10 @@ export function mountApp(root) {
       ['em', 'topic.em'],
     ];
     return `
-      <section class="panel">
+      <section class="panel panel--topic-hub">
         <h2>${t('topics.title')}</h2>
         <p class="lead">${t('topics.intro')}</p>
-        <div class="grid cols-2">
+        <div class="grid cols-2 topic-hub-grid">
           ${cards
             .map(([id, key]) => {
               const tid = id === 'convex' || id === 'concave' ? 'lens' : id === 'em' ? 'em' : id;
