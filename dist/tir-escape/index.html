@@ -144,7 +144,8 @@
             border: 1px solid rgba(255,255,255,0.2);
             background: rgba(51, 65, 85, 0.8);
             color: #e2e8f0;
-            font-size: 14px;
+            font-size: clamp(15px, 0.45rem + 1.9vw, 17px);
+            line-height: 1.45;
             font-weight: 500;
             cursor: pointer;
             transition: all 0.2s;
@@ -164,12 +165,12 @@
 </head>
 <body class="tir-app-root h-full w-full min-h-0 flex flex-col md:flex-row">
 
-    <div class="w-full md:w-1/3 p-4 md:p-6 flex flex-col gap-4 md:gap-6 z-10 relative min-h-0 md:h-full md:max-w-[min(42vw,520px)] shrink-0 overflow-y-auto">
-        <div class="glass-panel p-6 shadow-2xl">
-            <h1 class="text-3xl font-bold mb-2 text-sky-400 neon-text">🔥 逃獄遊戲</h1>
-            <p class="text-sm text-slate-400 mb-4">The Prison Break: 全反射模擬</p>
+    <div class="tir-sidebar w-full md:w-1/3 p-4 md:p-6 flex flex-col gap-4 md:gap-6 z-10 relative min-h-0 md:h-full md:max-w-[min(42vw,520px)] shrink-0 overflow-y-auto text-[15px] sm:text-base leading-relaxed">
+        <div class="glass-panel p-5 sm:p-6 shadow-2xl">
+            <h1 class="text-2xl sm:text-3xl font-bold mb-2 text-sky-400 neon-text">🔥 逃獄遊戲</h1>
+            <p class="text-base text-slate-400 mb-4">The Prison Break: 全反射模擬</p>
 
-            <div id="status-badge" class="rounded-lg font-bold text-white text-xl mb-6 transition-all duration-300 status-escaped">
+            <div id="status-badge" class="rounded-lg font-bold text-white text-lg sm:text-xl mb-6 transition-all duration-300 status-escaped">
                 <div class="chibi-container">
                     <div id="chibi-display" class="chibi-svg"></div>
                     <span id="status-text">自由！ (折射)</span>
@@ -178,13 +179,13 @@
 
             <div class="space-y-6">
                 <div>
-                    <label class="flex justify-between items-center text-sm font-medium mb-2">
-                        <span>入射角 (Incident Angle) <span class="math-inline">\(\theta_1\)</span></span>
-                        <div class="flex items-center gap-3">
-                            <button type="button" id="btn-set-critical" class="text-xs bg-sky-700/80 hover:bg-sky-600 text-white px-2 py-1 rounded transition-colors border border-sky-500/50">設為 \(\theta_c\)</button>
-                            <button type="button" id="btn-set-0" class="text-xs bg-slate-700/80 hover:bg-slate-600 text-white px-2 py-1 rounded transition-colors border border-slate-500/50">設為 0°</button>
-                            <button type="button" id="btn-set-90" class="text-xs bg-slate-700/80 hover:bg-slate-600 text-white px-2 py-1 rounded transition-colors border border-slate-500/50">設為 90°</button>
-                            <span id="angle-display" class="text-sky-400 font-mono text-lg">30.0°</span>
+                    <label class="flex flex-col gap-2 sm:flex-row sm:justify-between sm:items-center text-base font-medium mb-2">
+                        <span class="min-w-0 shrink">入射角 (Incident Angle) <span class="math-inline">\(\theta_1\)</span></span>
+                        <div class="flex flex-wrap items-center gap-2 sm:gap-3">
+                            <button type="button" id="btn-set-critical" class="text-sm bg-sky-700/80 hover:bg-sky-600 text-white px-2.5 py-1.5 rounded transition-colors border border-sky-500/50">設為 \(\theta_c\)</button>
+                            <button type="button" id="btn-set-0" class="text-sm bg-slate-700/80 hover:bg-slate-600 text-white px-2.5 py-1.5 rounded transition-colors border border-slate-500/50">設為 0°</button>
+                            <button type="button" id="btn-set-90" class="text-sm bg-slate-700/80 hover:bg-slate-600 text-white px-2.5 py-1.5 rounded transition-colors border border-slate-500/50">設為 90°</button>
+                            <span id="angle-display" class="text-sky-400 font-mono text-lg sm:text-xl tabular-nums">30.0°</span>
                         </div>
                     </label>
                     <input type="range" id="angle-slider" min="0" max="90" value="30" step="0.1">
@@ -192,7 +193,7 @@
 
                 <div class="grid grid-cols-2 gap-4">
                     <div class="p-3 bg-slate-800 rounded-lg border border-slate-700">
-                        <div class="text-xs text-slate-400 mb-2">監獄 (玻璃) <span class="math-inline">\(n_1\)</span></div>
+                        <div class="text-sm text-slate-400 mb-2">監獄 (玻璃) <span class="math-inline">\(n_1\)</span></div>
                         <div class="n-control">
                             <button type="button" class="n-btn" id="n1-minus" title="減少 n₁">−</button>
                             <span id="n1-value" class="text-xl font-mono text-blue-300 n-value">1.50</span>
@@ -200,7 +201,7 @@
                         </div>
                     </div>
                     <div class="p-3 bg-slate-800 rounded-lg border border-slate-700">
-                        <div class="text-xs text-slate-400 mb-2">自由 (空氣) <span class="math-inline">\(n_2\)</span></div>
+                        <div class="text-sm text-slate-400 mb-2">自由 (空氣) <span class="math-inline">\(n_2\)</span></div>
                         <div class="n-control">
                             <button type="button" class="n-btn" id="n2-minus" title="減少 n₂">−</button>
                             <span id="n2-value" class="text-xl font-mono text-gray-300 n-value">1.00</span>
@@ -226,32 +227,32 @@
             </div>
         </div>
 
-        <div class="glass-panel p-6 flex-grow overflow-y-auto min-h-0">
-            <h3 class="text-lg font-semibold text-sky-300 mb-3">🧮 物理核心運算</h3>
+        <div class="glass-panel p-5 sm:p-6 flex-grow overflow-y-auto min-h-0">
+            <h3 class="text-xl font-semibold text-sky-300 mb-3">🧮 物理核心運算</h3>
 
-            <div class="space-y-4 text-sm">
+            <div class="space-y-4 text-base">
                 <div class="bg-slate-800/60 p-3.5 rounded-lg border border-slate-700 shadow-inner" id="theory-box">
-                    <p class="mb-2 text-slate-200"><strong>【越獄理論】</strong> 光想從監獄 (光密介質, Denser, e.g., 玻璃) 逃到自由世界 (光疏介質, Rarer, e.g., 空氣)。</p>
-                    <ul class="list-disc pl-5 space-y-1.5 text-slate-300">
+                    <p class="mb-2 text-slate-200 leading-relaxed"><strong>【越獄理論】</strong> 光想從監獄 (光密介質, Denser, e.g., 玻璃) 逃到自由世界 (光疏介質, Rarer, e.g., 空氣)。</p>
+                    <ul class="list-disc pl-5 space-y-2 text-slate-300 leading-relaxed">
                         <li><strong>角度 &lt; <span class="math-inline">\(C\)</span></strong>：成功越獄 (折射)</li>
                         <li><strong>角度 = <span class="math-inline">\(C\)</span></strong>：卡在圍牆上 (沿界面跑)</li>
                         <li><strong>角度 &gt; <span class="math-inline">\(C\)</span></strong>：越獄失敗，被彈回來 (全內反射)</li>
                     </ul>
                 </div>
 
-                <p class="text-sky-300 font-semibold text-center py-2 px-3 bg-sky-900/40 rounded-lg border border-sky-600/50">
+                <p class="text-sky-300 font-semibold text-center text-base py-2.5 px-3 bg-sky-900/40 rounded-lg border border-sky-600/50 leading-snug">
                     Total Internal Reflection · 完全內反射
                 </p>
 
                 <div class="bg-slate-900 p-3 rounded border border-slate-700">
-                    <p class="text-xs text-slate-500 mb-1">臨界角 (Critical Angle):</p>
-                    <div id="critical-formula" class="text-center my-2"></div>
+                    <p class="text-sm text-slate-400 mb-1">臨界角 (Critical Angle):</p>
+                    <div id="critical-formula" class="text-center my-2 text-base"></div>
                 </div>
 
                 <div class="bg-slate-900 p-3 rounded border border-slate-700">
-                    <p class="text-xs text-slate-500 mb-1">斯涅爾定律 (Snell's Law):</p>
-                    <div id="snell-formula" class="text-center my-2"></div>
-                    <div id="calc-result" class="text-center text-green-400 font-mono mt-2">
+                    <p class="text-sm text-slate-400 mb-1">斯涅爾定律 (Snell's Law):</p>
+                    <div id="snell-formula" class="text-center my-2 text-base"></div>
+                    <div id="calc-result" class="text-center text-green-400 font-mono text-base mt-2">
                         \[\theta_2 \approx 48.6^\circ\]
                     </div>
                 </div>
