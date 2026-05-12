@@ -3,20 +3,18 @@ import questions from './data/questions.json';
 import flashcards from './data/flashcards.json';
 import { createReflectionLab } from './tools/reflectionLab.js';
 import { createRotatingMirrorLab } from './tools/rotatingMirrorLab.js';
-import { createRefractionLab } from './tools/refractionLab.js';
-import { createTirLab } from './tools/tirLab.js';
+import { createTirEscapeLab } from './tools/tirEscapeLab.js';
 import { createLensLab } from './tools/lensLab.js';
 import { createEmLab } from './tools/emLab.js';
 
 const SECTIONS = ['topics', 'notes', 'tools', 'worksheets', 'flashcards', 'summary'];
 
-const TOOL_ORDER = ['reflection', 'rotatingMirror', 'refraction', 'tir', 'convexLens', 'concaveLens', 'em'];
+const TOOL_ORDER = ['reflection', 'rotatingMirror', 'refractionTir', 'convexLens', 'concaveLens', 'em'];
 
 const TOOL_FACTORIES = {
   reflection: (tr) => createReflectionLab(tr),
   rotatingMirror: (tr) => createRotatingMirrorLab(tr),
-  refraction: (tr) => createRefractionLab(tr),
-  tir: (tr) => createTirLab(tr),
+  refractionTir: (tr) => createTirEscapeLab(tr),
   convexLens: (tr) => createLensLab(tr, { defaultKind: 'convex' }),
   concaveLens: (tr) => createLensLab(tr, { defaultKind: 'concave' }),
   em: (tr) => createEmLab(tr),
@@ -26,8 +24,7 @@ function toolLabel(id) {
   const map = {
     reflection: 'tools.reflection.title',
     rotatingMirror: 'tools.rotatingMirror.title',
-    refraction: 'tools.refraction.title',
-    tir: 'tools.tir.title',
+    refractionTir: 'tools.refractionTir.title',
     convexLens: 'tools.convexLens.title',
     concaveLens: 'tools.concaveLens.title',
     em: 'tools.em.title',
@@ -142,8 +139,7 @@ export function mountApp(root) {
     const cards = [
       ['reflection', 'topic.reflection'],
       ['rotatingMirror', 'topic.rotatingMirror'],
-      ['refraction', 'topic.refraction'],
-      ['tir', 'topic.tir'],
+      ['refractionTir', 'topic.refractionTir'],
       ['convex', 'topic.convex'],
       ['concave', 'topic.concave'],
       ['em', 'topic.em'],
@@ -273,8 +269,7 @@ export function mountApp(root) {
   function renderWorksheets() {
     const topics = [
       ['reflection', 'topic.reflection'],
-      ['refraction', 'topic.refraction'],
-      ['tir', 'topic.tir'],
+      ['refractionTir', 'topic.refractionTir'],
       ['convex', 'topic.convex'],
       ['concave', 'topic.concave'],
       ['em', 'topic.em'],
@@ -324,6 +319,12 @@ export function mountApp(root) {
       const pool = questions.filter((q) => {
         const topic = q.topic;
         if (picked.includes(topic)) return true;
+        if (
+          picked.includes('refractionTir') &&
+          (topic === 'refraction' || topic === 'tir')
+        ) {
+          return true;
+        }
         if (topic === 'convex' && (picked.includes('convex') || picked.includes('concave'))) return true;
         return false;
       });
@@ -372,8 +373,7 @@ export function mountApp(root) {
           <select data-flash-deck>
             <option value="all">${t('flashcards.all')}</option>
             <option value="reflection">${t('topic.reflection')}</option>
-            <option value="refraction">${t('topic.refraction')}</option>
-            <option value="tir">${t('topic.tir')}</option>
+            <option value="refractionTir">${t('flashcards.deck.refractionTir')}</option>
             <option value="convex">${t('topic.convex')}</option>
             <option value="concave">${t('topic.concave')}</option>
             <option value="em">${t('topic.em')}</option>
@@ -399,6 +399,8 @@ export function mountApp(root) {
     if (flashDeck === 'all') return list;
     if (flashDeck === 'convex' || flashDeck === 'concave') {
       list = list.filter((c) => c.topic === 'convex' || c.topic === 'concave');
+    } else if (flashDeck === 'refractionTir') {
+      list = list.filter((c) => c.topic === 'refraction' || c.topic === 'tir');
     } else {
       list = list.filter((c) => c.topic === flashDeck);
     }

@@ -520,6 +520,22 @@ a {
   background: var(--surface2);
 }
 
+.tool-tir-escape {
+  width: 100%;
+  min-height: clamp(520px, 78vh, 1000px);
+  display: flex;
+  flex-direction: column;
+}
+
+.tool-tir-escape iframe {
+  flex: 1;
+  width: 100%;
+  min-height: clamp(520px, 78vh, 1000px);
+  border: 0;
+  border-radius: 10px;
+  background: var(--surface2);
+}
+
 .controls {
   display: flex;
   flex-wrap: wrap;
