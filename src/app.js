@@ -2,6 +2,7 @@ import { t, getLang, setLang } from './i18n.js';
 import questions from './data/questions.json';
 import flashcards from './data/flashcards.json';
 import { createReflectionLab } from './tools/reflectionLab.js';
+import { createRotatingMirrorLab } from './tools/rotatingMirrorLab.js';
 import { createRefractionLab } from './tools/refractionLab.js';
 import { createTirLab } from './tools/tirLab.js';
 import { createLensLab } from './tools/lensLab.js';
@@ -9,10 +10,11 @@ import { createEmLab } from './tools/emLab.js';
 
 const SECTIONS = ['topics', 'notes', 'tools', 'worksheets', 'flashcards', 'summary'];
 
-const TOOL_ORDER = ['reflection', 'refraction', 'tir', 'convexLens', 'concaveLens', 'em'];
+const TOOL_ORDER = ['reflection', 'rotatingMirror', 'refraction', 'tir', 'convexLens', 'concaveLens', 'em'];
 
 const TOOL_FACTORIES = {
   reflection: (tr) => createReflectionLab(tr),
+  rotatingMirror: (tr) => createRotatingMirrorLab(tr),
   refraction: (tr) => createRefractionLab(tr),
   tir: (tr) => createTirLab(tr),
   convexLens: (tr) => createLensLab(tr, { defaultKind: 'convex' }),
@@ -23,6 +25,7 @@ const TOOL_FACTORIES = {
 function toolLabel(id) {
   const map = {
     reflection: 'tools.reflection.title',
+    rotatingMirror: 'tools.rotatingMirror.title',
     refraction: 'tools.refraction.title',
     tir: 'tools.tir.title',
     convexLens: 'tools.convexLens.title',
@@ -138,6 +141,7 @@ export function mountApp(root) {
   function renderTopics() {
     const cards = [
       ['reflection', 'topic.reflection'],
+      ['rotatingMirror', 'topic.rotatingMirror'],
       ['refraction', 'topic.refraction'],
       ['tir', 'topic.tir'],
       ['convex', 'topic.convex'],
