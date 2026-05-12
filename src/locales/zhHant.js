@@ -36,8 +36,6 @@ export const zhHant = {
   'notes.missing': '\u5c1a\u672a\u4e0a\u8f09 PDF\u3002',
   'tools.title': '\u4e92\u52d5\u5be6\u9a57\u5ba4',
   'tools.pick': '\u9078\u64c7\u5be6\u9a57',
-  'tools.reflection.title': '\u5e73\u9762\u93e1 \u2014 \u53cd\u5c04',
-  'tools.reflection.angle': '\u5165\u5c04\u89d4\uff08\u5ea6\uff09',
   'tools.rotatingMirror.title': '\u65cb\u8f49\u5e73\u9762\u93e1',
   'tools.rotatingMirror.subtitle': '\u93e1\u9762\u8f49\u52d5\u6642\u53cd\u5c04\u5149\u7dda\u7684\u504f\u79fb\uff08\u5149\u7dda\u504f\u89d2 = 2 \u00d7 \u93e1\u89d2\uff09\u3002',
   'tools.rotatingMirror.toggle.origNormal': '\u539f\u6cd5\u7dda',
