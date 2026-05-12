@@ -506,7 +506,7 @@ a {
 
 .tool-lens-simulator {
   width: 100%;
-  min-height: clamp(480px, 72vh, 920px);
+  min-height: clamp(520px, 78vh, 1000px);
   display: flex;
   flex-direction: column;
 }
@@ -514,7 +514,7 @@ a {
 .tool-lens-simulator iframe {
   flex: 1;
   width: 100%;
-  min-height: clamp(480px, 72vh, 920px);
+  min-height: clamp(520px, 78vh, 1000px);
   border: 0;
   border-radius: 10px;
   background: var(--surface2);

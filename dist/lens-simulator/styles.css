@@ -1128,28 +1128,61 @@ html.s3phy-embed .main-container {
 }
 
 html.s3phy-embed header {
-    margin-bottom: 10px;
-    padding: 10px 14px;
+    margin-bottom: 8px;
+    padding: 8px 12px;
 }
 
 html.s3phy-embed .title-zh {
-    font-size: 22px;
+    font-size: 18px;
 }
 
 html.s3phy-embed .title-en {
-    font-size: 15px;
-}
-
-html.s3phy-embed .instruction-box {
-    margin-top: 8px;
-    padding: 8px 10px;
     font-size: 13px;
 }
 
+html.s3phy-embed .instruction-box {
+    margin-top: 6px;
+    padding: 6px 8px;
+    font-size: 12px;
+}
+
+html.s3phy-embed h1 {
+    font-size: 18px;
+}
+
+/* Top parameter bar: tighter */
 html.s3phy-embed .top-sliders-container {
-    margin-bottom: 8px;
-    padding: 10px 12px;
-    gap: 10px;
+    margin-bottom: 6px;
+    padding: 8px 10px;
+    gap: 8px;
+    grid-template-columns: repeat(3, minmax(0, 1fr));
+}
+
+html.s3phy-embed .slider-title {
+    font-size: 12px;
+    margin: 0 0 6px 0;
+    gap: 4px;
+}
+
+html.s3phy-embed .slider-control {
+    margin-bottom: 10px;
+    padding-bottom: 8px;
+}
+
+html.s3phy-embed .slider-labels {
+    font-size: 10px;
+    margin-top: 3px;
+}
+
+html.s3phy-embed .number-input input {
+    font-size: 12px;
+    width: 44px;
+}
+
+html.s3phy-embed .value-adjust-btn {
+    width: 20px;
+    height: 20px;
+    font-size: 10px;
 }
 
 html.s3phy-embed .simulator-container {
@@ -1168,14 +1201,125 @@ html.s3phy-embed .main-view {
 }
 
 html.s3phy-embed .canvas-container {
-    margin: 0 6px;
+    margin: 0 4px;
     flex: 1 1 auto;
     min-height: 200px;
 }
 
+/* Side control column: narrower */
+html.s3phy-embed .control-panel {
+    width: 200px;
+}
+
+html.s3phy-embed .control-panel.collapsed {
+    width: 32px;
+}
+
+html.s3phy-embed .panel-content {
+    padding: 8px 10px;
+}
+
+html.s3phy-embed .control-section {
+    margin-bottom: 12px;
+    padding-bottom: 10px;
+}
+
+html.s3phy-embed .panel-title .zh {
+    font-size: 13px;
+}
+
+html.s3phy-embed .panel-title .en {
+    font-size: 10px;
+}
+
+html.s3phy-embed .lens-toggle {
+    padding: 6px 10px;
+    font-size: 12px;
+}
+
+html.s3phy-embed .rule-text .en {
+    font-size: 10px;
+}
+
+html.s3phy-embed .icon-switch {
+    padding: 3px 6px;
+    font-size: 11px;
+}
+
+html.s3phy-embed .ray-indicator {
+    width: 12px;
+    height: 12px;
+    margin-right: 5px;
+}
+
+html.s3phy-embed .toggle-panel {
+    width: 20px;
+    height: 48px;
+}
+
+/* Floating measurements card */
+html.s3phy-embed .data-card {
+    width: 168px;
+}
+
+html.s3phy-embed .data-card.expanded {
+    width: 252px;
+}
+
+html.s3phy-embed .data-card-header {
+    padding: 5px 8px;
+    font-size: 11px;
+}
+
+html.s3phy-embed .data-card-content {
+    padding: 6px 8px;
+}
+
+html.s3phy-embed .data-card .measurement-item {
+    font-size: 11px;
+    margin-bottom: 4px;
+    padding: 4px 5px;
+}
+
+html.s3phy-embed .data-card .measurement-value {
+    font-size: 11px;
+}
+
+html.s3phy-embed .image-type-indicator {
+    padding: 3px;
+    gap: 6px;
+    font-size: 11px;
+}
+
+/* HUD on canvas */
+html.s3phy-embed .preset-btn-group {
+    top: 10px;
+    gap: 10px;
+}
+
+html.s3phy-embed .preset-btn {
+    width: 30px;
+    height: 30px;
+    font-size: 16px;
+}
+
+html.s3phy-embed .scale-bar {
+    bottom: 22px;
+    left: 10px;
+    width: 220px;
+    font-size: 10px;
+    padding: 2px 6px;
+}
+
+html.s3phy-embed .focal-info {
+    bottom: 6px;
+    font-size: 10px;
+    padding: 3px 8px;
+}
+
 html.s3phy-embed .sliders-container {
-    margin-top: 10px;
-    padding: 12px;
+    margin-top: 8px;
+    padding: 10px;
 }
 
 @media (max-width: 1200px) {

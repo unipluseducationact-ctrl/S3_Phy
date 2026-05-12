@@ -23,8 +23,11 @@ function syncPixelsPerCm() {
     }
     const halfH = h / 2;
     const margin = 16;
-    const maxVertCm = 32;
-    const ppc = Math.min(10, Math.max(3, ((halfH - margin) * 0.85) / maxVertCm));
+    const embed = isS3phyEmbed();
+    const maxVertCm = embed ? 28 : 32;
+    const maxPpc = embed ? 14 : 10;
+    const minPpc = embed ? 3 : 3;
+    const ppc = Math.min(maxPpc, Math.max(minPpc, ((halfH - margin) * 0.85) / maxVertCm));
     pixelsPerCm = ppc;
 }
 
