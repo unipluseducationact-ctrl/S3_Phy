@@ -1,0 +1,68 @@
+import { t, getLang, setLang } from './i18n.js';
+
+const STRANDS = [
+  { id: 'optics', titleKey: 'strand.optics.title', descKey: 'strand.optics.desc' },
+  { id: 'heat', titleKey: 'strand.heat.title', descKey: 'strand.heat.desc' },
+];
+
+export function mountStrandHub(root) {
+  function render() {
+    root.innerHTML = `
+      <header class="site-header site-header--strand-picker">
+        <div class="site-header__brand">
+          <div class="brand-logo-wrap" aria-hidden="true">
+            <img class="brand-logo-img" src="${import.meta.env.BASE_URL}images/uniplus-logo.png" alt="" width="220" height="52" decoding="async" />
+          </div>
+          <div class="brand-text-block">
+            <h1 class="site-title">${t('app.title')}</h1>
+            <p class="site-subtitle">${t('app.subtitle')}</p>
+          </div>
+        </div>
+        <div class="site-header__actions">
+          <div class="lang-toggle" data-lang></div>
+        </div>
+      </header>
+      <section class="panel panel--topic-hub panel--strand-hub">
+        <h2>${t('strands.title')}</h2>
+        <p class="lead">${t('strands.intro')}</p>
+        <div class="grid cols-2 topic-hub-grid strand-hub-grid">
+          ${STRANDS.map(
+            ({ id, titleKey, descKey }) => `
+            <div class="card">
+              <h3>${t(titleKey)}</h3>
+              <p>${t(descKey)}</p>
+              <button class="btn primary" type="button" data-strand="${id}">${t('strand.open')}</button>
+            </div>`,
+          ).join('')}
+        </div>
+      </section>
+    `;
+
+    const langEl = root.querySelector('[data-lang]');
+    langEl.innerHTML = `
+      <button type="button" data-set-lang="en" class="${getLang() === 'en' ? 'active' : ''}">${t('lang.en')}</button>
+      <button type="button" data-set-lang="zh-Hant" class="${getLang() === 'zh-Hant' ? 'active' : ''}">${t('lang.zhHant')}</button>
+    `;
+    langEl.querySelectorAll('button').forEach((btn) => {
+      btn.addEventListener('click', () => {
+        setLang(btn.getAttribute('data-set-lang'));
+        render();
+      });
+    });
+
+    root.querySelectorAll('[data-strand]').forEach((btn) => {
+      btn.addEventListener('click', () => {
+        const id = btn.getAttribute('data-strand');
+        window.dispatchEvent(new CustomEvent('s3phy:strand', { detail: id }));
+      });
+    });
+  }
+
+  const onLang = () => render();
+  window.addEventListener('s3phy:lang', onLang);
+  render();
+
+  return () => {
+    window.removeEventListener('s3phy:lang', onLang);
+  };
+}

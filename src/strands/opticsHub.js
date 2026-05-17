@@ -1,12 +1,11 @@
-import { t, getLang, setLang } from './i18n.js';
-import questions from './data/questions.json';
-import flashcards from './data/flashcards.json';
-import { createRotatingMirrorLab } from './tools/rotatingMirrorLab.js';
-import { createTirEscapeLab } from './tools/tirEscapeLab.js';
-import { createLensLab } from './tools/lensLab.js';
-import { createEmLab } from './tools/emLab.js';
-
-const SECTIONS = ['topics', 'notes', 'tools', 'worksheets', 'flashcards', 'summary'];
+import { t, getLang } from '../i18n.js';
+import questions from '../data/questions.json';
+import flashcards from '../data/flashcards.json';
+import { createRotatingMirrorLab } from '../tools/rotatingMirrorLab.js';
+import { createTirEscapeLab } from '../tools/tirEscapeLab.js';
+import { createLensLab } from '../tools/lensLab.js';
+import { createEmLab } from '../tools/emLab.js';
+import { mountHubShell } from '../hubShell.js';
 
 const TOOL_ORDER = ['rotatingMirror', 'refractionTir', 'convexLens', 'concaveLens', 'em'];
 
@@ -52,7 +51,7 @@ function shuffle(arr) {
   return a;
 }
 
-export function mountApp(root) {
+export function mountOpticsHub(root) {
   let section = 'topics';
   let toolId = 'rotatingMirror';
   let flashIndex = 0;
@@ -61,63 +60,11 @@ export function mountApp(root) {
   let wsItems = [];
   let wsAnswers = false;
 
-  const el = {};
-  const toolStageMount = { node: null };
+  let shell = null;
+  let el = { main: null };
 
-  function render() {
-    root.innerHTML = `
-      <header class="site-header">
-        <div class="site-header__brand">
-          <div class="brand-logo-wrap" aria-hidden="true">
-            <img class="brand-logo-img" src="${import.meta.env.BASE_URL}images/uniplus-logo.png" alt="" width="220" height="52" decoding="async" />
-          </div>
-          <div class="brand-text-block">
-            <h1 class="site-title">${t('app.title')}</h1>
-            <p class="site-subtitle">${t('app.subtitle')}</p>
-          </div>
-        </div>
-        <div class="site-header__actions">
-          <div class="lang-toggle" data-lang></div>
-        </div>
-      </header>
-      <nav class="main-nav" data-nav></nav>
-      <main data-main></main>
-      <footer class="site-footer no-print">${t('footer.conventions')}</footer>
-    `;
-
-    el.lang = root.querySelector('[data-lang]');
-    el.nav = root.querySelector('[data-nav]');
-    el.main = root.querySelector('[data-main]');
-
-    el.lang.innerHTML = `
-      <button type="button" data-set-lang="en" class="${getLang() === 'en' ? 'active' : ''}">${t('lang.en')}</button>
-      <button type="button" data-set-lang="zh-Hant" class="${getLang() === 'zh-Hant' ? 'active' : ''}">${t('lang.zhHant')}</button>
-    `;
-    el.lang.querySelectorAll('button').forEach((btn) => {
-      btn.addEventListener('click', () => {
-        setLang(btn.getAttribute('data-set-lang'));
-        render();
-      });
-    });
-
-    el.nav.innerHTML = SECTIONS.map((id) => {
-      const labels = {
-        topics: 'nav.topics',
-        notes: 'nav.notes',
-        tools: 'nav.tools',
-        worksheets: 'nav.worksheets',
-        flashcards: 'nav.flashcards',
-        summary: 'nav.summary',
-      };
-      const active = section === id ? 'active' : '';
-      return `<button type="button" class="${active}" data-sec="${id}">${t(labels[id])}</button>`;
-    }).join('');
-    el.nav.querySelectorAll('button').forEach((btn) => {
-      btn.addEventListener('click', () => {
-        section = btn.getAttribute('data-sec');
-        render();
-      });
-    });
+  function renderMain() {
+    if (!el.main) return;
 
     if (section === 'topics') el.main.innerHTML = renderTopics();
     else if (section === 'notes') el.main.innerHTML = renderNotesShell();
@@ -130,6 +77,23 @@ export function mountApp(root) {
     if (section === 'tools') hydrateTools();
     if (section === 'worksheets') hydrateWorksheets();
     if (section === 'flashcards') hydrateFlashcards();
+  }
+
+  function render() {
+    shell?.destroy();
+    shell = mountHubShell(root, {
+      subtitleKey: 'strand.optics.subtitle',
+      activeSection: section,
+      onSection: (id) => {
+        section = id;
+        shell.updateSection(section);
+        renderMain();
+      },
+      onLang: () => render(),
+    });
+    el.main = shell.main;
+    shell.updateSection(section);
+    renderMain();
   }
 
   function renderTopics() {
@@ -166,7 +130,8 @@ export function mountApp(root) {
     if (!b) return;
     section = 'tools';
     toolId = b.getAttribute('data-go-tool');
-    render();
+    shell.updateSection(section);
+    renderMain();
   }
 
   function renderNotesShell() {
@@ -490,9 +455,17 @@ export function mountApp(root) {
       </section>`;
   }
 
-  window.addEventListener('s3phy:lang', () => render());
+  const onLang = () => render();
+  const onClick = (ev) => onMainClick(ev);
 
-  root.addEventListener('click', onMainClick);
+  window.addEventListener('s3phy:lang', onLang);
+  root.addEventListener('click', onClick);
 
   render();
+
+  return () => {
+    window.removeEventListener('s3phy:lang', onLang);
+    root.removeEventListener('click', onClick);
+    shell?.destroy();
+  };
 }

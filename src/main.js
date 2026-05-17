@@ -1,11 +1,61 @@
 import './style.css';
 import { initI18n, t } from './i18n.js';
-import { mountApp } from './app.js';
+import { mountStrandHub } from './strandHub.js';
+import { mountOpticsHub } from './strands/opticsHub.js';
+import { mountHeatHub } from './strands/heatHub.js';
 import { SPLASH_PHRASES } from './splashPhrases.js';
 
 initI18n();
 
 const SPLASH_KEY = 's3phy_splash_seen';
+
+const STRANDS = {
+  optics: mountOpticsHub,
+  heat: mountHeatHub,
+};
+
+let unmountActive = null;
+let unmountPicker = null;
+
+function parseStrandFromHash() {
+  const m = location.hash.match(/^#\/(\w+)/);
+  const id = m?.[1];
+  return id && Object.prototype.hasOwnProperty.call(STRANDS, id) ? id : null;
+}
+
+function clearHash() {
+  const base = `${location.pathname}${location.search}`;
+  history.replaceState(null, '', base);
+}
+
+function navigateStrand(id) {
+  unmountActive?.();
+  unmountActive = null;
+  unmountPicker?.();
+  unmountPicker = null;
+
+  const app = document.getElementById('app');
+  if (!app) return;
+  app.innerHTML = '';
+
+  if (!id) {
+    if (location.hash) clearHash();
+    unmountPicker = mountStrandHub(app);
+    return;
+  }
+
+  const targetHash = `#/${id}`;
+  if (location.hash !== targetHash) {
+    location.hash = targetHash;
+    return;
+  }
+
+  unmountActive = STRANDS[id](app) ?? null;
+}
+
+function routeStrand() {
+  navigateStrand(parseStrandFromHash());
+}
 
 function logoSrc() {
   return `${import.meta.env.BASE_URL}images/uniplus-logo.png`;
@@ -73,8 +123,7 @@ function wireSplashAnimations(splash) {
 }
 
 function startApp() {
-  const root = document.getElementById('app');
-  if (root) mountApp(root);
+  routeStrand();
 }
 
 function trySplashThenApp() {
@@ -108,5 +157,10 @@ function trySplashThenApp() {
     window.setTimeout(finish, 480);
   });
 }
+
+window.addEventListener('hashchange', routeStrand);
+window.addEventListener('s3phy:strand', (e) => {
+  navigateStrand(e.detail ?? null);
+});
 
 trySplashThenApp();

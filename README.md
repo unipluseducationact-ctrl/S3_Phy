@@ -1,6 +1,13 @@
 # S3_PHY — Uni+ HKDSE Physics Hub
 
-Static learning site for HKDSE Physics (light and waves): reflection, refraction, total internal reflection, convex and concave lenses, and electromagnetic waves. UI strings in **English** and **Traditional Chinese**.
+Static learning site for HKDSE S3 Physics with two strands:
+
+- **Optics** — light and waves: reflection, refraction, total internal reflection, convex and concave lenses, and electromagnetic waves (interactive labs, worksheets, flashcards).
+- **Heat** — temperature and thermal physics (hub shell in place; content coming soon).
+
+After the entry splash, choose a strand, then use the same hub navigation (Topics, Notes, Tools, Worksheets, Flashcards, Summary). UI strings in **English** and **Traditional Chinese**.
+
+Deep links: `#/optics` and `#/heat`.
 
 ## Local development
 
