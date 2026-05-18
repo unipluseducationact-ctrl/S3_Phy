@@ -5,15 +5,17 @@ import { createRotatingMirrorLab } from '../tools/rotatingMirrorLab.js';
 import { createTirEscapeLab } from '../tools/tirEscapeLab.js';
 import { createLensLab } from '../tools/lensLab.js';
 import { createEmLab } from '../tools/emLab.js';
+import { createRgbColorMixerLab } from '../tools/rgbColorMixerLab.js';
 import { mountHubShell } from '../hubShell.js';
 
-const TOOL_ORDER = ['rotatingMirror', 'refractionTir', 'convexLens', 'concaveLens', 'em'];
+const TOOL_ORDER = ['rotatingMirror', 'refractionTir', 'convexLens', 'concaveLens', 'rgbMixer', 'em'];
 
 const TOOL_FACTORIES = {
   rotatingMirror: (tr) => createRotatingMirrorLab(tr),
   refractionTir: (tr) => createTirEscapeLab(tr),
   convexLens: (tr) => createLensLab(tr, { defaultKind: 'convex' }),
   concaveLens: (tr) => createLensLab(tr, { defaultKind: 'concave' }),
+  rgbMixer: (tr) => createRgbColorMixerLab(tr),
   em: (tr) => createEmLab(tr),
 };
 
@@ -23,6 +25,7 @@ function toolLabel(id) {
     refractionTir: 'tools.refractionTir.title',
     convexLens: 'tools.convexLens.title',
     concaveLens: 'tools.concaveLens.title',
+    rgbMixer: 'tools.rgbMixer.title',
     em: 'tools.em.title',
   };
   return t(map[id] || id);
@@ -102,6 +105,7 @@ export function mountOpticsHub(root) {
       ['refractionTir', 'topic.refractionTir'],
       ['convex', 'topic.convex'],
       ['concave', 'topic.concave'],
+      ['rgbMixer', 'topic.rgbMixer'],
       ['em', 'topic.em'],
     ];
     return `
