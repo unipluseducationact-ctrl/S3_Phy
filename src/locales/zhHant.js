@@ -107,7 +107,7 @@ export const zhHant = {
   'tools.rgbMixer.presetBlack': '\u9ed1',
   'topic.rgbMixer': 'RGB \u984f\u8272\u6df7\u5408',
   'tools.em.title': '\u96fb\u78c1\u6ce2\u8b5c',
-  'tools.em.pick': '\u9ede\u9078\u6ce2\u6bb5',
+  'tools.em.pick': '\u63a2\u7d22\u6ce2\u9577\u3001\u983b\u7387\u8207\u6a21\u64ec\u5be6\u9a57',
   'worksheets.title': '\u5de5\u4f5c\u7d19\u7522\u751f\u5668',
   'worksheets.intro': '\u7522\u751f\u53ef\u5217\u5370\u7df4\u7fd2\u3002\u9078\u64c7\u984c\u6578\u8207\u8ab2\u984c\u3002',
   'worksheets.count': '\u984c\u6578',
