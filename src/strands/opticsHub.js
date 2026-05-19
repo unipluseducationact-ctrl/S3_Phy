@@ -197,7 +197,7 @@ export function mountOpticsHub(root) {
 
   function renderToolsShell() {
     return `
-      <section class="panel">
+      <section class="panel panel--tools">
         <h2>${t('tools.title')}</h2>
         <p class="lead">${t('tools.pick')}</p>
         <div class="tools-layout">

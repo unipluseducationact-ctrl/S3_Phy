@@ -1190,7 +1190,7 @@ html.s3phy-embed .simulator-container {
     min-height: 0;
     max-height: none;
     flex: 1 1 auto;
-    min-height: 260px;
+    min-height: 320px;
 }
 
 html.s3phy-embed .main-view {
@@ -1203,7 +1203,7 @@ html.s3phy-embed .main-view {
 html.s3phy-embed .canvas-container {
     margin: 0 4px;
     flex: 1 1 auto;
-    min-height: 200px;
+    min-height: 320px;
 }
 
 /* Side control column: narrower */

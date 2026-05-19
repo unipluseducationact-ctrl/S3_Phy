@@ -59,7 +59,7 @@ const RML_CSS = `
   background: #121214;
   border-radius: 12px;
   width: 100%;
-  max-width: 700px;
+  max-width: min(100%, 960px);
   height: auto;
   display: block;
 }

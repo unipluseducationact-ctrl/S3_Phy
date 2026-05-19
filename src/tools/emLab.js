@@ -17,7 +17,7 @@ function log10(x) {
 export function createEmLab(t) {
   const wrap = document.createElement('div');
   wrap.innerHTML = `
-    <canvas class="lab-canvas" width="900" height="220"></canvas>
+    <canvas class="lab-canvas" width="900" height="280"></canvas>
     <p class="lead" style="margin-top:8px">${t('tools.em.pick')}</p>
     <div data-detail class="card" style="margin-top:10px"></div>
   `;

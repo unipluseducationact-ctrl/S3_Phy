@@ -110,7 +110,7 @@ export function createRgbColorMixerLab(t) {
 
   function resizeCanvas() {
     const rect = stage.getBoundingClientRect();
-    const size = Math.max(200, Math.min(rect.width - 8, rect.height - 8, 480));
+    const size = Math.max(200, Math.min(rect.width - 8, rect.height - 8, 720));
     const dpr = window.devicePixelRatio || 1;
     canvas.width = size * dpr;
     canvas.height = size * dpr;
