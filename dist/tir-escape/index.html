@@ -247,26 +247,61 @@
             padding: 0.75rem 1rem !important;
             font-size: 12px;
         }
+        #critical-block,
         #snell-block {
             overflow: visible;
-            padding-bottom: 1rem;
-            min-height: 4.5rem;
         }
+        #critical-formula,
+        #snell-formula,
         #calc-result {
             overflow: visible;
-            padding-bottom: 0.5rem;
+            display: block;
+            margin-bottom: 0.5rem;
+        }
+        #critical-block {
+            padding-bottom: 1rem;
+            min-height: 4rem;
+        }
+        #critical-formula {
+            min-height: 2.75rem;
+        }
+        #snell-block {
+            padding-bottom: 1.75rem;
+            min-height: 7rem;
+        }
+        #snell-formula {
             min-height: 2.5rem;
         }
+        #calc-result {
+            padding-bottom: 0.75rem;
+            min-height: 3.25rem;
+        }
+        #critical-block mjx-container,
         #snell-block mjx-container {
             overflow: visible !important;
-            margin-bottom: 0.25rem;
+            margin: 0.35rem auto !important;
+            max-width: 100%;
+        }
+        #snell-block mjx-container[display="true"] {
+            margin-bottom: 0.5rem !important;
+        }
+        html.s3phy-embed #critical-block {
+            min-height: 4.5rem;
+            padding-bottom: 1.25rem;
         }
         html.s3phy-embed #snell-block {
-            padding-bottom: 1.25rem;
-            min-height: 5rem;
+            padding-bottom: 2.5rem;
+            min-height: 9rem;
+        }
+        html.s3phy-embed #calc-result {
+            min-height: 3.75rem;
+            padding-bottom: 1rem;
         }
         html.s3phy-embed .tir-physics-panel mjx-container {
             overflow: visible !important;
+        }
+        html.s3phy-embed .tir-physics-panel .bg-slate-900 {
+            overflow: visible;
         }
         html.s3phy-embed .tir-physics-panel h3 {
             font-size: 13px;
@@ -388,7 +423,7 @@
                     Total Internal Reflection · 完全內反射
                 </p>
 
-                <div class="bg-slate-900 p-3 rounded border border-slate-700">
+                <div id="critical-block" class="bg-slate-900 p-3 rounded border border-slate-700">
                     <p id="critical-angle-label" class="text-sm text-slate-400 mb-1">臨界角 (Critical Angle):</p>
                     <div id="critical-formula" class="text-center my-2 text-base"></div>
                 </div>
@@ -396,9 +431,7 @@
                 <div id="snell-block" class="bg-slate-900 p-3 rounded border border-slate-700">
                     <p id="snell-label" class="text-sm text-slate-400 mb-1">斯涅爾定律 (Snell's Law):</p>
                     <div id="snell-formula" class="text-center my-2 text-base"></div>
-                    <div id="calc-result" class="text-center text-green-400 font-mono text-base mt-2">
-                        \[\theta_2 \approx 48.6^\circ\]
-                    </div>
+                    <div id="calc-result" class="text-center text-green-400 font-mono text-base mt-2"></div>
                 </div>
             </div>
         </div>
@@ -545,7 +578,11 @@
             return MathJax.typesetPromise(els).catch(function (err) { console.warn(err); });
         }
 
-        function updateTexts() {
+        function typesetAllMath() {
+            return retypesetMath([tirControlsPanel, tirPhysicsPanel]);
+        }
+
+        function applyLabels() {
             document.querySelector('h1').innerHTML = t('title');
             document.querySelector('h1').nextElementSibling.innerHTML = t('subtitle');
             document.getElementById('incident-angle-label').innerHTML = t('incidentLabel');
@@ -561,12 +598,19 @@
             document.getElementById('tir-badge').innerHTML = t('tirBadge');
             document.getElementById('critical-angle-label').innerHTML = t('criticalAngleLabel');
             document.getElementById('snell-label').innerHTML = t('snellLabel');
+        }
 
-            updateTheoryText();
-            updateStaticFormulas();
-            draw();
+        /** Fill theory + formulas + calc immediately (no MathJax). */
+        function refreshPhysicsPanel() {
+            applyLabels();
+            updateTheoryText(true);
+            updateStaticFormulas(true);
+            draw(true);
+        }
 
-            return retypesetMath([tirControlsPanel, tirPhysicsPanel]);
+        function updateTexts() {
+            refreshPhysicsPanel();
+            return typesetAllMath();
         }
 
         document.getElementById('lang-toggle-btn').addEventListener('click', function () {
@@ -597,7 +641,7 @@
             n2Value.textContent = n2.toFixed(2);
         }
 
-        function updateStaticFormulas() {
+        function updateStaticFormulas(skipTypeset) {
             const thetaC = getCriticalAngleDeg();
             const n_i = incidentFromBottom ? n1 : n2;
             const n_r = incidentFromBottom ? n2 : n1;
@@ -609,10 +653,11 @@
             }
             snellFormula.innerHTML = '\\[' + n_i.toFixed(2) + ' \\cdot \\sin(\\theta_1) = ' + n_r.toFixed(2) + ' \\cdot \\sin(\\theta_2)\\]';
 
+            if (skipTypeset) return;
             return retypesetMath([criticalFormula, snellFormula, calcResult, snellBlock]);
         }
 
-        function updateTheoryText() {
+        function updateTheoryText(skipTypeset) {
             const n_i = incidentFromBottom ? n1 : n2;
             const n_r = incidentFromBottom ? n2 : n1;
             const theoryBox = document.getElementById('theory-box');
@@ -634,6 +679,7 @@
                     </ul>
                 `;
             }
+            if (skipTypeset) return;
             return retypesetMath([theoryBox]);
         }
 
@@ -701,7 +747,7 @@
             };
         }
 
-        function draw() {
+        function draw(skipTypeset) {
             if (!width || !height) return;
             ctx.clearRect(0, 0, width, height);
 
@@ -829,7 +875,7 @@
                         }
                     }
                 }
-                updateUI('critical', theta1, theta2);
+                updateUI('critical', theta1, theta2, skipTypeset);
             } else if (sinTheta2 >= 1.0) {
                 if (showReflectedRay && canShowReflection) {
                     const reflStyle = rayStyle('reflect', incidentAngle, criticalAngle, 'tir');
@@ -849,7 +895,7 @@
                         }
                     }
                 }
-                updateUI('tir', theta1);
+                updateUI('tir', theta1, 0, skipTypeset);
             } else {
                 theta2 = Math.asin(sinTheta2);
                 const rayLength = radius * 1.5;
@@ -886,7 +932,7 @@
                         }
                     }
                 }
-                updateUI('refract', theta1, theta2);
+                updateUI('refract', theta1, theta2, skipTypeset);
             }
 
             if (Math.abs(incidentAngle - 90) < 0.1) {
@@ -1020,7 +1066,7 @@
             ctx.fillText('θc ≈ ' + getCriticalAngleDeg().toFixed(1) + '°', x - 10, y + (incidentFromBottom ? 10 : -10));
         }
 
-        function updateUI(state, theta1Rad, theta2Rad) {
+        function updateUI(state, theta1Rad, theta2Rad, skipTypeset) {
             theta2Rad = theta2Rad || 0;
             const theta2Deg = toDeg(theta2Rad).toFixed(1);
             const theta1Deg = toDeg(theta1Rad).toFixed(1);
@@ -1050,6 +1096,7 @@
                 calcResult.className = "text-center text-green-400 font-mono mt-2";
             }
 
+            if (skipTypeset) return;
             return retypesetMath([calcResult, snellBlock]);
         }
 
@@ -1081,23 +1128,6 @@
             angleDisplay.innerText = incidentAngle.toFixed(1) + "°";
             draw();
         });
-
-        function adjustN1(delta) {
-            n1 = Math.max(N1_MIN, Math.min(N1_MAX, n1 + delta));
-            n1 = Math.round(n1 * 100) / 100;
-            updateNControls();
-            updateStaticFormulas();
-            updateTheoryText();
-            draw();
-        }
-        function adjustN2(delta) {
-            n2 = Math.max(N2_MIN, Math.min(N2_MAX, n2 + delta));
-            n2 = Math.round(n2 * 100) / 100;
-            updateNControls();
-            updateStaticFormulas();
-            updateTheoryText();
-            draw();
-        }
 
         document.getElementById('n1-minus').addEventListener('click', function () { adjustN1(-N_STEP); });
         document.getElementById('n1-plus').addEventListener('click', function () { adjustN1(N_STEP); });
@@ -1133,23 +1163,34 @@
         dirToggleBtn.addEventListener('click', function () {
             incidentFromBottom = !incidentFromBottom;
             dirToggleText.textContent = incidentFromBottom ? t('dirFromGlass') : t('dirFromAir');
-            updateStaticFormulas();
-            updateTheoryText();
-            draw();
+            refreshPhysicsPanel();
+            typesetAllMath();
         });
+
+        function adjustN1(delta) {
+            n1 = Math.max(N1_MIN, Math.min(N1_MAX, n1 + delta));
+            n1 = Math.round(n1 * 100) / 100;
+            updateNControls();
+            refreshPhysicsPanel();
+            typesetAllMath();
+        }
+        function adjustN2(delta) {
+            n2 = Math.max(N2_MIN, Math.min(N2_MAX, n2 + delta));
+            n2 = Math.round(n2 * 100) / 100;
+            updateNControls();
+            refreshPhysicsPanel();
+            typesetAllMath();
+        }
 
         resizeCanvas();
         updateNControls();
         updateChibi(false);
-
-        function initTirLab() {
-            updateTexts();
-        }
+        refreshPhysicsPanel();
 
         if (window.MathJax?.startup?.promise) {
-            window.MathJax.startup.promise.then(initTirLab);
+            window.MathJax.startup.promise.then(typesetAllMath);
         } else {
-            window.addEventListener('load', initTirLab);
+            window.addEventListener('load', typesetAllMath);
         }
     </script>
 </body>
