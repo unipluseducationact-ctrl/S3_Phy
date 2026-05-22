@@ -127,7 +127,6 @@ export function mountOpticsHub(root) {
               return `
             <div class="card">
               <h3>${t(key)}</h3>
-              <p>${id === 'convex' || id === 'concave' ? t('tools.lens.note') : ''}</p>
               <button class="btn primary" type="button" data-go-tool="${tid}"${lensKind ? ` data-lens-kind="${lensKind}"` : ''}>${t('topic.openTool')}</button>
             </div>`;
             })
