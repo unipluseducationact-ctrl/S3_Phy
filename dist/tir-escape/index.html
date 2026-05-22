@@ -155,7 +155,7 @@
             flex-wrap: nowrap;
             align-items: center;
             gap: 0.5rem 0.75rem;
-            min-height: 5.5rem;
+            min-height: 6.5rem;
         }
         .tir-tune-zone {
             flex: 0 1 auto;
@@ -164,23 +164,25 @@
             display: flex;
             flex-wrap: wrap;
             align-items: center;
-            gap: 0.5rem 1rem;
-            min-width: 0;
+            gap: 0.5rem 0.75rem;
+            flex: 1 1 240px;
+            min-width: 200px;
         }
         .tir-tune-zone-brand .tir-brand-text {
             flex: 0 1 auto;
         }
         .tir-tune-zone-brand #status-badge {
             margin-bottom: 0;
-            flex: 1 1 160px;
-            min-width: 140px;
-            max-width: 220px;
-            overflow: hidden;
+            flex: 1 1 auto;
+            min-width: 160px;
+            max-width: none;
         }
         .tir-tune-zone-brand #status-text {
-            white-space: nowrap;
-            overflow: hidden;
-            text-overflow: ellipsis;
+            white-space: normal;
+            line-height: 1.3;
+        }
+        .tir-tune-zone-brand .chibi-container {
+            flex-wrap: nowrap;
         }
         .tir-tune-zone-angle {
             flex: 1 1 280px;
@@ -211,11 +213,26 @@
             min-width: 7.5rem;
         }
         .tir-tune-zone-rays {
-            flex: 0 1 auto;
+            flex: 0 0 auto;
             display: flex;
+            flex-direction: column;
             flex-wrap: nowrap;
-            gap: 0.5rem;
-            max-width: 100%;
+            align-items: stretch;
+            gap: 0.35rem;
+            width: 10.5rem;
+            max-width: 11.5rem;
+            align-self: center;
+        }
+        .tir-tune-zone-rays .ray-toggle-btn {
+            width: 100%;
+            min-width: 0;
+            max-width: none;
+            flex: 0 0 auto;
+            white-space: normal;
+            text-align: center;
+            line-height: 1.25;
+            padding: 6px 8px;
+            font-size: 11px;
         }
         #sim-canvas-host {
             flex: 1 1 auto;
@@ -255,10 +272,10 @@
             }
             .tir-tune-zone-rays {
                 flex: 1 1 100%;
-                flex-wrap: wrap;
+                width: 100%;
+                max-width: none;
             }
             .tir-tune-zone-rays .ray-toggle-btn {
-                flex: 1 1 100%;
                 width: 100%;
                 max-width: none;
             }
@@ -329,7 +346,18 @@
         html.s3phy-embed .tir-controls-panel.tir-tuning-bar {
             gap: 0.35rem 0.5rem;
             flex-wrap: nowrap;
-            min-height: 5.25rem;
+            min-height: 6.25rem;
+        }
+        html.s3phy-embed .tir-tune-zone-rays {
+            width: 9.25rem;
+            max-width: 9.75rem;
+        }
+        html.s3phy-embed .tir-tune-zone-rays .ray-toggle-btn {
+            font-size: 9px;
+            padding: 4px 6px;
+        }
+        html.s3phy-embed .tir-tune-zone-brand #status-badge {
+            min-width: 140px;
         }
         html.s3phy-embed .tir-controls-panel input[type=range]::-webkit-slider-thumb {
             height: 14px;
@@ -343,8 +371,6 @@
         html.s3phy-embed .tir-controls-panel .ray-toggle-btn {
             padding: 5px 8px;
             font-size: 10px;
-            min-width: 7.5rem;
-            max-width: 11rem;
         }
         /* Tuning bar: incident angle slider + n controls */
         html.s3phy-embed .tir-controls-panel {
