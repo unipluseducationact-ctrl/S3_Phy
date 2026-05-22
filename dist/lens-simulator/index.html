@@ -138,8 +138,33 @@
         </div>
 
         <div class="simulator-container">
-            <!-- 左侧可折叠控制面板 -->
+            <!-- 主要光路图显示区 -->
+            <div class="main-view">
+                <div class="canvas-container" id="real-time-diagram">
+                    <div class="preset-btn-group">
+                        <button class="preset-btn" id="presetBtn1" aria-label="預設值1">1</button>
+                        <button class="preset-btn" id="presetBtn2" aria-label="預設值2">2</button>
+                    </div>
+                    <canvas id="lensCanvas"></canvas>
+                    <div class="scale-bar">
+                        <span>0</span>
+                        <span>5</span>
+                        <span>10</span>
+                        <span>15</span>
+                        <span>cm</span>
+                    </div>
+                    <div class="focal-info">
+                        <i class="fas fa-ruler-horizontal"></i> <span class="zh">焦距</span> <span class="en">Focal Length</span> = <span id="focalLengthValue">5.0 cm</span>
+                    </div>
+                </div>
+            </div>
+
+            <!-- 可拖動浮動控制面板 -->
             <div class="control-panel collapsible" id="ray-rules-container">
+                <div class="control-panel-drag-handle" title="拖動面板 Drag panel">
+                    <i class="fas fa-grip-lines"></i>
+                    <span class="zh">拖動</span><span class="en">Drag</span>
+                </div>
                 <button class="toggle-panel" title="折叠/展开控制面板"><i class="fas fa-chevron-left"></i></button>
                 
                 <div class="panel-content">
@@ -247,27 +272,6 @@
                                 <span class="switch-label"><span class="zh">光束</span><span class="en">Bundle of Light Rays</span></span>
                             </label>
                         </div>
-                    </div>
-                </div>
-            </div>
-
-            <!-- 主要光路图显示区 -->
-            <div class="main-view">
-                <div class="canvas-container" id="real-time-diagram">
-                    <div class="preset-btn-group">
-                        <button class="preset-btn" id="presetBtn1" aria-label="預設值1">1</button>
-                        <button class="preset-btn" id="presetBtn2" aria-label="預設值2">2</button>
-                    </div>
-                    <canvas id="lensCanvas"></canvas>
-                    <div class="scale-bar">
-                        <span>0</span>
-                        <span>5</span>
-                        <span>10</span>
-                        <span>15</span>
-                        <span>cm</span>
-                    </div>
-                    <div class="focal-info">
-                        <i class="fas fa-ruler-horizontal"></i> <span class="zh">焦距</span> <span class="en">Focal Length</span> = <span id="focalLengthValue">5.0 cm</span>
                     </div>
                 </div>
             </div>

@@ -2784,7 +2784,8 @@ function setupUIInteractions() {
     const togglePanelBtn = document.querySelector('.toggle-panel');
     const controlPanel = document.querySelector('.control-panel');
     
-    togglePanelBtn.addEventListener('click', () => {
+    togglePanelBtn.addEventListener('click', (e) => {
+        e.stopPropagation();
         controlPanel.classList.toggle('collapsed');
         // 更新按钮图标方向
         const icon = togglePanelBtn.querySelector('i');
@@ -2826,6 +2827,16 @@ function setupUIInteractions() {
     
     // 使测量数据面板可拖动
     makeDraggable(document.getElementById('image-type-indicator'));
+
+    // 使控制面板可拖动
+    const controlPanelEl = document.getElementById('ray-rules-container');
+    if (controlPanelEl) {
+        makeDraggable(controlPanelEl, {
+            handle: '.control-panel-drag-handle',
+            storageKey: 'lens-control-panel-pos',
+            excludeDragStart: 'button, input, label, .toggle-panel, a, select, textarea'
+        });
+    }
     
     // 设置透镜类型切换按钮
     const lensTypeToggle = document.getElementById('lensTypeToggle');
@@ -3672,6 +3683,15 @@ function init() {
     // 设置屏幕拖动功能
     setupDraggableScreen();
     
+    // 设置控制面板初始位置（可從 sessionStorage 還原）
+    const controlPanel = document.getElementById('ray-rules-container');
+    if (controlPanel) {
+        controlPanel.style.position = 'absolute';
+        setTimeout(() => {
+            positionControlPanel(controlPanel);
+        }, 50);
+    }
+
     // 设置测量数据面板的初始位置
     const dataCard = document.getElementById('image-type-indicator');
     if (dataCard) {
@@ -3762,10 +3782,41 @@ function init() {
 // Initialize after page load
 window.addEventListener('load', init);
 
+function positionControlPanel(panel) {
+    const simulatorContainer = document.querySelector('.simulator-container');
+    if (!simulatorContainer || !panel) return;
+
+    const storageKey = 'lens-control-panel-pos';
+    const saved = sessionStorage.getItem(storageKey);
+    if (saved) {
+        try {
+            const pos = JSON.parse(saved);
+            if (typeof pos.left === 'number' && typeof pos.top === 'number') {
+                panel.style.left = pos.left + 'px';
+                panel.style.top = pos.top + 'px';
+                panel.style.bottom = 'auto';
+                panel.style.right = 'auto';
+                return;
+            }
+        } catch (_) { /* ignore */ }
+    }
+
+    panel.style.left = '16px';
+    panel.style.bottom = '16px';
+    panel.style.top = 'auto';
+    panel.style.right = 'auto';
+}
+
 // 使元素可拖动的函数
 // Make element draggable function
-function makeDraggable(element) {
+function makeDraggable(element, options) {
     if (!element) return;
+
+    options = options || {};
+    const handleSelector = options.handle || null;
+    const storageKey = options.storageKey || null;
+    const excludeSelector = options.excludeDragStart || null;
+    const defaultHeader = element.querySelector('.data-card-header');
     
     let offsetX, offsetY, isDragging = false;
     
@@ -3775,17 +3826,28 @@ function makeDraggable(element) {
     document.addEventListener('mouseup', endDrag);
     
     // 触摸事件
-    element.addEventListener('touchstart', startDragTouch);
-    document.addEventListener('touchmove', dragTouch);
+    element.addEventListener('touchstart', startDragTouch, { passive: false });
+    document.addEventListener('touchmove', dragTouch, { passive: false });
     document.addEventListener('touchend', endDrag);
+    
+    function canStartDrag(e) {
+        const target = e.target;
+        if (excludeSelector && target.closest && target.closest(excludeSelector)) {
+            return false;
+        }
+        if (handleSelector) {
+            const handle = element.querySelector(handleSelector);
+            return handle && (handle.contains(target) || target.closest(handleSelector));
+        }
+        if (defaultHeader) {
+            return defaultHeader.contains(target) || target.closest('.data-card-header');
+        }
+        return true;
+    }
     
     // 鼠标拖动开始
     function startDrag(e) {
-        // 仅当点击卡片头部时才可拖动
-        const header = element.querySelector('.data-card-header');
-        if (header && !header.contains(e.target) && !e.target.closest('.data-card-header')) {
-            return;
-        }
+        if (!canStartDrag(e)) return;
         
         e.preventDefault();
         
@@ -3803,11 +3865,7 @@ function makeDraggable(element) {
     
     // 触摸拖动开始
     function startDragTouch(e) {
-        // 仅当点击卡片头部时才可拖动
-        const header = element.querySelector('.data-card-header');
-        if (header && !header.contains(e.target) && !e.target.closest('.data-card-header')) {
-            return;
-        }
+        if (!canStartDrag(e)) return;
         
         // 获取触摸相对于元素左上角的偏移量
         const rect = element.getBoundingClientRect();
@@ -3902,7 +3960,14 @@ function makeDraggable(element) {
             // 恢复透明度
             element.style.opacity = '1';
             // 恢复正常层级
-            element.style.zIndex = '50';
+            element.style.zIndex = element.classList.contains('control-panel') ? '60' : '50';
+            if (storageKey) {
+                const left = parseFloat(element.style.left);
+                const top = parseFloat(element.style.top);
+                if (!Number.isNaN(left) && !Number.isNaN(top)) {
+                    sessionStorage.setItem(storageKey, JSON.stringify({ left, top }));
+                }
+            }
         }
     }
 } 

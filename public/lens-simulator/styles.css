@@ -132,7 +132,7 @@ h1 {
 
 .simulator-container {
     display: grid;
-    grid-template-columns: auto 1fr;
+    grid-template-columns: 1fr;
     gap: 0;
     position: relative;
     height: calc(100vh - 150px);
@@ -140,10 +140,12 @@ h1 {
 }
 
 .main-view {
-    grid-column: 2;
+    grid-column: 1;
+    grid-row: 1;
     display: flex;
     flex-direction: column;
     height: 100%;
+    min-width: 0;
 }
 
 .canvas-container {
@@ -445,11 +447,11 @@ label input {
 
 @media (max-width: 1200px) {
     .simulator-container {
-        grid-template-columns: 1fr 1fr;
+        grid-template-columns: 1fr;
     }
     
     .main-view {
-        grid-column: span 2;
+        grid-column: 1;
         grid-row: 1;
     }
     
@@ -477,29 +479,28 @@ label input {
     
     .simulator-container {
         grid-template-columns: 1fr;
-        grid-template-rows: auto 1fr;
+        grid-template-rows: 1fr;
     }
     
     .control-panel {
-        width: 100%;
-        height: auto;
+        width: min(280px, calc(100% - 32px));
+        max-height: min(60vh, calc(100% - 32px));
     }
     
     .control-panel.collapsed {
-        height: 40px;
-        width: 100%;
+        width: 40px;
     }
     
     .toggle-panel {
-        right: 50%;
-        top: auto;
-        bottom: 0;
-        transform: translateX(50%) rotate(90deg);
-        border-radius: 4px 4px 0 0;
+        right: 0;
+        top: 50%;
+        bottom: auto;
+        transform: translateY(-50%);
+        border-radius: 4px 0 0 4px;
     }
     
     .main-view {
-        grid-row: 2;
+        grid-row: 1;
         grid-column: 1;
     }
     
@@ -591,27 +592,95 @@ input[type="number"]::-webkit-outer-spin-button {
     margin: 0;
 }
 
-/* 侧边折叠面板 */
+/* 浮動可拖動控制面板 */
 .control-panel {
-    position: relative;
-    width: 300px;
+    position: absolute;
+    left: 16px;
+    bottom: 16px;
+    top: auto;
+    right: auto;
+    width: 280px;
+    max-height: min(72vh, calc(100% - 32px));
     background-color: var(--card-bg);
     border-radius: 10px;
     box-shadow: var(--shadow-md);
-    transition: all var(--transition-speed);
+    transition: width var(--transition-speed), height var(--transition-speed);
     overflow: hidden;
-    z-index: 100;
+    z-index: 60;
+    display: flex;
+    flex-direction: column;
 }
 
 .control-panel.collapsed {
     width: 40px;
+    max-height: none;
+}
+
+.control-panel-drag-handle {
+    flex-shrink: 0;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 6px;
+    padding: 6px 10px;
+    background-color: var(--primary-color);
+    color: white;
+    font-size: 11px;
+    cursor: move;
+    user-select: none;
+    border-radius: 10px 10px 0 0;
+}
+
+.control-panel-drag-handle .zh {
+    font-size: 11px;
+    font-weight: bold;
+}
+
+.control-panel-drag-handle .en {
+    font-size: 9px;
+    opacity: 0.85;
+}
+
+.control-panel-drag-handle i {
+    font-size: 12px;
+}
+
+.control-panel.collapsed .control-panel-drag-handle {
+    display: none;
 }
 
 .panel-content {
     width: 100%;
-    height: 100%;
+    flex: 1 1 auto;
+    min-height: 0;
     overflow-y: auto;
-    padding: 15px;
+    padding: 12px;
+}
+
+/* Scoped Traditional Chinese typography in control panel */
+.control-panel .panel-title .zh {
+    font-size: 13px;
+}
+
+.control-panel .panel-title .en {
+    font-size: 12px;
+}
+
+.control-panel .lens-toggle,
+.control-panel #lensTypeText {
+    font-size: 12px;
+}
+
+.control-panel .icon-label .zh {
+    font-size: 12px;
+}
+
+.control-panel .rule-text .zh {
+    font-size: 11px;
+}
+
+.control-panel .switch-label .zh {
+    font-size: 11px;
 }
 
 .toggle-panel {
@@ -1209,6 +1278,7 @@ html.s3phy-embed .canvas-container {
 /* Side control column: narrower */
 html.s3phy-embed .control-panel {
     width: 176px;
+    max-height: min(68vh, calc(100% - 24px));
 }
 
 html.s3phy-embed .control-panel.collapsed {
@@ -1224,17 +1294,38 @@ html.s3phy-embed .control-section {
     padding-bottom: 10px;
 }
 
-html.s3phy-embed .panel-title .zh {
-    font-size: 13px;
+html.s3phy-embed .control-panel .panel-title .zh {
+    font-size: 11px;
 }
 
-html.s3phy-embed .panel-title .en {
+html.s3phy-embed .control-panel .panel-title .en {
+    font-size: 9px;
+}
+
+html.s3phy-embed .control-panel .lens-toggle,
+html.s3phy-embed .control-panel #lensTypeText {
+    padding: 6px 10px;
     font-size: 10px;
 }
 
-html.s3phy-embed .lens-toggle {
-    padding: 6px 10px;
-    font-size: 12px;
+html.s3phy-embed .control-panel .icon-label .zh {
+    font-size: 11px;
+}
+
+html.s3phy-embed .control-panel .rule-text .zh {
+    font-size: 10px;
+}
+
+html.s3phy-embed .control-panel .switch-label .zh {
+    font-size: 10px;
+}
+
+html.s3phy-embed .control-panel-drag-handle .zh {
+    font-size: 10px;
+}
+
+html.s3phy-embed .control-panel-drag-handle .en {
+    font-size: 8px;
 }
 
 html.s3phy-embed .rule-text .en {
@@ -1325,7 +1416,7 @@ html.s3phy-embed .sliders-container {
 @media (max-width: 1200px) {
     html.s3phy-embed .simulator-container {
         grid-template-columns: 1fr;
-        grid-template-rows: auto auto;
+        grid-template-rows: 1fr;
     }
 
     html.s3phy-embed .main-view {

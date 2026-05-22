@@ -202,8 +202,20 @@
         .tir-physics-panel {
             flex-shrink: 0;
             width: 100%;
-            min-height: clamp(280px, 38vh, 520px);
+            min-height: clamp(140px, 20vh, 280px);
             overflow-y: visible;
+        }
+        .tir-formula-grid {
+            display: flex;
+            flex-direction: column;
+            gap: 0.5rem;
+        }
+        @media (min-width: 768px) {
+            .tir-formula-grid {
+                display: grid;
+                grid-template-columns: 1fr 1fr;
+                gap: 0.5rem;
+            }
         }
         #theory-box {
             max-height: none;
@@ -313,7 +325,7 @@
         }
         html.s3phy-embed .tir-physics-panel {
             flex-shrink: 0;
-            min-height: clamp(320px, 42vh, 560px);
+            min-height: clamp(160px, 22vh, 320px);
             overflow-y: visible;
             padding: 0.75rem 1rem !important;
             font-size: 12px;
@@ -321,7 +333,7 @@
         @media (max-height: 720px) {
             html.s3phy-embed .tir-physics-panel {
                 overflow-y: auto;
-                min-height: clamp(260px, 36vh, 480px);
+                min-height: clamp(140px, 18vh, 260px);
             }
         }
         #critical-block,
@@ -336,22 +348,22 @@
             margin-bottom: 0.5rem;
         }
         #critical-block {
-            padding-bottom: 1rem;
-            min-height: 4rem;
-        }
-        #critical-formula {
-            min-height: 2.75rem;
-        }
-        #snell-block {
-            padding-bottom: 1.75rem;
-            min-height: 7rem;
-        }
-        #snell-formula {
+            padding-bottom: 0.5rem;
             min-height: 2.5rem;
         }
-        #calc-result {
+        #critical-formula {
+            min-height: 2rem;
+        }
+        #snell-block {
             padding-bottom: 0.75rem;
-            min-height: 3.25rem;
+            min-height: 4rem;
+        }
+        #snell-formula {
+            min-height: 2rem;
+        }
+        #calc-result {
+            padding-bottom: 0.5rem;
+            min-height: 2.5rem;
         }
         #critical-block mjx-container,
         #snell-block mjx-container {
@@ -363,16 +375,16 @@
             margin-bottom: 0.5rem !important;
         }
         html.s3phy-embed #critical-block {
-            min-height: 4.5rem;
-            padding-bottom: 1.25rem;
+            min-height: 2.75rem;
+            padding-bottom: 0.5rem;
         }
         html.s3phy-embed #snell-block {
-            padding-bottom: 2.5rem;
-            min-height: 9rem;
+            padding-bottom: 0.75rem;
+            min-height: 5rem;
         }
         html.s3phy-embed #calc-result {
-            min-height: 3.75rem;
-            padding-bottom: 1rem;
+            min-height: 2.5rem;
+            padding-bottom: 0.5rem;
         }
         html.s3phy-embed .tir-physics-panel mjx-container {
             overflow: visible !important;
@@ -384,11 +396,11 @@
             font-size: 13px;
             margin-bottom: 0.5rem;
         }
-        html.s3phy-embed .tir-physics-panel .space-y-4 {
+        html.s3phy-embed .tir-physics-panel .space-y-2 {
             font-size: 12px;
         }
-        html.s3phy-embed .tir-physics-panel .space-y-4 > * + * {
-            margin-top: 0.625rem;
+        html.s3phy-embed .tir-physics-panel .space-y-2 > * + * {
+            margin-top: 0.375rem;
         }
         html.s3phy-embed .tir-physics-panel .text-base {
             font-size: 12px !important;
@@ -493,25 +505,27 @@
             </div>
         </div>
 
-        <div class="tir-physics-panel glass-panel p-5 sm:p-6 shrink-0 w-full">
-            <h3 id="physics-core-title" class="text-xl font-semibold text-sky-300 mb-3">🧮 物理核心運算</h3>
+        <div class="tir-physics-panel glass-panel p-3 sm:p-4 shrink-0 w-full">
+            <h3 id="physics-core-title" class="text-xl font-semibold text-sky-300 mb-2">🧮 物理核心運算</h3>
 
-            <div class="space-y-4 text-base">
-                <div class="bg-slate-800/60 p-3.5 rounded-lg border border-slate-700 shadow-inner" id="theory-box"></div>
+            <div class="space-y-2 text-base">
+                <div class="bg-slate-800/60 p-2.5 rounded-lg border border-slate-700 shadow-inner" id="theory-box"></div>
 
-                <p id="tir-badge" class="text-sky-300 font-semibold text-center text-base py-2.5 px-3 bg-sky-900/40 rounded-lg border border-sky-600/50 leading-snug">
+                <p id="tir-badge" class="text-sky-300 font-semibold text-center text-sm py-1.5 px-2 bg-sky-900/40 rounded-lg border border-sky-600/50 leading-snug">
                     Total Internal Reflection · 完全內反射
                 </p>
 
-                <div id="critical-block" class="bg-slate-900 p-3 rounded border border-slate-700">
-                    <p id="critical-angle-label" class="text-sm text-slate-400 mb-1">臨界角 (Critical Angle):</p>
-                    <div id="critical-formula" class="text-center my-2 text-base"></div>
-                </div>
+                <div class="tir-formula-grid">
+                    <div id="critical-block" class="bg-slate-900 p-2 rounded border border-slate-700">
+                        <p id="critical-angle-label" class="text-sm text-slate-400 mb-1">臨界角 (Critical Angle):</p>
+                        <div id="critical-formula" class="text-center my-1 text-base"></div>
+                    </div>
 
-                <div id="snell-block" class="bg-slate-900 p-3 rounded border border-slate-700">
-                    <p id="snell-label" class="text-sm text-slate-400 mb-1">斯涅爾定律 (Snell's Law):</p>
-                    <div id="snell-formula" class="text-center my-2 text-base"></div>
-                    <div id="calc-result" class="text-center text-green-400 font-mono text-base mt-2"></div>
+                    <div id="snell-block" class="bg-slate-900 p-2 rounded border border-slate-700">
+                        <p id="snell-label" class="text-sm text-slate-400 mb-1">斯涅爾定律 (Snell's Law):</p>
+                        <div id="snell-formula" class="text-center my-1 text-base"></div>
+                        <div id="calc-result" class="text-center text-green-400 font-mono text-base mt-1"></div>
+                    </div>
                 </div>
             </div>
         </div>
