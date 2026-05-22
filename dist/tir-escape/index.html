@@ -145,8 +145,83 @@
             min-width: 3em;
             text-align: center;
         }
-        .ray-toggle-btn {
+        .tir-top-dock {
+            flex-shrink: 0;
             width: 100%;
+            z-index: 10;
+        }
+        .tir-controls-panel.tir-tuning-bar {
+            display: flex;
+            flex-wrap: wrap;
+            align-items: center;
+            gap: 0.75rem 1rem;
+        }
+        .tir-tune-zone {
+            flex: 0 1 auto;
+        }
+        .tir-tune-zone-brand {
+            display: flex;
+            flex-wrap: wrap;
+            align-items: center;
+            gap: 0.5rem 1rem;
+            min-width: 0;
+        }
+        .tir-tune-zone-brand .tir-brand-text {
+            flex: 0 1 auto;
+        }
+        .tir-tune-zone-brand #status-badge {
+            margin-bottom: 0;
+            flex: 1 1 200px;
+            min-width: 180px;
+        }
+        .tir-tune-zone-angle {
+            flex: 1 1 280px;
+            min-width: 200px;
+        }
+        .tir-tune-zone-angle label {
+            margin-bottom: 0.35rem;
+        }
+        .tir-tune-zone-n {
+            flex: 0 1 auto;
+        }
+        .tir-tune-zone-n .tir-n-grid {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 0.75rem;
+        }
+        .tir-tune-zone-n .tir-n-cell {
+            padding: 0.5rem 0.75rem;
+            min-width: 7.5rem;
+        }
+        .tir-tune-zone-rays {
+            flex: 1 1 100%;
+            display: flex;
+            flex-wrap: wrap;
+            gap: 0.5rem;
+        }
+        .tir-physics-panel {
+            flex-shrink: 0;
+            width: 100%;
+            min-height: clamp(280px, 38vh, 520px);
+            overflow-y: visible;
+        }
+        #theory-box {
+            max-height: none;
+            line-height: 1.55;
+        }
+        @media (max-width: 640px) {
+            .tir-controls-panel.tir-tuning-bar {
+                flex-direction: column;
+                align-items: stretch;
+            }
+            .tir-tune-zone-rays .ray-toggle-btn {
+                flex: 1 1 100%;
+                width: 100%;
+            }
+        }
+        .ray-toggle-btn {
+            width: auto;
+            flex: 1 1 140px;
             padding: 10px 16px;
             border-radius: 10px;
             border: 1px solid rgba(255,255,255,0.2);
@@ -174,36 +249,32 @@
         html.s3phy-embed body.tir-app-root {
             overflow: hidden;
         }
-        html.s3phy-embed .tir-sidebar {
+        html.s3phy-embed .tir-top-dock {
             gap: 0.5rem;
-            padding: 0.75rem;
-            overflow: hidden;
+            padding: 0.5rem 0.75rem;
+            overflow: visible;
+            max-height: none;
         }
         html.s3phy-embed .tir-controls-panel {
             flex-shrink: 0;
             padding: 0.75rem 1rem !important;
         }
-        html.s3phy-embed .tir-controls-panel h1 {
+        html.s3phy-embed .tir-tune-zone-brand h1 {
             font-size: 1.125rem;
-            margin-bottom: 0.25rem;
         }
-        html.s3phy-embed .tir-controls-panel > p.text-base {
+        html.s3phy-embed .tir-brand-text > p {
             font-size: 0.8125rem;
-            margin-bottom: 0.5rem;
         }
-        html.s3phy-embed .tir-controls-panel #status-badge {
-            margin-bottom: 0.75rem;
-            font-size: 1rem;
+        html.s3phy-embed .tir-tune-zone-brand #status-badge {
+            margin-bottom: 0;
+            font-size: 0.9375rem;
         }
         html.s3phy-embed .tir-controls-panel .chibi-container {
             padding: 4px 10px;
             gap: 8px;
         }
-        html.s3phy-embed .tir-controls-panel .space-y-6 {
-            gap: 0.75rem;
-        }
-        html.s3phy-embed .tir-controls-panel .space-y-6 > * + * {
-            margin-top: 0.75rem;
+        html.s3phy-embed .tir-controls-panel.tir-tuning-bar {
+            gap: 0.5rem 0.75rem;
         }
         html.s3phy-embed .tir-controls-panel input[type=range]::-webkit-slider-thumb {
             height: 14px;
@@ -241,11 +312,17 @@
             font-size: 14px;
         }
         html.s3phy-embed .tir-physics-panel {
-            flex: 1 1 auto;
-            min-height: min(44vh, 380px);
-            overflow-y: auto;
+            flex-shrink: 0;
+            min-height: clamp(320px, 42vh, 560px);
+            overflow-y: visible;
             padding: 0.75rem 1rem !important;
             font-size: 12px;
+        }
+        @media (max-height: 720px) {
+            html.s3phy-embed .tir-physics-panel {
+                overflow-y: auto;
+                min-height: clamp(260px, 36vh, 480px);
+            }
         }
         #critical-block,
         #snell-block {
@@ -349,45 +426,48 @@
     })();
     </script>
 </head>
-<body class="tir-app-root h-full w-full min-h-0 flex flex-col md:flex-row">
+<body class="tir-app-root h-full w-full min-h-0 flex flex-col">
 
-    <div class="tir-sidebar w-full md:w-1/3 p-4 md:p-6 flex flex-col gap-4 md:gap-6 z-10 relative min-h-0 md:h-full md:max-w-[min(42vw,520px)] shrink-0 overflow-y-auto text-[15px] sm:text-base leading-relaxed">
-        <div class="tir-controls-panel glass-panel p-5 sm:p-6 shadow-2xl shrink-0">
-            <h1 class="text-2xl sm:text-3xl font-bold mb-2 text-sky-400 neon-text">🔥 逃獄遊戲</h1>
-            <p class="text-base text-slate-400 mb-4">The Prison Break: 全反射模擬</p>
-
-            <div id="status-badge" class="rounded-lg font-bold text-white text-lg sm:text-xl mb-6 transition-all duration-300 status-escaped">
-                <div class="chibi-container">
-                    <div id="chibi-display" class="chibi-svg"></div>
-                    <span id="status-text">自由！ (折射)</span>
+    <div class="tir-top-dock w-full shrink-0 flex flex-col gap-3 p-3 md:p-4 z-10 relative text-[15px] sm:text-base leading-relaxed overflow-visible">
+        <div class="tir-controls-panel tir-tuning-bar glass-panel p-4 sm:p-5 shadow-2xl shrink-0">
+            <div class="tir-tune-zone tir-tune-zone-brand">
+                <div class="tir-brand-text">
+                    <h1 class="text-xl sm:text-2xl font-bold mb-0 text-sky-400 neon-text leading-tight">🔥 逃獄遊戲</h1>
+                    <p class="text-sm text-slate-400 mb-0 mt-0.5">The Prison Break: 全反射模擬</p>
+                </div>
+                <div id="status-badge" class="rounded-lg font-bold text-white text-base sm:text-lg transition-all duration-300 status-escaped">
+                    <div class="chibi-container">
+                        <div id="chibi-display" class="chibi-svg"></div>
+                        <span id="status-text">自由！ (折射)</span>
+                    </div>
                 </div>
             </div>
 
-            <div class="space-y-6">
-                <div>
-                    <label class="flex flex-col gap-2 sm:flex-row sm:justify-between sm:items-center text-base font-medium mb-2">
-                        <span id="incident-angle-label" class="min-w-0 shrink">入射角 (Incident Angle) <span class="math-inline">\(\theta_1\)</span></span>
-                        <div class="flex flex-wrap items-center gap-2 sm:gap-3">
-                            <button type="button" id="btn-set-critical" class="text-sm bg-sky-700/80 hover:bg-sky-600 text-white px-2.5 py-1.5 rounded transition-colors border border-sky-500/50">設為 \(\theta_c\)</button>
-                            <button type="button" id="btn-set-0" class="text-sm bg-slate-700/80 hover:bg-slate-600 text-white px-2.5 py-1.5 rounded transition-colors border border-slate-500/50">設為 0°</button>
-                            <button type="button" id="btn-set-90" class="text-sm bg-slate-700/80 hover:bg-slate-600 text-white px-2.5 py-1.5 rounded transition-colors border border-slate-500/50">設為 90°</button>
-                            <span id="angle-display" class="text-sky-400 font-mono text-lg sm:text-xl tabular-nums">30.0°</span>
-                        </div>
-                    </label>
-                    <input type="range" id="angle-slider" min="0" max="90" value="30" step="0.1">
-                </div>
+            <div class="tir-tune-zone tir-tune-zone-angle">
+                <label class="flex flex-col gap-1.5 sm:flex-row sm:justify-between sm:items-center text-base font-medium">
+                    <span id="incident-angle-label" class="min-w-0 shrink">入射角 (Incident Angle) <span class="math-inline">\(\theta_1\)</span></span>
+                    <div class="flex flex-wrap items-center gap-2">
+                        <button type="button" id="btn-set-critical" class="text-sm bg-sky-700/80 hover:bg-sky-600 text-white px-2.5 py-1.5 rounded transition-colors border border-sky-500/50">設為 \(\theta_c\)</button>
+                        <button type="button" id="btn-set-0" class="text-sm bg-slate-700/80 hover:bg-slate-600 text-white px-2.5 py-1.5 rounded transition-colors border border-slate-500/50">設為 0°</button>
+                        <button type="button" id="btn-set-90" class="text-sm bg-slate-700/80 hover:bg-slate-600 text-white px-2.5 py-1.5 rounded transition-colors border border-slate-500/50">設為 90°</button>
+                        <span id="angle-display" class="text-sky-400 font-mono text-lg tabular-nums">30.0°</span>
+                    </div>
+                </label>
+                <input type="range" id="angle-slider" min="0" max="90" value="30" step="0.1">
+            </div>
 
-                <div class="grid grid-cols-2 gap-4">
-                    <div class="p-3 bg-slate-800 rounded-lg border border-slate-700">
-                        <div id="n1-label" class="text-sm text-slate-400 mb-2">監獄 (玻璃) <span class="math-inline">\(n_1\)</span></div>
+            <div class="tir-tune-zone tir-tune-zone-n">
+                <div class="tir-n-grid">
+                    <div class="tir-n-cell bg-slate-800 rounded-lg border border-slate-700">
+                        <div id="n1-label" class="text-sm text-slate-400 mb-1">監獄 (玻璃) <span class="math-inline">\(n_1\)</span></div>
                         <div class="n-control">
                             <button type="button" class="n-btn" id="n1-minus" title="減少 n₁">−</button>
                             <span id="n1-value" class="text-xl font-mono text-blue-300 n-value">1.50</span>
                             <button type="button" class="n-btn" id="n1-plus" title="增加 n₁">+</button>
                         </div>
                     </div>
-                    <div class="p-3 bg-slate-800 rounded-lg border border-slate-700">
-                        <div id="n2-label" class="text-sm text-slate-400 mb-2">自由 (空氣) <span class="math-inline">\(n_2\)</span></div>
+                    <div class="tir-n-cell bg-slate-800 rounded-lg border border-slate-700">
+                        <div id="n2-label" class="text-sm text-slate-400 mb-1">自由 (空氣) <span class="math-inline">\(n_2\)</span></div>
                         <div class="n-control">
                             <button type="button" class="n-btn" id="n2-minus" title="減少 n₂">−</button>
                             <span id="n2-value" class="text-xl font-mono text-gray-300 n-value">1.00</span>
@@ -395,25 +475,25 @@
                         </div>
                     </div>
                 </div>
+            </div>
 
-                <div class="flex flex-col gap-3">
-                    <button type="button" id="refract-toggle-btn" class="ray-toggle-btn" title="切換折射(出射)光線的顯示">
-                        <span id="refract-toggle-icon">👁</span>
-                        <span id="refract-toggle-text">隱藏折射光線</span>
-                    </button>
-                    <button type="button" id="reflect-toggle-btn" class="ray-toggle-btn" title="切換反射光線的顯示">
-                        <span id="reflect-toggle-icon">👁</span>
-                        <span id="reflect-toggle-text">隱藏反射光線</span>
-                    </button>
-                    <button type="button" id="dir-toggle-btn" class="ray-toggle-btn" title="切換入射方向">
-                        <span id="dir-toggle-icon">↕️</span>
-                        <span id="dir-toggle-text">入射方向：由 玻璃(n₁) 射向 空氣(n₂)</span>
-                    </button>
-                </div>
+            <div class="tir-tune-zone tir-tune-zone-rays">
+                <button type="button" id="refract-toggle-btn" class="ray-toggle-btn" title="切換折射(出射)光線的顯示">
+                    <span id="refract-toggle-icon">👁</span>
+                    <span id="refract-toggle-text">隱藏折射光線</span>
+                </button>
+                <button type="button" id="reflect-toggle-btn" class="ray-toggle-btn" title="切換反射光線的顯示">
+                    <span id="reflect-toggle-icon">👁</span>
+                    <span id="reflect-toggle-text">隱藏反射光線</span>
+                </button>
+                <button type="button" id="dir-toggle-btn" class="ray-toggle-btn" title="切換入射方向">
+                    <span id="dir-toggle-icon">↕️</span>
+                    <span id="dir-toggle-text">入射方向：由 玻璃(n₁) 射向 空氣(n₂)</span>
+                </button>
             </div>
         </div>
 
-        <div class="tir-physics-panel glass-panel p-5 sm:p-6 flex-grow overflow-y-auto min-h-0">
+        <div class="tir-physics-panel glass-panel p-5 sm:p-6 shrink-0 w-full">
             <h3 id="physics-core-title" class="text-xl font-semibold text-sky-300 mb-3">🧮 物理核心運算</h3>
 
             <div class="space-y-4 text-base">
@@ -437,7 +517,7 @@
         </div>
     </div>
 
-    <div id="sim-canvas-host" class="w-full md:w-2/3 flex-1 min-h-[220px] md:min-h-0 relative bg-gray-900 flex flex-col overflow-hidden">
+    <div id="sim-canvas-host" class="w-full flex-1 min-h-0 relative bg-gray-900 flex flex-col overflow-hidden">
         <button id="lang-toggle-btn" class="absolute top-4 right-4 z-50 bg-slate-800/80 hover:bg-slate-700 text-slate-200 px-3 py-1.5 rounded-lg border border-slate-600 backdrop-blur-sm transition-colors text-sm font-medium shadow-lg">
             EN / 中文
         </button>
@@ -693,8 +773,8 @@
             canvas.height = height;
 
             centerX = width / 2;
-            centerY = height / 2 + 100;
-            radius = Math.min(width, height) * 0.35;
+            centerY = height / 2 + Math.min(60, height * 0.08);
+            radius = Math.min(width, height) * 0.32;
 
             draw();
         }
