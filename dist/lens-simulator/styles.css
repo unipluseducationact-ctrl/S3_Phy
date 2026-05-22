@@ -1208,7 +1208,7 @@ html.s3phy-embed .canvas-container {
 
 /* Side control column: narrower */
 html.s3phy-embed .control-panel {
-    width: 200px;
+    width: 176px;
 }
 
 html.s3phy-embed .control-panel.collapsed {

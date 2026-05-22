@@ -8,13 +8,12 @@ import { createEmLab } from '../tools/emLab.js';
 import { createRgbColorMixerLab } from '../tools/rgbColorMixerLab.js';
 import { mountHubShell } from '../hubShell.js';
 
-const TOOL_ORDER = ['rotatingMirror', 'refractionTir', 'convexLens', 'concaveLens', 'rgbMixer', 'em'];
+const TOOL_ORDER = ['rotatingMirror', 'refractionTir', 'lens', 'rgbMixer', 'em'];
 
 const TOOL_FACTORIES = {
   rotatingMirror: (tr) => createRotatingMirrorLab(tr),
   refractionTir: (tr) => createTirEscapeLab(tr),
-  convexLens: (tr) => createLensLab(tr, { defaultKind: 'convex' }),
-  concaveLens: (tr) => createLensLab(tr, { defaultKind: 'concave' }),
+  lens: (tr, kind) => createLensLab(tr, { defaultKind: kind }),
   rgbMixer: (tr) => createRgbColorMixerLab(tr),
   em: (tr) => createEmLab(tr),
 };
@@ -23,8 +22,7 @@ function toolLabel(id) {
   const map = {
     rotatingMirror: 'tools.rotatingMirror.title',
     refractionTir: 'tools.refractionTir.title',
-    convexLens: 'tools.convexLens.title',
-    concaveLens: 'tools.concaveLens.title',
+    lens: 'tools.lens.title',
     rgbMixer: 'tools.rgbMixer.title',
     em: 'tools.em.title',
   };
@@ -57,6 +55,7 @@ function shuffle(arr) {
 export function mountOpticsHub(root) {
   let section = 'topics';
   let toolId = 'rotatingMirror';
+  let lensDefaultKind = 'convex';
   let flashIndex = 0;
   let flashDeck = 'all';
   let flashShowBack = false;
@@ -115,13 +114,14 @@ export function mountOpticsHub(root) {
         <div class="grid cols-2 topic-hub-grid">
           ${cards
             .map(([id, key]) => {
-              const tid =
-                id === 'convex' ? 'convexLens' : id === 'concave' ? 'concaveLens' : id === 'em' ? 'em' : id;
+              const tid = id === 'convex' || id === 'concave' ? 'lens' : id === 'em' ? 'em' : id;
+              const lensKind =
+                id === 'convex' ? 'convex' : id === 'concave' ? 'concave' : '';
               return `
             <div class="card">
               <h3>${t(key)}</h3>
               <p>${id === 'convex' || id === 'concave' ? t('tools.lens.note') : ''}</p>
-              <button class="btn primary" type="button" data-go-tool="${tid}">${t('topic.openTool')}</button>
+              <button class="btn primary" type="button" data-go-tool="${tid}"${lensKind ? ` data-lens-kind="${lensKind}"` : ''}>${t('topic.openTool')}</button>
             </div>`;
             })
             .join('')}
@@ -134,6 +134,8 @@ export function mountOpticsHub(root) {
     if (!b) return;
     section = 'tools';
     toolId = b.getAttribute('data-go-tool');
+    const lk = b.getAttribute('data-lens-kind');
+    if (lk === 'convex' || lk === 'concave') lensDefaultKind = lk;
     shell.updateSection(section);
     renderMain();
   }
@@ -227,7 +229,7 @@ export function mountOpticsHub(root) {
     stage.innerHTML = '';
     const factory = TOOL_FACTORIES[toolId];
     if (!factory) return;
-    const node = factory(t);
+    const node = toolId === 'lens' ? factory(t, lensDefaultKind) : factory(t);
     stage.appendChild(node);
   }
 

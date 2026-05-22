@@ -161,12 +161,88 @@
         .ray-toggle-btn.rays-hidden {
             opacity: 0.9;
         }
+
+        /* Embedded in S3_PHY hub iframe (?embed=1) */
+        html.s3phy-embed body.tir-app-root {
+            overflow: hidden;
+        }
+        html.s3phy-embed .tir-sidebar {
+            gap: 0.5rem;
+            padding: 0.75rem;
+            overflow: hidden;
+        }
+        html.s3phy-embed .tir-controls-panel {
+            flex-shrink: 0;
+            padding: 0.75rem 1rem !important;
+        }
+        html.s3phy-embed .tir-controls-panel h1 {
+            font-size: 1.125rem;
+            margin-bottom: 0.25rem;
+        }
+        html.s3phy-embed .tir-controls-panel > p.text-base {
+            font-size: 0.8125rem;
+            margin-bottom: 0.5rem;
+        }
+        html.s3phy-embed .tir-controls-panel #status-badge {
+            margin-bottom: 0.75rem;
+            font-size: 1rem;
+        }
+        html.s3phy-embed .tir-controls-panel .chibi-container {
+            padding: 4px 10px;
+            gap: 8px;
+        }
+        html.s3phy-embed .tir-controls-panel .space-y-6 {
+            gap: 0.75rem;
+        }
+        html.s3phy-embed .tir-controls-panel .space-y-6 > * + * {
+            margin-top: 0.75rem;
+        }
+        html.s3phy-embed .tir-controls-panel input[type=range]::-webkit-slider-thumb {
+            height: 14px;
+            width: 14px;
+            margin-top: -5px;
+        }
+        html.s3phy-embed .tir-controls-panel input[type=range]::-moz-range-thumb {
+            height: 14px;
+            width: 14px;
+        }
+        html.s3phy-embed .tir-controls-panel .ray-toggle-btn {
+            padding: 6px 10px;
+            font-size: 13px;
+        }
+        html.s3phy-embed .tir-physics-panel {
+            flex: 1 1 auto;
+            min-height: min(42vh, 360px);
+            overflow-y: auto;
+            padding: 0.75rem 1rem !important;
+        }
+        html.s3phy-embed .tir-physics-panel h3 {
+            font-size: 1rem;
+            margin-bottom: 0.5rem;
+        }
+        html.s3phy-embed .tir-physics-panel .space-y-4 > * + * {
+            margin-top: 0.625rem;
+        }
+        html.s3phy-embed .tir-physics-panel #theory-box {
+            padding: 0.625rem 0.75rem;
+        }
+        html.s3phy-embed .tir-physics-panel .bg-slate-900 {
+            padding: 0.5rem 0.625rem;
+        }
     </style>
+    <script>
+    (function () {
+      var p = new URLSearchParams(location.search);
+      if (p.get('embed') === '1') {
+        document.documentElement.classList.add('s3phy-embed');
+      }
+    })();
+    </script>
 </head>
 <body class="tir-app-root h-full w-full min-h-0 flex flex-col md:flex-row">
 
     <div class="tir-sidebar w-full md:w-1/3 p-4 md:p-6 flex flex-col gap-4 md:gap-6 z-10 relative min-h-0 md:h-full md:max-w-[min(42vw,520px)] shrink-0 overflow-y-auto text-[15px] sm:text-base leading-relaxed">
-        <div class="glass-panel p-5 sm:p-6 shadow-2xl">
+        <div class="tir-controls-panel glass-panel p-5 sm:p-6 shadow-2xl shrink-0">
             <h1 class="text-2xl sm:text-3xl font-bold mb-2 text-sky-400 neon-text">🔥 逃獄遊戲</h1>
             <p class="text-base text-slate-400 mb-4">The Prison Break: 全反射模擬</p>
 
@@ -227,7 +303,7 @@
             </div>
         </div>
 
-        <div class="glass-panel p-5 sm:p-6 flex-grow overflow-y-auto min-h-0">
+        <div class="tir-physics-panel glass-panel p-5 sm:p-6 flex-grow overflow-y-auto min-h-0">
             <h3 class="text-xl font-semibold text-sky-300 mb-3">🧮 物理核心運算</h3>
 
             <div class="space-y-4 text-base">

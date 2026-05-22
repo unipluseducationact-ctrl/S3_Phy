@@ -57,7 +57,7 @@ a {
   max-width: min(1400px, 96vw);
 }
 
-/* Entry splash ¡X colors and motion aligned with S3-CH5-table onboardingController */
+/* Entry splash ï¿½X colors and motion aligned with S3-CH5-table onboardingController */
 .splash {
   position: fixed;
   inset: 0;
@@ -411,7 +411,7 @@ a {
   grid-template-columns: repeat(auto-fill, minmax(260px, 1fr));
 }
 
-/* Topic map ¡X centered block (matches splash branding density) */
+/* Topic map ï¿½X centered block (matches splash branding density) */
 .panel--topic-hub {
   max-width: 960px;
   margin-left: auto;

@@ -1,7 +1,7 @@
 /** @param {(key: string) => string} t @param {{ defaultKind?: 'convex' | 'concave' }} [opts] */
 export function createLensLab(t, opts = {}) {
   const kind = opts.defaultKind === 'concave' ? 'concave' : 'convex';
-  const titleKey = kind === 'concave' ? 'tools.concaveLens.title' : 'tools.convexLens.title';
+  const titleKey = 'tools.lens.title';
 
   const wrap = document.createElement('div');
   wrap.className = 'tool-lens-simulator';

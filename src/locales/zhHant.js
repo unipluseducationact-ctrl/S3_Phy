@@ -79,6 +79,7 @@ export const zhHant = {
   'tools.tir.state': '\u72c0\u614b',
   'tools.tir.partial': '\u90e8\u5206\u6298\u5c04',
   'tools.tir.full': '\u5168\u5167\u53cd\u5c04',
+  'tools.lens.title': '\u900f\u93e1 \u2014 \u5149\u7dda\u793a\u610f',
   'tools.convexLens.title': '\u51f8\u900f\u93e1 \u2014 \u5149\u7dda\u793a\u610f',
   'tools.concaveLens.title': '\u51f9\u900f\u93e1 \u2014 \u5149\u7dda\u793a\u610f',
   'tools.lens.type': '\u900f\u93e1\u985e\u578b',
