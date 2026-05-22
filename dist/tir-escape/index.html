@@ -4,6 +4,14 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>逃獄遊戲：全反射互動實驗室</title>
+    <script>
+        window.MathJax = {
+            tex: {
+                inlineMath: [['\\(', '\\)']],
+                displayMath: [['\\[', '\\]']]
+            }
+        };
+    </script>
     <script id="MathJax-script" async src="https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-mml-chtml.js"></script>
     <script src="https://cdn.tailwindcss.com"></script>
     <style>
@@ -234,10 +242,31 @@
         }
         html.s3phy-embed .tir-physics-panel {
             flex: 1 1 auto;
-            min-height: min(42vh, 360px);
+            min-height: min(44vh, 380px);
             overflow-y: auto;
             padding: 0.75rem 1rem !important;
             font-size: 12px;
+        }
+        #snell-block {
+            overflow: visible;
+            padding-bottom: 1rem;
+            min-height: 4.5rem;
+        }
+        #calc-result {
+            overflow: visible;
+            padding-bottom: 0.5rem;
+            min-height: 2.5rem;
+        }
+        #snell-block mjx-container {
+            overflow: visible !important;
+            margin-bottom: 0.25rem;
+        }
+        html.s3phy-embed #snell-block {
+            padding-bottom: 1.25rem;
+            min-height: 5rem;
+        }
+        html.s3phy-embed .tir-physics-panel mjx-container {
+            overflow: visible !important;
         }
         html.s3phy-embed .tir-physics-panel h3 {
             font-size: 13px;
@@ -302,7 +331,7 @@
             <div class="space-y-6">
                 <div>
                     <label class="flex flex-col gap-2 sm:flex-row sm:justify-between sm:items-center text-base font-medium mb-2">
-                        <span class="min-w-0 shrink">入射角 (Incident Angle) <span class="math-inline">\(\theta_1\)</span></span>
+                        <span id="incident-angle-label" class="min-w-0 shrink">入射角 (Incident Angle) <span class="math-inline">\(\theta_1\)</span></span>
                         <div class="flex flex-wrap items-center gap-2 sm:gap-3">
                             <button type="button" id="btn-set-critical" class="text-sm bg-sky-700/80 hover:bg-sky-600 text-white px-2.5 py-1.5 rounded transition-colors border border-sky-500/50">設為 \(\theta_c\)</button>
                             <button type="button" id="btn-set-0" class="text-sm bg-slate-700/80 hover:bg-slate-600 text-white px-2.5 py-1.5 rounded transition-colors border border-slate-500/50">設為 0°</button>
@@ -315,7 +344,7 @@
 
                 <div class="grid grid-cols-2 gap-4">
                     <div class="p-3 bg-slate-800 rounded-lg border border-slate-700">
-                        <div class="text-sm text-slate-400 mb-2">監獄 (玻璃) <span class="math-inline">\(n_1\)</span></div>
+                        <div id="n1-label" class="text-sm text-slate-400 mb-2">監獄 (玻璃) <span class="math-inline">\(n_1\)</span></div>
                         <div class="n-control">
                             <button type="button" class="n-btn" id="n1-minus" title="減少 n₁">−</button>
                             <span id="n1-value" class="text-xl font-mono text-blue-300 n-value">1.50</span>
@@ -323,7 +352,7 @@
                         </div>
                     </div>
                     <div class="p-3 bg-slate-800 rounded-lg border border-slate-700">
-                        <div class="text-sm text-slate-400 mb-2">自由 (空氣) <span class="math-inline">\(n_2\)</span></div>
+                        <div id="n2-label" class="text-sm text-slate-400 mb-2">自由 (空氣) <span class="math-inline">\(n_2\)</span></div>
                         <div class="n-control">
                             <button type="button" class="n-btn" id="n2-minus" title="減少 n₂">−</button>
                             <span id="n2-value" class="text-xl font-mono text-gray-300 n-value">1.00</span>
@@ -350,29 +379,22 @@
         </div>
 
         <div class="tir-physics-panel glass-panel p-5 sm:p-6 flex-grow overflow-y-auto min-h-0">
-            <h3 class="text-xl font-semibold text-sky-300 mb-3">🧮 物理核心運算</h3>
+            <h3 id="physics-core-title" class="text-xl font-semibold text-sky-300 mb-3">🧮 物理核心運算</h3>
 
             <div class="space-y-4 text-base">
-                <div class="bg-slate-800/60 p-3.5 rounded-lg border border-slate-700 shadow-inner" id="theory-box">
-                    <p class="mb-2 text-slate-200 leading-relaxed"><strong>【越獄理論】</strong> 光想從監獄 (光密介質, Denser, e.g., 玻璃) 逃到自由世界 (光疏介質, Rarer, e.g., 空氣)。</p>
-                    <ul class="list-disc pl-5 space-y-2 text-slate-300 leading-relaxed">
-                        <li><strong>角度 &lt; <span class="math-inline">\(C\)</span></strong>：成功越獄 (折射)</li>
-                        <li><strong>角度 = <span class="math-inline">\(C\)</span></strong>：卡在圍牆上 (沿界面跑)</li>
-                        <li><strong>角度 &gt; <span class="math-inline">\(C\)</span></strong>：越獄失敗，被彈回來 (全內反射)</li>
-                    </ul>
-                </div>
+                <div class="bg-slate-800/60 p-3.5 rounded-lg border border-slate-700 shadow-inner" id="theory-box"></div>
 
-                <p class="text-sky-300 font-semibold text-center text-base py-2.5 px-3 bg-sky-900/40 rounded-lg border border-sky-600/50 leading-snug">
+                <p id="tir-badge" class="text-sky-300 font-semibold text-center text-base py-2.5 px-3 bg-sky-900/40 rounded-lg border border-sky-600/50 leading-snug">
                     Total Internal Reflection · 完全內反射
                 </p>
 
                 <div class="bg-slate-900 p-3 rounded border border-slate-700">
-                    <p class="text-sm text-slate-400 mb-1">臨界角 (Critical Angle):</p>
+                    <p id="critical-angle-label" class="text-sm text-slate-400 mb-1">臨界角 (Critical Angle):</p>
                     <div id="critical-formula" class="text-center my-2 text-base"></div>
                 </div>
 
-                <div class="bg-slate-900 p-3 rounded border border-slate-700">
-                    <p class="text-sm text-slate-400 mb-1">斯涅爾定律 (Snell's Law):</p>
+                <div id="snell-block" class="bg-slate-900 p-3 rounded border border-slate-700">
+                    <p id="snell-label" class="text-sm text-slate-400 mb-1">斯涅爾定律 (Snell's Law):</p>
                     <div id="snell-formula" class="text-center my-2 text-base"></div>
                     <div id="calc-result" class="text-center text-green-400 font-mono text-base mt-2">
                         \[\theta_2 \approx 48.6^\circ\]
@@ -420,6 +442,9 @@
         const snellFormula = document.getElementById('snell-formula');
         const n1Value = document.getElementById('n1-value');
         const n2Value = document.getElementById('n2-value');
+        const tirControlsPanel = document.querySelector('.tir-controls-panel');
+        const tirPhysicsPanel = document.querySelector('.tir-physics-panel');
+        const snellBlock = document.getElementById('snell-block');
 
         let incidentAngle = 30;
         let showRefractedRay = true;
@@ -512,30 +537,36 @@
             return i18n[currentLang][key];
         }
 
+        function retypesetMath(elements) {
+            if (!window.MathJax?.typesetPromise) return Promise.resolve();
+            const els = (Array.isArray(elements) ? elements : [elements]).filter(Boolean);
+            if (!els.length) return Promise.resolve();
+            if (MathJax.typesetClear) MathJax.typesetClear(els);
+            return MathJax.typesetPromise(els).catch(function (err) { console.warn(err); });
+        }
+
         function updateTexts() {
             document.querySelector('h1').innerHTML = t('title');
             document.querySelector('h1').nextElementSibling.innerHTML = t('subtitle');
-            document.querySelector('label span').innerHTML = t('incidentLabel');
+            document.getElementById('incident-angle-label').innerHTML = t('incidentLabel');
             document.getElementById('btn-set-critical').innerHTML = t('setCritical');
             document.getElementById('btn-set-0').innerHTML = t('set0deg');
             document.getElementById('btn-set-90').innerHTML = t('set90deg');
-            document.getElementById('n1-value').parentElement.previousElementSibling.innerHTML = t('glassLabel');
-            document.getElementById('n2-value').parentElement.previousElementSibling.innerHTML = t('airLabel');
+            document.getElementById('n1-label').innerHTML = t('glassLabel');
+            document.getElementById('n2-label').innerHTML = t('airLabel');
             document.getElementById('refract-toggle-text').textContent = showRefractedRay ? t('hideRefractRay') : t('showRefractRay');
             document.getElementById('reflect-toggle-text').textContent = showReflectedRay ? t('hideReflectRay') : t('showReflectRay');
             document.getElementById('dir-toggle-text').textContent = incidentFromBottom ? t('dirFromGlass') : t('dirFromAir');
-            document.querySelector('h3.text-lg').innerHTML = t('physicsCore');
-            document.querySelector('p.text-sky-300.font-semibold').innerHTML = t('tirBadge');
-            document.getElementById('critical-formula').previousElementSibling.innerHTML = t('criticalAngleLabel');
-            document.getElementById('snell-formula').previousElementSibling.innerHTML = t('snellLabel');
-            
+            document.getElementById('physics-core-title').innerHTML = t('physicsCore');
+            document.getElementById('tir-badge').innerHTML = t('tirBadge');
+            document.getElementById('critical-angle-label').innerHTML = t('criticalAngleLabel');
+            document.getElementById('snell-label').innerHTML = t('snellLabel');
+
             updateTheoryText();
             updateStaticFormulas();
             draw();
-            
-            if (window.MathJax && window.MathJax.typesetPromise) {
-                MathJax.typesetPromise().catch(err => console.log(err));
-            }
+
+            return retypesetMath([tirControlsPanel, tirPhysicsPanel]);
         }
 
         document.getElementById('lang-toggle-btn').addEventListener('click', function () {
@@ -577,10 +608,8 @@
                 criticalFormula.innerHTML = '\\[\\theta_c = \\sin^{-1}\\left(\\frac{n_r}{n_i}\\right) = \\sin^{-1}\\left(\\frac{' + n_r.toFixed(2) + '}{' + n_i.toFixed(2) + '}\\right) \\approx ' + thetaC.toFixed(1) + '^\\circ\\]';
             }
             snellFormula.innerHTML = '\\[' + n_i.toFixed(2) + ' \\cdot \\sin(\\theta_1) = ' + n_r.toFixed(2) + ' \\cdot \\sin(\\theta_2)\\]';
-            
-            if (window.MathJax && window.MathJax.typesetPromise) {
-                MathJax.typesetPromise([criticalFormula, snellFormula]).catch(function (err) { console.log(err); });
-            }
+
+            return retypesetMath([criticalFormula, snellFormula, calcResult, snellBlock]);
         }
 
         function updateTheoryText() {
@@ -605,9 +634,7 @@
                     </ul>
                 `;
             }
-            if (window.MathJax && window.MathJax.typesetPromise) {
-                MathJax.typesetPromise([theoryBox]).catch(function (err) { console.log(err); });
-            }
+            return retypesetMath([theoryBox]);
         }
 
         let width, height, centerX, centerY, radius;
@@ -1023,9 +1050,7 @@
                 calcResult.className = "text-center text-green-400 font-mono mt-2";
             }
 
-            if (window.MathJax && window.MathJax.typesetPromise) {
-                MathJax.typesetPromise([calcResult]).catch(function (err) { console.log(err); });
-            }
+            return retypesetMath([calcResult, snellBlock]);
         }
 
         slider.addEventListener('input', function (e) {
@@ -1115,16 +1140,17 @@
 
         resizeCanvas();
         updateNControls();
-        updateStaticFormulas();
         updateChibi(false);
 
-        window.MathJax = window.MathJax || {};
-        window.MathJax.startup = window.MathJax.startup || {};
-        window.addEventListener('load', function () {
-            if (window.MathJax && window.MathJax.typesetPromise) {
-                MathJax.typesetPromise();
-            }
-        });
+        function initTirLab() {
+            updateTexts();
+        }
+
+        if (window.MathJax?.startup?.promise) {
+            window.MathJax.startup.promise.then(initTirLab);
+        } else {
+            window.addEventListener('load', initTirLab);
+        }
     </script>
 </body>
 </html>
