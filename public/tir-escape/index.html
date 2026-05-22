@@ -612,7 +612,7 @@
                 <div id="snell-block" class="bg-slate-900 p-2 rounded border border-slate-700">
                     <p id="snell-label" class="text-sm text-slate-400 mb-1">斯涅爾定律 (Snell's Law):</p>
                     <div id="snell-formula" class="text-center my-1 text-base"></div>
-                    <div id="calc-result" class="text-center text-green-400 font-mono text-base mt-1"></div>
+                    <div id="calc-result" class="text-center text-green-400 text-base mt-1"></div>
                 </div>
             </div>
         </div>
@@ -684,7 +684,7 @@
                 noSolution: "無解 (全內反射)",
                 reflectRayTip: "切換反射光線的顯示",
                 reflectRayTipDisabled: "此情況不顯示反射（θ₁=0° 或由低 n→高 n）",
-                calcCritical: "\\[\\theta_2 = \\sin^{-1}(1.00) = 90.0^\\circ\\]",
+                calcCritical: "\\[\\theta_2 = \\sin^{-1}(1.00) = 90.0^{\\circ}\\]",
                 calcTir: "\\[\\sin(\\theta_2) > 1 \\rightarrow \\text{無解 (全內反射)}\\]"
             },
             en: {
@@ -723,7 +723,7 @@
                 noSolution: "No solution (TIR)",
                 reflectRayTip: "Toggle reflected ray visibility",
                 reflectRayTipDisabled: "No reflected ray for θ₁≈0° or rare→dense incidence",
-                calcCritical: "\\[\\theta_2 = \\sin^{-1}(1.00) = 90.0^\\circ\\]",
+                calcCritical: "\\[\\theta_2 = \\sin^{-1}(1.00) = 90.0^{\\circ}\\]",
                 calcTir: "\\[\\sin(\\theta_2) > 1 \\rightarrow \\text{No solution (TIR)}\\]"
             }
         };
@@ -740,9 +740,16 @@
             return MathJax.typesetPromise(els).catch(function (err) { console.warn(err); });
         }
 
+        function typesetCalcResult() {
+            return retypesetMath([calcResult]);
+        }
+
         function typesetAllMath() {
             return retypesetMath([
                 tirPhysicsPanel,
+                calcResult,
+                criticalFormula,
+                snellFormula,
                 document.getElementById('incident-angle-label'),
                 document.getElementById('btn-set-critical'),
                 document.getElementById('n1-label'),
@@ -768,12 +775,13 @@
             document.getElementById('snell-label').innerHTML = t('snellLabel');
         }
 
-        /** Fill theory + formulas + calc immediately (no MathJax). */
+        /** Fill theory + formulas + calc; always re-typeset Snell result line after draw. */
         function refreshPhysicsPanel() {
             applyLabels();
             updateTheoryText(true);
             updateStaticFormulas(true);
             draw(true);
+            return typesetCalcResult();
         }
 
         function updateTexts() {
@@ -786,6 +794,7 @@
                     angleDisplay.innerText = savedAngle.toFixed(1) + '°';
                 }
                 draw(true);
+                return typesetCalcResult();
             });
         }
 
@@ -924,7 +933,7 @@
         }
 
         function draw(skipTypeset) {
-            if (!width || !height) return;
+            if (!width || !height) return undefined;
             ctx.clearRect(0, 0, width, height);
 
             ctx.fillStyle = '#0f172a';
@@ -1255,12 +1264,12 @@
                 statusText.textContent = t('statusFailed');
                 statusBadge.className = "rounded-lg font-bold text-white text-xl mb-6 transition-all duration-300 status-trapped";
                 calcResult.innerHTML = t('calcTir');
-                calcResult.className = "text-center text-red-400 font-mono mt-2";
+                calcResult.className = "text-center text-red-400 mt-2";
             } else if (state === 'critical') {
                 statusText.textContent = t('statusStuck');
                 statusBadge.className = "rounded-lg font-bold text-white text-xl mb-6 transition-all duration-300 bg-yellow-500 shadow-[0_0_15px_rgba(234,179,8,0.6)]";
                 calcResult.innerHTML = t('calcCritical');
-                calcResult.className = "text-center text-yellow-400 font-mono mt-2";
+                calcResult.className = "text-center text-yellow-400 mt-2";
             } else {
                 if (n_i > n_r) {
                     statusText.textContent = t('statusEscaped');
@@ -1268,11 +1277,11 @@
                     statusText.textContent = t('statusEntered');
                 }
                 statusBadge.className = "rounded-lg font-bold text-white text-xl mb-6 transition-all duration-300 status-escaped";
-                calcResult.innerHTML = '\\[\\theta_2 = \\sin^{-1}\\left(\\frac{' + n_i.toFixed(2) + ' \\cdot \\sin(' + theta1Deg + '^\\circ)}{' + n_r.toFixed(2) + '}\\right) \\approx ' + theta2Deg + '^\\circ\\]';
-                calcResult.className = "text-center text-green-400 font-mono mt-2";
+                calcResult.innerHTML = '\\[\\theta_2 = \\sin^{-1}\\left(\\frac{' + n_i.toFixed(2) + ' \\cdot \\sin\\left(' + theta1Deg + '^{\\circ}\\right)}{' + n_r.toFixed(2) + '}\\right) \\approx ' + theta2Deg + '^{\\circ}\\]';
+                calcResult.className = "text-center text-green-400 mt-2";
             }
 
-            if (skipTypeset) return;
+            if (skipTypeset) return typesetCalcResult();
             return retypesetMath([calcResult, snellBlock]);
         }
 
