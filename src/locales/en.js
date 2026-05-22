@@ -28,6 +28,7 @@ export const en = {
   'topic.reflection': 'Reflection',
   'topic.rotatingMirror': 'Rotating plane mirror',
   'topic.refraction': 'Refraction',
+  'topic.refractionSnell': 'Refraction and Snell\u2019s law',
   'topic.tir': 'Total internal reflection',
   'topic.refractionTir': 'Refraction, Snell\u2019s law & total internal reflection',
   'topic.convex': 'Convex lens',

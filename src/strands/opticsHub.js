@@ -100,11 +100,11 @@ export function mountOpticsHub(root) {
 
   function renderTopics() {
     const cards = [
-      ['rotatingMirror', 'topic.rotatingMirror'],
-      ['refractionTir', 'topic.refractionTir'],
+      ['rotatingMirror', 'topic.reflection'],
+      ['refraction', 'topic.refractionSnell'],
+      ['tir', 'topic.tir'],
       ['convex', 'topic.convex'],
       ['concave', 'topic.concave'],
-      ['rgbMixer', 'topic.rgbMixer'],
       ['em', 'topic.em'],
     ];
     return `
@@ -114,7 +114,14 @@ export function mountOpticsHub(root) {
         <div class="grid cols-2 topic-hub-grid">
           ${cards
             .map(([id, key]) => {
-              const tid = id === 'convex' || id === 'concave' ? 'lens' : id === 'em' ? 'em' : id;
+              const tid =
+                id === 'convex' || id === 'concave'
+                  ? 'lens'
+                  : id === 'refraction' || id === 'tir'
+                    ? 'refractionTir'
+                    : id === 'em'
+                      ? 'em'
+                      : id;
               const lensKind =
                 id === 'convex' ? 'convex' : id === 'concave' ? 'concave' : '';
               return `

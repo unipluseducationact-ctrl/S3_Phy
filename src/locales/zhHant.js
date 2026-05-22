@@ -28,6 +28,7 @@ export const zhHant = {
   'topic.reflection': '\u53cd\u5c04',
   'topic.rotatingMirror': '\u65cb\u8f49\u5e73\u9762\u93e1',
   'topic.refraction': '\u6298\u5c04',
+  'topic.refractionSnell': '\u6298\u5c04\u8207\u53f8\u4e43\u8033\u5b9a\u5f8b',
   'topic.tir': '\u5168\u53cd\u5c04',
   'topic.refractionTir': '\u6298\u5c04\u3001\u53f8\u4e43\u8033\u5b9a\u5f8b\u8207\u5168\u5167\u53cd\u5c04',
   'topic.convex': '\u51f8\u900f\u93e1',
