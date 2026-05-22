@@ -675,6 +675,22 @@ input[type="number"]::-webkit-outer-spin-button {
     font-size: 12px;
 }
 
+.control-panel .radio-group label {
+    padding: 6px 8px;
+}
+
+.control-panel .radio-group .icon-label .zh {
+    font-size: 10px;
+}
+
+.control-panel .radio-group .icon-label .en {
+    font-size: 9px;
+}
+
+.control-panel .radio-group .icon-label i {
+    font-size: 11px;
+}
+
 .control-panel .rule-text .zh {
     font-size: 11px;
 }
@@ -1310,6 +1326,18 @@ html.s3phy-embed .control-panel #lensTypeText {
 
 html.s3phy-embed .control-panel .icon-label .zh {
     font-size: 11px;
+}
+
+html.s3phy-embed .control-panel .radio-group .icon-label .zh {
+    font-size: 9px;
+}
+
+html.s3phy-embed .control-panel .radio-group .icon-label .en {
+    font-size: 8px;
+}
+
+html.s3phy-embed .control-panel .radio-group .icon-label i {
+    font-size: 10px;
 }
 
 html.s3phy-embed .control-panel .rule-text .zh {
