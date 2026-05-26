@@ -1,46 +1,22 @@
 name: Deploy to GitHub Pages
 
-# Shell-only (no marketplace actions). Publishes site layout to gh-pages branch.
-
 on:
-  push:
-    branches: [main]
   workflow_dispatch:
 
 permissions:
   contents: write
 
-concurrency:
-  group: pages
-  cancel-in-progress: true
-
 jobs:
-  deploy:
+  # Validates the production build. Live deploy: Settings → Pages → branch main → folder /dist
+  # (committed dist/ already includes summary PDFs and bundled assets).
+  verify-build:
     runs-on: ubuntu-latest
     steps:
-      - name: Clone, build, publish gh-pages
-        env:
-          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
-          REPO: unipluseducationact-ctrl/S3_Phy
+      - name: Verify npm build
         run: |
           set -euxo pipefail
-          git clone --depth 1 "https://x-access-token:${GITHUB_TOKEN}@github.com/${REPO}.git" repo
+          git clone --depth 1 https://github.com/unipluseducationact-ctrl/S3_Phy.git repo
           cd repo
           node --version
-          npm --version
           npm ci
           npm run build
-          SITE="../_site"
-          rm -rf "$SITE"
-          mkdir -p "$SITE/dist"
-          cp -r dist/. "$SITE/dist/"
-          cp scripts/github-pages-repo-root-redirect.html "$SITE/index.html"
-          touch "$SITE/.nojekyll" "$SITE/dist/.nojekyll"
-          cd "$SITE"
-          git init -b gh-pages
-          git config user.name "github-actions[bot]"
-          git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
-          git add -A
-          git commit -m "Deploy ${GITHUB_SHA}"
-          git remote add origin "https://x-access-token:${GITHUB_TOKEN}@github.com/${REPO}.git"
-          git push --force origin gh-pages
