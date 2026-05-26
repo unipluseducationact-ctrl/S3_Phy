@@ -33,14 +33,18 @@ function langKey() {
   return getLang() === 'zh-Hant' ? 'zhHant' : 'en';
 }
 
-async function noteExists(name) {
-  const url = `${import.meta.env.BASE_URL}notes/${name}`;
+async function assetExists(folder, name) {
+  const url = `${import.meta.env.BASE_URL}${folder}/${name}`;
   try {
     const res = await fetch(url, { method: 'HEAD' });
     return res.ok;
   } catch {
     return false;
   }
+}
+
+async function noteExists(name) {
+  return assetExists('notes', name);
 }
 
 function shuffle(arr) {
@@ -79,6 +83,7 @@ export function mountOpticsHub(root) {
     if (section === 'tools') hydrateTools();
     if (section === 'worksheets') hydrateWorksheets();
     if (section === 'flashcards') hydrateFlashcards();
+    if (section === 'summary') void hydrateSummary();
   }
 
   function render() {
@@ -299,7 +304,8 @@ export function mountOpticsHub(root) {
         ) {
           return true;
         }
-        if (topic === 'convex' && (picked.includes('convex') || picked.includes('concave'))) return true;
+        if (topic === 'convex' && picked.includes('convex')) return true;
+        if (topic === 'concave' && picked.includes('concave')) return true;
         return false;
       });
       const deck = shuffle(pool).slice(0, Math.min(count, pool.length || 1));
@@ -442,29 +448,58 @@ export function mountOpticsHub(root) {
 
   function renderSummary() {
     const items = [
-      { file: 'reflection.svg', key: 'summary.item.reflection' },
-      { file: 'refraction.svg', key: 'summary.item.refraction' },
-      { file: 'lenses.svg', key: 'summary.item.lenses' },
-      { file: 'emwaves.svg', key: 'summary.item.em' },
+      { key: 'reflection', fileEn: 'reflection-en.pdf', fileZh: 'reflection-zhHant.pdf' },
+      { key: 'refraction', fileEn: 'refraction-en.pdf', fileZh: 'refraction-zhHant.pdf' },
+      { key: 'tir', fileEn: 'tir-en.pdf', fileZh: 'tir-zhHant.pdf' },
+      { key: 'convex', fileEn: 'convex-en.pdf', fileZh: 'convex-zhHant.pdf' },
+      { key: 'concave', fileEn: 'concave-en.pdf', fileZh: 'concave-zhHant.pdf' },
+      { key: 'em', fileEn: 'em-en.pdf', fileZh: 'em-zhHant.pdf' },
     ];
     return `
       <section class="panel">
         <h2>${t('summary.title')}</h2>
         <p class="lead">${t('summary.intro')}</p>
-        <div class="grid cols-2">
+        <p class="lead">${t('notes.embedHint')}</p>
+        <div class="grid cols-2" data-summary-grid>
           ${items
             .map((it) => {
-              const src = `${import.meta.env.BASE_URL}summary/${it.file}`;
+              const title = t(`summary.item.${it.key}`);
               return `
-            <div class="card">
-              <h3>${t(it.key)}</h3>
-              <img class="summary-thumb" alt="" src="${src}" />
-              <p style="margin-top:10px"><a download href="${src}">${t('summary.download')}</a></p>
+            <div class="card" data-summary-card="${it.key}">
+              <h3>${title}</h3>
+              <div data-summary-body></div>
             </div>`;
             })
             .join('')}
         </div>
       </section>`;
+  }
+
+  async function hydrateSummary() {
+    const rows = [
+      { key: 'reflection', fileEn: 'reflection-en.pdf', fileZh: 'reflection-zhHant.pdf' },
+      { key: 'refraction', fileEn: 'refraction-en.pdf', fileZh: 'refraction-zhHant.pdf' },
+      { key: 'tir', fileEn: 'tir-en.pdf', fileZh: 'tir-zhHant.pdf' },
+      { key: 'convex', fileEn: 'convex-en.pdf', fileZh: 'convex-zhHant.pdf' },
+      { key: 'concave', fileEn: 'concave-en.pdf', fileZh: 'concave-zhHant.pdf' },
+      { key: 'em', fileEn: 'em-en.pdf', fileZh: 'em-zhHant.pdf' },
+    ];
+    const lk = langKey();
+    for (const r of rows) {
+      const card = root.querySelector(`[data-summary-card="${r.key}"]`);
+      if (!card) continue;
+      const body = card.querySelector('[data-summary-body]');
+      const file = lk === 'zhHant' ? r.fileZh : r.fileEn;
+      const ok = await assetExists('summary-pdfs', file);
+      const url = `${import.meta.env.BASE_URL}summary-pdfs/${file}`;
+      if (ok) {
+        body.innerHTML = `
+          <iframe class="notes-grid" title="${t(`summary.item.${r.key}`)}" src="${url}"></iframe>
+          <p style="margin-top:8px"><a href="${url}" target="_blank" rel="noopener">${t('summary.download')}</a></p>`;
+      } else {
+        body.innerHTML = `<p class="lead">${t('summary.missing')}</p>`;
+      }
+    }
   }
 
   const onLang = () => render();
