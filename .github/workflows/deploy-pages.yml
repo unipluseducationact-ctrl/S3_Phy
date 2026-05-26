@@ -1,6 +1,6 @@
 name: Deploy to GitHub Pages
 
-# Shell-only workflow: no marketplace actions (codeload.github.com downloads fail on this repo).
+# Shell-only (no marketplace actions). Publishes site layout to gh-pages branch.
 
 on:
   push:
@@ -21,23 +21,26 @@ jobs:
       - name: Clone, build, publish gh-pages
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+          REPO: unipluseducationact-ctrl/S3_Phy
         run: |
-          set -euo pipefail
-          git clone --depth 1 "https://x-access-token:${GITHUB_TOKEN}@github.com/unipluseducationact-ctrl/S3_Phy.git" repo
+          set -euxo pipefail
+          git clone --depth 1 "https://x-access-token:${GITHUB_TOKEN}@github.com/${REPO}.git" repo
           cd repo
-          git config user.name "github-actions[bot]"
-          git config user.email "github-actions[bot]@users.noreply.github.com"
-          curl -fsSL https://deb.nodesource.com/setup_22.x | sudo -E bash -
-          sudo apt-get install -y nodejs
+          node --version
+          npm --version
           npm ci
           npm run build
-          mkdir -p _site/dist
-          cp -r dist/. _site/dist/
-          cp scripts/github-pages-repo-root-redirect.html _site/index.html
-          touch _site/.nojekyll _site/dist/.nojekyll
-          cd _site
-          git init
-          git checkout -b gh-pages
+          SITE="../_site"
+          rm -rf "$SITE"
+          mkdir -p "$SITE/dist"
+          cp -r dist/. "$SITE/dist/"
+          cp scripts/github-pages-repo-root-redirect.html "$SITE/index.html"
+          touch "$SITE/.nojekyll" "$SITE/dist/.nojekyll"
+          cd "$SITE"
+          git init -b gh-pages
+          git config user.name "github-actions[bot]"
+          git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
           git add -A
-          git commit -m "Deploy site from ${GITHUB_SHA}"
-          git push -f "https://x-access-token:${GITHUB_TOKEN}@github.com/unipluseducationact-ctrl/S3_Phy.git" gh-pages
+          git commit -m "Deploy ${GITHUB_SHA}"
+          git remote add origin "https://x-access-token:${GITHUB_TOKEN}@github.com/${REPO}.git"
+          git push --force origin gh-pages
