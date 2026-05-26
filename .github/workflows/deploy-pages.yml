@@ -1,7 +1,6 @@
 name: Deploy to GitHub Pages
 
-# Publishes to the gh-pages branch (git push). Avoids actions/upload-pages-artifact,
-# which is currently failing to download from codeload.github.com on this repo.
+# Shell-only workflow: no marketplace actions (codeload.github.com downloads fail on this repo).
 
 on:
   push:
@@ -19,22 +18,26 @@ jobs:
   deploy:
     runs-on: ubuntu-latest
     steps:
-      - uses: actions/checkout@v4
-      - uses: actions/setup-node@v4
-        with:
-          node-version: '22'
-          cache: npm
-      - run: npm ci
-      - run: npm run build
-      - name: Prepare site bundle (root redirect + dist/)
+      - name: Clone, build, publish gh-pages
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
         run: |
+          set -euo pipefail
+          git clone --depth 1 "https://x-access-token:${GITHUB_TOKEN}@github.com/unipluseducationact-ctrl/S3_Phy.git" repo
+          cd repo
+          git config user.name "github-actions[bot]"
+          git config user.email "github-actions[bot]@users.noreply.github.com"
+          curl -fsSL https://deb.nodesource.com/setup_22.x | sudo -E bash -
+          sudo apt-get install -y nodejs
+          npm ci
+          npm run build
           mkdir -p _site/dist
           cp -r dist/. _site/dist/
           cp scripts/github-pages-repo-root-redirect.html _site/index.html
           touch _site/.nojekyll _site/dist/.nojekyll
-      - name: Publish to gh-pages branch
-        uses: peaceiris/actions-gh-pages@v4
-        with:
-          github_token: ${{ secrets.GITHUB_TOKEN }}
-          publish_dir: ./_site
-          publish_branch: gh-pages
+          cd _site
+          git init
+          git checkout -b gh-pages
+          git add -A
+          git commit -m "Deploy site from ${GITHUB_SHA}"
+          git push -f "https://x-access-token:${GITHUB_TOKEN}@github.com/unipluseducationact-ctrl/S3_Phy.git" gh-pages
