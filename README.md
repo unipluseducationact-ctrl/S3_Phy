@@ -35,9 +35,11 @@ GitHub was serving the **repository root** `index.html`, which only loads `/src/
 2. **Root `index.html`** includes a tiny script (stripped from the built `dist/index.html`) that redirects `*.github.io` visitors from `/S3_PHY/` to **`/S3_PHY/dist/`** until you point Pages at `/dist` or Actions.
 3. **`base: './'`** so `./assets/...` works under `/S3_PHY/dist/` as well as when `/dist` contents are mapped to the site root.
 
-**Option A — GitHub Actions:** Settings → Pages → **Source: GitHub Actions** (workflow `.github/workflows/deploy-pages.yml`).
+**Option A — GitHub Actions (recommended):** Settings → Pages → **Source: GitHub Actions**. The workflow publishes to the **`gh-pages`** branch; set Pages to **Deploy from branch** → **`gh-pages`** → **`/ (root)`** after the first successful run.
 
-**Option B — Branch + `/dist`:** Settings → Pages → **Deploy from a branch** → Branch **main**, folder **`/dist`** (not `/ (root)`).
+**Option B — Branch + `/dist` on `main`:** Settings → Pages → **Deploy from a branch** → Branch **`main`**, folder **`/dist`**. Uses the committed `dist/` folder (no Actions artifact upload). Site URL: `…/S3_Phy/dist/#/optics`.
+
+**Note:** If Actions fails with `upload-pages-artifact` / codeload errors, use Option B for an immediate deploy, or rely on the updated workflow that pushes to `gh-pages` via `peaceiris/actions-gh-pages`.
 
 ## Live URL
 

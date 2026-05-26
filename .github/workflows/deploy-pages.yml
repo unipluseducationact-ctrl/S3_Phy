@@ -1,21 +1,22 @@
 name: Deploy to GitHub Pages
 
+# Publishes to the gh-pages branch (git push). Avoids actions/upload-pages-artifact,
+# which is currently failing to download from codeload.github.com on this repo.
+
 on:
   push:
     branches: [main]
   workflow_dispatch:
 
 permissions:
-  contents: read
-  pages: write
-  id-token: write
+  contents: write
 
 concurrency:
   group: pages
-  cancel-in-progress: false
+  cancel-in-progress: true
 
 jobs:
-  build:
+  deploy:
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v4
@@ -25,23 +26,15 @@ jobs:
           cache: npm
       - run: npm ci
       - run: npm run build
-      - name: Layout Pages root (dist/ + root redirect)
+      - name: Prepare site bundle (root redirect + dist/)
         run: |
-          mkdir -p _pages/dist
-          cp -r dist/. _pages/dist/
-          cp scripts/github-pages-repo-root-redirect.html _pages/index.html
-          touch _pages/.nojekyll _pages/dist/.nojekyll
-      - uses: actions/upload-pages-artifact@v4
+          mkdir -p _site/dist
+          cp -r dist/. _site/dist/
+          cp scripts/github-pages-repo-root-redirect.html _site/index.html
+          touch _site/.nojekyll _site/dist/.nojekyll
+      - name: Publish to gh-pages branch
+        uses: peaceiris/actions-gh-pages@v4
         with:
-          path: _pages
-
-  deploy:
-    needs: build
-    runs-on: ubuntu-latest
-    environment:
-      name: github-pages
-      url: ${{ steps.deployment.outputs.page_url }}
-    steps:
-      - name: Deploy to GitHub Pages
-        id: deployment
-        uses: actions/deploy-pages@v4
+          github_token: ${{ secrets.GITHUB_TOKEN }}
+          publish_dir: ./_site
+          publish_branch: gh-pages
