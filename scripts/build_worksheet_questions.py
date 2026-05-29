@@ -981,20 +981,47 @@ QUESTIONS = [
 ]
 
 
+def shorten_hint(exp: str, max_len: int = 90) -> str:
+    """Derive a scaffolded hint from the full explanation."""
+    text = exp.strip()
+    for sep in (". ", "。", "；", "; "):
+        if sep in text:
+            part = text.split(sep, 1)[0].strip()
+            if 12 <= len(part) <= max_len:
+                return part + (sep.strip() if sep.strip() in ".。" else ".")
+    if len(text) <= max_len:
+        return text
+    return text[: max_len - 1].rstrip() + "…"
+
+
+def ensure_hints(questions: list[dict]) -> list[dict]:
+    out = []
+    for q in questions:
+        entry = dict(q)
+        for lang in ("en", "zhHant"):
+            pack = dict(entry[lang])
+            if not pack.get("hint"):
+                pack["hint"] = shorten_hint(pack.get("exp", ""))
+            entry[lang] = pack
+        out.append(entry)
+    return out
+
+
 def main() -> None:
-    OUT.write_text(json.dumps(QUESTIONS, ensure_ascii=False, indent=2) + "\n", encoding="utf-8")
-    lines = ["# Worksheet questions review\n", f"Total: {len(QUESTIONS)}\n\n"]
+    prepared = ensure_hints(QUESTIONS)
+    OUT.write_text(json.dumps(prepared, ensure_ascii=False, indent=2) + "\n", encoding="utf-8")
+    lines = ["# Worksheet questions review\n", f"Total: {len(prepared)}\n\n"]
     by_topic: dict[str, int] = {}
-    for q in QUESTIONS:
+    for q in prepared:
         by_topic[q["topic"]] = by_topic.get(q["topic"], 0) + 1
     for topic, n in sorted(by_topic.items()):
         lines.append(f"- **{topic}**: {n} questions\n")
     lines.append("\n| Topic | Section | Question (EN) |\n|-------|---------|---------------|\n")
-    for q in QUESTIONS:
+    for q in prepared:
         stem = q["en"]["q"][:70].replace("|", "/")
         lines.append(f"| {q['topic']} | {q['section']} | {stem}… |\n")
     REVIEW.write_text("".join(lines), encoding="utf-8")
-    print(f"Wrote {len(QUESTIONS)} questions -> {OUT}")
+    print(f"Wrote {len(prepared)} questions -> {OUT}")
 
 
 if __name__ == "__main__":

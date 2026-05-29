@@ -655,6 +655,300 @@ canvas.lab-canvas {
   margin-bottom: 14px;
 }
 
+/* ===== Worksheet generator (Chem-style) ===== */
+.panel--worksheets .ws-topic-card {
+  cursor: pointer;
+  display: flex;
+  gap: 10px;
+  align-items: center;
+}
+
+.panel--worksheets .ws-action-row {
+  margin-top: 14px;
+}
+
+.preview-tabs {
+  display: flex;
+  gap: 6px;
+  margin: 14px 0 10px;
+  flex-wrap: wrap;
+}
+
+.preview-tab {
+  padding: 8px 16px;
+  border: 1px solid var(--border);
+  border-radius: 999px;
+  background: var(--surface2);
+  color: var(--text);
+  font-size: 0.875rem;
+  font-weight: 600;
+  cursor: pointer;
+  transition: background 0.15s, border-color 0.15s;
+}
+
+.preview-tab:hover {
+  background: var(--surface);
+}
+
+.preview-tab.active {
+  background: var(--accent, #4f46e5);
+  border-color: var(--accent, #4f46e5);
+  color: #fff;
+}
+
+.worksheet-paper {
+  background: #fff;
+  border: 1px solid var(--border);
+  border-radius: var(--radius);
+  padding: 20px 24px;
+  box-shadow: var(--shadow);
+}
+
+.worksheet-paper.practice-mode {
+  border-color: #a5b4fc;
+}
+
+.worksheet-header .header-top {
+  display: flex;
+  justify-content: space-between;
+  align-items: flex-start;
+  gap: 12px;
+  flex-wrap: wrap;
+  margin-bottom: 16px;
+  padding-bottom: 12px;
+  border-bottom: 2px solid var(--border);
+}
+
+.worksheet-header h3 {
+  margin: 0;
+  font-size: 1.1rem;
+}
+
+.ws-date-row {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  font-size: 0.875rem;
+}
+
+.btn-sm {
+  padding: 4px 10px;
+  font-size: 0.8rem;
+}
+
+.ws-date-print {
+  font-size: 0.875rem;
+  color: var(--muted);
+  margin: 0 0 12px;
+}
+
+.question-row {
+  margin-bottom: 18px;
+  padding: 12px;
+  border-radius: 10px;
+  border: 1px solid transparent;
+  transition: background 0.15s;
+}
+
+.question-row .q-header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 8px;
+}
+
+.question-row h4 {
+  margin: 0 0 6px;
+  font-size: 0.95rem;
+}
+
+.q-section {
+  font-size: 0.75rem;
+  font-weight: 500;
+  color: var(--muted);
+}
+
+.choice-list {
+  margin: 8px 0 0;
+  padding-left: 0;
+  list-style: none;
+}
+
+.choice-list li {
+  margin-bottom: 6px;
+}
+
+.choice-circle {
+  display: inline-block;
+  width: 14px;
+  height: 14px;
+  border: 1.5px solid #94a3b8;
+  border-radius: 50%;
+  margin-right: 4px;
+  vertical-align: middle;
+}
+
+.choice-radio {
+  display: flex;
+  align-items: flex-start;
+  gap: 8px;
+  cursor: pointer;
+}
+
+.choice-radio input {
+  margin-top: 3px;
+  accent-color: #4f46e5;
+}
+
+.choice-correct {
+  color: #047857;
+  font-weight: 600;
+}
+
+.q-hint {
+  margin-top: 8px;
+  padding: 8px 12px;
+  background: #fef3c7;
+  border-radius: 8px;
+  font-size: 0.875rem;
+}
+
+.q-exp {
+  margin-top: 8px;
+  font-size: 0.875rem;
+  color: var(--muted);
+}
+
+.question-row.correct {
+  background: linear-gradient(135deg, #ecfdf5 0%, #d1fae5 100%);
+  border-color: #a7f3d0;
+}
+
+.question-row.incorrect {
+  background: linear-gradient(135deg, #fef2f2 0%, #fee2e2 100%);
+  border-color: #fca5a5;
+}
+
+.result-icon {
+  font-size: 1.2rem;
+  font-weight: 700;
+}
+
+.question-row.correct .result-icon {
+  color: #10b981;
+}
+
+.question-row.incorrect .result-icon {
+  color: #ef4444;
+}
+
+.practice-actions {
+  display: flex;
+  align-items: center;
+  gap: 16px;
+  margin-top: 16px;
+  padding-top: 14px;
+  border-top: 1px dashed var(--border);
+}
+
+.check-btn {
+  padding: 10px 20px;
+  background: linear-gradient(135deg, #6366f1 0%, #4f46e5 100%);
+  color: #fff;
+  border: none;
+  border-radius: 12px;
+  font-size: 0.9rem;
+  font-weight: 600;
+  cursor: pointer;
+  transition: transform 0.15s, box-shadow 0.15s;
+}
+
+.check-btn:hover {
+  transform: translateY(-1px);
+  box-shadow: 0 4px 12px rgba(79, 70, 229, 0.3);
+}
+
+.score-display {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+
+.score-label {
+  font-size: 0.875rem;
+  color: var(--muted);
+}
+
+.score-value {
+  font-size: 1.25rem;
+  font-weight: 700;
+  color: #4f46e5;
+}
+
+.score-value.perfect {
+  color: #10b981;
+}
+
+.ws-session-summary {
+  margin-top: 16px;
+  padding: 16px;
+  background: var(--surface2);
+  border-radius: var(--radius);
+  border: 1px solid var(--border);
+}
+
+.ws-session-summary h4 {
+  margin: 0 0 8px;
+}
+
+.export-buttons {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px;
+  margin-top: 14px;
+}
+
+.export-btn {
+  padding: 8px 14px;
+  border: 1px solid var(--border);
+  border-radius: 10px;
+  background: var(--surface2);
+  font-size: 0.85rem;
+  font-weight: 600;
+  cursor: pointer;
+  transition: background 0.15s;
+}
+
+.export-btn:hover {
+  background: var(--surface);
+}
+
+@media print {
+  .no-print {
+    display: none !important;
+  }
+
+  .panel--worksheets .ws-controls,
+  .preview-tabs,
+  .practice-actions,
+  .export-buttons,
+  .ws-session-summary {
+    display: none !important;
+  }
+
+  .worksheet-paper {
+    box-shadow: none;
+    border: none;
+    padding: 0;
+  }
+
+  .question-row.correct,
+  .question-row.incorrect {
+    background: transparent !important;
+    border-color: transparent !important;
+  }
+}
+
 .flashcard-box {
   min-height: 180px;
   display: flex;

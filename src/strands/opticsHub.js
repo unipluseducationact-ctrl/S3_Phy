@@ -7,6 +7,7 @@ import { createLensLab } from '../tools/lensLab.js';
 import { createEmLab } from '../tools/emLab.js';
 import { createRgbColorMixerLab } from '../tools/rgbColorMixerLab.js';
 import { mountHubShell } from '../hubShell.js';
+import { renderWorksheets, hydrateWorksheets } from '../worksheets/mcqWorksheet.js';
 
 const TOOL_ORDER = ['rotatingMirror', 'refractionTir', 'lens', 'rgbMixer', 'em'];
 
@@ -47,15 +48,6 @@ async function noteExists(name) {
   return assetExists('notes', name);
 }
 
-function shuffle(arr) {
-  const a = arr.slice();
-  for (let i = a.length - 1; i > 0; i -= 1) {
-    const j = Math.floor(Math.random() * (i + 1));
-    [a[i], a[j]] = [a[j], a[i]];
-  }
-  return a;
-}
-
 export function mountOpticsHub(root) {
   let section = 'topics';
   let toolId = 'rotatingMirror';
@@ -63,8 +55,6 @@ export function mountOpticsHub(root) {
   let flashIndex = 0;
   let flashDeck = 'all';
   let flashShowBack = false;
-  let wsItems = [];
-  let wsAnswers = false;
 
   let shell = null;
   let el = { main: null };
@@ -75,13 +65,13 @@ export function mountOpticsHub(root) {
     if (section === 'topics') el.main.innerHTML = renderTopics();
     else if (section === 'notes') el.main.innerHTML = renderNotesShell();
     else if (section === 'tools') el.main.innerHTML = renderToolsShell();
-    else if (section === 'worksheets') el.main.innerHTML = renderWorksheets();
+    else if (section === 'worksheets') el.main.innerHTML = renderWorksheets(t);
     else if (section === 'flashcards') el.main.innerHTML = renderFlashcardsShell();
     else if (section === 'summary') el.main.innerHTML = renderSummary();
 
     if (section === 'notes') void hydrateNotes();
     if (section === 'tools') hydrateTools();
-    if (section === 'worksheets') hydrateWorksheets();
+    if (section === 'worksheets') hydrateWorksheets(root, questions, t, langKey);
     if (section === 'flashcards') hydrateFlashcards();
     if (section === 'summary') void hydrateSummary();
   }
@@ -242,105 +232,6 @@ export function mountOpticsHub(root) {
     if (!factory) return;
     const node = toolId === 'lens' ? factory(t, lensDefaultKind) : factory(t);
     stage.appendChild(node);
-  }
-
-  function renderWorksheets() {
-    const topics = [
-      ['rotatingMirror', 'topic.rotatingMirror'],
-      ['refractionTir', 'topic.refractionTir'],
-      ['convex', 'topic.convex'],
-      ['concave', 'topic.concave'],
-      ['em', 'topic.em'],
-    ];
-    return `
-      <section class="panel">
-        <h2>${t('worksheets.title')}</h2>
-        <p class="lead">${t('worksheets.intro')}</p>
-        <div class="controls">
-          <div class="control">
-            <label>${t('worksheets.count')}</label>
-            <select data-ws-count>
-              <option>5</option><option>10</option><option>15</option>
-            </select>
-          </div>
-        </div>
-        <p class="lead" style="margin-top:10px">${t('worksheets.topics')}</p>
-        <div class="grid cols-2" data-ws-topics>
-          ${topics
-            .map(([id, key]) => `<label class="card" style="cursor:pointer;display:flex;gap:10px;align-items:center">
-            <input type="checkbox" data-ws-topic="${id}" checked />
-            <span>${t(key)}</span>
-          </label>`)
-            .join('')}
-        </div>
-        <p style="margin-top:14px">
-          <button class="btn primary" type="button" data-ws-gen>${t('worksheets.generate')}</button>
-          <button class="btn" type="button" data-ws-print-p>${t('worksheets.printPractice')}</button>
-          <button class="btn" type="button" data-ws-print-a>${t('worksheets.printAnswers')}</button>
-        </p>
-        <div class="worksheet-output" data-ws-out><p class="lead">${t('worksheets.empty')}</p></div>
-      </section>`;
-  }
-
-  function hydrateWorksheets() {
-    const gen = root.querySelector('[data-ws-gen]');
-    const printP = root.querySelector('[data-ws-print-p]');
-    const printA = root.querySelector('[data-ws-print-a]');
-    const out = root.querySelector('[data-ws-out]');
-    if (!gen || !out) return;
-
-    gen.addEventListener('click', () => {
-      const count = Number(root.querySelector('[data-ws-count]').value);
-      const picked = [...root.querySelectorAll('[data-ws-topic]')]
-        .filter((c) => c.checked)
-        .map((c) => c.getAttribute('data-ws-topic'));
-      const pool = questions.filter((q) => {
-        const topic = q.topic;
-        if (picked.includes(topic)) return true;
-        if (picked.includes('rotatingMirror') && topic === 'reflection') return true;
-        if (
-          picked.includes('refractionTir') &&
-          (topic === 'refraction' || topic === 'tir')
-        ) {
-          return true;
-        }
-        if (topic === 'convex' && picked.includes('convex')) return true;
-        if (topic === 'concave' && picked.includes('concave')) return true;
-        return false;
-      });
-      const deck = shuffle(pool).slice(0, Math.min(count, pool.length || 1));
-      wsItems = deck.length ? deck : shuffle(questions).slice(0, Math.min(count, questions.length));
-      wsAnswers = false;
-      paintWs(out);
-    });
-
-    printP.addEventListener('click', () => {
-      wsAnswers = false;
-      paintWs(out);
-      window.print();
-    });
-    printA.addEventListener('click', () => {
-      wsAnswers = true;
-      paintWs(out);
-      window.print();
-    });
-  }
-
-  function paintWs(out) {
-    const lk = langKey();
-    if (!wsItems.length) {
-      out.innerHTML = `<p class="lead">${t('worksheets.empty')}</p>`;
-      return;
-    }
-    out.innerHTML = wsItems
-      .map((q, i) => {
-        const pack = q[lk] || q.en;
-        const letters = ['A', 'B', 'C', 'D'];
-        const choices = pack.choices.map((c, j) => `<li><strong>${letters[j]}.</strong> ${c}</li>`).join('');
-        const ans = wsAnswers ? `<p><em>${pack.exp}</em></p><p><strong>Answer:</strong> ${letters[pack.a]}</p>` : '';
-        return `<div class="q"><h4>Q${i + 1}</h4><p>${pack.q}</p><ol style="margin:0;padding-left:18px">${choices}</ol>${ans}</div>`;
-      })
-      .join('');
   }
 
   function renderFlashcardsShell() {

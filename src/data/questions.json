@@ -11,7 +11,8 @@
         "unrelated"
       ],
       "a": 0,
-      "exp": "Summary: i = r for all reflection."
+      "exp": "Summary: i = r for all reflection.",
+      "hint": "Summary: i = r for all reflection."
     },
     "zhHant": {
       "q": "根據反射定律，入射角與反射角的關係是____。",
@@ -22,7 +23,8 @@
         "無關"
       ],
       "a": 0,
-      "exp": "總結：入射角 = 反射角。"
+      "exp": "總結：入射角 = 反射角。",
+      "hint": "總結：入射角 = 反射角。"
     }
   },
   {
@@ -37,7 +39,8 @@
         "principal axis"
       ],
       "a": 1,
-      "exp": "Angles are measured from the normal, not the surface."
+      "exp": "Angles are measured from the normal, not the surface.",
+      "hint": "Angles are measured from the normal, not the surface."
     },
     "zhHant": {
       "q": "入射角是入射光線與哪一條線的夾角？",
@@ -48,7 +51,8 @@
         "主軸"
       ],
       "a": 1,
-      "exp": "角度應與法線量度，不是與鏡面。"
+      "exp": "角度應與法線量度，不是與鏡面。",
+      "hint": "角度應與法線量度，不是與鏡面。"
     }
   },
   {
@@ -63,7 +67,8 @@
         "black"
       ],
       "a": 1,
-      "exp": "Smooth polished surfaces give parallel reflected rays and clear images."
+      "exp": "Smooth polished surfaces give parallel reflected rays and clear images.",
+      "hint": "Smooth polished surfaces give parallel reflected rays and clear images."
     },
     "zhHant": {
       "q": "規則反射主要發生在____表面。",
@@ -74,7 +79,8 @@
         "黑色"
       ],
       "a": 1,
-      "exp": "光滑表面反射光線互相平行，可形成清晰像。"
+      "exp": "光滑表面反射光線互相平行，可形成清晰像。",
+      "hint": "光滑表面反射光線互相平行，可形成清晰像。"
     }
   },
   {
@@ -89,7 +95,8 @@
         "underwater"
       ],
       "a": 1,
-      "exp": "Rough surfaces scatter reflected rays in many directions."
+      "exp": "Rough surfaces scatter reflected rays in many directions.",
+      "hint": "Rough surfaces scatter reflected rays in many directions."
     },
     "zhHant": {
       "q": "漫反射發生在____表面，不能形成清晰像。",
@@ -100,7 +107,8 @@
         "水中"
       ],
       "a": 1,
-      "exp": "粗糙表面使反射光向各方向散射。"
+      "exp": "粗糙表面使反射光向各方向散射。",
+      "hint": "粗糙表面使反射光向各方向散射。"
     }
   },
   {
@@ -115,7 +123,8 @@
         "enlarged"
       ],
       "a": 1,
-      "exp": "Plane mirror images are virtual; rays only appear to meet behind the mirror."
+      "exp": "Plane mirror images are virtual; rays only appear to meet behind the mirror.",
+      "hint": "Plane mirror images are virtual."
     },
     "zhHant": {
       "q": "平面鏡所成的像必定是____。",
@@ -126,7 +135,8 @@
         "放大"
       ],
       "a": 1,
-      "exp": "平面鏡成虛像，光線延長線在鏡後相交。"
+      "exp": "平面鏡成虛像，光線延長線在鏡後相交。",
+      "hint": "平面鏡成虛像，光線延長線在鏡後相交。"
     }
   },
   {
@@ -141,7 +151,8 @@
         "at infinity from"
       ],
       "a": 1,
-      "exp": "Image height equals object height; left and right appear swapped."
+      "exp": "Image height equals object height; left and right appear swapped.",
+      "hint": "Image height equals object height."
     },
     "zhHant": {
       "q": "平面鏡像與物體比較，大小____，且左右倒轉。",
@@ -152,7 +163,8 @@
         "在無窮遠"
       ],
       "a": 1,
-      "exp": "像高與物高相同，並有左右倒轉。"
+      "exp": "像高與物高相同，並有左右倒轉。",
+      "hint": "像高與物高相同，並有左右倒轉。"
     }
   },
   {
@@ -167,7 +179,8 @@
         "v = 0"
       ],
       "a": 1,
-      "exp": "The image is as far behind the mirror as the object is in front."
+      "exp": "The image is as far behind the mirror as the object is in front.",
+      "hint": "The image is as far behind the mirror as the object is in front."
     },
     "zhHant": {
       "q": "平面鏡的物距 u 與像距 v 滿足____。",
@@ -178,7 +191,8 @@
         "v = 0"
       ],
       "a": 1,
-      "exp": "像距等於物距（虛像在鏡後）。"
+      "exp": "像距等於物距（虛像在鏡後）。",
+      "hint": "像距等於物距（虛像在鏡後）。"
     }
   },
   {
@@ -193,7 +207,8 @@
         "the full"
       ],
       "a": 1,
-      "exp": "Summary: minimum mirror length ≈ ½ × height (eyes to feet)."
+      "exp": "Summary: minimum mirror length ≈ ½ × height (eyes to feet).",
+      "hint": "Summary: minimum mirror length ≈ ½ × height (eyes to feet)."
     },
     "zhHant": {
       "q": "要看見全身，平面鏡的最小長度約為身高的____。",
@@ -204,7 +219,8 @@
         "與身高相同"
       ],
       "a": 1,
-      "exp": "總結：最小鏡長約為身高的一半。"
+      "exp": "總結：最小鏡長約為身高的一半。",
+      "hint": "總結：最小鏡長約為身高的一半。"
     }
   },
   {
@@ -219,7 +235,8 @@
         "random"
       ],
       "a": 2,
-      "exp": "Far-away rays arriving at the eye are nearly parallel."
+      "exp": "Far-away rays arriving at the eye are nearly parallel.",
+      "hint": "Far-away rays arriving at the eye are nearly parallel."
     },
     "zhHant": {
       "q": "很遠的物體發出的光線通常可視為____。",
@@ -230,7 +247,8 @@
         "雜亂"
       ],
       "a": 2,
-      "exp": "遠距離光線接近平行。"
+      "exp": "遠距離光線接近平行。",
+      "hint": "遠距離光線接近平行。"
     }
   },
   {
@@ -245,7 +263,8 @@
         "90° − θ"
       ],
       "a": 1,
-      "exp": "Mirror rotation θ changes the reflected direction by 2θ."
+      "exp": "Mirror rotation θ changes the reflected direction by 2θ.",
+      "hint": "Mirror rotation θ changes the reflected direction by 2θ."
     },
     "zhHant": {
       "q": "平面鏡轉動 θ（入射光線不變），反射光線方向改變____。",
@@ -256,7 +275,8 @@
         "90° − θ"
       ],
       "a": 1,
-      "exp": "鏡面轉 θ，反射光偏轉 2θ。"
+      "exp": "鏡面轉 θ，反射光偏轉 2θ。",
+      "hint": "鏡面轉 θ，反射光偏轉 2θ。"
     }
   },
   {
@@ -271,7 +291,8 @@
         "i = r"
       ],
       "a": 0,
-      "exp": "n1 sin i = n2 sin r relates angles and refractive indices."
+      "exp": "n1 sin i = n2 sin r relates angles and refractive indices.",
+      "hint": "n1 sin i = n2 sin r relates angles and refractive indices."
     },
     "zhHant": {
       "q": "司乃耳定律的公式是____。",
@@ -282,7 +303,8 @@
         "i = r"
       ],
       "a": 0,
-      "exp": "n1 sin i = n2 sin r 連結折射率與角度。"
+      "exp": "n1 sin i = n2 sin r 連結折射率與角度。",
+      "hint": "n1 sin i = n2 sin r 連結折射率與角度。"
     }
   },
   {
@@ -297,7 +319,8 @@
         "parallel to"
       ],
       "a": 1,
-      "exp": "In a denser medium the ray is closer to the normal."
+      "exp": "In a denser medium the ray is closer to the normal.",
+      "hint": "In a denser medium the ray is closer to the normal."
     },
     "zhHant": {
       "q": "光進入光密介質（n2 > n1）時，向法線哪方偏折？",
@@ -308,7 +331,8 @@
         "平行法線"
       ],
       "a": 1,
-      "exp": "進入光密介質時光線較靠近法線。"
+      "exp": "進入光密介質時光線較靠近法線。",
+      "hint": "進入光密介質時光線較靠近法線。"
     }
   },
   {
@@ -323,7 +347,8 @@
         "i/r"
       ],
       "a": 1,
-      "exp": "n = speed of light in vacuum / speed in the medium."
+      "exp": "n = speed of light in vacuum / speed in the medium.",
+      "hint": "n = speed of light in vacuum / speed in the medium."
     },
     "zhHant": {
       "q": "折射率 n 的定義為 n = ____。",
@@ -334,7 +359,8 @@
         "i/r"
       ],
       "a": 1,
-      "exp": "n = 真空光速 / 介質中光速。"
+      "exp": "n = 真空光速 / 介質中光速。",
+      "hint": "n = 真空光速 / 介質中光速。"
     }
   },
   {
@@ -349,7 +375,8 @@
         "inverted"
       ],
       "a": 1,
-      "exp": "Refraction at the surface makes the image appear closer (apparent depth < real depth)."
+      "exp": "Refraction at the surface makes the image appear closer (apparent depth < real depth).",
+      "hint": "Refraction at the surface makes the image appear closer (apparent depth < real depth)."
     },
     "zhHant": {
       "q": "從水上俯視水底物體，它看起來比實際深度____。",
@@ -360,7 +387,8 @@
         "倒立"
       ],
       "a": 1,
-      "exp": "折射使視深小於實深。"
+      "exp": "折射使視深小於實深。",
+      "hint": "折射使視深小於實深。"
     }
   },
   {
@@ -375,7 +403,8 @@
         "only as transverse waves"
       ],
       "a": 1,
-      "exp": "Larger n means smaller speed v = c/n."
+      "exp": "Larger n means smaller speed v = c/n.",
+      "hint": "Larger n means smaller speed v = c/n."
     },
     "zhHant": {
       "q": "折射率較大的介質中，光速____。",
@@ -386,7 +415,8 @@
         "只有橫波"
       ],
       "a": 1,
-      "exp": "n 越大，v = c/n 越小。"
+      "exp": "n 越大，v = c/n 越小。",
+      "hint": "n 越大，v = c/n 越小。"
     }
   },
   {
@@ -401,7 +431,8 @@
         "doubles its speed"
       ],
       "a": 1,
-      "exp": "At i = 0°, the refracted ray continues along the normal."
+      "exp": "At i = 0°, the refracted ray continues along the normal.",
+      "hint": "At i = 0°, the refracted ray continues along the normal."
     },
     "zhHant": {
       "q": "光垂直入射介面（i = 0°）時，____。",
@@ -412,7 +443,8 @@
         "速度加倍"
       ],
       "a": 1,
-      "exp": "i = 0° 時折射光沿法線方向。"
+      "exp": "i = 0° 時折射光沿法線方向。",
+      "hint": "i = 0° 時折射光沿法線方向。"
     }
   },
   {
@@ -427,7 +459,8 @@
         "not at all"
       ],
       "a": 1,
-      "exp": "Leaving a denser medium, the ray moves away from the normal."
+      "exp": "Leaving a denser medium, the ray moves away from the normal.",
+      "hint": "Leaving a denser medium, the ray moves away from the normal."
     },
     "zhHant": {
       "q": "光由光密進入光疏介質時，向法線____偏折。",
@@ -438,7 +471,8 @@
         "不偏折"
       ],
       "a": 1,
-      "exp": "進入光疏介質時光線遠離法線。"
+      "exp": "進入光疏介質時光線遠離法線。",
+      "hint": "進入光疏介質時光線遠離法線。"
     }
   },
   {
@@ -453,7 +487,8 @@
         "stops"
       ],
       "a": 1,
-      "exp": "Refraction obeys reversibility of light rays."
+      "exp": "Refraction obeys reversibility of light rays.",
+      "hint": "Refraction obeys reversibility of light rays."
     },
     "zhHant": {
       "q": "沿折射光路反向傳播時，光線____。",
@@ -464,7 +499,8 @@
         "停止"
       ],
       "a": 1,
-      "exp": "折射符合光路可逆性。"
+      "exp": "折射符合光路可逆性。",
+      "hint": "折射符合光路可逆性。"
     }
   },
   {
@@ -479,7 +515,8 @@
         "2.4"
       ],
       "a": 1,
-      "exp": "Air ≈ 1; glass and water have n > 1."
+      "exp": "Air ≈ 1; glass and water have n > 1.",
+      "hint": "Air ≈ 1; glass and water have n > 1."
     },
     "zhHant": {
       "q": "在空氣中的計算通常取折射率約為____。",
@@ -490,7 +527,8 @@
         "2.4"
       ],
       "a": 1,
-      "exp": "空氣 n ≈ 1。"
+      "exp": "空氣 n ≈ 1。",
+      "hint": "空氣 n ≈ 1。"
     }
   },
   {
@@ -505,7 +543,8 @@
         "always zero"
       ],
       "a": 2,
-      "exp": "From Snell's law, sin r > sin i when n2 < n1."
+      "exp": "From Snell's law, sin r > sin i when n2 < n1.",
+      "hint": "From Snell's law, sin r > sin i when n2 < n1."
     },
     "zhHant": {
       "q": "光由光密進入光疏時，光疏中的折射角與光密中的入射角相比____。",
@@ -516,7 +555,8 @@
         "恆為零"
       ],
       "a": 2,
-      "exp": "n2 < n1 時 sin r > sin i。"
+      "exp": "n2 < n1 時 sin r > sin i。",
+      "hint": "n2 < n1 時 sin r > sin i。"
     }
   },
   {
@@ -531,7 +571,8 @@
         "vacuum to vacuum"
       ],
       "a": 1,
-      "exp": "TIR needs light incident in the optically denser medium."
+      "exp": "TIR needs light incident in the optically denser medium.",
+      "hint": "TIR needs light incident in the optically denser medium."
     },
     "zhHant": {
       "q": "全內反射發生時，光由____進入____。",
@@ -542,7 +583,8 @@
         "真空到真空"
       ],
       "a": 1,
-      "exp": "須從光密介質射向光疏介質。"
+      "exp": "須從光密介質射向光疏介質。",
+      "hint": "須從光密介質射向光疏介質。"
     }
   },
   {
@@ -557,7 +599,8 @@
         "1"
       ],
       "a": 1,
-      "exp": "sin C = n_rare / n_dense (second medium / first)."
+      "exp": "sin C = n_rare / n_dense (second medium / first).",
+      "hint": "sin C = n_rare / n_dense (second medium / first)."
     },
     "zhHant": {
       "q": "光由介質 1（光密）到介質 2（光疏）的臨界角 C 滿足 sin C = ____。",
@@ -568,7 +611,8 @@
         "1"
       ],
       "a": 1,
-      "exp": "sin C = n疏 / n密。"
+      "exp": "sin C = n疏 / n密。",
+      "hint": "sin C = n疏 / n密。"
     }
   },
   {
@@ -583,7 +627,8 @@
         "unrelated to"
       ],
       "a": 2,
-      "exp": "i > C gives total internal reflection."
+      "exp": "i > C gives total internal reflection.",
+      "hint": "i > C gives total internal reflection."
     },
     "zhHant": {
       "q": "當光密中的入射角____臨界角時發生全內反射。",
@@ -594,7 +639,8 @@
         "與…無關"
       ],
       "a": 2,
-      "exp": "i > C 時全內反射。"
+      "exp": "i > C 時全內反射。",
+      "hint": "i > C 時全內反射。"
     }
   },
   {
@@ -609,7 +655,8 @@
         "180°"
       ],
       "a": 2,
-      "exp": "At C the refracted ray grazes the surface (r = 90°)."
+      "exp": "At C the refracted ray grazes the surface (r = 90°).",
+      "hint": "At C the refracted ray grazes the surface (r = 90°)."
     },
     "zhHant": {
       "q": "在臨界角時，折射光線沿界面的折射角為____。",
@@ -620,7 +667,8 @@
         "180°"
       ],
       "a": 2,
-      "exp": "臨界角時 r = 90°。"
+      "exp": "臨界角時 r = 90°。",
+      "hint": "臨界角時 r = 90°。"
     }
   },
   {
@@ -635,7 +683,8 @@
         "dispersion only"
       ],
       "a": 1,
-      "exp": "Core-cladding TIR guides light along the fibre."
+      "exp": "Core-cladding TIR guides light along the fibre.",
+      "hint": "Core-cladding TIR guides light along the fibre."
     },
     "zhHant": {
       "q": "光纖利用重複的____使光在芯內傳播。",
@@ -646,7 +695,8 @@
         "只有色散"
       ],
       "a": 1,
-      "exp": "芯與包層間的全內反射導光。"
+      "exp": "芯與包層間的全內反射導光。",
+      "hint": "芯與包層間的全內反射導光。"
     }
   },
   {
@@ -661,7 +711,8 @@
         "infinite"
       ],
       "a": 1,
-      "exp": "Small C means more TIR inside the gem."
+      "exp": "Small C means more TIR inside the gem.",
+      "hint": "Small C means more TIR inside the gem."
     },
     "zhHant": {
       "q": "鑽石耀眼，部分原因是高折射率使臨界角____。",
@@ -672,7 +723,8 @@
         "無窮"
       ],
       "a": 1,
-      "exp": "臨界角小，內部全內反射多。"
+      "exp": "臨界角小，內部全內反射多。",
+      "hint": "臨界角小，內部全內反射多。"
     }
   },
   {
@@ -687,7 +739,8 @@
         "replaces refraction"
       ],
       "a": 1,
-      "exp": "TIR requires dense-to-rare incidence."
+      "exp": "TIR requires dense-to-rare incidence.",
+      "hint": "TIR requires dense-to-rare incidence."
     },
     "zhHant": {
       "q": "光由光疏進入光密時，全內反射____。",
@@ -698,7 +751,8 @@
         "取代折射"
       ],
       "a": 1,
-      "exp": "全內反射需光密→光疏。"
+      "exp": "全內反射需光密→光疏。",
+      "hint": "全內反射需光密→光疏。"
     }
   },
   {
@@ -713,7 +767,8 @@
         "polarization"
       ],
       "a": 1,
-      "exp": "Below C there is partial reflection and refraction."
+      "exp": "Below C there is partial reflection and refraction.",
+      "hint": "Below C there is partial reflection and refraction."
     },
     "zhHant": {
       "q": "光密→光疏且 i < C 時，界面上同時有反射和____。",
@@ -724,7 +779,8 @@
         "偏振"
       ],
       "a": 1,
-      "exp": "i < C 時為部分反射與折射。"
+      "exp": "i < C 時為部分反射與折射。",
+      "hint": "i < C 時為部分反射與折射。"
     }
   },
   {
@@ -739,7 +795,8 @@
         "diffraction"
       ],
       "a": 1,
-      "exp": "Standard periscopes use reflection, not TIR."
+      "exp": "Standard periscopes use reflection, not TIR.",
+      "hint": "Standard periscopes use reflection, not TIR."
     },
     "zhHant": {
       "q": "用平面鏡的潛望鏡在每面鏡上依靠____。",
@@ -750,7 +807,8 @@
         "繞射"
       ],
       "a": 1,
-      "exp": "一般潛望鏡用反射。"
+      "exp": "一般潛望鏡用反射。",
+      "hint": "一般潛望鏡用反射。"
     }
   },
   {
@@ -765,7 +823,8 @@
         "2.33"
       ],
       "a": 1,
-      "exp": "sin C = n_air / n_water ≈ 1/1.33."
+      "exp": "sin C = n_air / n_water ≈ 1/1.33.",
+      "hint": "sin C = n_air / n_water ≈ 1/1.33."
     },
     "zhHant": {
       "q": "光由水（n ≈ 1.33）到空氣（n ≈ 1），sin C 約為____。",
@@ -776,7 +835,8 @@
         "2.33"
       ],
       "a": 1,
-      "exp": "sin C = n空氣 / n水。"
+      "exp": "sin C = n空氣 / n水。",
+      "hint": "sin C = n空氣 / n水。"
     }
   },
   {
@@ -791,7 +851,8 @@
         "polarizing"
       ],
       "a": 1,
-      "exp": "Convex lenses converge parallel rays toward a focus."
+      "exp": "Convex lenses converge parallel rays toward a focus.",
+      "hint": "Convex lenses converge parallel rays toward a focus."
     },
     "zhHant": {
       "q": "凸透鏡又稱____透鏡。",
@@ -802,7 +863,8 @@
         "偏振"
       ],
       "a": 1,
-      "exp": "凸透鏡使平行光會聚。"
+      "exp": "凸透鏡使平行光會聚。",
+      "hint": "凸透鏡使平行光會聚。"
     }
   },
   {
@@ -817,7 +879,8 @@
         "the object"
       ],
       "a": 1,
-      "exp": "Rule 1: parallel in, focus out."
+      "exp": "Rule 1: parallel in, focus out.",
+      "hint": "Rule 1: parallel in, focus out."
     },
     "zhHant": {
       "q": "凸透鏡：平行於主軸的光線折射後通過____。",
@@ -828,7 +891,8 @@
         "物體"
       ],
       "a": 1,
-      "exp": "規則一：平行入、焦點出。"
+      "exp": "規則一：平行入、焦點出。",
+      "hint": "規則一：平行入、焦點出。"
     }
   },
   {
@@ -843,7 +907,8 @@
         "backward"
       ],
       "a": 1,
-      "exp": "Rule 2: focus in, parallel out."
+      "exp": "Rule 2: focus in, parallel out.",
+      "hint": "Rule 2: focus in, parallel out."
     },
     "zhHant": {
       "q": "通過凸透鏡焦點 F 的光線折射後與主軸____。",
@@ -854,7 +919,8 @@
         "反向"
       ],
       "a": 1,
-      "exp": "規則二：焦點入、平行出。"
+      "exp": "規則二：焦點入、平行出。",
+      "hint": "規則二：焦點入、平行出。"
     }
   },
   {
@@ -869,7 +935,8 @@
         "doubles in speed"
       ],
       "a": 1,
-      "exp": "Rule 3: C in, C out — undeviated."
+      "exp": "Rule 3: C in, C out — undeviated.",
+      "hint": "Rule 3: C in, C out — undeviated."
     },
     "zhHant": {
       "q": "通過薄透鏡光心 C 的光線____。",
@@ -880,7 +947,8 @@
         "速度加倍"
       ],
       "a": 1,
-      "exp": "規則三：光心入、光心出。"
+      "exp": "規則三：光心入、光心出。",
+      "hint": "規則三：光心入、光心出。"
     }
   },
   {
@@ -895,7 +963,8 @@
         "at the object"
       ],
       "a": 1,
-      "exp": "u > 2f: real, inverted, diminished image between f and 2f."
+      "exp": "u > 2f: real, inverted, diminished image between f and 2f.",
+      "hint": "u > 2f: real, inverted, diminished image between f and 2f."
     },
     "zhHant": {
       "q": "實物在凸透鏡 2f 以外時，像為____。",
@@ -906,7 +975,8 @@
         "在物體處"
       ],
       "a": 1,
-      "exp": "u > 2f：實像、倒立、縮小。"
+      "exp": "u > 2f：實像、倒立、縮小。",
+      "hint": "u > 2f：實像、倒立、縮小。"
     }
   },
   {
@@ -921,7 +991,8 @@
         "inside the lens"
       ],
       "a": 1,
-      "exp": "u = 2f gives v = 2f, same size inverted real image."
+      "exp": "u = 2f gives v = 2f, same size inverted real image.",
+      "hint": "u = 2f gives v = 2f, same size inverted real image."
     },
     "zhHant": {
       "q": "凸透鏡 u = 2f 時，像成在____。",
@@ -932,7 +1003,8 @@
         "鏡內"
       ],
       "a": 1,
-      "exp": "u = v = 2f，等大倒立實像。"
+      "exp": "u = v = 2f，等大倒立實像。",
+      "hint": "u = v = 2f，等大倒立實像。"
     }
   },
   {
@@ -947,7 +1019,8 @@
         "virtual"
       ],
       "a": 1,
-      "exp": "f < u < 2f gives enlarged real image beyond 2f."
+      "exp": "f < u < 2f gives enlarged real image beyond 2f.",
+      "hint": "f < u < 2f gives enlarged real image beyond 2f."
     },
     "zhHant": {
       "q": "凸透鏡 f < u < 2f 時，像為實像、倒立且____。",
@@ -958,7 +1031,8 @@
         "虛像"
       ],
       "a": 1,
-      "exp": "f < u < 2f：放大實像。"
+      "exp": "f < u < 2f：放大實像。",
+      "hint": "f < u < 2f：放大實像。"
     }
   },
   {
@@ -973,7 +1047,8 @@
         "absent"
       ],
       "a": 1,
-      "exp": "u < f: virtual magnifying-glass image."
+      "exp": "u < f: virtual magnifying-glass image.",
+      "hint": "u < f: virtual magnifying-glass image."
     },
     "zhHant": {
       "q": "物在凸透鏡焦距內（u < f）時，像為____。",
@@ -984,7 +1059,8 @@
         "不存在"
       ],
       "a": 1,
-      "exp": "u < f：虛像、正立、放大（放大鏡）。"
+      "exp": "u < f：虛像、正立、放大（放大鏡）。",
+      "hint": "u < f：虛像、正立、放大（放大鏡）。"
     }
   },
   {
@@ -999,7 +1075,8 @@
         "imaginary"
       ],
       "a": 1,
-      "exp": "Convex converging lenses have f > 0."
+      "exp": "Convex converging lenses have f > 0.",
+      "hint": "Convex converging lenses have f > 0."
     },
     "zhHant": {
       "q": "薄透鏡符號規定中，凸透鏡的焦距為____。",
@@ -1010,7 +1087,8 @@
         "虛數"
       ],
       "a": 1,
-      "exp": "凸透鏡 f > 0。"
+      "exp": "凸透鏡 f > 0。",
+      "hint": "凸透鏡 f > 0。"
     }
   },
   {
@@ -1025,7 +1103,8 @@
         "no"
       ],
       "a": 1,
-      "exp": "Objects are usually beyond 2f → real inverted image."
+      "exp": "Objects are usually beyond 2f → real inverted image.",
+      "hint": "Objects are usually beyond 2f → real inverted image."
     },
     "zhHant": {
       "q": "相機用凸透鏡在感光元件上成____。",
@@ -1036,7 +1115,8 @@
         "無像"
       ],
       "a": 1,
-      "exp": "物通常在 2f 外→實像倒立。"
+      "exp": "物通常在 2f 外→實像倒立。",
+      "hint": "物通常在 2f 外→實像倒立。"
     }
   },
   {
@@ -1051,7 +1131,8 @@
         "polarizing"
       ],
       "a": 1,
-      "exp": "Concave lenses spread out parallel rays."
+      "exp": "Concave lenses spread out parallel rays.",
+      "hint": "Concave lenses spread out parallel rays."
     },
     "zhHant": {
       "q": "凹透鏡是____透鏡。",
@@ -1062,7 +1143,8 @@
         "偏振"
       ],
       "a": 1,
-      "exp": "凹透鏡使平行光發散。"
+      "exp": "凹透鏡使平行光發散。",
+      "hint": "凹透鏡使平行光發散。"
     }
   },
   {
@@ -1077,7 +1159,8 @@
         "at F"
       ],
       "a": 1,
-      "exp": "Diverging lens → virtual, upright, smaller image."
+      "exp": "Diverging lens → virtual, upright, smaller image.",
+      "hint": "Diverging lens → virtual, upright, smaller image."
     },
     "zhHant": {
       "q": "凹透鏡對實物總是成____。",
@@ -1088,7 +1171,8 @@
         "在 F"
       ],
       "a": 1,
-      "exp": "發散透鏡→虛像、正立、縮小。"
+      "exp": "發散透鏡→虛像、正立、縮小。",
+      "hint": "發散透鏡→虛像、正立、縮小。"
     }
   },
   {
@@ -1103,7 +1187,8 @@
         "equal to u"
       ],
       "a": 1,
-      "exp": "Concave diverging lenses have f < 0."
+      "exp": "Concave diverging lenses have f < 0.",
+      "hint": "Concave diverging lenses have f < 0."
     },
     "zhHant": {
       "q": "凹透鏡的焦距在慣用符號下為____。",
@@ -1114,7 +1199,8 @@
         "等於 u"
       ],
       "a": 1,
-      "exp": "凹透鏡 f < 0。"
+      "exp": "凹透鏡 f < 0。",
+      "hint": "凹透鏡 f < 0。"
     }
   },
   {
@@ -1129,7 +1215,8 @@
         "the centre of Earth"
       ],
       "a": 1,
-      "exp": "Parallel in, diverges as if from F."
+      "exp": "Parallel in, diverges as if from F.",
+      "hint": "Parallel in, diverges as if from F."
     },
     "zhHant": {
       "q": "凹透鏡：平行主軸的光線折射後好像來自____。",
@@ -1140,7 +1227,8 @@
         "地心"
       ],
       "a": 1,
-      "exp": "平行入、發散似從 F 出發。"
+      "exp": "平行入、發散似從 F 出發。",
+      "hint": "平行入、發散似從 F 出發。"
     }
   },
   {
@@ -1155,7 +1243,8 @@
         "TIR"
       ],
       "a": 1,
-      "exp": "Myopia needs diverging lenses to move the focus onto the retina."
+      "exp": "Myopia needs diverging lenses to move the focus onto the retina.",
+      "hint": "Myopia needs diverging lenses to move the focus onto the retina."
     },
     "zhHant": {
       "q": "凹透鏡眼鏡用於矯正____。",
@@ -1166,7 +1255,8 @@
         "全內反射"
       ],
       "a": 1,
-      "exp": "近視需發散透鏡使焦點後移到視網膜。"
+      "exp": "近視需發散透鏡使焦點後移到視網膜。",
+      "hint": "近視需發散透鏡使焦點後移到視網膜。"
     }
   },
   {
@@ -1181,7 +1271,8 @@
         "only at C"
       ],
       "a": 1,
-      "exp": "Virtual image lies between F and the lens on the object side."
+      "exp": "Virtual image lies between F and the lens on the object side.",
+      "hint": "Virtual image lies between F and the lens on the object side."
     },
     "zhHant": {
       "q": "凹透鏡的虛像總是在物的____側。",
@@ -1192,7 +1283,8 @@
         "只在 C"
       ],
       "a": 1,
-      "exp": "虛像在物與透鏡之間。"
+      "exp": "虛像在物與透鏡之間。",
+      "hint": "虛像在物與透鏡之間。"
     }
   },
   {
@@ -1207,7 +1299,8 @@
         "top only"
       ],
       "a": 1,
-      "exp": "Diverging lenses are thinner in the centre."
+      "exp": "Diverging lenses are thinner in the centre.",
+      "hint": "Diverging lenses are thinner in the centre."
     },
     "zhHant": {
       "q": "凹透鏡____較薄，邊緣較厚。",
@@ -1218,7 +1311,8 @@
         "只有上方"
       ],
       "a": 1,
-      "exp": "凹透鏡中間薄、邊緣厚。"
+      "exp": "凹透鏡中間薄、邊緣厚。",
+      "hint": "凹透鏡中間薄、邊緣厚。"
     }
   },
   {
@@ -1233,7 +1327,8 @@
         "Only in vacuum"
       ],
       "a": 1,
-      "exp": "Real objects always give virtual images with a diverging lens."
+      "exp": "Real objects always give virtual images with a diverging lens.",
+      "hint": "Real objects always give virtual images with a diverging lens."
     },
     "zhHant": {
       "q": "凹透鏡能否單獨把實物的實像成在屏幕上？",
@@ -1244,7 +1339,8 @@
         "只在真空中能"
       ],
       "a": 1,
-      "exp": "實物經凹透鏡只能成虛像。"
+      "exp": "實物經凹透鏡只能成虛像。",
+      "hint": "實物經凹透鏡只能成虛像。"
     }
   },
   {
@@ -1259,7 +1355,8 @@
         "none"
       ],
       "a": 1,
-      "exp": "Galilean design uses concave eyepiece with convex objective."
+      "exp": "Galilean design uses concave eyepiece with convex objective.",
+      "hint": "Galilean design uses concave eyepiece with convex objective."
     },
     "zhHant": {
       "q": "簡單伽利略望遠鏡的目鏡通常是____透鏡。",
@@ -1270,7 +1367,8 @@
         "無"
       ],
       "a": 1,
-      "exp": "伽利略式：凸物鏡 + 凹目鏡。"
+      "exp": "伽利略式：凸物鏡 + 凹目鏡。",
+      "hint": "伽利略式：凸物鏡 + 凹目鏡。"
     }
   },
   {
@@ -1285,7 +1383,8 @@
         "infinite converging"
       ],
       "a": 1,
-      "exp": "Smaller (more negative) f means stronger divergence."
+      "exp": "Smaller (more negative) f means stronger divergence.",
+      "hint": "Smaller (more negative) f means stronger divergence."
     },
     "zhHant": {
       "q": "焦距越負（絕對值越大）的凹透鏡，發散能力____。",
@@ -1296,7 +1395,8 @@
         "變會聚"
       ],
       "a": 1,
-      "exp": "f 越負，發散越強。"
+      "exp": "f 越負，發散越強。",
+      "hint": "f 越負，發散越強。"
     }
   },
   {
@@ -1311,7 +1411,8 @@
         "wires only"
       ],
       "a": 1,
-      "exp": "EM waves do not need a medium; they travel in vacuum."
+      "exp": "EM waves do not need a medium; they travel in vacuum.",
+      "hint": "EM waves do not need a medium."
     },
     "zhHant": {
       "q": "電磁波是橫波，可在____中傳播。",
@@ -1322,7 +1423,8 @@
         "只有金屬線"
       ],
       "a": 1,
-      "exp": "電磁波不需介質，可在真空傳播。"
+      "exp": "電磁波不需介質，可在真空傳播。",
+      "hint": "電磁波不需介質，可在真空傳播。"
     }
   },
   {
@@ -1337,7 +1439,8 @@
         "IR → radio → UV only"
       ],
       "a": 0,
-      "exp": "Standard EM spectrum from low to high frequency."
+      "exp": "Standard EM spectrum from low to high frequency.",
+      "hint": "Standard EM spectrum from low to high frequency."
     },
     "zhHant": {
       "q": "下列哪個次序為頻率遞增？",
@@ -1348,7 +1451,8 @@
         "只有紅外→無線電→紫外"
       ],
       "a": 0,
-      "exp": "電磁波譜由低頻到高頻的標準次序。"
+      "exp": "電磁波譜由低頻到高頻的標準次序。",
+      "hint": "電磁波譜由低頻到高頻的標準次序。"
     }
   },
   {
@@ -1363,7 +1467,8 @@
         "doubles always"
       ],
       "a": 1,
-      "exp": "c = fλ; higher f means shorter λ."
+      "exp": "c = fλ; higher f means shorter λ.",
+      "hint": "c = fλ; higher f means shorter λ."
     },
     "zhHant": {
       "q": "電磁波頻率增加時，波長在同一介質中____。",
@@ -1374,7 +1479,8 @@
         "總是加倍"
       ],
       "a": 1,
-      "exp": "c = fλ，f 大則 λ 小。"
+      "exp": "c = fλ，f 大則 λ 小。",
+      "hint": "c = fλ，f 大則 λ 小。"
     }
   },
   {
@@ -1389,7 +1495,8 @@
         "700–1000 only"
       ],
       "a": 0,
-      "exp": "Visible light ≈ 400 nm (violet) to 700 nm (red)."
+      "exp": "Visible light ≈ 400 nm (violet) to 700 nm (red).",
+      "hint": "Visible light ≈ 400 nm (violet) to 700 nm (red)."
     },
     "zhHant": {
       "q": "可見光波長大約在____ nm 之間。",
@@ -1400,7 +1507,8 @@
         "只有 700–1000"
       ],
       "a": 0,
-      "exp": "可見光約 400–700 nm。"
+      "exp": "可見光約 400–700 nm。",
+      "hint": "可見光約 400–700 nm。"
     }
   },
   {
@@ -1415,7 +1523,8 @@
         "periscopes"
       ],
       "a": 1,
-      "exp": "Summary lists communications and heating applications."
+      "exp": "Summary lists communications and heating applications.",
+      "hint": "Summary lists communications and heating applications."
     },
     "zhHant": {
       "q": "微波常用於____。",
@@ -1426,7 +1535,8 @@
         "潛望鏡"
       ],
       "a": 1,
-      "exp": "通訊與加熱是微波常見用途。"
+      "exp": "通訊與加熱是微波常見用途。",
+      "hint": "通訊與加熱是微波常見用途。"
     }
   },
   {
@@ -1441,7 +1551,8 @@
         "TIR"
       ],
       "a": 1,
-      "exp": "UV can damage skin and eyes; use protection."
+      "exp": "UV can damage skin and eyes; use protection.",
+      "hint": "UV can damage skin and eyes."
     },
     "zhHant": {
       "q": "過量紫外輻射可導致____。",
@@ -1452,7 +1563,8 @@
         "全內反射"
       ],
       "a": 1,
-      "exp": "紫外線可損害皮膚和眼睛。"
+      "exp": "紫外線可損害皮膚和眼睛。",
+      "hint": "紫外線可損害皮膚和眼睛。"
     }
   },
   {
@@ -1467,7 +1579,8 @@
         "have the longest wavelength"
       ],
       "a": 1,
-      "exp": "X-rays pass through flesh but are absorbed more by bone."
+      "exp": "X-rays pass through flesh but are absorbed more by bone.",
+      "hint": "X-rays pass through flesh but are absorbed more by bone."
     },
     "zhHant": {
       "q": "X 射線在醫學上主要因為它們____。",
@@ -1478,7 +1591,8 @@
         "波長最長"
       ],
       "a": 1,
-      "exp": "X 射線可穿透軟組織，骨頭吸收較多。"
+      "exp": "X 射線可穿透軟組織，骨頭吸收較多。",
+      "hint": "X 射線可穿透軟組織，骨頭吸收較多。"
     }
   },
   {
@@ -1493,7 +1607,8 @@
         "magenta only"
       ],
       "a": 1,
-      "exp": "RGB additive mixing: full red, green and blue → white."
+      "exp": "RGB additive mixing: full red, green and blue → white.",
+      "hint": "RGB additive mixing: full red, green and blue → white."
     },
     "zhHant": {
       "q": "螢幕上加法混色：紅 + 綠 + 藍 = ____。",
@@ -1504,7 +1619,8 @@
         "只有品紅"
       ],
       "a": 1,
-      "exp": "RGB 全亮→白色。"
+      "exp": "RGB 全亮→白色。",
+      "hint": "RGB 全亮→白色。"
     }
   },
   {
@@ -1519,7 +1635,8 @@
         "copper wire only"
       ],
       "a": 1,
-      "exp": "In vacuum all EM waves share the same speed c."
+      "exp": "In vacuum all EM waves share the same speed c.",
+      "hint": "In vacuum all EM waves share the same speed c."
     },
     "zhHant": {
       "q": "所有電磁波在____中速率約為 c ≈ 3×10⁸ m s⁻¹。",
@@ -1530,7 +1647,8 @@
         "只有銅線"
       ],
       "a": 1,
-      "exp": "真空中各種電磁波速率均為 c。"
+      "exp": "真空中各種電磁波速率均為 c。",
+      "hint": "真空中各種電磁波速率均為 c。"
     }
   },
   {
@@ -1545,7 +1663,8 @@
         "only reflection in mirrors"
       ],
       "a": 1,
-      "exp": "Warm bodies emit IR; used in thermal imaging and heaters."
+      "exp": "Warm bodies emit IR; used in thermal imaging and heaters.",
+      "hint": "Warm bodies emit IR."
     },
     "zhHant": {
       "q": "紅外輻射與____關係密切。",
@@ -1556,7 +1675,8 @@
         "只有鏡面反射"
       ],
       "a": 1,
-      "exp": "暖物體發出紅外線；用於熱成像等。"
+      "exp": "暖物體發出紅外線；用於熱成像等。",
+      "hint": "暖物體發出紅外線；用於熱成像等。"
     }
   }
 ]
