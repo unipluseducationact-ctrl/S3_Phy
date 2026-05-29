@@ -1,22 +1,38 @@
 name: Deploy to GitHub Pages
 
 on:
+  push:
+    branches: [main]
   workflow_dispatch:
 
 permissions:
   contents: write
 
+concurrency:
+  group: pages
+  cancel-in-progress: true
+
 jobs:
-  # Validates the production build. Live deploy: Settings → Pages → branch main → folder /dist
-  # (committed dist/ already includes summary PDFs and bundled assets).
-  verify-build:
+  deploy:
     runs-on: ubuntu-latest
     steps:
-      - name: Verify npm build
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Setup Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: 20
+          cache: npm
+
+      - name: Install and build
         run: |
-          set -euxo pipefail
-          git clone --depth 1 https://github.com/unipluseducationact-ctrl/S3_Phy.git repo
-          cd repo
-          node --version
           npm ci
           npm run build
+
+      # Pushes built dist/ to gh-pages (avoids jekyll-build-pages / upload-pages-artifact codeload failures).
+      - name: Deploy to gh-pages branch
+        uses: peaceiris/actions-gh-pages@v4
+        with:
+          github_token: ${{ secrets.GITHUB_TOKEN }}
+          publish_dir: ./dist
