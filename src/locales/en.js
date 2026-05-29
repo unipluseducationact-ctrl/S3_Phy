@@ -122,6 +122,7 @@ export const en = {
   'worksheets.tabAnswer': 'Answer key',
   'worksheets.paperTitle': 'S3 Optics — Multiple choice worksheet',
   'worksheets.score': 'Score',
+  'worksheets.hint': 'Hint',
   'worksheets.answer': 'Answer',
   'worksheets.today': 'Today',
   'worksheets.date': 'Date',

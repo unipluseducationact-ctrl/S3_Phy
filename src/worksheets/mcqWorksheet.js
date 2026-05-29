@@ -117,6 +117,7 @@ export function hydrateWorksheets(root, questions, t, langKey) {
     tab: 'practice',
     dateStr: '',
     userAnswers: {},
+    wrongAttempts: {},
     resolved: {},
   };
 
@@ -143,6 +144,7 @@ export function hydrateWorksheets(root, questions, t, langKey) {
 
   function resetSession() {
     state.userAnswers = {};
+    state.wrongAttempts = {};
     state.resolved = {};
     scoreEl.hidden = true;
     summaryEl.hidden = true;
@@ -205,21 +207,25 @@ export function hydrateWorksheets(root, questions, t, langKey) {
 
     // practice mode
     const selected = state.userAnswers[i];
-    const isResolved = state.resolved[i];
-    const isCorrect = isResolved && selected === pack.a;
-    const isWrong = isResolved && selected !== pack.a;
+    const wrongCount = state.wrongAttempts[i] || 0;
+    const locked = state.resolved[i];
+    const isCorrect = locked && selected === pack.a;
+    const isFailed = locked && selected !== pack.a;
 
     let feedback = '';
-    if (isWrong) {
-      feedback = `<p class="q-exp q-summary"><em>${escapeHtml(pack.exp)}</em></p>`;
+    if (wrongCount === 1 && !locked) {
+      feedback = `<p class="q-hint"><strong>${t('worksheets.hint')}:</strong> ${escapeHtml(pack.hint || pack.exp)}</p>`;
+    } else if (isFailed) {
+      feedback = `<p class="q-exp"><strong>${t('worksheets.answer')}:</strong> ${letters[pack.a]}</p>
+        <p class="q-exp q-summary"><em>${escapeHtml(pack.exp)}</em></p>`;
     }
 
-    const rowClass = isResolved ? (isCorrect ? 'correct' : 'incorrect') : '';
+    const rowClass = isCorrect ? 'correct' : isFailed ? 'incorrect' : '';
 
     const choices = pack.choices
       .map((c, j) => {
         const checked = selected === j ? ' checked' : '';
-        const disabled = isResolved ? ' disabled' : '';
+        const disabled = locked ? ' disabled' : '';
         return `<li>
           <label class="choice-radio">
             <input type="radio" name="ws-q-${i}" value="${j}" data-ws-q="${i}" data-ws-choice="${j}"${checked}${disabled} />
@@ -230,11 +236,11 @@ export function hydrateWorksheets(root, questions, t, langKey) {
       })
       .join('');
 
-    const icon = isResolved
-      ? isCorrect
-        ? '<span class="result-icon">✓</span>'
-        : '<span class="result-icon">✗</span>'
-      : '';
+    const icon = isCorrect
+      ? '<span class="result-icon">✓</span>'
+      : isFailed
+        ? '<span class="result-icon">✗</span>'
+        : '';
 
     return `<div class="question-row ${rowClass}" data-ws-row="${i}">
       <div class="q-header"><h4>Q${qNum} ${sectionTag}</h4>${icon}</div>
@@ -258,8 +264,17 @@ export function hydrateWorksheets(root, questions, t, langKey) {
         if (state.resolved[qi]) return;
 
         const choice = Number(input.getAttribute('data-ws-choice'));
+        const pack = state.items[qi][lk()] || state.items[qi].en;
         state.userAnswers[qi] = choice;
-        state.resolved[qi] = true;
+
+        if (choice === pack.a) {
+          state.resolved[qi] = true;
+        } else {
+          state.wrongAttempts[qi] = (state.wrongAttempts[qi] || 0) + 1;
+          if (state.wrongAttempts[qi] >= 2) {
+            state.resolved[qi] = true;
+          }
+        }
 
         updateScore();
         if (allResolved()) buildSessionSummary();
@@ -279,7 +294,7 @@ export function hydrateWorksheets(root, questions, t, langKey) {
       const ans = state.userAnswers[i];
       if (ans === pack.a) {
         correct += 1;
-        firstTry += 1;
+        if ((state.wrongAttempts[i] || 0) === 0) firstTry += 1;
       } else if (state.resolved[i]) {
         const sec = q.section || q.topic;
         weakSections[sec] = (weakSections[sec] || 0) + 1;

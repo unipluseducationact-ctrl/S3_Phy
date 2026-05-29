@@ -956,6 +956,7 @@ canvas.lab-canvas {
 
   .ws-print-blank .choice-radio input,
   .ws-print-blank .q-exp,
+  .ws-print-blank .q-hint,
   .ws-print-blank .q-summary,
   .ws-print-blank .result-icon {
     display: none !important;

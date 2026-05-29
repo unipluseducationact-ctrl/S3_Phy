@@ -122,6 +122,7 @@ export const zhHant = {
   'worksheets.tabAnswer': '\u7b54\u6848',
   'worksheets.paperTitle': 'S3 \u5149\u5b78 \u2014 \u591a\u9805\u9078\u64c7\u984c\u5de5\u4f5c\u7d19',
   'worksheets.score': '\u5f97\u5206',
+  'worksheets.hint': '\u63d0\u793a',
   'worksheets.answer': '\u7b54\u6848',
   'worksheets.today': '\u4eca\u65e5',
   'worksheets.date': '\u65e5\u671f',
