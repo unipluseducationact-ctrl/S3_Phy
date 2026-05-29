@@ -748,6 +748,8 @@ canvas.lab-canvas {
   border-radius: 10px;
   border: 1px solid transparent;
   transition: background 0.15s;
+  break-inside: avoid;
+  page-break-inside: avoid;
 }
 
 .question-row .q-header {
@@ -798,6 +800,10 @@ canvas.lab-canvas {
 .choice-radio input {
   margin-top: 3px;
   accent-color: #4f46e5;
+}
+
+.choice-radio .choice-circle--print {
+  display: none;
 }
 
 .choice-correct {
@@ -946,6 +952,22 @@ canvas.lab-canvas {
   .question-row.incorrect {
     background: transparent !important;
     border-color: transparent !important;
+  }
+
+  .ws-print-blank .choice-radio input,
+  .ws-print-blank .q-exp,
+  .ws-print-blank .q-summary,
+  .ws-print-blank .result-icon {
+    display: none !important;
+  }
+
+  .ws-print-blank .choice-radio .choice-circle--print {
+    display: inline-block !important;
+  }
+
+  .ws-print-blank .question-row.correct,
+  .ws-print-blank .question-row.incorrect {
+    background: transparent !important;
   }
 }
 
