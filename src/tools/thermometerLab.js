@@ -413,6 +413,53 @@ const CSS = `
   grid-template-columns: 1fr 1fr;
   gap: 10px;
 }
+.tl-wrap .tl-faulty-cal {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 10px;
+  margin-bottom: 4px;
+}
+.tl-wrap .tl-faulty-cal .tl-calc-inputs {
+  flex-direction: column;
+  align-items: stretch;
+  gap: 6px;
+}
+.tl-wrap .tl-faulty-cal .tl-input-with-unit {
+  width: 100%;
+  justify-content: space-between;
+}
+.tl-wrap .tl-faulty-cal .tl-calc-input {
+  width: 100%;
+  text-align: right;
+}
+.tl-wrap .tl-faulty-interval {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  font-size: 0.75rem;
+  font-weight: 600;
+  color: var(--tl-muted);
+  padding: 6px 10px;
+  background: rgba(255,255,255,0.03);
+  border-radius: 8px;
+  border: 1px dashed var(--tl-border);
+  margin-bottom: 8px;
+}
+.tl-wrap .tl-faulty-interval b {
+  color: var(--tl-cyan);
+  font-family: ui-monospace, monospace;
+}
+.tl-wrap .tl-faulty-preset {
+  font-size: 0.68rem;
+  padding: 4px 8px;
+  margin-bottom: 8px;
+}
+.tl-wrap .tl-solver-error {
+  font-size: 0.72rem;
+  color: var(--tl-red);
+  font-weight: 600;
+  margin: 0;
+}
 `;
 
 function ensureStyles() {
@@ -548,25 +595,51 @@ export function createThermometerLab(t) {
 
           <!-- Faulty Thermometer Solver -->
           <div class="tl-cg" style="border-top:1px solid var(--tl-border);padding-top:10px">
-            <span class="tl-lr" style="font-weight:bold;color:#fff">Faulty Thermometer Solver (Q10)</span>
-            <p style="font-size:0.7rem;color:var(--tl-muted);margin:0">Reads -1.5°C in ice (C<sub>f</sub>) and 105°C in steam (C<sub>u</sub>).</p>
+            <span class="tl-lr" style="font-weight:bold;color:#fff">Faulty Thermometer Solver</span>
+            <p style="font-size:0.7rem;color:var(--tl-muted);margin:0 0 8px">Set the faulty scale readings at ice (0°C) and steam (100°C), then solve for true T or faulty C.</p>
+            <div class="tl-info-card" style="margin-bottom:8px">
+              <div class="tl-info-label">Faulty scale calibration</div>
+              <p style="margin:0;font-size:0.68rem">T / 100 = (C − C<sub>f</sub>) / (C<sub>u</sub> − C<sub>f</sub>)</p>
+            </div>
+            <div class="tl-faulty-cal">
+              <div class="tl-calc-inputs">
+                <span>Ice reading C<sub>f</sub> (true 0°C)</span>
+                <div class="tl-input-with-unit">
+                  <input type="number" id="tl-input-faulty-cf" value="-1.5" step="0.1" class="tl-calc-input" aria-label="Ice point faulty reading">
+                  <span class="tl-unit">°C</span>
+                </div>
+              </div>
+              <div class="tl-calc-inputs">
+                <span>Steam reading C<sub>u</sub> (true 100°C)</span>
+                <div class="tl-input-with-unit">
+                  <input type="number" id="tl-input-faulty-cu" value="105" step="0.1" class="tl-calc-input" aria-label="Steam point faulty reading">
+                  <span class="tl-unit">°C</span>
+                </div>
+              </div>
+            </div>
+            <div class="tl-faulty-interval">
+              <span>Proportional interval (C<sub>u</sub> − C<sub>f</sub>)</span>
+              <b id="tl-val-faulty-interval">106.5 °C</b>
+            </div>
+            <button type="button" class="tl-btn tl-faulty-preset" id="tl-btn-faulty-preset">Reset to HKDSE example (−1.5 / 105)</button>
             <div class="tl-solver-tabs">
               <button class="tl-solver-tab-btn active" id="tl-btn-solve-q10a">Find True Temp (T)</button>
               <button class="tl-solver-tab-btn" id="tl-btn-solve-q10b">Find Faulty Reading (C)</button>
             </div>
             <div id="tl-pane-q10a" class="tl-solver-pane active">
               <div class="tl-calc-inputs">
-                <span>Faulty Reading (C<sub>measured</sub>):</span>
+                <span>Faulty reading C</span>
                 <div class="tl-input-with-unit">
                   <input type="number" id="tl-input-q10a-cm" value="25.0" step="0.5" class="tl-calc-input">
                   <span class="tl-unit">°C</span>
                 </div>
               </div>
+              <p class="tl-solver-error" id="tl-faulty-error-a" hidden></p>
               <div class="tl-worked-solution" style="background:rgba(0,0,0,0.15)">
                 <div class="tl-math-formula" style="font-size:0.8rem">
                   T = <div class="tl-math-fraction">
-                    <div class="tl-math-num">C + 1.5</div>
-                    <div class="tl-math-den">106.5</div>
+                    <div class="tl-math-num" id="tl-faulty-sub-num-a">25.0 − (−1.5)</div>
+                    <div class="tl-math-den" id="tl-faulty-sub-den-a">105.0 − (−1.5)</div>
                   </div>
                   &times; 100 <span class="tl-math-symbol">=</span> <b class="tl-final-ans" id="tl-ans-q10a">24.9 °C</b>
                 </div>
@@ -574,19 +647,21 @@ export function createThermometerLab(t) {
             </div>
             <div id="tl-pane-q10b" class="tl-solver-pane">
               <div class="tl-calc-inputs">
-                <span>True Temperature (T):</span>
+                <span>True temperature T</span>
                 <div class="tl-input-with-unit">
                   <input type="number" id="tl-input-q10b-t" value="70.0" step="1.0" class="tl-calc-input">
                   <span class="tl-unit">°C</span>
                 </div>
               </div>
+              <p class="tl-solver-error" id="tl-faulty-error-b" hidden></p>
               <div class="tl-worked-solution" style="background:rgba(0,0,0,0.15)">
                 <div class="tl-math-formula" style="font-size:0.8rem">
                   C = <div class="tl-math-fraction">
-                    <div class="tl-math-num">T &times; 106.5</div>
+                    <div class="tl-math-num" id="tl-faulty-sub-num-b">70.0 × 106.5</div>
                     <div class="tl-math-den">100</div>
                   </div>
-                  - 1.5 <span class="tl-math-symbol">=</span> <b class="tl-final-ans" id="tl-ans-q10b">73.05 °C</b>
+                  <span id="tl-faulty-sub-cf-b">+ (−1.5)</span>
+                  <span class="tl-math-symbol">=</span> <b class="tl-final-ans" id="tl-ans-q10b">73.05 °C</b>
                 </div>
               </div>
             </div>
@@ -650,7 +725,7 @@ export function createThermometerLab(t) {
 
           <!-- Resistance Solver -->
           <div class="tl-cg" style="border-top:1px solid var(--tl-border);padding-top:10px">
-            <span class="tl-lr" style="font-weight:bold;color:#fff">Resistance-to-Temperature Solver (Q11)</span>
+            <span class="tl-lr" style="font-weight:bold;color:#fff">Resistance-to-Temperature Solver</span>
             <div class="tl-calc-inputs">
               <span>Measured Resistance (R):</span>
               <div class="tl-input-with-unit">
@@ -1539,16 +1614,58 @@ export function createThermometerLab(t) {
     animationFrameId = requestAnimationFrame(simulationLoop);
   }
 
-  function calculateQ10a() {
-    const cm = parseFloat(wrap.querySelector('#tl-input-q10a-cm').value) || 0;
-    const trueT = ((cm - (-1.5)) / 106.5) * 100;
-    wrap.querySelector('#tl-ans-q10a').textContent = trueT.toFixed(1) + ' °C';
+  function getFaultyCalibration() {
+    const cf = parseFloat(wrap.querySelector('#tl-input-faulty-cf').value);
+    const cu = parseFloat(wrap.querySelector('#tl-input-faulty-cu').value);
+    const cfVal = Number.isFinite(cf) ? cf : -1.5;
+    const cuVal = Number.isFinite(cu) ? cu : 105;
+    const interval = cuVal - cfVal;
+    return { cf: cfVal, cu: cuVal, interval };
   }
 
-  function calculateQ10b() {
+  function formatFaultyNum(n) {
+    const rounded = Math.round(n * 100) / 100;
+    return rounded >= 0 ? rounded.toFixed(1) : `(${rounded.toFixed(1)})`;
+  }
+
+  function updateFaultySolver() {
+    const { cf, cu, interval } = getFaultyCalibration();
+    const intervalEl = wrap.querySelector('#tl-val-faulty-interval');
+    const errA = wrap.querySelector('#tl-faulty-error-a');
+    const errB = wrap.querySelector('#tl-faulty-error-b');
+    const ansA = wrap.querySelector('#tl-ans-q10a');
+    const ansB = wrap.querySelector('#tl-ans-q10b');
+    const invalid = Math.abs(interval) < 0.01;
+
+    intervalEl.textContent = interval.toFixed(1) + ' °C';
+
+    if (invalid) {
+      errA.hidden = false;
+      errA.textContent = 'C_u must differ from C_f (interval cannot be zero).';
+      errB.hidden = false;
+      errB.textContent = errA.textContent;
+      ansA.textContent = '—';
+      ansB.textContent = '—';
+      return;
+    }
+    errA.hidden = true;
+    errB.hidden = true;
+
+    const cm = parseFloat(wrap.querySelector('#tl-input-q10a-cm').value) || 0;
     const tVal = parseFloat(wrap.querySelector('#tl-input-q10b-t').value) || 0;
-    const faultyC = (tVal / 100) * 106.5 - 1.5;
-    wrap.querySelector('#tl-ans-q10b').textContent = faultyC.toFixed(2) + ' °C';
+    const trueT = ((cm - cf) / interval) * 100;
+    const faultyC = (tVal / 100) * interval + cf;
+
+    wrap.querySelector('#tl-faulty-sub-num-a').textContent =
+      `${cm.toFixed(1)} − ${formatFaultyNum(cf)}`;
+    wrap.querySelector('#tl-faulty-sub-den-a').textContent =
+      `${cu.toFixed(1)} − ${formatFaultyNum(cf)}`;
+    wrap.querySelector('#tl-faulty-sub-num-b').textContent =
+      `${tVal.toFixed(1)} × ${interval.toFixed(1)}`;
+    wrap.querySelector('#tl-faulty-sub-cf-b').textContent =
+      `+ ${formatFaultyNum(cf)}`;
+    ansA.textContent = trueT.toFixed(1) + ' °C';
+    ansB.textContent = faultyC.toFixed(2) + ' °C';
   }
 
   function calculateQ11() {
@@ -1559,8 +1676,7 @@ export function createThermometerLab(t) {
   }
 
   function updateCalculations() {
-    calculateQ10a();
-    calculateQ10b();
+    updateFaultySolver();
     calculateQ11();
   }
 
@@ -1677,8 +1793,15 @@ export function createThermometerLab(t) {
       wrap.querySelector('#tl-pane-q10b').classList.add('active');
     });
 
-    wrap.querySelector('#tl-input-q10a-cm').addEventListener('input', calculateQ10a);
-    wrap.querySelector('#tl-input-q10b-t').addEventListener('input', calculateQ10b);
+    wrap.querySelector('#tl-input-faulty-cf').addEventListener('input', updateFaultySolver);
+    wrap.querySelector('#tl-input-faulty-cu').addEventListener('input', updateFaultySolver);
+    wrap.querySelector('#tl-btn-faulty-preset').addEventListener('click', () => {
+      wrap.querySelector('#tl-input-faulty-cf').value = '-1.5';
+      wrap.querySelector('#tl-input-faulty-cu').value = '105';
+      updateFaultySolver();
+    });
+    wrap.querySelector('#tl-input-q10a-cm').addEventListener('input', updateFaultySolver);
+    wrap.querySelector('#tl-input-q10b-t').addEventListener('input', updateFaultySolver);
     wrap.querySelector('#tl-input-q11-r').addEventListener('input', calculateQ11);
   }
 
