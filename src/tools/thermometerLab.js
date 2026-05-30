@@ -60,15 +60,18 @@ const CSS = `
   display: flex;
   flex-direction: column;
   gap: 12px;
-  align-items: center;
+  align-items: stretch;
+  width: 100%;
 }
 .tl-wrap .tl-canvas {
   background: #121214;
   border-radius: 12px;
   width: 100%;
   max-width: 460px;
-  height: 300px;
+  height: auto;
+  aspect-ratio: 460 / 300;
   display: block;
+  margin: 0 auto;
 }
 .tl-wrap .tl-controls {
   flex: 1;
@@ -761,14 +764,10 @@ export function createThermometerLab(t) {
   const dpr = window.devicePixelRatio || 1;
   physCanvas.width = PHYS_WIDTH * dpr;
   physCanvas.height = PHYS_HEIGHT * dpr;
-  physCanvas.style.width = PHYS_WIDTH + 'px';
-  physCanvas.style.height = PHYS_HEIGHT + 'px';
   physCtx.scale(dpr, dpr);
 
   graphCanvas.width = GRAPH_WIDTH * dpr;
   graphCanvas.height = GRAPH_HEIGHT * dpr;
-  graphCanvas.style.width = GRAPH_WIDTH + 'px';
-  graphCanvas.style.height = GRAPH_HEIGHT + 'px';
   graphCtx.scale(dpr, dpr);
 
   // Particles

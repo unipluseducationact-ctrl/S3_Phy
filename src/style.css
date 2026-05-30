@@ -520,6 +520,11 @@ a {
   grid-template-columns: 220px 1fr;
 }
 
+/* Heat (and other single-tool strands) omit the tool list — span full width */
+.tools-layout > .tool-stage:only-child {
+  grid-column: 1 / -1;
+}
+
 @media (min-width: 900px) {
   .tools-layout {
     grid-template-columns: 200px 1fr;
@@ -568,6 +573,11 @@ a {
 
 .tool-stage > * {
   min-height: var(--tool-viewport-min-h);
+}
+
+.tool-stage > .tl-wrap {
+  min-height: 0;
+  width: 100%;
 }
 
 .tool-lens-simulator,
