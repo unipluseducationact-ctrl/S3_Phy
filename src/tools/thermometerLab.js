@@ -83,11 +83,12 @@ const CSS = `
   flex-direction: column;
   gap: 8px;
   width: 100%;
-  margin-top: 4px;
-  padding: 10px 12px;
+  margin-top: 2px;
+  padding: 8px 12px;
   background: var(--tl-panel);
   border: 1px solid var(--tl-border);
   border-radius: 12px;
+  align-items: stretch;
 }
 .tl-wrap .tl-bath-bar-top {
   display: flex;
@@ -129,8 +130,15 @@ const CSS = `
   overflow-y: auto;
   display: flex;
   flex-direction: column;
-  gap: 10px;
+  gap: 8px;
   padding-right: 2px;
+  scrollbar-width: thin;
+  scrollbar-color: #3f3f46 transparent;
+}
+.tl-wrap .tl-controls-scroll::-webkit-scrollbar { width: 6px; }
+.tl-wrap .tl-controls-scroll::-webkit-scrollbar-thumb {
+  background: #3f3f46;
+  border-radius: 3px;
 }
 .tl-wrap .tl-details {
   border: 1px solid var(--tl-border);
@@ -158,10 +166,28 @@ const CSS = `
   flex-direction: column;
   gap: 8px;
 }
+@media (min-width: 700px) {
+  .tl-wrap .tl-btn-group {
+    grid-template-columns: repeat(4, 1fr);
+  }
+  .tl-wrap .tl-bath-bar {
+    flex-direction: row;
+    flex-wrap: wrap;
+    align-items: center;
+    gap: 10px 14px;
+  }
+  .tl-wrap .tl-bath-bar-top {
+    flex: 1 1 auto;
+  }
+  .tl-wrap .tl-btn-group {
+    flex: 1 1 280px;
+    max-width: none;
+  }
+}
 @media (min-width: 900px) {
   .tl-wrap .tl-dash {
     display: grid;
-    grid-template-columns: 1fr minmax(300px, 380px);
+    grid-template-columns: 1fr minmax(340px, 420px);
     grid-template-rows: auto auto;
     gap: 12px;
     align-items: start;
@@ -178,7 +204,7 @@ const CSS = `
   .tl-wrap .tl-controls {
     grid-column: 2;
     grid-row: 1;
-    max-height: min(85vh, 620px);
+    max-height: min(88vh, 680px);
     min-height: 0;
     overflow: hidden;
     align-self: start;
@@ -186,14 +212,14 @@ const CSS = `
   .tl-wrap .tl-controls-scroll {
     flex: 1;
     min-height: 0;
-    max-height: min(78vh, 560px);
+    max-height: min(82vh, 640px);
   }
   .tl-wrap .tl-bath-bar {
     grid-column: 1 / -1;
     grid-row: 2;
     flex-direction: row;
     flex-wrap: wrap;
-    align-items: flex-end;
+    align-items: center;
     gap: 10px 14px;
     margin-top: 0;
   }
@@ -236,19 +262,25 @@ const CSS = `
   border-radius: 8px;
   padding: 3px;
   gap: 3px;
+  overflow-x: auto;
+  scrollbar-width: none;
 }
+.tl-wrap .tl-tabs-container::-webkit-scrollbar { display: none; }
 .tl-wrap .tl-tab-btn {
   flex: 1;
-  padding: 8px 4px;
+  min-width: 0;
+  padding: 7px 4px;
   background: none;
   border: none;
-  font-size: 0.78rem;
+  font-size: 0.72rem;
+  line-height: 1.2;
   font-weight: 700;
   color: var(--tl-muted);
   cursor: pointer;
   border-radius: 6px;
   transition: all 0.2s;
   text-align: center;
+  white-space: nowrap;
 }
 .tl-wrap .tl-tab-btn:hover {
   color: #fff;
@@ -260,7 +292,7 @@ const CSS = `
 .tl-wrap .tl-tab-content {
   display: none;
   flex-direction: column;
-  gap: 10px;
+  gap: 8px;
 }
 .tl-wrap .tl-tab-content.active {
   display: flex;
@@ -280,8 +312,23 @@ const CSS = `
   font-weight: 800;
   color: var(--tl-cyan);
 }
-.tl-wrap .tl-cg { display: flex; flex-direction: column; gap: 6px; }
-.tl-wrap .tl-lr { display: flex; justify-content: space-between; align-items: center; font-size: 0.82rem; font-weight: 600; }
+.tl-wrap .tl-cg { display: flex; flex-direction: column; gap: 4px; }
+.tl-wrap .tl-lr { display: flex; justify-content: space-between; align-items: center; font-size: 0.75rem; font-weight: 600; }
+.tl-wrap .tl-section-label {
+  font-size: 0.7rem;
+  font-weight: 700;
+  color: var(--tl-muted);
+  text-transform: uppercase;
+  letter-spacing: 0.04em;
+  margin: 0 0 2px;
+}
+.tl-wrap .tl-param-grid {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 8px 10px;
+}
+.tl-wrap .tl-param-grid .tl-cg { min-width: 0; }
+.tl-wrap .tl-param-grid input[type="range"] { margin: 2px 0; }
 .tl-wrap .tl-badge {
   background: #27272a;
   padding: 2px 8px;
@@ -325,46 +372,47 @@ const CSS = `
 .tl-wrap .tl-btn.primary:hover {
   background-color: #4338ca;
 }
-.tl-wrap .tl-radio-cards {
+.tl-wrap .tl-seg {
   display: flex;
-  gap: 10px;
-}
-.tl-wrap .tl-radio-card {
-  flex: 1;
-  border: 1px solid var(--tl-border);
   background-color: #27272a;
   border-radius: 8px;
-  padding: 8px;
+  padding: 3px;
+  gap: 3px;
+}
+.tl-wrap .tl-seg-btn {
+  flex: 1;
+  border: 1px solid transparent;
+  background: none;
+  border-radius: 6px;
+  padding: 7px 8px;
+  font-size: 0.78rem;
+  font-weight: 700;
+  color: var(--tl-muted);
   cursor: pointer;
   transition: all 0.2s;
-}
-.tl-wrap .tl-radio-card h4 {
-  font-size: 0.8rem;
-  font-weight: 700;
-  margin: 0 0 4px;
   display: flex;
   align-items: center;
+  justify-content: center;
   gap: 6px;
+  font-family: inherit;
 }
-.tl-wrap .tl-radio-card p {
-  font-size: 0.7rem;
-  color: var(--tl-muted);
-  margin: 0;
-  line-height: 1.2;
-}
-.tl-wrap .tl-radio-card.active-mercury {
-  border-color: var(--tl-muted);
+.tl-wrap .tl-seg-btn:hover { color: #fff; }
+.tl-wrap .tl-seg-btn.active-mercury {
+  color: #fff;
   background-color: #3f3f46;
+  border-color: var(--tl-muted);
 }
-.tl-wrap .tl-radio-card.active-alcohol {
+.tl-wrap .tl-seg-btn.active-alcohol {
+  color: #fff;
+  background-color: rgba(239, 68, 68, 0.2);
   border-color: var(--tl-red);
-  background-color: rgba(239, 68, 68, 0.15);
 }
 .tl-wrap .tl-dot {
   width: 6px;
   height: 6px;
   border-radius: 50%;
   display: inline-block;
+  flex-shrink: 0;
 }
 .tl-wrap .tl-dot.mercury { background-color: var(--tl-muted); }
 .tl-wrap .tl-dot.alcohol { background-color: var(--tl-red); }
@@ -383,8 +431,14 @@ const CSS = `
   background-color: rgba(255,255,255,0.03);
   border: 1px dashed var(--tl-border);
   border-radius: 8px;
-  padding: 10px;
+  padding: 6px 10px;
 }
+.tl-wrap .tl-info-card--compact {
+  font-size: 0.72rem;
+  color: var(--tl-muted);
+  line-height: 1.35;
+}
+.tl-wrap .tl-info-card--compact b { color: var(--tl-cyan); }
 .tl-wrap .tl-info-label {
   font-size: 0.75rem;
   font-weight: 700;
@@ -396,6 +450,11 @@ const CSS = `
   font-size: 0.72rem;
   color: var(--tl-muted);
   line-height: 1.3;
+}
+.tl-wrap .tl-details-body .tl-math-formula {
+  margin: 6px 0;
+  padding: 5px;
+  font-size: 0.82rem;
 }
 .tl-wrap .tl-worked-solution {
   background-color: rgba(79, 70, 229, 0.08);
@@ -632,25 +691,23 @@ export function createThermometerLab(t) {
       <!-- RIGHT PANEL: CONTROLS & SOLVERS -->
       <div class="tl-controls">
         <nav class="tl-tabs-container">
-          <button class="tl-tab-btn active" data-tl-tab="liquid">Liquid-in-Glass</button>
-          <button class="tl-tab-btn" data-tl-tab="resistance">Platinum Resistance</button>
-          <button class="tl-tab-btn" data-tl-tab="thermistor">Thermistor (NTC)</button>
+          <button class="tl-tab-btn active" data-tl-tab="liquid">Liquid</button>
+          <button class="tl-tab-btn" data-tl-tab="resistance">Pt RTD</button>
+          <button class="tl-tab-btn" data-tl-tab="thermistor">NTC</button>
         </nav>
         <div class="tl-controls-scroll">
 
         <!-- TAB 1: LIQUID-IN-GLASS -->
         <div class="tl-tab-content active" id="tl-tab-liquid">
           <div class="tl-cg">
-            <span class="tl-lr" style="font-size:0.75rem;color:var(--tl-muted)">Select Thermometric Liquid:</span>
-            <div class="tl-radio-cards">
-              <div class="tl-radio-card active-mercury" id="tl-card-mercury">
-                <h4><span class="tl-dot mercury"></span> Mercury</h4>
-                <p>Boils at 356.7°C. Ideal for high temps.</p>
-              </div>
-              <div class="tl-radio-card" id="tl-card-alcohol">
-                <h4><span class="tl-dot alcohol"></span> Alcohol</h4>
-                <p>Boils at 78.4°C. Vaporizes at high temps.</p>
-              </div>
+            <span class="tl-section-label">Thermometric liquid</span>
+            <div class="tl-seg" role="group" aria-label="Thermometric liquid">
+              <button type="button" class="tl-seg-btn active-mercury" id="tl-card-mercury" title="Mercury — boils at 356.7°C; suitable for high temperatures">
+                <span class="tl-dot mercury"></span> Hg
+              </button>
+              <button type="button" class="tl-seg-btn" id="tl-card-alcohol" title="Alcohol — boils at 78.4°C; vaporizes at high temperatures">
+                <span class="tl-dot alcohol"></span> Alcohol
+              </button>
             </div>
           </div>
 
@@ -658,51 +715,49 @@ export function createThermometerLab(t) {
             <strong>CRITICAL PHYSICS ALERT!</strong> Alcohol boils at 78.4°C. Dipping it into this temperature vaporizes the liquid, creating extreme pressure and breaking the thermometer. This is why alcohol <b>cannot</b> be used to measure hot oil (150°C)!
           </div>
 
-          <div class="tl-cg">
-            <div class="tl-lr">
-              <span>Bulb Volume (V<sub>b</sub>):</span>
-              <span class="tl-badge" id="tl-val-bulb-vol">200 mm³</span>
-            </div>
-            <input type="range" id="tl-slider-bulb-vol" min="50" max="500" step="10" value="200">
-          </div>
-          <div class="tl-cg">
-            <div class="tl-lr">
-              <span>Wall Thickness (w):</span>
-              <span class="tl-badge" id="tl-val-wall-thickness">0.5 mm</span>
-            </div>
-            <input type="range" id="tl-slider-wall-thick" min="0.1" max="2.0" step="0.1" value="0.5">
-          </div>
-          <div class="tl-cg">
-            <div class="tl-lr">
-              <span>Capillary Bore (d):</span>
-              <span class="tl-badge" id="tl-val-capillary-bore">0.3 mm</span>
-            </div>
-            <input type="range" id="tl-slider-capillary-bore" min="0.1" max="1.2" step="0.05" value="0.3">
-          </div>
-
-          <div class="tl-help-grid" style="border-top:1px solid var(--tl-border);padding-top:10px">
+          <div class="tl-param-grid">
             <div class="tl-cg">
               <div class="tl-lr">
-                <span>Ice Pt Length (L<sub>0</sub>):</span>
+                <span>V<sub>b</sub></span>
+                <span class="tl-badge" id="tl-val-bulb-vol">200 mm³</span>
+              </div>
+              <input type="range" id="tl-slider-bulb-vol" min="50" max="500" step="10" value="200">
+            </div>
+            <div class="tl-cg">
+              <div class="tl-lr">
+                <span>w</span>
+                <span class="tl-badge" id="tl-val-wall-thickness">0.5 mm</span>
+              </div>
+              <input type="range" id="tl-slider-wall-thick" min="0.1" max="2.0" step="0.1" value="0.5">
+            </div>
+            <div class="tl-cg">
+              <div class="tl-lr">
+                <span>d</span>
+                <span class="tl-badge" id="tl-val-capillary-bore">0.3 mm</span>
+              </div>
+              <input type="range" id="tl-slider-capillary-bore" min="0.1" max="1.2" step="0.05" value="0.3">
+            </div>
+            <div class="tl-cg">
+              <div class="tl-lr">
+                <span>L<sub>0</sub></span>
                 <span class="tl-badge" id="tl-val-liquid-l0">3.0 cm</span>
               </div>
               <input type="range" id="tl-slider-liquid-l0" min="1.0" max="10.0" step="0.1" value="3.0">
             </div>
             <div class="tl-cg">
               <div class="tl-lr">
-                <span>Steam Pt (L<sub>100</sub>):</span>
+                <span>L<sub>100</sub></span>
                 <span class="tl-badge" id="tl-val-liquid-l100">13.0 cm</span>
               </div>
               <input type="range" id="tl-slider-liquid-l100" min="10.0" max="25.0" step="0.1" value="13.0">
             </div>
           </div>
 
-          <div class="tl-info-card">
-            <div class="tl-info-label">Bulb size &amp; response</div>
-            <p>Response time: <b id="tl-val-response-time">0.65 s</b>. A <b>larger bulb volume</b> (higher V<sub>b</sub>) increases thermal mass and slows equilibration — the bulb in the diagram scales with your slider.</p>
+          <div class="tl-info-card tl-info-card--compact">
+            τ = <b id="tl-val-response-time">0.65 s</b> · larger V<sub>b</sub> → slower equilibration
           </div>
 
-          <details class="tl-details" open>
+          <details class="tl-details">
             <summary>Live calibration formula</summary>
             <div class="tl-details-body">
           <div class="tl-worked-solution">
@@ -813,17 +868,17 @@ export function createThermometerLab(t) {
             </div>
           </div>
 
-          <div class="tl-help-grid">
+          <div class="tl-param-grid">
             <div class="tl-cg">
               <div class="tl-lr">
-                <span>R<sub>0</sub> Calibration:</span>
+                <span>R<sub>0</sub></span>
                 <span class="tl-badge" id="tl-val-resistance-r0">5.0 Ω</span>
               </div>
               <input type="range" id="tl-slider-resistance-r0" min="1.0" max="10.0" step="0.1" value="5.0">
             </div>
             <div class="tl-cg">
               <div class="tl-lr">
-                <span>R<sub>100</sub> Calibration:</span>
+                <span>R<sub>100</sub></span>
                 <span class="tl-badge" id="tl-val-resistance-r100">6.2 Ω</span>
               </div>
               <input type="range" id="tl-slider-resistance-r100" min="5.0" max="15.0" step="0.1" value="6.2">
@@ -835,7 +890,7 @@ export function createThermometerLab(t) {
             <p>To calculate temperature using linear calibration, it is <b>fundamentally assumed that electrical resistance varies linearly with temperature</b>.</p>
           </div>
 
-          <details class="tl-details" open>
+          <details class="tl-details">
             <summary>Live calibration formula</summary>
             <div class="tl-details-body">
           <div class="tl-worked-solution">
@@ -894,24 +949,24 @@ export function createThermometerLab(t) {
             </div>
           </div>
 
-          <div class="tl-help-grid">
+          <div class="tl-param-grid">
             <div class="tl-cg">
               <div class="tl-lr">
-                <span>R<sub>25</sub> Calibration:</span>
+                <span>R<sub>25</sub></span>
                 <span class="tl-badge" id="tl-val-thermistor-r25">10.0 kΩ</span>
               </div>
               <input type="range" id="tl-slider-thermistor-r25" min="1.0" max="20.0" step="0.1" value="10.0">
             </div>
             <div class="tl-cg">
               <div class="tl-lr">
-                <span>Beta β:</span>
+                <span>β</span>
                 <span class="tl-badge" id="tl-val-thermistor-beta">3500 K</span>
               </div>
               <input type="range" id="tl-slider-thermistor-beta" min="2000" max="5000" step="50" value="3500">
             </div>
           </div>
 
-          <details class="tl-details" open>
+          <details class="tl-details">
             <summary>Live NTC beta calculation</summary>
             <div class="tl-details-body">
           <div class="tl-worked-solution" style="background-color:rgba(16,185,129,0.05);border-left-color:var(--tl-green)">
@@ -1957,15 +2012,15 @@ export function createThermometerLab(t) {
 
     wrap.querySelector('#tl-card-mercury').addEventListener('click', () => {
       state.liquidType = 'mercury';
-      wrap.querySelector('#tl-card-mercury').className = 'tl-radio-card active-mercury';
-      wrap.querySelector('#tl-card-alcohol').className = 'tl-radio-card';
+      wrap.querySelector('#tl-card-mercury').className = 'tl-seg-btn active-mercury';
+      wrap.querySelector('#tl-card-alcohol').className = 'tl-seg-btn';
       updateCalculations();
     });
 
     wrap.querySelector('#tl-card-alcohol').addEventListener('click', () => {
       state.liquidType = 'alcohol';
-      wrap.querySelector('#tl-card-mercury').className = 'tl-radio-card';
-      wrap.querySelector('#tl-card-alcohol').className = 'tl-radio-card active-alcohol';
+      wrap.querySelector('#tl-card-mercury').className = 'tl-seg-btn';
+      wrap.querySelector('#tl-card-alcohol').className = 'tl-seg-btn active-alcohol';
       updateCalculations();
     });
 
