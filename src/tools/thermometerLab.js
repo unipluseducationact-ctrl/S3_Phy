@@ -60,10 +60,10 @@ const CSS = `
   display: flex;
   flex-direction: column;
   gap: 12px;
-  align-items: stretch;
+  align-items: center;
   width: 100%;
 }
-.tl-wrap .tl-canvas {
+.tl-wrap .tl-canvas-phys {
   background: #121214;
   border-radius: 12px;
   width: 100%;
@@ -71,7 +71,15 @@ const CSS = `
   height: auto;
   aspect-ratio: 460 / 300;
   display: block;
-  margin: 0 auto;
+}
+.tl-wrap .tl-canvas-graph {
+  background: #121214;
+  border-radius: 12px;
+  width: 100%;
+  max-width: 560px;
+  height: auto;
+  aspect-ratio: 560 / 380;
+  display: block;
 }
 .tl-wrap .tl-controls {
   flex: 1;
@@ -449,11 +457,6 @@ const CSS = `
   color: var(--tl-cyan);
   font-family: ui-monospace, monospace;
 }
-.tl-wrap .tl-faulty-preset {
-  font-size: 0.68rem;
-  padding: 4px 8px;
-  margin-bottom: 8px;
-}
 .tl-wrap .tl-solver-error {
   font-size: 0.72rem;
   color: var(--tl-red);
@@ -488,8 +491,8 @@ export function createThermometerLab(t) {
           <span>Temp: <b class="tl-temp-badge" id="tl-bath-temp-display">25.0°C</b></span>
         </div>
         <div class="tl-canvas-container">
-          <canvas class="tl-canvas" id="tl-thermometerCanvas" width="460" height="300"></canvas>
-          <canvas class="tl-canvas" id="tl-graphCanvas" width="460" height="300"></canvas>
+          <canvas class="tl-canvas-phys" id="tl-thermometerCanvas" width="460" height="300"></canvas>
+          <canvas class="tl-canvas-graph" id="tl-graphCanvas" width="560" height="380"></canvas>
         </div>
         <div class="tl-cg">
           <div class="tl-lr">
@@ -534,21 +537,19 @@ export function createThermometerLab(t) {
             <strong>CRITICAL PHYSICS ALERT!</strong> Alcohol boils at 78.4°C. Dipping it into this temperature vaporizes the liquid, creating extreme pressure and breaking the thermometer. This is why alcohol <b>cannot</b> be used to measure hot oil (150°C)!
           </div>
 
-          <div class="tl-help-grid">
-            <div class="tl-cg">
-              <div class="tl-lr">
-                <span>Bulb Volume (V<sub>b</sub>):</span>
-                <span class="tl-badge" id="tl-val-bulb-vol">200 mm³</span>
-              </div>
-              <input type="range" id="tl-slider-bulb-vol" min="50" max="500" step="10" value="200">
+          <div class="tl-cg">
+            <div class="tl-lr">
+              <span>Bulb Volume (V<sub>b</sub>):</span>
+              <span class="tl-badge" id="tl-val-bulb-vol">200 mm³</span>
             </div>
-            <div class="tl-cg">
-              <div class="tl-lr">
-                <span>Wall Thickness (w):</span>
-                <span class="tl-badge" id="tl-val-wall-thickness">0.5 mm</span>
-              </div>
-              <input type="range" id="tl-slider-wall-thick" min="0.1" max="2.0" step="0.1" value="0.5">
+            <input type="range" id="tl-slider-bulb-vol" min="50" max="500" step="10" value="200">
+          </div>
+          <div class="tl-cg">
+            <div class="tl-lr">
+              <span>Wall Thickness (w):</span>
+              <span class="tl-badge" id="tl-val-wall-thickness">0.5 mm</span>
             </div>
+            <input type="range" id="tl-slider-wall-thick" min="0.1" max="2.0" step="0.1" value="0.5">
           </div>
 
           <div class="tl-help-grid" style="border-top:1px solid var(--tl-border);padding-top:10px">
@@ -621,7 +622,6 @@ export function createThermometerLab(t) {
               <span>Proportional interval (C<sub>u</sub> − C<sub>f</sub>)</span>
               <b id="tl-val-faulty-interval">106.5 °C</b>
             </div>
-            <button type="button" class="tl-btn tl-faulty-preset" id="tl-btn-faulty-preset">Reset to HKDSE example (−1.5 / 105)</button>
             <div class="tl-solver-tabs">
               <button class="tl-solver-tab-btn active" id="tl-btn-solve-q10a">Find True Temp (T)</button>
               <button class="tl-solver-tab-btn" id="tl-btn-solve-q10b">Find Faulty Reading (C)</button>
@@ -827,8 +827,24 @@ export function createThermometerLab(t) {
 
   const PHYS_WIDTH = 460;
   const PHYS_HEIGHT = 300;
-  const GRAPH_WIDTH = 460;
-  const GRAPH_HEIGHT = 300;
+  const PHYS_SCENE_OFFSET_X = 80;
+  const GRAPH_WIDTH = 560;
+  const GRAPH_HEIGHT = 380;
+
+  function getGraphLayout() {
+    const margin = { left: 72, top: 48, right: 24, bottom: 52 };
+    return {
+      gx: margin.left,
+      gy: margin.top,
+      gw: GRAPH_WIDTH - margin.left - margin.right,
+      gh: GRAPH_HEIGHT - margin.top - margin.bottom,
+      tickFont: `${Math.round(GRAPH_WIDTH * 0.02)}px Arial`,
+      axisFont: `bold ${Math.round(GRAPH_WIDTH * 0.022)}px Arial`,
+      dotR: 5,
+      yLabelX: margin.left - 34,
+      xLabelY: GRAPH_HEIGHT - margin.bottom + 18,
+    };
+  }
 
   const physCanvas = wrap.querySelector('#tl-thermometerCanvas');
   const physCtx = physCanvas.getContext('2d');
@@ -1039,7 +1055,7 @@ export function createThermometerLab(t) {
     const stemBottom = 230;
     const bulbCenterY = 250;
     const bulbRadius = 11;
-    const glassWidth = 12;
+    const glassWidth = 8 + state.wallThickness * 8;
     const leftX = x - glassWidth / 2;
     const rightX = x + glassWidth / 2;
 
@@ -1071,9 +1087,9 @@ export function createThermometerLab(t) {
     bulbGrad.addColorStop(1, 'rgba(156, 163, 175, 0.3)');
     ctx.fillStyle = bulbGrad;
     ctx.strokeStyle = '#6b7280';
-    ctx.lineWidth = 1.2;
+    ctx.lineWidth = 0.8 + state.wallThickness * 0.6;
     ctx.beginPath();
-    ctx.arc(x, bulbCenterY, bulbRadius + 1, 0, Math.PI * 2);
+    ctx.arc(x, bulbCenterY, bulbRadius + 0.5 + state.wallThickness * 0.5, 0, Math.PI * 2);
     ctx.fill();
     ctx.stroke();
 
@@ -1290,13 +1306,10 @@ export function createThermometerLab(t) {
   }
 
   function drawLiquidGraph(ctx) {
-    const gx = 50;
-    const gy = 30;
-    const gw = 380;
-    const gh = 230;
+    const { gx, gy, gw, gh, tickFont, axisFont, dotR, yLabelX, xLabelY } = getGraphLayout();
 
     ctx.strokeStyle = '#4b5563';
-    ctx.lineWidth = 1.2;
+    ctx.lineWidth = 1.4;
     ctx.beginPath();
     ctx.moveTo(gx, gy);
     ctx.lineTo(gx, gy + gh);
@@ -1304,9 +1317,9 @@ export function createThermometerLab(t) {
     ctx.stroke();
 
     ctx.strokeStyle = '#27272a';
-    ctx.lineWidth = 0.5;
+    ctx.lineWidth = 0.6;
     ctx.fillStyle = '#a1a1aa';
-    ctx.font = '7px Arial';
+    ctx.font = tickFont;
     ctx.textAlign = 'right';
     ctx.textBaseline = 'middle';
 
@@ -1319,7 +1332,7 @@ export function createThermometerLab(t) {
       ctx.moveTo(gx, yGrid);
       ctx.lineTo(gx + gw, yGrid);
       ctx.stroke();
-      ctx.fillText(`${l.toFixed(1)}`, gx - 6, yGrid);
+      ctx.fillText(`${l.toFixed(1)}`, gx - 8, yGrid);
     }
 
     ctx.textAlign = 'center';
@@ -1330,25 +1343,25 @@ export function createThermometerLab(t) {
       ctx.moveTo(xGrid, gy);
       ctx.lineTo(xGrid, gy + gh);
       ctx.stroke();
-      ctx.fillText(`${tVal}`, xGrid, gy + gh + 4);
+      ctx.fillText(`${tVal}`, xGrid, gy + gh + 6);
     }
 
     ctx.save();
-    ctx.translate(gx - 26, gy + gh / 2);
+    ctx.translate(yLabelX, gy + gh / 2);
     ctx.rotate(-Math.PI / 2);
-    ctx.font = 'bold 8px Arial';
+    ctx.font = axisFont;
     ctx.fillStyle = '#e4e4e7';
     ctx.fillText('Length of liquid column / cm', 0, 0);
     ctx.restore();
 
-    ctx.font = 'bold 8px Arial';
-    ctx.fillText('temperature / °C', gx + gw / 2, gy + gh + 14);
+    ctx.font = axisFont;
+    ctx.fillText('temperature / °C', gx + gw / 2, xLabelY);
 
     const py0 = gy + gh - (state.liquidL0 / maxL) * gh;
     const pyMax = gy + gh - ((state.liquidL0 + ((state.liquidL100 - state.liquidL0) / 100) * maxT) / maxL) * gh;
 
     ctx.strokeStyle = '#ef4444';
-    ctx.lineWidth = 1.8;
+    ctx.lineWidth = 2;
     ctx.beginPath();
     ctx.moveTo(gx, py0);
     ctx.lineTo(gx + gw, pyMax);
@@ -1361,19 +1374,16 @@ export function createThermometerLab(t) {
       const py = gy + gh - (currentL / maxL) * gh;
       ctx.fillStyle = '#ef4444';
       ctx.beginPath();
-      ctx.arc(px, py, 4, 0, Math.PI * 2);
+      ctx.arc(px, py, dotR, 0, Math.PI * 2);
       ctx.fill();
     }
   }
 
   function drawResistanceGraph(ctx) {
-    const gx = 50;
-    const gy = 30;
-    const gw = 380;
-    const gh = 230;
+    const { gx, gy, gw, gh, tickFont, axisFont, dotR, yLabelX, xLabelY } = getGraphLayout();
 
     ctx.strokeStyle = '#4b5563';
-    ctx.lineWidth = 1.2;
+    ctx.lineWidth = 1.4;
     ctx.beginPath();
     ctx.moveTo(gx, gy);
     ctx.lineTo(gx, gy + gh);
@@ -1381,9 +1391,9 @@ export function createThermometerLab(t) {
     ctx.stroke();
 
     ctx.strokeStyle = '#27272a';
-    ctx.lineWidth = 0.5;
+    ctx.lineWidth = 0.6;
     ctx.fillStyle = '#a1a1aa';
-    ctx.font = '7px Arial';
+    ctx.font = tickFont;
     ctx.textAlign = 'right';
     ctx.textBaseline = 'middle';
 
@@ -1396,7 +1406,7 @@ export function createThermometerLab(t) {
       ctx.moveTo(gx, yGrid);
       ctx.lineTo(gx + gw, yGrid);
       ctx.stroke();
-      ctx.fillText(`${r.toFixed(1)}`, gx - 6, yGrid);
+      ctx.fillText(`${r.toFixed(1)}`, gx - 8, yGrid);
     }
 
     ctx.textAlign = 'center';
@@ -1407,25 +1417,25 @@ export function createThermometerLab(t) {
       ctx.moveTo(xGrid, gy);
       ctx.lineTo(xGrid, gy + gh);
       ctx.stroke();
-      ctx.fillText(`${tVal}`, xGrid, gy + gh + 4);
+      ctx.fillText(`${tVal}`, xGrid, gy + gh + 6);
     }
 
     ctx.save();
-    ctx.translate(gx - 26, gy + gh / 2);
+    ctx.translate(yLabelX, gy + gh / 2);
     ctx.rotate(-Math.PI / 2);
-    ctx.font = 'bold 8px Arial';
+    ctx.font = axisFont;
     ctx.fillStyle = '#e4e4e7';
     ctx.fillText('Resistance of platinum / Ω', 0, 0);
     ctx.restore();
 
-    ctx.font = 'bold 8px Arial';
-    ctx.fillText('temperature / °C', gx + gw / 2, gy + gh + 14);
+    ctx.font = axisFont;
+    ctx.fillText('temperature / °C', gx + gw / 2, xLabelY);
 
     const py0 = gy + gh - (state.resistanceR0 / maxR) * gh;
     const pyMax = gy + gh - ((state.resistanceR0 + ((state.resistanceR100 - state.resistanceR0) / 100) * maxT) / maxR) * gh;
 
     ctx.strokeStyle = '#4f46e5';
-    ctx.lineWidth = 1.8;
+    ctx.lineWidth = 2;
     ctx.beginPath();
     ctx.moveTo(gx, py0);
     ctx.lineTo(gx + gw, pyMax);
@@ -1438,19 +1448,16 @@ export function createThermometerLab(t) {
       const py = gy + gh - (currentR / maxR) * gh;
       ctx.fillStyle = '#4f46e5';
       ctx.beginPath();
-      ctx.arc(px, py, 4, 0, Math.PI * 2);
+      ctx.arc(px, py, dotR, 0, Math.PI * 2);
       ctx.fill();
     }
   }
 
   function drawThermistorGraph(ctx) {
-    const gx = 50;
-    const gy = 30;
-    const gw = 380;
-    const gh = 230;
+    const { gx, gy, gw, gh, tickFont, axisFont, dotR, yLabelX, xLabelY } = getGraphLayout();
 
     ctx.strokeStyle = '#4b5563';
-    ctx.lineWidth = 1.2;
+    ctx.lineWidth = 1.4;
     ctx.beginPath();
     ctx.moveTo(gx, gy);
     ctx.lineTo(gx, gy + gh);
@@ -1458,9 +1465,9 @@ export function createThermometerLab(t) {
     ctx.stroke();
 
     ctx.strokeStyle = '#27272a';
-    ctx.lineWidth = 0.5;
+    ctx.lineWidth = 0.6;
     ctx.fillStyle = '#a1a1aa';
-    ctx.font = '7px Arial';
+    ctx.font = tickFont;
     ctx.textAlign = 'right';
     ctx.textBaseline = 'middle';
 
@@ -1473,7 +1480,7 @@ export function createThermometerLab(t) {
       ctx.moveTo(gx, yGrid);
       ctx.lineTo(gx + gw, yGrid);
       ctx.stroke();
-      ctx.fillText(`${r.toFixed(1)}`, gx - 6, yGrid);
+      ctx.fillText(`${r.toFixed(1)}`, gx - 8, yGrid);
     }
 
     ctx.textAlign = 'center';
@@ -1484,22 +1491,22 @@ export function createThermometerLab(t) {
       ctx.moveTo(xGrid, gy);
       ctx.lineTo(xGrid, gy + gh);
       ctx.stroke();
-      ctx.fillText(`${tVal}`, xGrid, gy + gh + 4);
+      ctx.fillText(`${tVal}`, xGrid, gy + gh + 6);
     }
 
     ctx.save();
-    ctx.translate(gx - 26, gy + gh / 2);
+    ctx.translate(yLabelX, gy + gh / 2);
     ctx.rotate(-Math.PI / 2);
-    ctx.font = 'bold 8px Arial';
+    ctx.font = axisFont;
     ctx.fillStyle = '#e4e4e7';
     ctx.fillText('Resistance of thermistor / kΩ', 0, 0);
     ctx.restore();
 
-    ctx.font = 'bold 8px Arial';
-    ctx.fillText('temperature / °C', gx + gw / 2, gy + gh + 14);
+    ctx.font = axisFont;
+    ctx.fillText('temperature / °C', gx + gw / 2, xLabelY);
 
     ctx.strokeStyle = '#10b981';
-    ctx.lineWidth = 1.8;
+    ctx.lineWidth = 2;
     ctx.beginPath();
     let started = false;
     for (let tVal = 0; tVal <= maxT; tVal += 2) {
@@ -1525,7 +1532,7 @@ export function createThermometerLab(t) {
       const py = gy + gh - (Math.min(maxR, currentR) / maxR) * gh;
       ctx.fillStyle = '#10b981';
       ctx.beginPath();
-      ctx.arc(px, py, 4, 0, Math.PI * 2);
+      ctx.arc(px, py, dotR, 0, Math.PI * 2);
       ctx.fill();
     }
   }
@@ -1534,16 +1541,23 @@ export function createThermometerLab(t) {
     physCtx.clearRect(0, 0, PHYS_WIDTH, PHYS_HEIGHT);
     graphCtx.clearRect(0, 0, GRAPH_WIDTH, GRAPH_HEIGHT);
 
+    physCtx.save();
+    physCtx.translate(PHYS_SCENE_OFFSET_X, 0);
     drawBeaker(physCtx);
-
     if (state.thermometerType === 'liquid') {
       drawLiquidThermometer(physCtx);
-      drawLiquidGraph(graphCtx);
     } else if (state.thermometerType === 'resistance') {
       drawResistanceProbe(physCtx);
-      drawResistanceGraph(graphCtx);
     } else {
       drawThermistorProbe(physCtx);
+    }
+    physCtx.restore();
+
+    if (state.thermometerType === 'liquid') {
+      drawLiquidGraph(graphCtx);
+    } else if (state.thermometerType === 'resistance') {
+      drawResistanceGraph(graphCtx);
+    } else {
       drawThermistorGraph(graphCtx);
     }
   }
@@ -1795,11 +1809,6 @@ export function createThermometerLab(t) {
 
     wrap.querySelector('#tl-input-faulty-cf').addEventListener('input', updateFaultySolver);
     wrap.querySelector('#tl-input-faulty-cu').addEventListener('input', updateFaultySolver);
-    wrap.querySelector('#tl-btn-faulty-preset').addEventListener('click', () => {
-      wrap.querySelector('#tl-input-faulty-cf').value = '-1.5';
-      wrap.querySelector('#tl-input-faulty-cu').value = '105';
-      updateFaultySolver();
-    });
     wrap.querySelector('#tl-input-q10a-cm').addEventListener('input', updateFaultySolver);
     wrap.querySelector('#tl-input-q10b-t').addEventListener('input', updateFaultySolver);
     wrap.querySelector('#tl-input-q11-r').addEventListener('input', calculateQ11);
