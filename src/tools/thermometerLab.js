@@ -66,23 +66,28 @@ const CSS = `
   width: 100%;
   max-width: 460px;
   height: auto;
-  aspect-ratio: 460 / 300;
+  aspect-ratio: 460 / 340;
   display: block;
 }
 .tl-wrap .tl-canvas-graph {
   background: #121214;
   border-radius: 12px;
   width: 100%;
-  max-width: 560px;
+  max-width: 680px;
   height: auto;
-  aspect-ratio: 560 / 380;
+  aspect-ratio: 680 / 480;
   display: block;
 }
 .tl-wrap .tl-bath-bar {
   display: flex;
   flex-direction: column;
-  gap: 6px;
+  gap: 8px;
   width: 100%;
+  margin-top: 4px;
+  padding: 10px 12px;
+  background: var(--tl-panel);
+  border: 1px solid var(--tl-border);
+  border-radius: 12px;
 }
 .tl-wrap .tl-bath-bar-top {
   display: flex;
@@ -157,40 +162,63 @@ const CSS = `
   .tl-wrap .tl-dash {
     display: grid;
     grid-template-columns: 1fr minmax(300px, 380px);
+    grid-template-rows: minmax(480px, 1fr) auto;
     gap: 12px;
-    align-items: start;
+    align-items: stretch;
+    min-height: min(88vh, 720px);
+  }
+  .tl-wrap .tl-viz {
+    grid-column: 1;
+    grid-row: 1;
+    min-height: 0;
+    display: flex;
+    flex-direction: column;
+    justify-content: flex-start;
+  }
+  .tl-wrap .tl-controls {
+    grid-column: 2;
+    grid-row: 1;
+    max-height: none;
+    min-height: 0;
+    height: 100%;
+    overflow: hidden;
+    align-self: stretch;
+  }
+  .tl-wrap .tl-controls-scroll {
+    max-height: none;
+    flex: 1;
+  }
+  .tl-wrap .tl-bath-bar {
+    grid-column: 1 / -1;
+    grid-row: 2;
+    flex-direction: row;
+    flex-wrap: wrap;
+    align-items: flex-end;
+    gap: 10px 14px;
+    margin-top: 0;
   }
   .tl-wrap .tl-canvas-container {
     display: grid;
-    grid-template-columns: minmax(0, 460px) minmax(0, 560px);
-    gap: 10px;
-    align-items: start;
+    grid-template-columns: minmax(0, 460px) minmax(0, 680px);
+    gap: 12px;
+    align-items: end;
     justify-content: center;
+    flex: 1;
+    min-height: 420px;
   }
   .tl-wrap .tl-canvas-phys,
   .tl-wrap .tl-canvas-graph {
     max-width: 100%;
     width: 100%;
   }
-  .tl-wrap .tl-controls {
-    max-height: min(72vh, 520px);
-    overflow: hidden;
-  }
   .tl-wrap .tl-btn-group {
     grid-template-columns: repeat(4, 1fr);
-  }
-  .tl-wrap .tl-bath-bar {
-    flex-direction: row;
-    flex-wrap: wrap;
-    align-items: flex-end;
-    gap: 8px 12px;
+    flex: 1 1 auto;
+    max-width: none;
   }
   .tl-wrap .tl-bath-slider-wrap {
-    flex: 1 1 220px;
-    max-width: 280px;
-  }
-  .tl-wrap .tl-btn-group {
-    flex: 1 1 100%;
+    flex: 1 1 240px;
+    max-width: 320px;
   }
   .tl-wrap .tl-worked-solution {
     padding: 8px 10px;
@@ -596,29 +624,8 @@ export function createThermometerLab(t) {
       <!-- LEFT PANEL: VISUALIZATIONS -->
       <div class="tl-viz">
         <div class="tl-canvas-container">
-          <canvas class="tl-canvas-phys" id="tl-thermometerCanvas" width="460" height="300"></canvas>
-          <canvas class="tl-canvas-graph" id="tl-graphCanvas" width="560" height="380"></canvas>
-        </div>
-        <div class="tl-bath-bar">
-          <div class="tl-bath-bar-top">
-            <div class="tl-beaker-overlay">
-              <span>Liquid: <b id="tl-bath-state">Water</b></span>
-              <span><b class="tl-temp-badge" id="tl-bath-temp-display">25.0°C</b></span>
-            </div>
-            <div class="tl-bath-slider-wrap">
-              <div class="tl-lr">
-                <span>T<sub>bath</sub></span>
-                <span class="tl-badge" id="tl-val-bath-temp" style="color:var(--tl-cyan)">25.0 °C</span>
-              </div>
-              <input type="range" id="tl-bath-temp-slider" min="0" max="250" step="0.5" value="25.0">
-            </div>
-          </div>
-          <div class="tl-btn-group">
-            <button class="tl-btn" id="tl-btn-preset-ice">Ice 0°C</button>
-            <button class="tl-btn" id="tl-btn-preset-room">Room 25°C</button>
-            <button class="tl-btn" id="tl-btn-preset-steam">Steam 100°C</button>
-            <button class="tl-btn" id="tl-btn-preset-oil">Oil 150°C</button>
-          </div>
+          <canvas class="tl-canvas-phys" id="tl-thermometerCanvas" width="460" height="340"></canvas>
+          <canvas class="tl-canvas-graph" id="tl-graphCanvas" width="680" height="480"></canvas>
         </div>
       </div>
 
@@ -928,6 +935,28 @@ export function createThermometerLab(t) {
 
         </div>
       </div>
+
+      <div class="tl-bath-bar">
+        <div class="tl-bath-bar-top">
+          <div class="tl-beaker-overlay">
+            <span>Liquid: <b id="tl-bath-state">Water</b></span>
+            <span><b class="tl-temp-badge" id="tl-bath-temp-display">25.0°C</b></span>
+          </div>
+          <div class="tl-bath-slider-wrap">
+            <div class="tl-lr">
+              <span>T<sub>bath</sub></span>
+              <span class="tl-badge" id="tl-val-bath-temp" style="color:var(--tl-cyan)">25.0 °C</span>
+            </div>
+            <input type="range" id="tl-bath-temp-slider" min="0" max="250" step="0.5" value="25.0">
+          </div>
+        </div>
+        <div class="tl-btn-group">
+          <button class="tl-btn" id="tl-btn-preset-ice">Ice 0°C</button>
+          <button class="tl-btn" id="tl-btn-preset-room">Room 25°C</button>
+          <button class="tl-btn" id="tl-btn-preset-steam">Steam 100°C</button>
+          <button class="tl-btn" id="tl-btn-preset-oil">Oil 150°C</button>
+        </div>
+      </div>
     </div>
   `;
 
@@ -960,10 +989,10 @@ export function createThermometerLab(t) {
   };
 
   const PHYS_WIDTH = 460;
-  const PHYS_HEIGHT = 300;
+  const PHYS_HEIGHT = 340;
   const PHYS_SCENE_OFFSET_X = 80;
-  const GRAPH_WIDTH = 560;
-  const GRAPH_HEIGHT = 380;
+  const GRAPH_WIDTH = 680;
+  const GRAPH_HEIGHT = 480;
 
   function getGraphLayout() {
     const margin = { left: 72, top: 48, right: 24, bottom: 52 };
