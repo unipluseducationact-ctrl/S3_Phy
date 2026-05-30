@@ -1,0 +1,10 @@
+[
+  {
+    "id": 1,
+    "topic": "reflection",
+    "title": "Law of Reflection",
+    "front": "./flashcards/reflection/01-front.webp",
+    "alt": "Flashcard 1 — Law of Reflection",
+    "back": "./flashcards/reflection/01-back.webp"
+  }
+]

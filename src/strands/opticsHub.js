@@ -1,6 +1,7 @@
 import { t, getLang } from '../i18n.js';
 import questions from '../data/questions.json';
 import flashcards from '../data/flashcards.json';
+import reflectionImages from '../data/flashcards-reflection.json';
 import { createRotatingMirrorLab } from '../tools/rotatingMirrorLab.js';
 import { createTirEscapeLab } from '../tools/tirEscapeLab.js';
 import { createLensLab } from '../tools/lensLab.js';
@@ -243,7 +244,7 @@ export function mountOpticsHub(root) {
           <label>${t('flashcards.deck')}</label>
           <select data-flash-deck>
             <option value="all">${t('flashcards.all')}</option>
-            <option value="rotatingMirror">${t('topic.rotatingMirror')}</option>
+            <option value="reflection">${t('topic.reflection')}</option>
             <option value="refractionTir">${t('flashcards.deck.refractionTir')}</option>
             <option value="convex">${t('topic.convex')}</option>
             <option value="concave">${t('topic.concave')}</option>
@@ -252,9 +253,10 @@ export function mountOpticsHub(root) {
         </div>
         <div class="flashcard-box">
           <div class="flashcard-surface" data-flip-card>
-            <div class="label">${t('flashcards.question')}</div>
+            <div class="label" data-flash-label>${t('flashcards.question')}</div>
             <div class="body" data-flash-front></div>
           </div>
+          <p class="flashcard-progress muted" data-flash-progress hidden></p>
           <div class="flash-toolbar no-print">
             <button class="btn" type="button" data-flash-prev>${t('flashcards.prev')}</button>
             <button class="btn primary" type="button" data-flash-flip>${t('flashcards.flip')}</button>
@@ -265,40 +267,97 @@ export function mountOpticsHub(root) {
       </section>`;
   }
 
+  function isImageCard(card) {
+    return Boolean(card?.front);
+  }
+
+  function flashImageUrl(relPath) {
+    const clean = String(relPath).replace(/^\.\//, '');
+    return `${import.meta.env.BASE_URL}${clean}`;
+  }
+
+  function textFlashcards() {
+    return flashcards.slice();
+  }
+
   function flashDeckList() {
-    let list = flashcards.slice();
-    if (flashDeck === 'all') return list;
-    if (flashDeck === 'convex' || flashDeck === 'concave') {
-      list = list.filter((c) => c.topic === 'convex' || c.topic === 'concave');
-    } else if (flashDeck === 'refractionTir') {
-      list = list.filter((c) => c.topic === 'refraction' || c.topic === 'tir');
-    } else if (flashDeck === 'rotatingMirror') {
-      list = list.filter((c) => c.topic === 'reflection');
-    } else {
-      list = list.filter((c) => c.topic === flashDeck);
+    const images = reflectionImages.slice();
+    const text = textFlashcards();
+    const deck = flashDeck === 'rotatingMirror' ? 'reflection' : flashDeck;
+
+    if (deck === 'all') return [...images, ...text];
+    if (deck === 'reflection') return images;
+    if (deck === 'convex' || deck === 'concave') {
+      const list = text.filter((c) => c.topic === 'convex' || c.topic === 'concave');
+      return list.length ? list : text;
     }
-    return list.length ? list : flashcards;
+    if (deck === 'refractionTir') {
+      const list = text.filter((c) => c.topic === 'refraction' || c.topic === 'tir');
+      return list.length ? list : text;
+    }
+    const list = text.filter((c) => c.topic === deck);
+    return list.length ? list : text;
   }
 
   function paintFlash() {
     const list = flashDeckList();
+    const progress = root.querySelector('[data-flash-progress]');
+    if (!list.length) {
+      flashIndex = 0;
+      const front = root.querySelector('[data-flash-front]');
+      const surface = root.querySelector('[data-flip-card]');
+      if (front) front.textContent = '';
+      if (surface) surface.classList.remove('flashcard-surface--image');
+      if (progress) {
+        progress.hidden = true;
+        progress.textContent = '';
+      }
+      return;
+    }
+
     flashIndex = Math.max(0, Math.min(flashIndex, list.length - 1));
     const card = list[flashIndex];
+    const frontEl = root.querySelector('[data-flash-front]');
+    const surface = root.querySelector('[data-flip-card]');
+    const labelEl = root.querySelector('[data-flash-label]');
+    if (!frontEl || !surface) return;
+
+    if (progress) {
+      progress.hidden = false;
+      progress.textContent = t('flashcards.progress')
+        .replace('{current}', String(flashIndex + 1))
+        .replace('{total}', String(list.length));
+    }
+
+    if (isImageCard(card)) {
+      const twoSided = card.back && card.back !== card.front;
+      surface.classList.add('flashcard-surface--image');
+      if (labelEl) {
+        if (!twoSided) {
+          labelEl.hidden = true;
+        } else {
+          labelEl.hidden = false;
+          labelEl.textContent = flashShowBack ? t('flashcards.answer') : t('flashcards.question');
+        }
+      }
+      const src = flashShowBack && card.back ? card.back : card.front;
+      const alt = card.alt || card.title || '';
+      frontEl.innerHTML = `<img src="${flashImageUrl(src)}" alt="${alt.replace(/"/g, '&quot;')}" loading="lazy" />`;
+      return;
+    }
+
+    surface.classList.remove('flashcard-surface--image');
     const lk = langKey();
     const pack = card[lk] || card.en;
-    const front = root.querySelector('[data-flash-front]');
-    const surface = root.querySelector('[data-flip-card]');
-    if (!front || !surface) return;
-    if (!flashShowBack) {
-      surface.querySelector('.label').textContent = t('flashcards.question');
-      front.textContent = pack.q;
-    } else {
-      surface.querySelector('.label').textContent = t('flashcards.answer');
-      front.textContent = pack.a;
+    if (labelEl) {
+      labelEl.hidden = false;
+      labelEl.textContent = flashShowBack ? t('flashcards.answer') : t('flashcards.question');
     }
+    frontEl.textContent = flashShowBack ? pack.a : pack.q;
   }
 
   function hydrateFlashcards() {
+    if (flashDeck === 'rotatingMirror') flashDeck = 'reflection';
     const deckSel = root.querySelector('[data-flash-deck]');
     deckSel.value = flashDeck;
     deckSel.addEventListener('change', () => {

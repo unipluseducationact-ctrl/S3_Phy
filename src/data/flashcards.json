@@ -1,295 +1,5 @@
 [
   {
-    "topic": "reflection",
-    "en": {
-      "q": "What is the law of reflection?",
-      "a": "Law of Reflection i=r = angle of incidence i = angle of reflection r Angles measured from normal (perpendicular to surface) Applies to all types of reflection"
-    },
-    "zhHant": {
-      "q": "如何表示光線？",
-      "a": "用帶箭頭的實線表示 箭頭顯示光的傳播方向 光沿直線傳播"
-    }
-  },
-  {
-    "topic": "reflection",
-    "en": {
-      "q": "What are the key terms in reflection?",
-      "a": "Key Terms Incident ray: Light approaching surface Reflected ray: Light leaving surface Normal: Perpendicular to surface at point of incidence Angle of incidence (i): Angle between incident ray and normal Angle of reflection (r): Angle between reflected ray and normal"
-    },
-    "zhHant": {
-      "q": "光束有哪三種類型？",
-      "a": "平行光束：光線互相平行1. 發散光束：光線向外擴散2. 會聚光束：光線向內集中3."
-    }
-  },
-  {
-    "topic": "reflection",
-    "en": {
-      "q": "What is regular (specular) reflection?",
-      "a": "Regular Reflection Occurs on smooth, polished surfaces Parallel incident rays → Parallel reflected rays Forms clear images Q: What is diffuse (irregular) reflection? A: Q: What are the characteristics of plane mirror image? A: Q: How to locate image in plane mirror? A: Examples: Mirror, calm water, polished metal"
-    },
-    "zhHant": {
-      "q": "反射定律的內容是什麼？",
-      "a": "入射角 = 反射角1. 法線、入射光線和反射光線都在同一平面上2."
-    }
-  },
-  {
-    "topic": "reflection",
-    "en": {
-      "q": "What is diffuse (irregular) reflection?",
-      "a": "Diffuse Reflection Occurs on rough, uneven surfaces Parallel incident rays → Scattered reflected rays Does not form clear images Examples: Paper, wall, clothing Law still applies at each point i=r"
-    },
-    "zhHant": {
-      "q": "入射角和反射角是與什麼的夾角？",
-      "a": "與法線的夾角 不是與鏡面的夾角 問題： 什麼是法線？ 答案： 問題： 平面鏡成像有哪五個特性？ 答案： 問題： 平面鏡成的像是虛像還是實像？ 答案： 記住：法線垂直於鏡面"
-    }
-  },
-  {
-    "topic": "reflection",
-    "en": {
-      "q": "What are the characteristics of plane mirror image?",
-      "a": "Plane Mirror Image (1) ✅ Virtual - Cannot project on screen1. ✅ Erect - Upright orientation2. ✅ Same size - Image height = Object height3. ✅ Laterally inverted - Left-right reversed4. ✅ - Image distance = Object distance 5. v=u"
-    },
-    "zhHant": {
-      "q": "什麼是法線？",
-      "a": "在入射點垂直於鏡面的虛線 用虛線表示 用來測量入射角和反射角"
-    }
-  },
-  {
-    "topic": "reflection",
-    "en": {
-      "q": "How to locate image in plane mirror?",
-      "a": "Plane Mirror Image (2) Draw at least two rays from object1. Q: What is a parallel beam? A: Q: What is a converging beam? A: Q: What is a diverging beam? A: Rays reflect following 2. i=r Extend reflected rays behind mirror (dotted lines)3. Image is where extensions intersect4. Image distance = Object distance5."
-    },
-    "zhHant": {
-      "q": "平面鏡成像有哪五個特性？",
-      "a": "左右倒轉1. 大小與物體相同2. 正立3. 虛像4. 物距 = 像距5."
-    }
-  },
-  {
-    "topic": "reflection",
-    "en": {
-      "q": "What is a parallel beam?",
-      "a": "Parallel Beam All rays parallel to each other Travel in same direction Do not converge or diverge Sources: Sun, distant star, searchlight, laser"
-    },
-    "zhHant": {
-      "q": "平面鏡成的像是虛像還是實像？",
-      "a": "虛像 不能投射在屏幕上 光線的延伸線相交形成 問題： 平面鏡中，物距和像距的關係是什麼？ 答案： 問題： 什麼是左右倒轉（橫向倒轉）？ 答案： 問題： 如果鏡中時鐘顯示 3:30，實際時間是多少？ 答案： 問題： 一個人要看到自己的全身，鏡子的最小長度是多少？ 答案："
-    }
-  },
-  {
-    "topic": "reflection",
-    "en": {
-      "q": "What is a converging beam?",
-      "a": "Converging Beam Rays converge (come together) at a point Travel towards common point Formation: After convex lens, reflected from concave mirror"
-    },
-    "zhHant": {
-      "q": "平面鏡中，物距和像距的關係是什麼？",
-      "a": "物距 = 像距 物體到鏡的距離 = 像到鏡的距離 影像在鏡後的位置與物體在鏡前的位置對稱"
-    }
-  },
-  {
-    "topic": "reflection",
-    "en": {
-      "q": "What is a diverging beam?",
-      "a": "Diverging Beam Rays diverge (spread out) from a point Appear to come from common point Q: What is the minimum mirror length to see full body? A: Minimum length = × Person's height Q: What is lateral inversion? A: Q: Difference between virtual and real image? A: Virtual (Plane Mirror): Real (Curved Mirror): Formation: From point source, after concave lens, reflected from convex mirror"
-    },
-    "zhHant": {
-      "q": "什麼是左右倒轉（橫向倒轉）？",
-      "a": "影像的左右與物體相反 例如：舉起右手，鏡中的像舉起左手 時鐘在鏡中的數字順序相反"
-    }
-  },
-  {
-    "topic": "reflection",
-    "en": {
-      "q": "What is the minimum mirror length to see full body?",
-      "a": "Minimum Mirror Length 21 Top of mirror: Halfway between eyes and head top Bottom of mirror: Halfway between eyes and feet Distance from mirror does not affect length"
-    },
-    "zhHant": {
-      "q": "如果鏡中時鐘顯示 3:30，實際時間是多少？",
-      "a": "實際時間 = 12:00 - 鏡中時間 12:00 - 3:30 = 8:30 答案：8:30"
-    }
-  },
-  {
-    "topic": "reflection",
-    "en": {
-      "q": "What is lateral inversion?",
-      "a": "Lateral Inversion Left and right are reversed in plane mirror Top and bottom remain same Text appears reversed (mirror writing) Example: \"AMBULANCE\" written reversed on vehicle front"
-    },
-    "zhHant": {
-      "q": "一個人要看到自己的全身，鏡子的最小長度是多少？",
-      "a": "鏡子最小長度 = 身高的一半 鏡子頂端位置：眼睛到頭頂距離的一半處 問題： 什麼是光的可逆性？ 答案： 問題： 規則反射和漫反射有什麼分別？ 答案： 問題： 觀察者什麼時候能看到鏡中的影像？ 答案： 問題： 人站在鏡前 A 距離，看到身後 B 距離處的物體，眼睛到物體影像的總距離是多少？ 答案： 與人到鏡的距離無關"
-    }
-  },
-  {
-    "topic": "reflection",
-    "en": {
-      "q": "Difference between virtual and real image?",
-      "a": "Virtual vs Real Image Formed by ray extensions Cannot project on screen Behind mirror, erect Q: What are applications of concave mirror? A: Q: What are applications of convex mirror? A: Q: What happens with two parallel mirrors? A: Formed by actual convergence Can project on screen In front of mirror, usually inverted"
-    },
-    "zhHant": {
-      "q": "什麼是光的可逆性？",
-      "a": "如果光的方向反轉，光會沿著相同路徑傳播 入射光線和反射光線可以互換"
-    }
-  },
-  {
-    "topic": "reflection",
-    "en": {
-      "q": "What are applications of concave mirror?",
-      "a": "Concave Mirror Applications Shaving mirror (magnified image) Dentist's mirror Telescope mirror Solar concentrator Converging mirror"
-    },
-    "zhHant": {
-      "q": "規則反射和漫反射有什麼分別？",
-      "a": "規則反射：平滑表面，產生清晰影像 漫反射：粗糙表面，產生模糊或扭曲影像"
-    }
-  },
-  {
-    "topic": "reflection",
-    "en": {
-      "q": "What are applications of convex mirror?",
-      "a": "Convex Mirror Applications Car side mirror (wider field of view) Security mirror in shops Road safety mirror at corners Diverging mirror"
-    },
-    "zhHant": {
-      "q": "觀察者什麼時候能看到鏡中的影像？",
-      "a": "反射光線必須能進入觀察者的眼睛 連接影像點和觀察者的直線必須通過鏡面 如果不通過鏡面，則看不到影像"
-    }
-  },
-  {
-    "topic": "reflection",
-    "en": {
-      "q": "What happens with two parallel mirrors?",
-      "a": "Multiple Reflections - Parallel Mirrors Produce infinite images Images alternate between left and right Each image further away Q: How many images formed by two mirrors at angle? A: Examples: Q: How does a periscope work? A: Q: Steps to draw reflection ray diagram? A: Used in: Barber shop mirrors"
-    },
-    "zhHant": {
-      "q": "人站在鏡前 A 距離，看到身後 B 距離處的物體，眼睛到物體影像的總距離是多少？",
-      "a": "總距離 = A + (A + B) 或：人到鏡距離 + 人到鏡距離 + 物體到鏡距離 問題： 光線與鏡面成 20° 角，入射角是多少？ 答案： 問題： 如果鏡子旋轉 θ 度，反射光線旋轉多少度？ 答案： 問題： 平面鏡有哪些實際應用？ 答案： 問題： 使用平面鏡的優點是什麼？ 答案： 例如：人距鏡 20 cm，物體在身後 150 cm 總距離 = 20 + 20 + 150 = 190 cm"
-    }
-  },
-  {
-    "topic": "reflection",
-    "en": {
-      "q": "How many images formed by two mirrors at angle?",
-      "a": "Multiple Reflections - Angled Mirrors N= −θ360° 1 : 3 images θ=90° : 5 images θ=60° : 7 images θ=45°"
-    },
-    "zhHant": {
-      "q": "光線與鏡面成 20° 角，入射角是多少？",
-      "a": "入射角 = 90° - 20° = 70° 記住：入射角是與法線的夾角 法線垂直於鏡面"
-    }
-  },
-  {
-    "topic": "reflection",
-    "en": {
-      "q": "How does a periscope work?",
-      "a": "Periscope Uses two plane mirrors at 45° angles Light reflects twice Allows seeing over obstacles Used in: Submarines, trenches"
-    },
-    "zhHant": {
-      "q": "如果鏡子旋轉 θ 度，反射光線旋轉多少度？",
-      "a": "反射光線旋轉 2θ 度 鏡子轉動角度的兩倍"
-    }
-  },
-  {
-    "topic": "reflection",
-    "en": {
-      "q": "Steps to draw reflection ray diagram?",
-      "a": "Ray Diagram Steps Draw normal at point of incidence1. Q: Are angles measured from surface? A: ❌ Wrong! Q: Does diffuse reflection follow ? A: ✅ Yes! Measure angle of incidence from normal 2. i Apply 3. i=r Draw reflected ray at angle from normal 4. r"
-    },
-    "zhHant": {
-      "q": "平面鏡有哪些實際應用？",
-      "a": "化妝鏡 汽車後視鏡 潛望鏡"
-    }
-  },
-  {
-    "topic": "reflection",
-    "en": {
-      "q": "Are angles measured from surface?",
-      "a": "Common Misconception (1) Angles are measured from normal Normal is perpendicular to surface NOT from surface itself"
-    },
-    "zhHant": {
-      "q": "使用平面鏡的優點是什麼？",
-      "a": "問題： 畫光線圖時，實線和虛線分別代表什麼？ 答案： ✅ 記憶口訣： ✅ 常見錯誤： ✅ 考試技巧： 產生與物體相同大小的影像 不會放大或縮小"
-    }
-  },
-  {
-    "topic": "reflection",
-    "en": {
-      "q": "Does diffuse reflection follow",
-      "a": "Common Misconception (2) i=r Law of reflection applies to all reflection Diffuse reflection is due to rough surface At each point, still holds i=r Q: Is plane mirror image real? A: ❌ Wrong! Q: Does mirror length depend on distance? A: ❌ Wrong! Q: Quick comparison of regular and diffuse reflection? A: Regular: Diffuse:"
-    },
-    "zhHant": {
-      "q": "畫光線圖時，實線和虛線分別代表什麼？",
-      "a": "實線：實際光線的路徑（入射光線、反射光線） 虛線：法線、光線的延伸線 箭頭顯示光的傳播方向 學習小貼士 「入反相等」：入射角 = 反射角 「物像等距」：物距 = 像距 「虛正同大」：虛像、正立、同樣大小 ❌ 把入射角當作與鏡面的夾角 ✅ 入射角是與法線的夾角 先畫法線（虛線，垂直於鏡面） 再量度角度（用量角器或目測） 記得標示箭頭方向"
-    }
-  },
-  {
-    "topic": "reflection",
-    "en": {
-      "q": "Is plane mirror image real?",
-      "a": "Common Misconception (3) Plane mirror image is always virtual Cannot be projected on screen Formed by extensions of reflected rays"
-    }
-  },
-  {
-    "topic": "reflection",
-    "en": {
-      "q": "Does mirror length depend on distance?",
-      "a": "Common Misconception (4) Minimum mirror length = × height 21 Independent of distance from mirror Position matters, but not distance"
-    }
-  },
-  {
-    "topic": "reflection",
-    "en": {
-      "q": "Quick comparison of regular and diffuse reflection?",
-      "a": "Regular vs Diffuse Quick Check Smooth surface Parallel → Parallel Clear image Rough surface Parallel → Scattered Q: Quick checklist for plane mirror image? A: Q: What must be remembered for HKDSE exam? A: No clear image Both follow i=r"
-    }
-  },
-  {
-    "topic": "reflection",
-    "en": {
-      "q": "Quick checklist for plane mirror image?",
-      "a": "Plane Mirror Image Quick Check Virtual ✓ Erect ✓ Same size ✓ Laterally inverted ✓ ✓ v=u"
-    }
-  },
-  {
-    "topic": "reflection",
-    "en": {
-      "q": "What must be remembered for HKDSE exam?",
-      "a": "HKDSE Must Remember Law: 1. i=r Angles from normal2. Plane mirror: Virtual, erect, same size, laterally inverted, 3. v=u Regular vs diffuse: Smooth vs rough4. Minimum mirror: × height 5. 21 Beams: Parallel, converging, diverging6. Q: Tips for reflection exam questions? A: Q: Mnemonic for law of reflection? A: i equals r, that's the law Measure from normal, not the floor Q: Mnemonic for plane mirror image? A: Virtual, erect, same size too Laterally inverted, distance equal through Q: Mnemonic for reflection types?"
-    }
-  },
-  {
-    "topic": "reflection",
-    "en": {
-      "q": "Tips for reflection exam questions?",
-      "a": "Exam Tips Always draw normal first Measure angles with protractor Label: Incident, reflected, normal State image characteristics clearly Show all working"
-    }
-  },
-  {
-    "topic": "reflection",
-    "en": {
-      "q": "Mnemonic for law of reflection?",
-      "a": "Memory Mnemonic - Law"
-    }
-  },
-  {
-    "topic": "reflection",
-    "en": {
-      "q": "Mnemonic for plane mirror image?",
-      "a": "Memory Mnemonic - Image"
-    }
-  },
-  {
-    "topic": "reflection",
-    "en": {
-      "q": "Mnemonic for reflection types?",
-      "a": "Memory Mnemonic - Reflection Types A: Smooth surface, regular reflection Rough surface, diffuse direction Both obey i = r perfection Q: Mnemonic for minimum mirror length? A: Half your height, that's the key To see yourself from head to knee"
-    }
-  },
-  {
-    "topic": "reflection",
-    "en": {
-      "q": "Mnemonic for minimum mirror length?",
-      "a": "Memory Mnemonic - Mirror Length"
-    }
-  },
-  {
     "topic": "refraction",
     "en": {
       "q": "What is refraction?",
@@ -1802,6 +1512,50 @@
     "zhHant": {
       "q": "綜合應用",
       "a": "通訊 → 無線電波、微波 加熱 → 微波、紅外線 遙控 → 紅外線 消毒 → 紫外線、伽馬射線 透視 → X 射線 治療癌症 → 伽馬射線 測溫 → 紅外線"
+    }
+  },
+  {
+    "topic": "liquidThermometer",
+    "en": {
+      "q": "What is the boiling point of mercury and alcohol?",
+      "a": "Mercury: 356.7°C (high boiling point, suitable for measuring hot oil)\nAlcohol: 78.4°C (low boiling point, vaporizes under high temperature/pressure)"
+    },
+    "zhHant": {
+      "q": "水銀和酒精的沸點分別是多少？",
+      "a": "水銀：356.7°C（沸點高，適合測量高溫熱油）\n酒精：78.4°C（沸點低，高溫下易汽化產生高壓）"
+    }
+  },
+  {
+    "topic": "faultyThermometer",
+    "en": {
+      "q": "What is the proportional interval formula for a faulty thermometer?",
+      "a": "T / 100 = (C_measured - C_f) / (C_u - C_f)\nWhere C_f is ice point reading, C_u is steam point reading, and C_measured is the faulty reading."
+    },
+    "zhHant": {
+      "q": "有誤差溫度計的等比例區間公式是什麼？",
+      "a": "T / 100 = (C_measured - C_f) / (C_u - C_f)\n其中 C_f 是冰點讀數，C_u 是蒸汽點讀數，C_measured 是測量讀數。"
+    }
+  },
+  {
+    "topic": "resistanceThermometer",
+    "en": {
+      "q": "What is the platinum resistance temperature formula?",
+      "a": "theta = ((R - R0) / (R100 - R0)) * 100\nAssumes resistance varies linearly with temperature."
+    },
+    "zhHant": {
+      "q": "鉑電阻溫度計的溫度計算公式是什麼？",
+      "a": "theta = ((R - R0) / (R100 - R0)) * 100\n假設電阻隨溫度線性變化。"
+    }
+  },
+  {
+    "topic": "thermistor",
+    "en": {
+      "q": "How does NTC thermistor resistance change with temperature?",
+      "a": "Negative Temperature Coefficient: resistance decreases exponentially as temperature increases."
+    },
+    "zhHant": {
+      "q": "NTC 熱敏電阻的電阻如何隨溫度變化？",
+      "a": "負溫度係數：電阻隨溫度升高而呈指數級減少。"
     }
   }
 ]

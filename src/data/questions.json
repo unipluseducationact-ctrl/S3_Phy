@@ -1678,5 +1678,117 @@
       "exp": "暖物體發出紅外線；用於熱成像等。",
       "hint": "暖物體發出紅外線；用於熱成像等。"
     }
+  },
+  {
+    "topic": "liquidThermometer",
+    "section": "Thermometric Liquid",
+    "en": {
+      "q": "Why is mercury preferred over alcohol to measure hot cooking oil at 150°C?",
+      "choices": [
+        "Mercury is cheaper",
+        "Mercury has a higher boiling point (356.7°C) than alcohol (78.4°C)",
+        "Mercury is non-toxic",
+        "Mercury is transparent"
+      ],
+      "a": 1,
+      "exp": "Alcohol boils at 78.4°C and would vaporize under high pressure, whereas mercury boils at 356.7°C.",
+      "hint": "Compare their boiling points."
+    },
+    "zhHant": {
+      "q": "為什麼在測量 150°C 的熱食油時，水銀比酒精更適合用作溫度計液體？",
+      "choices": [
+        "水銀較便宜",
+        "水銀的沸點 (356.7°C) 比酒精 (78.4°C) 高",
+        "水銀無毒",
+        "水銀是透明的"
+      ],
+      "a": 1,
+      "exp": "酒精在 78.4°C 沸騰並會汽化產生高壓，而水銀的沸點高達 356.7°C。",
+      "hint": "比較兩者的沸點。"
+    }
+  },
+  {
+    "topic": "faultyThermometer",
+    "section": "Faulty Scale Correction",
+    "en": {
+      "q": "A faulty thermometer reads -1.5°C in melting ice and 105°C in steam. What is the true temperature when it reads 25.0°C?",
+      "choices": [
+        "23.5°C",
+        "24.9°C",
+        "26.5°C",
+        "25.0°C"
+      ],
+      "a": 1,
+      "exp": "T = ((C - C_f)/(C_u - C_f)) * 100 = ((25.0 - (-1.5))/(105 - (-1.5))) * 100 = (26.5 / 106.5) * 100 ≈ 24.9°C.",
+      "hint": "Apply the proportional interval formula."
+    },
+    "zhHant": {
+      "q": "某有誤差的溫度計在熔冰中讀數為 -1.5°C，在蒸汽中讀數為 105°C。當讀數為 25.0°C 時，實際溫度是多少？",
+      "choices": [
+        "23.5°C",
+        "24.9°C",
+        "26.5°C",
+        "25.0°C"
+      ],
+      "a": 1,
+      "exp": "T = ((25.0 - (-1.5)) / (105 - (-1.5))) * 100 = (26.5 / 106.5) * 100 ≈ 24.9°C。",
+      "hint": "應用等比例區間公式。"
+    }
+  },
+  {
+    "topic": "resistanceThermometer",
+    "section": "Platinum Resistance Assumption",
+    "en": {
+      "q": "What is the fundamental physical assumption when using a platinum resistance thermometer?",
+      "choices": [
+        "The resistance varies exponentially with temperature",
+        "The resistance varies linearly with temperature",
+        "The resistance is independent of temperature",
+        "The resistance drops to zero at 0°C"
+      ],
+      "a": 1,
+      "exp": "Using the formula theta = ((R - R0)/(R100 - R0)) * 100 assumes a linear relationship between resistance and temperature.",
+      "hint": "Think about the calibration formula."
+    },
+    "zhHant": {
+      "q": "使用鉑電阻溫度計時，最基本的物理假設是什麼？",
+      "choices": [
+        "電阻隨溫度呈指數變化",
+        "電阻隨溫度呈線性變化",
+        "電阻與溫度無關",
+        "電阻在 0°C 時降至零"
+      ],
+      "a": 1,
+      "exp": "使用公式 theta = ((R - R0) / (R100 - R0)) * 100 假設了電阻與溫度之間存在線性關係。",
+      "hint": "思考校準公式。"
+    }
+  },
+  {
+    "topic": "thermistor",
+    "section": "NTC Thermistor",
+    "en": {
+      "q": "What does NTC stand for in thermistors, and how does its resistance change as temperature increases?",
+      "choices": [
+        "Neutral Temperature Coefficient; resistance stays constant",
+        "Negative Temperature Coefficient; resistance decreases",
+        "Normal Thermal Conduction; resistance increases",
+        "Negative Thermal Conduction; resistance increases"
+      ],
+      "a": 1,
+      "exp": "NTC stands for Negative Temperature Coefficient. Its resistance decreases exponentially as temperature increases.",
+      "hint": "Negative coefficient means opposite direction."
+    },
+    "zhHant": {
+      "q": "熱敏電阻中的 NTC 代表什麼？當溫度升高時，其電阻如何變化？",
+      "choices": [
+        "中性溫度係數；電阻保持不變",
+        "負溫度係數；電阻減少",
+        "正常熱傳導；電阻增加",
+        "負熱傳導；電阻增加"
+      ],
+      "a": 1,
+      "exp": "NTC 代表負溫度係數（Negative Temperature Coefficient）。隨著溫度升高，其電阻會呈指數級減少。",
+      "hint": "負係數意味著相反的變化方向。"
+    }
   }
 ]

@@ -973,7 +973,7 @@ canvas.lab-canvas {
 }
 
 .flashcard-box {
-  min-height: 180px;
+  min-height: 280px;
   display: flex;
   flex-direction: column;
   gap: 10px;
@@ -989,6 +989,10 @@ canvas.lab-canvas {
   box-shadow: var(--shadow);
 }
 
+.flashcard-surface--image {
+  padding: 10px;
+}
+
 .flashcard-surface .label {
   font-size: 0.75rem;
   color: var(--muted);
@@ -1000,6 +1004,24 @@ canvas.lab-canvas {
   font-size: 1.05rem;
   margin-top: 8px;
   color: var(--text);
+}
+
+.flashcard-surface--image .body {
+  margin-top: 4px;
+}
+
+.flashcard-surface .body img {
+  max-width: 100%;
+  height: auto;
+  display: block;
+  border-radius: 8px;
+  margin: 0 auto;
+}
+
+.flashcard-progress {
+  margin: 0;
+  font-size: 0.875rem;
+  text-align: center;
 }
 
 .flash-toolbar {
