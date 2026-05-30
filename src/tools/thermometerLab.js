@@ -551,6 +551,13 @@ export function createThermometerLab(t) {
             </div>
             <input type="range" id="tl-slider-wall-thick" min="0.1" max="2.0" step="0.1" value="0.5">
           </div>
+          <div class="tl-cg">
+            <div class="tl-lr">
+              <span>Capillary Bore (d):</span>
+              <span class="tl-badge" id="tl-val-capillary-bore">0.3 mm</span>
+            </div>
+            <input type="range" id="tl-slider-capillary-bore" min="0.1" max="1.2" step="0.05" value="0.3">
+          </div>
 
           <div class="tl-help-grid" style="border-top:1px solid var(--tl-border);padding-top:10px">
             <div class="tl-cg">
@@ -570,8 +577,8 @@ export function createThermometerLab(t) {
           </div>
 
           <div class="tl-info-card">
-            <div class="tl-info-label">Thin Wall Advantage</div>
-            <p>Current Response Time: <b id="tl-val-response-time">0.65 s</b>. Thin bulb walls allow rapid heat conduction for a fast response.</p>
+            <div class="tl-info-label">Stem &amp; Capillary</div>
+            <p>Current Response Time: <b id="tl-val-response-time">0.65 s</b>. Thinner walls and a wider capillary bore speed up heat transfer and liquid rise in the stem.</p>
           </div>
 
           <!-- Live Calibration -->
@@ -804,6 +811,7 @@ export function createThermometerLab(t) {
     thermometerType: 'liquid',
     bulbVolume: 200,
     wallThickness: 0.5,
+    capillaryBore: 0.3,
     liquidL0: 3.0,
     liquidL100: 13.0,
     resistanceR0: 5.0,
@@ -904,7 +912,8 @@ export function createThermometerLab(t) {
     const conductivityFactor = state.liquidType === 'mercury' ? 1.0 : 8.0;
     const thicknessFactor = 0.2 + state.wallThickness * 1.5;
     const volumeFactor = 0.4 + state.bulbVolume * 0.003;
-    return Math.max(0.1, thicknessFactor * volumeFactor * conductivityFactor * 0.15);
+    const capillaryFactor = 1.35 - state.capillaryBore * 0.45;
+    return Math.max(0.1, thicknessFactor * volumeFactor * capillaryFactor * conductivityFactor * 0.15);
   }
 
   function updateParticles(dt) {
@@ -1093,7 +1102,7 @@ export function createThermometerLab(t) {
     ctx.fill();
     ctx.stroke();
 
-    const boreWidth = 1.5;
+    const boreWidth = Math.min(glassWidth * 0.72, 0.6 + state.capillaryBore * 4.5);
     ctx.fillStyle = '#111827';
     ctx.fillRect(x - boreWidth / 2, stemTop + 8, boreWidth, stemBottom - stemTop - 8);
 
@@ -1751,6 +1760,11 @@ export function createThermometerLab(t) {
     wrap.querySelector('#tl-slider-wall-thick').addEventListener('input', (e) => {
       state.wallThickness = parseFloat(e.target.value);
       wrap.querySelector('#tl-val-wall-thickness').textContent = state.wallThickness.toFixed(1) + ' mm';
+    });
+
+    wrap.querySelector('#tl-slider-capillary-bore').addEventListener('input', (e) => {
+      state.capillaryBore = parseFloat(e.target.value);
+      wrap.querySelector('#tl-val-capillary-bore').textContent = state.capillaryBore.toFixed(2) + ' mm';
     });
 
     wrap.querySelector('#tl-slider-liquid-l0').addEventListener('input', (e) => {
