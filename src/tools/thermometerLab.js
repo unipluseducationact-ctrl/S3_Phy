@@ -36,30 +36,27 @@ const CSS = `
 .tl-wrap .tl-sub { color: var(--tl-muted); font-size: 0.82rem; margin-top: 4px; }
 .tl-wrap .tl-dash {
   display: flex;
-  flex-direction: row;
-  gap: 14px;
+  flex-direction: column;
+  gap: 12px;
   width: 100%;
-  max-width: 1100px;
+  max-width: min(1400px, 100%);
   margin: 0 auto;
-  align-items: flex-start;
-  justify-content: center;
-  flex-wrap: wrap;
+  align-items: stretch;
 }
 .tl-wrap .tl-viz {
-  flex: 1.2;
-  min-width: min(100%, 320px);
+  min-width: 0;
   background: var(--tl-panel);
-  padding: 12px;
+  padding: 10px;
   border-radius: 16px;
   border: 1px solid var(--tl-border);
   display: flex;
   flex-direction: column;
-  gap: 12px;
+  gap: 8px;
 }
 .tl-wrap .tl-canvas-container {
   display: flex;
   flex-direction: column;
-  gap: 12px;
+  gap: 10px;
   align-items: center;
   width: 100%;
 }
@@ -81,17 +78,129 @@ const CSS = `
   aspect-ratio: 560 / 380;
   display: block;
 }
+.tl-wrap .tl-bath-bar {
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+  width: 100%;
+}
+.tl-wrap .tl-bath-bar-top {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  justify-content: space-between;
+  gap: 8px 12px;
+  font-size: 0.75rem;
+  font-weight: 600;
+}
+.tl-wrap .tl-bath-bar-top .tl-beaker-overlay {
+  flex: 1 1 auto;
+  min-width: 140px;
+  padding: 6px 10px;
+  margin: 0;
+}
+.tl-wrap .tl-bath-slider-wrap {
+  flex: 1 1 200px;
+  min-width: 160px;
+}
+.tl-wrap .tl-bath-slider-wrap .tl-lr {
+  font-size: 0.72rem;
+  margin-bottom: 2px;
+}
 .tl-wrap .tl-controls {
-  flex: 1;
   min-width: min(100%, 280px);
-  max-width: 460px;
   background: var(--tl-panel);
   border-radius: 16px;
-  padding: 18px;
+  padding: 12px;
   border: 1px solid var(--tl-border);
   display: flex;
   flex-direction: column;
-  gap: 18px;
+  gap: 10px;
+  min-height: 0;
+}
+.tl-wrap .tl-controls-scroll {
+  flex: 1;
+  min-height: 0;
+  overflow-y: auto;
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+  padding-right: 2px;
+}
+.tl-wrap .tl-details {
+  border: 1px solid var(--tl-border);
+  border-radius: 8px;
+  background: rgba(255,255,255,0.02);
+}
+.tl-wrap .tl-details summary {
+  cursor: pointer;
+  font-size: 0.75rem;
+  font-weight: 700;
+  color: var(--tl-cyan);
+  padding: 8px 10px;
+  list-style: none;
+  user-select: none;
+}
+.tl-wrap .tl-details summary::-webkit-details-marker { display: none; }
+.tl-wrap .tl-details summary::before {
+  content: "▸ ";
+  color: var(--tl-muted);
+}
+.tl-wrap .tl-details[open] summary::before { content: "▾ "; }
+.tl-wrap .tl-details-body {
+  padding: 0 10px 10px;
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+}
+@media (min-width: 900px) {
+  .tl-wrap .tl-dash {
+    display: grid;
+    grid-template-columns: 1fr minmax(300px, 380px);
+    gap: 12px;
+    align-items: start;
+  }
+  .tl-wrap .tl-canvas-container {
+    display: grid;
+    grid-template-columns: minmax(0, 460px) minmax(0, 560px);
+    gap: 10px;
+    align-items: start;
+    justify-content: center;
+  }
+  .tl-wrap .tl-canvas-phys,
+  .tl-wrap .tl-canvas-graph {
+    max-width: 100%;
+    width: 100%;
+  }
+  .tl-wrap .tl-controls {
+    max-height: min(72vh, 520px);
+    overflow: hidden;
+  }
+  .tl-wrap .tl-btn-group {
+    grid-template-columns: repeat(4, 1fr);
+  }
+  .tl-wrap .tl-bath-bar {
+    flex-direction: row;
+    flex-wrap: wrap;
+    align-items: flex-end;
+    gap: 8px 12px;
+  }
+  .tl-wrap .tl-bath-slider-wrap {
+    flex: 1 1 220px;
+    max-width: 280px;
+  }
+  .tl-wrap .tl-btn-group {
+    flex: 1 1 100%;
+  }
+  .tl-wrap .tl-worked-solution {
+    padding: 8px 10px;
+    font-size: 0.74rem;
+  }
+  .tl-wrap .tl-math-formula {
+    font-size: 0.82rem;
+    margin: 6px 0;
+    padding: 5px;
+  }
 }
 .tl-wrap .tl-tabs-container {
   display: flex;
@@ -123,7 +232,7 @@ const CSS = `
 .tl-wrap .tl-tab-content {
   display: none;
   flex-direction: column;
-  gap: 14px;
+  gap: 10px;
 }
 .tl-wrap .tl-tab-content.active {
   display: flex;
@@ -486,26 +595,30 @@ export function createThermometerLab(t) {
     <div class="tl-dash">
       <!-- LEFT PANEL: VISUALIZATIONS -->
       <div class="tl-viz">
-        <div class="tl-beaker-overlay">
-          <span>Beaker Liquid: <b id="tl-bath-state">Water</b></span>
-          <span>Temp: <b class="tl-temp-badge" id="tl-bath-temp-display">25.0°C</b></span>
-        </div>
         <div class="tl-canvas-container">
           <canvas class="tl-canvas-phys" id="tl-thermometerCanvas" width="460" height="300"></canvas>
           <canvas class="tl-canvas-graph" id="tl-graphCanvas" width="560" height="380"></canvas>
         </div>
-        <div class="tl-cg">
-          <div class="tl-lr">
-            <span>Adjust Beaker Temperature (T<sub>bath</sub>):</span>
-            <span class="tl-badge" id="tl-val-bath-temp" style="color:var(--tl-cyan)">25.0 °C</span>
+        <div class="tl-bath-bar">
+          <div class="tl-bath-bar-top">
+            <div class="tl-beaker-overlay">
+              <span>Liquid: <b id="tl-bath-state">Water</b></span>
+              <span><b class="tl-temp-badge" id="tl-bath-temp-display">25.0°C</b></span>
+            </div>
+            <div class="tl-bath-slider-wrap">
+              <div class="tl-lr">
+                <span>T<sub>bath</sub></span>
+                <span class="tl-badge" id="tl-val-bath-temp" style="color:var(--tl-cyan)">25.0 °C</span>
+              </div>
+              <input type="range" id="tl-bath-temp-slider" min="0" max="250" step="0.5" value="25.0">
+            </div>
           </div>
-          <input type="range" id="tl-bath-temp-slider" min="0" max="250" step="0.5" value="25.0">
-        </div>
-        <div class="tl-btn-group">
-          <button class="tl-btn" id="tl-btn-preset-ice">Melting Ice (0°C)</button>
-          <button class="tl-btn" id="tl-btn-preset-room">Room Temp (25°C)</button>
-          <button class="tl-btn" id="tl-btn-preset-steam">Steam Bath (100°C)</button>
-          <button class="tl-btn" id="tl-btn-preset-oil">Hot Oil (150°C)</button>
+          <div class="tl-btn-group">
+            <button class="tl-btn" id="tl-btn-preset-ice">Ice 0°C</button>
+            <button class="tl-btn" id="tl-btn-preset-room">Room 25°C</button>
+            <button class="tl-btn" id="tl-btn-preset-steam">Steam 100°C</button>
+            <button class="tl-btn" id="tl-btn-preset-oil">Oil 150°C</button>
+          </div>
         </div>
       </div>
 
@@ -516,6 +629,7 @@ export function createThermometerLab(t) {
           <button class="tl-tab-btn" data-tl-tab="resistance">Platinum Resistance</button>
           <button class="tl-tab-btn" data-tl-tab="thermistor">Thermistor (NTC)</button>
         </nav>
+        <div class="tl-controls-scroll">
 
         <!-- TAB 1: LIQUID-IN-GLASS -->
         <div class="tl-tab-content active" id="tl-tab-liquid">
@@ -581,9 +695,10 @@ export function createThermometerLab(t) {
             <p>Current Response Time: <b id="tl-val-response-time">0.65 s</b>. Thinner walls and a wider capillary bore speed up heat transfer and liquid rise in the stem.</p>
           </div>
 
-          <!-- Live Calibration -->
+          <details class="tl-details" open>
+            <summary>Live calibration formula</summary>
+            <div class="tl-details-body">
           <div class="tl-worked-solution">
-            <div class="tl-solution-header">Live Calibration Formula:</div>
             <div class="tl-math-formula">
               T = <div class="tl-math-fraction">
                 <div class="tl-math-num">L<sub>T</sub> - L<sub>0</sub></div>
@@ -600,11 +715,13 @@ export function createThermometerLab(t) {
               &times; 100°C <span class="tl-math-symbol">=</span> <b class="tl-final-ans" id="tl-live-liquid-ans">25.0°C</b>
             </div>
           </div>
+            </div>
+          </details>
 
-          <!-- Faulty Thermometer Solver -->
-          <div class="tl-cg" style="border-top:1px solid var(--tl-border);padding-top:10px">
-            <span class="tl-lr" style="font-weight:bold;color:#fff">Faulty Thermometer Solver</span>
-            <p style="font-size:0.7rem;color:var(--tl-muted);margin:0 0 8px">Set the faulty scale readings at ice (0°C) and steam (100°C), then solve for true T or faulty C.</p>
+          <details class="tl-details">
+            <summary>Faulty thermometer solver</summary>
+            <div class="tl-details-body">
+            <p style="font-size:0.7rem;color:var(--tl-muted);margin:0">Set faulty readings at ice (0°C) and steam (100°C), then solve for T or C.</p>
             <div class="tl-info-card" style="margin-bottom:8px">
               <div class="tl-info-label">Faulty scale calibration</div>
               <p style="margin:0;font-size:0.68rem">T / 100 = (C − C<sub>f</sub>) / (C<sub>u</sub> − C<sub>f</sub>)</p>
@@ -672,7 +789,8 @@ export function createThermometerLab(t) {
                 </div>
               </div>
             </div>
-          </div>
+            </div>
+          </details>
         </div>
 
         <!-- TAB 2: PLATINUM RESISTANCE -->
@@ -710,9 +828,10 @@ export function createThermometerLab(t) {
             <p>To calculate temperature using linear calibration, it is <b>fundamentally assumed that electrical resistance varies linearly with temperature</b>.</p>
           </div>
 
-          <!-- Live Calibration -->
+          <details class="tl-details" open>
+            <summary>Live calibration formula</summary>
+            <div class="tl-details-body">
           <div class="tl-worked-solution">
-            <div class="tl-solution-header">Live Calibration Formula:</div>
             <div class="tl-math-formula">
               T = <div class="tl-math-fraction">
                 <div class="tl-math-num">R<sub>T</sub> - R<sub>0</sub></div>
@@ -729,10 +848,12 @@ export function createThermometerLab(t) {
               &times; 100°C <span class="tl-math-symbol">=</span> <b class="tl-final-ans" id="tl-live-resistance-ans">25.0°C</b>
             </div>
           </div>
+            </div>
+          </details>
 
-          <!-- Resistance Solver -->
-          <div class="tl-cg" style="border-top:1px solid var(--tl-border);padding-top:10px">
-            <span class="tl-lr" style="font-weight:bold;color:#fff">Resistance-to-Temperature Solver</span>
+          <details class="tl-details">
+            <summary>Resistance-to-temperature solver</summary>
+            <div class="tl-details-body">
             <div class="tl-calc-inputs">
               <span>Measured Resistance (R):</span>
               <div class="tl-input-with-unit">
@@ -749,7 +870,8 @@ export function createThermometerLab(t) {
                 &times; 100 <span class="tl-math-symbol">=</span> <b class="tl-final-ans" id="tl-ans-q11">225.0 °C</b>
               </div>
             </div>
-          </div>
+            </div>
+          </details>
         </div>
 
         <!-- TAB 3: THERMISTOR -->
@@ -782,9 +904,10 @@ export function createThermometerLab(t) {
             </div>
           </div>
 
-          <!-- Live Calibration -->
+          <details class="tl-details" open>
+            <summary>Live NTC beta calculation</summary>
+            <div class="tl-details-body">
           <div class="tl-worked-solution" style="background-color:rgba(16,185,129,0.05);border-left-color:var(--tl-green)">
-            <div class="tl-solution-header" style="color:var(--tl-green)">Live NTC Beta Calculation:</div>
             <div class="tl-math-formula" style="font-size:0.75rem">
               T = <div class="tl-math-fraction">
                 <div class="tl-math-num">1</div>
@@ -799,8 +922,11 @@ export function createThermometerLab(t) {
               T<sub>K</sub> = <span id="tl-live-thermistor-calc-tk">298.15</span> K <span class="tl-math-symbol">&rArr;</span> T = <b class="tl-final-ans" id="tl-live-thermistor-ans">25.0°C</b>
             </div>
           </div>
+            </div>
+          </details>
         </div>
 
+        </div>
       </div>
     </div>
   `;

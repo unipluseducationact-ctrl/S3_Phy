@@ -580,6 +580,10 @@ a {
   width: 100%;
 }
 
+.tool-stage .tl-wrap .tl-head {
+  display: none;
+}
+
 .tool-lens-simulator,
 .tool-tir-escape,
 .tool-em-spectrum {
