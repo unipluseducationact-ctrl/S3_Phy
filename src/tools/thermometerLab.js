@@ -698,8 +698,8 @@ export function createThermometerLab(t) {
           </div>
 
           <div class="tl-info-card">
-            <div class="tl-info-label">Stem &amp; Capillary</div>
-            <p>Current Response Time: <b id="tl-val-response-time">0.65 s</b>. Thinner walls and a wider capillary bore speed up heat transfer and liquid rise in the stem.</p>
+            <div class="tl-info-label">Bulb size &amp; response</div>
+            <p>Response time: <b id="tl-val-response-time">0.65 s</b>. A <b>larger bulb volume</b> (higher V<sub>b</sub>) increases thermal mass and slows equilibration — the bulb in the diagram scales with your slider.</p>
           </div>
 
           <details class="tl-details" open>
@@ -1193,6 +1193,14 @@ export function createThermometerLab(t) {
     }
   }
 
+  const BULB_VOLUME_REF = 200;
+  const BULB_RADIUS_REF = 11;
+
+  function getBulbVisualRadius() {
+    const scale = Math.pow(state.bulbVolume / BULB_VOLUME_REF, 1 / 3);
+    return BULB_RADIUS_REF * scale;
+  }
+
   function getResponseTimeConstant() {
     if (state.thermometerType === 'resistance' || state.thermometerType === 'thermistor') {
       return 0.35;
@@ -1349,9 +1357,9 @@ export function createThermometerLab(t) {
   function drawLiquidThermometer(ctx) {
     const x = 120;
     const stemTop = 20;
-    const stemBottom = 230;
-    const bulbCenterY = 250;
-    const bulbRadius = 11;
+    const bulbRadius = getBulbVisualRadius();
+    const bulbCenterY = 250 + Math.max(0, bulbRadius - BULB_RADIUS_REF) * 0.35;
+    const stemBottom = bulbCenterY - bulbRadius - 1;
     const glassWidth = 8 + state.wallThickness * 8;
     const leftX = x - glassWidth / 2;
     const rightX = x + glassWidth / 2;
@@ -1430,10 +1438,18 @@ export function createThermometerLab(t) {
     ctx.arc(x, bulbCenterY, bulbCoreRadius, 0, Math.PI * 2);
     ctx.fill();
 
+    ctx.font = 'bold 7px Arial';
+    ctx.fillStyle = '#9ca3af';
+    ctx.textAlign = 'center';
+    ctx.textBaseline = 'top';
+    ctx.fillText(`Vb = ${state.bulbVolume} mm³`, x, bulbCenterY + bulbRadius + 5);
+
     ctx.strokeStyle = '#4b5563';
     ctx.lineWidth = 0.5;
     ctx.font = '6.5px Arial';
     ctx.fillStyle = '#a1a1aa';
+    ctx.textAlign = 'right';
+    ctx.textBaseline = 'middle';
     for (let tVal = 0; tVal <= 200; tVal += 50) {
       const yTick = zeroY - tVal * pixelsPerC;
       ctx.beginPath();
