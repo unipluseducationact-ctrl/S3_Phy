@@ -576,7 +576,7 @@ a {
 }
 
 .tool-stage > .tl-wrap {
-  min-height: min(88vh, 760px);
+  min-height: 0;
   width: 100%;
 }
 

@@ -162,10 +162,9 @@ const CSS = `
   .tl-wrap .tl-dash {
     display: grid;
     grid-template-columns: 1fr minmax(300px, 380px);
-    grid-template-rows: minmax(480px, 1fr) auto;
+    grid-template-rows: auto auto;
     gap: 12px;
-    align-items: stretch;
-    min-height: min(88vh, 720px);
+    align-items: start;
   }
   .tl-wrap .tl-viz {
     grid-column: 1;
@@ -174,19 +173,20 @@ const CSS = `
     display: flex;
     flex-direction: column;
     justify-content: flex-start;
+    align-self: start;
   }
   .tl-wrap .tl-controls {
     grid-column: 2;
     grid-row: 1;
-    max-height: none;
+    max-height: min(85vh, 620px);
     min-height: 0;
-    height: 100%;
     overflow: hidden;
-    align-self: stretch;
+    align-self: start;
   }
   .tl-wrap .tl-controls-scroll {
-    max-height: none;
     flex: 1;
+    min-height: 0;
+    max-height: min(78vh, 560px);
   }
   .tl-wrap .tl-bath-bar {
     grid-column: 1 / -1;
@@ -203,8 +203,8 @@ const CSS = `
     gap: 12px;
     align-items: end;
     justify-content: center;
-    flex: 1;
-    min-height: 420px;
+    flex: 0 0 auto;
+    min-height: 0;
   }
   .tl-wrap .tl-canvas-phys,
   .tl-wrap .tl-canvas-graph {
@@ -1009,6 +1009,139 @@ export function createThermometerLab(t) {
     };
   }
 
+  function getTempAxisScale() {
+    const minT = 0;
+    let maxT = 100;
+    const peak = Math.max(state.bathTemp, state.thermometerTemp, 100);
+    if (peak > 120) maxT = 150;
+    if (peak > 145) maxT = 200;
+    const tickStep = maxT <= 100 ? 20 : 25;
+    return { minT, maxT, tickStep };
+  }
+
+  function mapGraphX(t, minT, maxT, gx, gw) {
+    return gx + ((t - minT) / (maxT - minT)) * gw;
+  }
+
+  function mapGraphY(v, minV, maxV, gy, gh) {
+    return gy + gh - ((v - minV) / (maxV - minV)) * gh;
+  }
+
+  function drawGraphAxes(ctx, layout, minT, maxT, tStep, yTicks) {
+    const { gx, gy, gw, gh, tickFont, axisFont, yLabelX, xLabelY } = layout;
+
+    ctx.strokeStyle = '#4b5563';
+    ctx.lineWidth = 1.4;
+    ctx.beginPath();
+    ctx.moveTo(gx, gy);
+    ctx.lineTo(gx, gy + gh);
+    ctx.lineTo(gx + gw, gy + gh);
+    ctx.stroke();
+
+    ctx.strokeStyle = '#27272a';
+    ctx.lineWidth = 0.6;
+    ctx.fillStyle = '#a1a1aa';
+    ctx.font = tickFont;
+    ctx.textAlign = 'right';
+    ctx.textBaseline = 'middle';
+
+    for (const tick of yTicks) {
+      const yGrid = mapGraphY(tick.value, tick.min, tick.max, gy, gh);
+      ctx.beginPath();
+      ctx.moveTo(gx, yGrid);
+      ctx.lineTo(gx + gw, yGrid);
+      ctx.stroke();
+      ctx.fillText(tick.label, gx - 8, yGrid);
+    }
+
+    ctx.textAlign = 'center';
+    ctx.textBaseline = 'top';
+    for (let tVal = minT; tVal <= maxT + 0.01; tVal += tStep) {
+      const xGrid = mapGraphX(tVal, minT, maxT, gx, gw);
+      ctx.beginPath();
+      ctx.moveTo(xGrid, gy);
+      ctx.lineTo(xGrid, gy + gh);
+      ctx.stroke();
+      ctx.fillText(`${Math.round(tVal)}`, xGrid, gy + gh + 6);
+    }
+
+    return { gx, gy, gw, gh, axisFont, yLabelX, xLabelY };
+  }
+
+  function buildLengthTicks(minL, maxL) {
+    const span = maxL - minL;
+    const step = span <= 8 ? 1 : span <= 14 ? 2 : 5;
+    const ticks = [];
+    const start = Math.ceil(minL / step) * step;
+    for (let l = start; l <= maxL + 0.001; l += step) {
+      ticks.push({
+        value: l,
+        label: l % 1 === 0 ? `${l.toFixed(0)}` : `${l.toFixed(1)}`,
+        min: minL,
+        max: maxL,
+      });
+    }
+    return ticks;
+  }
+
+  function getLiquidLengthBounds() {
+    const span = Math.max(0.5, state.liquidL100 - state.liquidL0);
+    const pad = Math.max(1, span * 0.15);
+    const minL = Math.max(0, Math.round((state.liquidL0 - pad) * 10) / 10);
+    const maxL = Math.round((state.liquidL100 + pad) * 10) / 10;
+    return { minL, maxL };
+  }
+
+  function liquidLengthAtTemp(t) {
+    return state.liquidL0 + ((state.liquidL100 - state.liquidL0) / 100) * t;
+  }
+
+  function getResistanceBounds() {
+    const span = Math.max(0.1, state.resistanceR100 - state.resistanceR0);
+    const pad = Math.max(0.2, span * 0.15);
+    const minR = Math.max(0, state.resistanceR0 - pad);
+    const maxR = state.resistanceR100 + pad;
+    const step = span <= 2 ? 0.5 : span <= 4 ? 1 : 2;
+    const ticks = [];
+    const start = Math.ceil(minR / step) * step;
+    for (let r = start; r <= maxR + 0.001; r += step) {
+      ticks.push({
+        value: r,
+        label: r.toFixed(1),
+        min: minR,
+        max: maxR,
+      });
+    }
+    return { minR, maxR, ticks };
+  }
+
+  function resistanceAtTemp(t) {
+    return state.resistanceR0 + ((state.resistanceR100 - state.resistanceR0) / 100) * t;
+  }
+
+  function getThermistorBounds(tempScale) {
+    const { maxT } = tempScale;
+    let maxR = state.thermistorR25;
+    for (let tVal = 0; tVal <= maxT; tVal += 5) {
+      const tempK = tVal + 273.15;
+      const r = state.thermistorR25 * Math.exp(state.thermistorBeta * (1 / tempK - 1 / 298.15));
+      maxR = Math.max(maxR, r);
+    }
+    maxR = Math.ceil(maxR * 1.08 * 10) / 10;
+    const minR = 0;
+    const step = maxR <= 12 ? 2 : 4;
+    const ticks = [];
+    for (let r = 0; r <= maxR + 0.001; r += step) {
+      ticks.push({
+        value: r,
+        label: r.toFixed(0),
+        min: minR,
+        max: maxR,
+      });
+    }
+    return { minR, maxR, ticks };
+  }
+
   const physCanvas = wrap.querySelector('#tl-thermometerCanvas');
   const physCtx = physCanvas.getContext('2d');
   const graphCanvas = wrap.querySelector('#tl-graphCanvas');
@@ -1470,45 +1603,12 @@ export function createThermometerLab(t) {
   }
 
   function drawLiquidGraph(ctx) {
-    const { gx, gy, gw, gh, tickFont, axisFont, dotR, yLabelX, xLabelY } = getGraphLayout();
-
-    ctx.strokeStyle = '#4b5563';
-    ctx.lineWidth = 1.4;
-    ctx.beginPath();
-    ctx.moveTo(gx, gy);
-    ctx.lineTo(gx, gy + gh);
-    ctx.lineTo(gx + gw, gy + gh);
-    ctx.stroke();
-
-    ctx.strokeStyle = '#27272a';
-    ctx.lineWidth = 0.6;
-    ctx.fillStyle = '#a1a1aa';
-    ctx.font = tickFont;
-    ctx.textAlign = 'right';
-    ctx.textBaseline = 'middle';
-
-    const maxL = 25;
-    const maxT = 200;
-
-    for (let l = 0; l <= maxL; l += 5) {
-      const yGrid = gy + gh - (l / maxL) * gh;
-      ctx.beginPath();
-      ctx.moveTo(gx, yGrid);
-      ctx.lineTo(gx + gw, yGrid);
-      ctx.stroke();
-      ctx.fillText(`${l.toFixed(1)}`, gx - 8, yGrid);
-    }
-
-    ctx.textAlign = 'center';
-    ctx.textBaseline = 'top';
-    for (let tVal = 0; tVal <= maxT; tVal += 40) {
-      const xGrid = gx + (tVal / maxT) * gw;
-      ctx.beginPath();
-      ctx.moveTo(xGrid, gy);
-      ctx.lineTo(xGrid, gy + gh);
-      ctx.stroke();
-      ctx.fillText(`${tVal}`, xGrid, gy + gh + 6);
-    }
+    const layout = getGraphLayout();
+    const { minL, maxL } = getLiquidLengthBounds();
+    const { minT, maxT, tickStep } = getTempAxisScale();
+    const yTicks = buildLengthTicks(minL, maxL);
+    const axis = drawGraphAxes(ctx, layout, minT, maxT, tickStep, yTicks);
+    const { gx, gy, gw, gh, axisFont, yLabelX, xLabelY, dotR } = { ...layout, ...axis };
 
     ctx.save();
     ctx.translate(yLabelX, gy + gh / 2);
@@ -1519,23 +1619,28 @@ export function createThermometerLab(t) {
     ctx.restore();
 
     ctx.font = axisFont;
+    ctx.fillStyle = '#e4e4e7';
+    ctx.textAlign = 'center';
     ctx.fillText('temperature / °C', gx + gw / 2, xLabelY);
 
-    const py0 = gy + gh - (state.liquidL0 / maxL) * gh;
-    const pyMax = gy + gh - ((state.liquidL0 + ((state.liquidL100 - state.liquidL0) / 100) * maxT) / maxL) * gh;
+    const tLineEnd = Math.min(maxT, 100);
+    const px0 = mapGraphX(0, minT, maxT, gx, gw);
+    const py0 = mapGraphY(liquidLengthAtTemp(0), minL, maxL, gy, gh);
+    const pxEnd = mapGraphX(tLineEnd, minT, maxT, gx, gw);
+    const pyEnd = mapGraphY(liquidLengthAtTemp(tLineEnd), minL, maxL, gy, gh);
 
     ctx.strokeStyle = '#ef4444';
     ctx.lineWidth = 2;
     ctx.beginPath();
-    ctx.moveTo(gx, py0);
-    ctx.lineTo(gx + gw, pyMax);
+    ctx.moveTo(px0, py0);
+    ctx.lineTo(pxEnd, pyEnd);
     ctx.stroke();
 
     const currentT = state.thermometerTemp;
     const currentL = state.currentLength;
-    if (currentT >= 0 && currentT <= maxT) {
-      const px = gx + (currentT / maxT) * gw;
-      const py = gy + gh - (currentL / maxL) * gh;
+    if (currentT >= minT && currentT <= maxT) {
+      const px = mapGraphX(currentT, minT, maxT, gx, gw);
+      const py = mapGraphY(currentL, minL, maxL, gy, gh);
       ctx.fillStyle = '#ef4444';
       ctx.beginPath();
       ctx.arc(px, py, dotR, 0, Math.PI * 2);
@@ -1544,45 +1649,11 @@ export function createThermometerLab(t) {
   }
 
   function drawResistanceGraph(ctx) {
-    const { gx, gy, gw, gh, tickFont, axisFont, dotR, yLabelX, xLabelY } = getGraphLayout();
-
-    ctx.strokeStyle = '#4b5563';
-    ctx.lineWidth = 1.4;
-    ctx.beginPath();
-    ctx.moveTo(gx, gy);
-    ctx.lineTo(gx, gy + gh);
-    ctx.lineTo(gx + gw, gy + gh);
-    ctx.stroke();
-
-    ctx.strokeStyle = '#27272a';
-    ctx.lineWidth = 0.6;
-    ctx.fillStyle = '#a1a1aa';
-    ctx.font = tickFont;
-    ctx.textAlign = 'right';
-    ctx.textBaseline = 'middle';
-
-    const maxR = 10;
-    const maxT = 200;
-
-    for (let r = 0; r <= maxR; r += 2) {
-      const yGrid = gy + gh - (r / maxR) * gh;
-      ctx.beginPath();
-      ctx.moveTo(gx, yGrid);
-      ctx.lineTo(gx + gw, yGrid);
-      ctx.stroke();
-      ctx.fillText(`${r.toFixed(1)}`, gx - 8, yGrid);
-    }
-
-    ctx.textAlign = 'center';
-    ctx.textBaseline = 'top';
-    for (let tVal = 0; tVal <= maxT; tVal += 40) {
-      const xGrid = gx + (tVal / maxT) * gw;
-      ctx.beginPath();
-      ctx.moveTo(xGrid, gy);
-      ctx.lineTo(xGrid, gy + gh);
-      ctx.stroke();
-      ctx.fillText(`${tVal}`, xGrid, gy + gh + 6);
-    }
+    const layout = getGraphLayout();
+    const { minR, maxR, ticks } = getResistanceBounds();
+    const tempScale = getTempAxisScale();
+    const axis = drawGraphAxes(ctx, layout, tempScale.minT, tempScale.maxT, tempScale.tickStep, ticks);
+    const { gx, gy, gw, gh, axisFont, yLabelX, xLabelY, dotR } = { ...layout, ...axis };
 
     ctx.save();
     ctx.translate(yLabelX, gy + gh / 2);
@@ -1593,23 +1664,29 @@ export function createThermometerLab(t) {
     ctx.restore();
 
     ctx.font = axisFont;
+    ctx.fillStyle = '#e4e4e7';
+    ctx.textAlign = 'center';
     ctx.fillText('temperature / °C', gx + gw / 2, xLabelY);
 
-    const py0 = gy + gh - (state.resistanceR0 / maxR) * gh;
-    const pyMax = gy + gh - ((state.resistanceR0 + ((state.resistanceR100 - state.resistanceR0) / 100) * maxT) / maxR) * gh;
+    const { minT, maxT } = tempScale;
+    const tEnd = Math.min(maxT, 100);
+    const px0 = mapGraphX(0, minT, maxT, gx, gw);
+    const py0 = mapGraphY(resistanceAtTemp(0), minR, maxR, gy, gh);
+    const pxEnd = mapGraphX(tEnd, minT, maxT, gx, gw);
+    const pyEnd = mapGraphY(resistanceAtTemp(tEnd), minR, maxR, gy, gh);
 
     ctx.strokeStyle = '#4f46e5';
     ctx.lineWidth = 2;
     ctx.beginPath();
-    ctx.moveTo(gx, py0);
-    ctx.lineTo(gx + gw, pyMax);
+    ctx.moveTo(px0, py0);
+    ctx.lineTo(pxEnd, pyEnd);
     ctx.stroke();
 
     const currentT = state.thermometerTemp;
     const currentR = state.currentResistance;
-    if (currentT >= 0 && currentT <= maxT) {
-      const px = gx + (currentT / maxT) * gw;
-      const py = gy + gh - (currentR / maxR) * gh;
+    if (currentT >= minT && currentT <= maxT) {
+      const px = mapGraphX(currentT, minT, maxT, gx, gw);
+      const py = mapGraphY(currentR, minR, maxR, gy, gh);
       ctx.fillStyle = '#4f46e5';
       ctx.beginPath();
       ctx.arc(px, py, dotR, 0, Math.PI * 2);
@@ -1618,45 +1695,12 @@ export function createThermometerLab(t) {
   }
 
   function drawThermistorGraph(ctx) {
-    const { gx, gy, gw, gh, tickFont, axisFont, dotR, yLabelX, xLabelY } = getGraphLayout();
-
-    ctx.strokeStyle = '#4b5563';
-    ctx.lineWidth = 1.4;
-    ctx.beginPath();
-    ctx.moveTo(gx, gy);
-    ctx.lineTo(gx, gy + gh);
-    ctx.lineTo(gx + gw, gy + gh);
-    ctx.stroke();
-
-    ctx.strokeStyle = '#27272a';
-    ctx.lineWidth = 0.6;
-    ctx.fillStyle = '#a1a1aa';
-    ctx.font = tickFont;
-    ctx.textAlign = 'right';
-    ctx.textBaseline = 'middle';
-
-    const maxR = 20;
-    const maxT = 200;
-
-    for (let r = 0; r <= maxR; r += 4) {
-      const yGrid = gy + gh - (r / maxR) * gh;
-      ctx.beginPath();
-      ctx.moveTo(gx, yGrid);
-      ctx.lineTo(gx + gw, yGrid);
-      ctx.stroke();
-      ctx.fillText(`${r.toFixed(1)}`, gx - 8, yGrid);
-    }
-
-    ctx.textAlign = 'center';
-    ctx.textBaseline = 'top';
-    for (let tVal = 0; tVal <= maxT; tVal += 40) {
-      const xGrid = gx + (tVal / maxT) * gw;
-      ctx.beginPath();
-      ctx.moveTo(xGrid, gy);
-      ctx.lineTo(xGrid, gy + gh);
-      ctx.stroke();
-      ctx.fillText(`${tVal}`, xGrid, gy + gh + 6);
-    }
+    const layout = getGraphLayout();
+    const tempScale = getTempAxisScale();
+    const { minR, maxR, ticks } = getThermistorBounds(tempScale);
+    const axis = drawGraphAxes(ctx, layout, tempScale.minT, tempScale.maxT, tempScale.tickStep, ticks);
+    const { gx, gy, gw, gh, axisFont, yLabelX, xLabelY, dotR } = { ...layout, ...axis };
+    const { minT, maxT } = tempScale;
 
     ctx.save();
     ctx.translate(yLabelX, gy + gh / 2);
@@ -1667,17 +1711,19 @@ export function createThermometerLab(t) {
     ctx.restore();
 
     ctx.font = axisFont;
+    ctx.fillStyle = '#e4e4e7';
+    ctx.textAlign = 'center';
     ctx.fillText('temperature / °C', gx + gw / 2, xLabelY);
 
     ctx.strokeStyle = '#10b981';
     ctx.lineWidth = 2;
     ctx.beginPath();
     let started = false;
-    for (let tVal = 0; tVal <= maxT; tVal += 2) {
+    for (let tVal = minT; tVal <= maxT; tVal += 2) {
       const tempK = tVal + 273.15;
       const r = state.thermistorR25 * Math.exp(state.thermistorBeta * (1 / tempK - 1 / 298.15));
-      const px = gx + (tVal / maxT) * gw;
-      const py = gy + gh - (Math.min(maxR, r) / maxR) * gh;
+      const px = mapGraphX(tVal, minT, maxT, gx, gw);
+      const py = mapGraphY(Math.min(maxR, r), minR, maxR, gy, gh);
       if (py >= gy && py <= gy + gh) {
         if (!started) {
           ctx.moveTo(px, py);
@@ -1691,9 +1737,9 @@ export function createThermometerLab(t) {
 
     const currentT = state.thermometerTemp;
     const currentR = state.currentThermistorR;
-    if (currentT >= 0 && currentT <= maxT) {
-      const px = gx + (currentT / maxT) * gw;
-      const py = gy + gh - (Math.min(maxR, currentR) / maxR) * gh;
+    if (currentT >= minT && currentT <= maxT) {
+      const px = mapGraphX(currentT, minT, maxT, gx, gw);
+      const py = mapGraphY(Math.min(maxR, currentR), minR, maxR, gy, gh);
       ctx.fillStyle = '#10b981';
       ctx.beginPath();
       ctx.arc(px, py, dotR, 0, Math.PI * 2);
