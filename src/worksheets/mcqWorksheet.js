@@ -9,8 +9,9 @@ function shuffle(arr) {
   return a;
 }
 
-function filterPool(questions, picked) {
+function filterPool(questions, picked, topicFilter) {
   return questions.filter((q) => {
+    if (topicFilter) return topicFilter(q, picked);
     const topic = q.topic;
     if (picked.includes(topic)) return true;
     if (picked.includes('rotatingMirror') && topic === 'reflection') return true;
@@ -38,8 +39,8 @@ function escapeHtml(s) {
     .replace(/"/g, '&quot;');
 }
 
-export function renderWorksheets(t) {
-  const topics = [
+export function renderWorksheets(t, options = {}) {
+  const topics = options.topics ?? [
     ['rotatingMirror', 'topic.rotatingMirror'],
     ['refraction', 'topic.refractionSnell'],
     ['tir', 'topic.tir'],
@@ -47,6 +48,7 @@ export function renderWorksheets(t) {
     ['concave', 'topic.concave'],
     ['em', 'topic.em'],
   ];
+  const paperTitleKey = options.paperTitleKey ?? 'worksheets.paperTitle';
   return `
     <section class="panel panel--worksheets">
       <h2>${t('worksheets.title')}</h2>
@@ -83,7 +85,7 @@ export function renderWorksheets(t) {
         <div class="worksheet-paper practice-mode" data-ws-paper>
           <div class="worksheet-header">
             <div class="header-top">
-              <h3>${t('worksheets.paperTitle')}</h3>
+              <h3>${t(paperTitleKey)}</h3>
               <div class="ws-date-row no-print" data-ws-date-row>
                 <span data-ws-date-label></span>
                 <button type="button" class="btn btn-sm" data-ws-date-today>${t('worksheets.today')}</button>
@@ -111,7 +113,7 @@ export function renderWorksheets(t) {
     </section>`;
 }
 
-export function hydrateWorksheets(root, questions, t, langKey) {
+export function hydrateWorksheets(root, questions, t, langKey, options = {}) {
   const state = {
     items: [],
     tab: 'practice',
@@ -355,7 +357,7 @@ ${rows}</body></html>`;
     const picked = [...root.querySelectorAll('[data-ws-topic]')]
       .filter((c) => c.checked)
       .map((c) => c.getAttribute('data-ws-topic'));
-    const pool = filterPool(questions, picked);
+    const pool = filterPool(questions, picked, options.topicFilter);
     const deck = shuffle(pool).slice(0, Math.min(count, pool.length || 1));
     state.items = deck.length ? deck : shuffle(questions).slice(0, Math.min(count, questions.length));
     resetSession();

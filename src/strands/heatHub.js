@@ -5,6 +5,45 @@ import { createThermometerLab } from '../tools/thermometerLab.js';
 import { mountHubShell } from '../hubShell.js';
 import { renderWorksheets, hydrateWorksheets } from '../worksheets/mcqWorksheet.js';
 
+const HEAT_TOPICS = [
+  {
+    id: 'thermometer',
+    titleKey: 'topic.thermometer',
+    fileEn: 'thermometer-en.pdf',
+    fileZh: 'thermometer-zhHant.pdf',
+    tool: 'thermometerLab',
+  },
+  {
+    id: 'heatInternalEnergy',
+    titleKey: 'topic.heatInternalEnergy',
+    fileEn: 'heat-internal-energy-en.pdf',
+    fileZh: 'heat-internal-energy-zhHant.pdf',
+  },
+  {
+    id: 'changeOfState',
+    titleKey: 'topic.changeOfState',
+    fileEn: 'change-of-state-en.pdf',
+    fileZh: 'change-of-state-zhHant.pdf',
+  },
+  {
+    id: 'heatTransfer',
+    titleKey: 'topic.heatTransfer',
+    fileEn: 'heat-transfer-en.pdf',
+    fileZh: 'heat-transfer-zhHant.pdf',
+  },
+];
+
+const THERMOMETRY_SUBTOPICS = [
+  'liquidThermometer',
+  'faultyThermometer',
+  'resistanceThermometer',
+  'thermistor',
+];
+
+const HEAT_WORKSHEET_TOPICS = [
+  ['thermometer', 'topic.thermometer'],
+];
+
 function langKey() {
   return getLang() === 'zh-Hant' ? 'zhHant' : 'en';
 }
@@ -31,6 +70,7 @@ export function mountHeatHub(root) {
 
   let shell = null;
   let el = { main: null };
+  let activeLabInstance = null;
 
   function renderMain() {
     if (!el.main) return;
@@ -38,23 +78,28 @@ export function mountHeatHub(root) {
     if (section === 'topics') el.main.innerHTML = renderTopics();
     else if (section === 'notes') el.main.innerHTML = renderNotesShell();
     else if (section === 'tools') el.main.innerHTML = renderToolsShell();
-    else if (section === 'worksheets') el.main.innerHTML = renderWorksheets(t);
-    else if (section === 'flashcards') el.main.innerHTML = renderFlashcardsShell();
+    else if (section === 'worksheets') {
+      el.main.innerHTML = renderWorksheets(t, {
+        topics: HEAT_WORKSHEET_TOPICS,
+        paperTitleKey: 'worksheets.paperTitleHeat',
+      });
+    } else if (section === 'flashcards') el.main.innerHTML = renderFlashcardsShell();
     else if (section === 'summary') el.main.innerHTML = renderSummary();
 
     if (section === 'notes') void hydrateNotes();
     if (section === 'tools') hydrateTools();
     if (section === 'worksheets') {
-      // Filter questions specifically for Heat topics
-      const heatQuestions = questions.filter(q => 
-        ['liquidThermometer', 'faultyThermometer', 'resistanceThermometer', 'thermistor'].includes(q.topic)
+      const heatQuestions = questions.filter((q) =>
+        THERMOMETRY_SUBTOPICS.includes(q.topic),
       );
-      hydrateWorksheets(root, heatQuestions, t, langKey);
-      // Override paper title for Heat
-      const titleEl = root.querySelector('[data-ws-paper] h3');
-      if (titleEl) {
-        titleEl.textContent = t('worksheets.paperTitleHeat');
-      }
+      hydrateWorksheets(root, heatQuestions, t, langKey, {
+        topicFilter: (q, picked) => {
+          if (picked.includes('thermometer')) {
+            return THERMOMETRY_SUBTOPICS.includes(q.topic);
+          }
+          return picked.includes(q.topic);
+        },
+      });
     }
     if (section === 'flashcards') hydrateFlashcards();
     if (section === 'summary') void hydrateSummary();
@@ -78,73 +123,63 @@ export function mountHeatHub(root) {
   }
 
   function renderTopics() {
-    const cards = [
-      ['liquidThermometer', 'topic.liquidThermometer'],
-      ['faultyThermometer', 'topic.faultyThermometer'],
-      ['resistanceThermometer', 'topic.resistanceThermometer'],
-      ['thermistor', 'topic.thermistor'],
-    ];
     return `
       <section class="panel panel--topic-hub">
         <h2>${t('topics.title')}</h2>
         <p class="lead">${t('topics.intro')}</p>
         <div class="grid cols-2 topic-hub-grid">
-          ${cards
-            .map(([id, key]) => `
+          ${HEAT_TOPICS.map((topic) => {
+            const btn = topic.tool
+              ? `<button class="btn primary" type="button" data-go-tool="${topic.tool}">${t('topic.openTool')}</button>`
+              : `<button class="btn primary" type="button" data-go-section="notes">${t('topic.viewNotes')}</button>`;
+            return `
             <div class="card">
-              <h3>${t(key)}</h3>
-              <button class="btn primary" type="button" data-go-tool="thermometerLab">${t('topic.openTool')}</button>
-            </div>`)
-            .join('')}
+              <h3>${t(topic.titleKey)}</h3>
+              ${btn}
+            </div>`;
+          }).join('')}
         </div>
       </section>`;
   }
 
   function onMainClick(ev) {
-    const b = ev.target.closest('[data-go-tool]');
-    if (!b) return;
-    section = 'tools';
-    shell.updateSection(section);
-    renderMain();
+    const toolBtn = ev.target.closest('[data-go-tool]');
+    if (toolBtn) {
+      section = 'tools';
+      shell.updateSection(section);
+      renderMain();
+      return;
+    }
+    const notesBtn = ev.target.closest('[data-go-section]');
+    if (notesBtn?.getAttribute('data-go-section') === 'notes') {
+      section = 'notes';
+      shell.updateSection(section);
+      renderMain();
+    }
   }
 
   function renderNotesShell() {
-    const rows = [
-      { key: 'liquidThermometer', fileEn: 'liquid-thermometer-en.pdf', fileZh: 'liquid-thermometer-zhHant.pdf' },
-      { key: 'faultyThermometer', fileEn: 'faulty-thermometer-en.pdf', fileZh: 'faulty-thermometer-zhHant.pdf' },
-      { key: 'resistanceThermometer', fileEn: 'resistance-thermometer-en.pdf', fileZh: 'resistance-thermometer-zhHant.pdf' },
-      { key: 'thermistor', fileEn: 'thermistor-en.pdf', fileZh: 'thermistor-zhHant.pdf' },
-    ];
     return `
       <section class="panel">
         <h2>${t('notes.title')}</h2>
         <p class="lead">${t('notes.intro')}</p>
         <p class="lead">${t('notes.embedHint')}</p>
         <div class="grid cols-2" data-notes-grid>
-          ${rows
-            .map((r) => {
-              const title = t(`notes.card.${r.key}`);
-              return `
-            <div class="card" data-note-card="${r.key}">
-              <h3>${title}</h3>
+          ${HEAT_TOPICS.map(
+            (r) => `
+            <div class="card" data-note-card="${r.id}">
+              <h3>${t(`notes.card.${r.id}`)}</h3>
               <div data-note-body></div>
-            </div>`;
-            })
-            .join('')}
+            </div>`,
+          ).join('')}
         </div>
       </section>`;
   }
 
   async function hydrateNotes() {
-    const rows = [
-      { key: 'liquidThermometer', fileEn: 'liquid-thermometer-en.pdf', fileZh: 'liquid-thermometer-zhHant.pdf' },
-      { key: 'faultyThermometer', fileEn: 'faulty-thermometer-en.pdf', fileZh: 'faulty-thermometer-zhHant.pdf' },
-      { key: 'resistanceThermometer', fileEn: 'resistance-thermometer-en.pdf', fileZh: 'resistance-thermometer-zhHant.pdf' },
-      { key: 'thermistor', fileEn: 'thermistor-en.pdf', fileZh: 'thermistor-zhHant.pdf' },
-    ];
     const lk = langKey();
-    for (const r of rows) {
-      const card = root.querySelector(`[data-note-card="${r.key}"]`);
+    for (const r of HEAT_TOPICS) {
+      const card = root.querySelector(`[data-note-card="${r.id}"]`);
       if (!card) continue;
       const body = card.querySelector('[data-note-body]');
       const file = lk === 'zhHant' ? r.fileZh : r.fileEn;
@@ -152,7 +187,7 @@ export function mountHeatHub(root) {
       const url = `${import.meta.env.BASE_URL}notes/${file}`;
       if (ok) {
         body.innerHTML = `
-          <iframe class="notes-grid" title="${t(`notes.card.${r.key}`)}" src="${url}"></iframe>
+          <iframe class="notes-grid" title="${t(`notes.card.${r.id}`)}" src="${url}"></iframe>
           <p style="margin-top:8px"><a href="${url}" target="_blank" rel="noopener">${t('notes.openPdf')}</a></p>`;
       } else {
         body.innerHTML = `<p class="lead">${t('notes.missing')}</p>`;
@@ -164,19 +199,18 @@ export function mountHeatHub(root) {
     return `
       <section class="panel panel--tools">
         <h2>${t('tools.title')}</h2>
+        <p class="lead">${t('tools.thermometerLab.subtitle')}</p>
         <div class="tools-layout">
           <div class="tool-stage" data-tool-stage style="width: 100%"></div>
         </div>
       </section>`;
   }
 
-  let activeLabInstance = null;
-
   function hydrateTools() {
     const stage = root.querySelector('[data-tool-stage]');
     if (!stage) return;
     stage.innerHTML = '';
-    if (activeLabInstance && activeLabInstance._thermometerLabCleanup) {
+    if (activeLabInstance?._thermometerLabCleanup) {
       activeLabInstance._thermometerLabCleanup();
     }
     activeLabInstance = createThermometerLab(t);
@@ -192,10 +226,7 @@ export function mountHeatHub(root) {
           <label>${t('flashcards.deck')}</label>
           <select data-flash-deck>
             <option value="all">${t('flashcards.all')}</option>
-            <option value="liquidThermometer">${t('topic.liquidThermometer')}</option>
-            <option value="faultyThermometer">${t('topic.faultyThermometer')}</option>
-            <option value="resistanceThermometer">${t('topic.resistanceThermometer')}</option>
-            <option value="thermistor">${t('topic.thermistor')}</option>
+            <option value="thermometry">${t('flashcards.deck.thermometry')}</option>
           </select>
         </div>
         <div class="flashcard-box">
@@ -215,15 +246,12 @@ export function mountHeatHub(root) {
   }
 
   function heatFlashcards() {
-    // Filter flashcards specifically for Heat topics
-    return flashcards.filter(c => 
-      ['liquidThermometer', 'faultyThermometer', 'resistanceThermometer', 'thermistor'].includes(c.topic)
-    );
+    return flashcards.filter((c) => THERMOMETRY_SUBTOPICS.includes(c.topic));
   }
 
   function flashDeckList() {
     const list = heatFlashcards();
-    if (flashDeck === 'all') return list;
+    if (flashDeck === 'all' || flashDeck === 'thermometry') return list;
     return list.filter((c) => c.topic === flashDeck);
   }
 
@@ -233,9 +261,7 @@ export function mountHeatHub(root) {
     if (!list.length) {
       flashIndex = 0;
       const front = root.querySelector('[data-flash-front]');
-      const surface = root.querySelector('[data-flip-card]');
       if (front) front.textContent = '';
-      if (surface) surface.classList.remove('flashcard-surface--image');
       if (progress) {
         progress.hidden = true;
         progress.textContent = '';
@@ -246,9 +272,8 @@ export function mountHeatHub(root) {
     flashIndex = Math.max(0, Math.min(flashIndex, list.length - 1));
     const card = list[flashIndex];
     const frontEl = root.querySelector('[data-flash-front]');
-    const surface = root.querySelector('[data-flip-card]');
     const labelEl = root.querySelector('[data-flash-label]');
-    if (!frontEl || !surface) return;
+    if (!frontEl) return;
 
     if (progress) {
       progress.hidden = false;
@@ -257,7 +282,6 @@ export function mountHeatHub(root) {
         .replace('{total}', String(list.length));
     }
 
-    surface.classList.remove('flashcard-surface--image');
     const lk = langKey();
     const pack = card[lk] || card.en;
     if (labelEl) {
@@ -307,50 +331,35 @@ export function mountHeatHub(root) {
   }
 
   function renderSummary() {
-    const items = [
-      { key: 'liquidThermometer', fileEn: 'liquid-thermometer-en.pdf', fileZh: 'liquid-thermometer-zhHant.pdf' },
-      { key: 'faultyThermometer', fileEn: 'faulty-thermometer-en.pdf', fileZh: 'faulty-thermometer-zhHant.pdf' },
-      { key: 'resistanceThermometer', fileEn: 'resistance-thermometer-en.pdf', fileZh: 'resistance-thermometer-zhHant.pdf' },
-      { key: 'thermistor', fileEn: 'thermistor-en.pdf', fileZh: 'thermistor-zhHant.pdf' },
-    ];
     return `
       <section class="panel">
         <h2>${t('summary.title')}</h2>
         <p class="lead">${t('summary.intro')}</p>
         <p class="lead">${t('notes.embedHint')}</p>
         <div class="grid cols-2" data-summary-grid>
-          ${items
-            .map((it) => {
-              const title = t(`summary.item.${it.key}`);
-              return `
-            <div class="card" data-summary-card="${it.key}">
-              <h3>${title}</h3>
+          ${HEAT_TOPICS.map(
+            (it) => `
+            <div class="card" data-summary-card="${it.id}">
+              <h3>${t(`summary.item.${it.id}`)}</h3>
               <div data-summary-body></div>
-            </div>`;
-            })
-            .join('')}
+            </div>`,
+          ).join('')}
         </div>
       </section>`;
   }
 
   async function hydrateSummary() {
-    const rows = [
-      { key: 'liquidThermometer', fileEn: 'liquid-thermometer-en.pdf', fileZh: 'liquid-thermometer-zhHant.pdf' },
-      { key: 'faultyThermometer', fileEn: 'faulty-thermometer-en.pdf', fileZh: 'faulty-thermometer-zhHant.pdf' },
-      { key: 'resistanceThermometer', fileEn: 'resistance-thermometer-en.pdf', fileZh: 'resistance-thermometer-zhHant.pdf' },
-      { key: 'thermistor', fileEn: 'thermistor-en.pdf', fileZh: 'thermistor-zhHant.pdf' },
-    ];
     const lk = langKey();
-    for (const r of rows) {
-      const card = root.querySelector(`[data-summary-card="${r.key}"]`);
+    for (const r of HEAT_TOPICS) {
+      const card = root.querySelector(`[data-summary-card="${r.id}"]`);
       if (!card) continue;
       const body = card.querySelector('[data-summary-body]');
       const file = lk === 'zhHant' ? r.fileZh : r.fileEn;
-      const ok = await assetExists('summary-pdfs', file);
-      const url = `${import.meta.env.BASE_URL}summary-pdfs/${file}`;
+      const ok = await noteExists(file);
+      const url = `${import.meta.env.BASE_URL}notes/${file}`;
       if (ok) {
         body.innerHTML = `
-          <iframe class="notes-grid" title="${t(`summary.item.${r.key}`)}" src="${url}"></iframe>
+          <iframe class="notes-grid" title="${t(`summary.item.${r.id}`)}" src="${url}"></iframe>
           <p style="margin-top:8px"><a href="${url}" target="_blank" rel="noopener">${t('summary.download')}</a></p>`;
       } else {
         body.innerHTML = `<p class="lead">${t('summary.missing')}</p>`;
@@ -369,7 +378,7 @@ export function mountHeatHub(root) {
   return () => {
     window.removeEventListener('s3phy:lang', onLang);
     root.removeEventListener('click', onClick);
-    if (activeLabInstance && activeLabInstance._thermometerLabCleanup) {
+    if (activeLabInstance?._thermometerLabCleanup) {
       activeLabInstance._thermometerLabCleanup();
     }
     shell?.destroy();
