@@ -672,7 +672,7 @@ ${D}</body></html>`}function c(v){const g=d(v),D=new Blob(["\uFEFF",g],{type:"ap
     display: grid;
     grid-template-columns: minmax(0, 460px) 1fr;
     grid-template-rows: auto auto auto;
-    gap: 12px;
+    gap: 16px;
     align-items: stretch;
   }
   .tl-wrap .tl-viz-phys {
@@ -682,6 +682,8 @@ ${D}</body></html>`}function c(v){const g=d(v),D=new Blob(["\uFEFF",g],{type:"ap
     display: flex;
     justify-content: center;
     align-items: center;
+    border: 2px solid #3b82f6; /* Highlight physical view */
+    box-shadow: 0 0 15px rgba(59, 130, 246, 0.15);
   }
   .tl-wrap .tl-viz-graph {
     grid-column: 2;
@@ -690,6 +692,8 @@ ${D}</body></html>`}function c(v){const g=d(v),D=new Blob(["\uFEFF",g],{type:"ap
     display: flex;
     justify-content: center;
     align-items: center;
+    border: 2px solid #10b981; /* Highlight graph view */
+    box-shadow: 0 0 15px rgba(16, 185, 129, 0.15);
   }
   .tl-wrap .tl-controls {
     grid-column: 1 / -1;
@@ -697,6 +701,8 @@ ${D}</body></html>`}function c(v){const g=d(v),D=new Blob(["\uFEFF",g],{type:"ap
     max-height: none;
     min-height: 0;
     overflow: visible;
+    border: 1px solid #4b5563;
+    background: #111115;
   }
   .tl-wrap .tl-controls-scroll {
     flex: none;
@@ -727,13 +733,16 @@ ${D}</body></html>`}function c(v){const g=d(v),D=new Blob(["\uFEFF",g],{type:"ap
     max-width: 320px;
   }
   .tl-wrap .tl-worked-solution {
-    padding: 8px 10px;
-    font-size: 0.74rem;
+    padding: 12px 16px;
+    font-size: 0.85rem; /* Larger font for classroom projector */
+    border-radius: 8px;
+    border-left-width: 6px;
+    box-shadow: 0 2px 8px rgba(0,0,0,0.25);
   }
   .tl-wrap .tl-math-formula {
-    font-size: 0.82rem;
-    margin: 6px 0;
-    padding: 5px;
+    font-size: 1.05rem; /* Highly readable math on projector */
+    margin: 8px 0;
+    padding: 8px;
   }
 }
 .tl-wrap .tl-tabs-container {
@@ -938,11 +947,11 @@ ${D}</body></html>`}function c(v){const g=d(v),D=new Blob(["\uFEFF",g],{type:"ap
 }
 .tl-wrap .tl-worked-solution {
   background-color: rgba(79, 70, 229, 0.08);
-  border-left: 4px solid var(--tl-primary);
+  border-left: 6px solid var(--tl-primary);
   border-radius: 0 8px 8px 0;
-  padding: 10px 12px;
-  font-size: 0.78rem;
-  line-height: 1.4;
+  padding: 12px 16px;
+  font-size: 0.85rem;
+  line-height: 1.45;
 }
 .tl-wrap .tl-solution-header {
   font-weight: 800;
@@ -959,12 +968,12 @@ ${D}</body></html>`}function c(v){const g=d(v),D=new Blob(["\uFEFF",g],{type:"ap
   display: flex;
   align-items: center;
   justify-content: center;
-  margin: 8px 0;
+  margin: 10px 0;
   font-family: 'Cambria', 'Georgia', serif;
-  font-size: 0.88rem;
+  font-size: 1.05rem;
   color: #fff;
   background-color: rgba(0,0,0,0.2);
-  padding: 6px;
+  padding: 8px;
   border-radius: 6px;
 }
 .tl-wrap .tl-math-fraction {
