@@ -177,5 +177,11 @@ export const en = {
   'flashcards.deck.thermometry': 'Thermometry (all types)',
   'tools.thermometerLab.title': 'Thermometry & Calibration Lab',
   'tools.thermometerLab.subtitle': 'Interactive study companion for liquid-in-glass, platinum resistance, and thermistor thermometers.',
+  'tools.thermometerLab.liquid.title': 'Liquid-in-Glass Thermometer',
+  'tools.thermometerLab.liquid.subtitle': 'Explore the effects of bulb volume, capillary bore, and liquid type on sensitivity and response time.',
+  'tools.thermometerLab.resistance.title': 'Platinum Resistance Thermometer',
+  'tools.thermometerLab.resistance.subtitle': 'Investigate how platinum resistance varies linearly with temperature and solve calibration problems.',
+  'tools.thermometerLab.thermistor.title': 'NTC Thermistor',
+  'tools.thermometerLab.thermistor.subtitle': 'Study the non-linear resistance-temperature relationship of NTC thermistors and live beta calculations.',
   'worksheets.paperTitleHeat': 'S3 Heat — Multiple choice worksheet',
 };

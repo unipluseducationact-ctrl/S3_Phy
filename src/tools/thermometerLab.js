@@ -669,15 +669,29 @@ function ensureStyles() {
   document.head.appendChild(el);
 }
 
-export function createThermometerLab(t) {
+export function createThermometerLab(t, options = {}) {
   ensureStyles();
+
+  const defaultType = options.type || 'liquid';
+  let title = t('tools.thermometerLab.title');
+  let subtitle = t('tools.thermometerLab.subtitle');
+  if (options.type === 'liquid') {
+    title = t('tools.thermometerLab.liquid.title');
+    subtitle = t('tools.thermometerLab.liquid.subtitle') || t('tools.thermometerLab.subtitle');
+  } else if (options.type === 'resistance') {
+    title = t('tools.thermometerLab.resistance.title');
+    subtitle = t('tools.thermometerLab.resistance.subtitle') || t('tools.thermometerLab.subtitle');
+  } else if (options.type === 'thermistor') {
+    title = t('tools.thermometerLab.thermistor.title');
+    subtitle = t('tools.thermometerLab.thermistor.subtitle') || t('tools.thermometerLab.subtitle');
+  }
 
   const wrap = document.createElement('div');
   wrap.className = 'tl-wrap';
   wrap.innerHTML = `
     <div class="tl-head">
-      <h2 class="tl-title">${t('tools.thermometerLab.title')}</h2>
-      <div class="tl-sub">${t('tools.thermometerLab.subtitle')}</div>
+      <h2 class="tl-title">${title}</h2>
+      <div class="tl-sub">${subtitle}</div>
     </div>
     <div class="tl-dash">
       <!-- LEFT PANEL: VISUALIZATIONS -->
@@ -1018,7 +1032,7 @@ export function createThermometerLab(t) {
   // --- STATE MANAGEMENT ---
   const state = {
     liquidType: 'mercury',
-    thermometerType: 'liquid',
+    thermometerType: defaultType,
     bulbVolume: 200,
     wallThickness: 0.5,
     capillaryBore: 0.3,
@@ -2099,6 +2113,32 @@ export function createThermometerLab(t) {
     wrap.querySelector('#tl-input-q10b-t').addEventListener('input', updateFaultySolver);
     wrap.querySelector('#tl-input-q11-r').addEventListener('input', calculateQ11);
   }
+
+  // Programmatic tab activation based on defaultType
+  if (options.type) {
+    const tabsContainer = wrap.querySelector('.tl-tabs-container');
+    if (tabsContainer) {
+      tabsContainer.style.display = 'none';
+    }
+  }
+
+  wrap.querySelectorAll('.tl-tab-btn').forEach(btn => {
+    const tabId = btn.getAttribute('data-tl-tab');
+    if (tabId === defaultType) {
+      btn.classList.add('active');
+    } else {
+      btn.classList.remove('active');
+    }
+  });
+
+  wrap.querySelectorAll('.tl-tab-content').forEach(content => {
+    const tabId = content.id.replace('tl-tab-', '');
+    if (tabId === defaultType) {
+      content.classList.add('active');
+    } else {
+      content.classList.remove('active');
+    }
+  });
 
   initParticles();
   setupEventListeners();

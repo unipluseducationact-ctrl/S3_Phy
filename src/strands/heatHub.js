@@ -11,7 +11,7 @@ const HEAT_TOPICS = [
     titleKey: 'topic.thermometer',
     fileEn: 'thermometer-en.pdf',
     fileZh: 'thermometer-zhHant.pdf',
-    tool: 'thermometerLab',
+    tool: 'liquid',
   },
   {
     id: 'heatInternalEnergy',
@@ -44,6 +44,23 @@ const HEAT_WORKSHEET_TOPICS = [
   ['thermometer', 'topic.thermometer'],
 ];
 
+const TOOL_ORDER = ['liquid', 'resistance', 'thermistor'];
+
+const TOOL_FACTORIES = {
+  liquid: (tr) => createThermometerLab(tr, { type: 'liquid' }),
+  resistance: (tr) => createThermometerLab(tr, { type: 'resistance' }),
+  thermistor: (tr) => createThermometerLab(tr, { type: 'thermistor' }),
+};
+
+function toolLabel(id) {
+  const map = {
+    liquid: 'tools.thermometerLab.liquid.title',
+    resistance: 'tools.thermometerLab.resistance.title',
+    thermistor: 'tools.thermometerLab.thermistor.title',
+  };
+  return t(map[id] || id);
+}
+
 function langKey() {
   return getLang() === 'zh-Hant' ? 'zhHant' : 'en';
 }
@@ -64,6 +81,7 @@ async function noteExists(name) {
 
 export function mountHeatHub(root) {
   let section = 'topics';
+  let toolId = 'liquid';
   let flashIndex = 0;
   let flashDeck = 'all';
   let flashShowBack = false;
@@ -111,6 +129,12 @@ export function mountHeatHub(root) {
       subtitleKey: 'strand.heat.subtitle',
       activeSection: section,
       onSection: (id) => {
+        if (section === 'tools' && id !== 'tools') {
+          if (activeLabInstance?._thermometerLabCleanup) {
+            activeLabInstance._thermometerLabCleanup();
+            activeLabInstance = null;
+          }
+        }
         section = id;
         shell.updateSection(section);
         renderMain();
@@ -145,6 +169,12 @@ export function mountHeatHub(root) {
   function onMainClick(ev) {
     const toolBtn = ev.target.closest('[data-go-tool]');
     if (toolBtn) {
+      const targetTool = toolBtn.getAttribute('data-go-tool');
+      if (TOOL_ORDER.includes(targetTool)) {
+        toolId = targetTool;
+      } else {
+        toolId = 'liquid';
+      }
       section = 'tools';
       shell.updateSection(section);
       renderMain();
@@ -199,21 +229,38 @@ export function mountHeatHub(root) {
     return `
       <section class="panel panel--tools">
         <h2>${t('tools.title')}</h2>
-        <p class="lead">${t('tools.thermometerLab.subtitle')}</p>
+        <p class="lead">${t('tools.pick')}</p>
         <div class="tools-layout">
-          <div class="tool-stage" data-tool-stage style="width: 100%"></div>
+          <div class="tool-list" data-tool-list>
+            ${TOOL_ORDER.map((id) => `<button type="button" data-tool="${id}" class="${toolId === id ? 'active' : ''}">${toolLabel(id)}</button>`).join('')}
+          </div>
+          <div class="tool-stage" data-tool-stage></div>
         </div>
       </section>`;
   }
 
   function hydrateTools() {
+    const list = root.querySelector('[data-tool-list]');
     const stage = root.querySelector('[data-tool-stage]');
-    if (!stage) return;
+    if (!list || !stage) return;
+    list.querySelectorAll('button').forEach((btn) => {
+      btn.addEventListener('click', () => {
+        toolId = btn.getAttribute('data-tool');
+        list.querySelectorAll('button').forEach((b) => b.classList.toggle('active', b.getAttribute('data-tool') === toolId));
+        mountTool(stage);
+      });
+    });
+    mountTool(stage);
+  }
+
+  function mountTool(stage) {
     stage.innerHTML = '';
     if (activeLabInstance?._thermometerLabCleanup) {
       activeLabInstance._thermometerLabCleanup();
     }
-    activeLabInstance = createThermometerLab(t);
+    const factory = TOOL_FACTORIES[toolId];
+    if (!factory) return;
+    activeLabInstance = factory(t);
     stage.appendChild(activeLabInstance);
   }
 
