@@ -1017,7 +1017,7 @@ export function createThermometerLab(t, options = {}) {
               <span>T<sub>bath</sub></span>
               <span class="tl-badge" id="tl-val-bath-temp" style="color:var(--tl-cyan)">25.0 °C</span>
             </div>
-            <input type="range" id="tl-bath-temp-slider" min="0" max="250" step="0.5" value="25.0">
+            <input type="range" id="tl-bath-temp-slider" min="0" max="200" step="0.5" value="25.0">
           </div>
         </div>
         <div class="tl-btn-group">
@@ -1155,12 +1155,13 @@ export function createThermometerLab(t, options = {}) {
   }
 
   function getLiquidLengthBounds() {
-    const span = Math.max(0.5, state.liquidL100 - state.liquidL0);
-    // Expand the upper bound padding significantly (e.g. 50% padding) to ensure high temperatures (130°C+)
-    // do not go off the top of the graph canvas.
-    const pad = Math.max(1, span * 0.55);
-    const minL = Math.max(0, Math.round((state.liquidL0 - span * 0.15) * 10) / 10);
-    const maxL = Math.round((state.liquidL100 + pad) * 10) / 10;
+    const { maxT } = getTempAxisScale();
+    const lMin = liquidLengthAtTemp(0);
+    const lMax = liquidLengthAtTemp(maxT);
+    const span = lMax - lMin;
+    const pad = Math.max(1, span * 0.1);
+    const minL = Math.max(0, Math.round((lMin - pad) * 10) / 10);
+    const maxL = Math.round((lMax + pad) * 10) / 10;
     return { minL, maxL };
   }
 
@@ -1169,12 +1170,13 @@ export function createThermometerLab(t, options = {}) {
   }
 
   function getResistanceBounds() {
-    const span = Math.max(0.1, state.resistanceR100 - state.resistanceR0);
-    // Expand the upper bound padding significantly to ensure high temperatures (130°C+)
-    // do not go off the top of the graph canvas.
-    const pad = Math.max(0.2, span * 0.55);
-    const minR = Math.max(0, state.resistanceR0 - span * 0.15);
-    const maxR = state.resistanceR100 + pad;
+    const { maxT } = getTempAxisScale();
+    const rMin = resistanceAtTemp(0);
+    const rMax = resistanceAtTemp(maxT);
+    const span = rMax - rMin;
+    const pad = Math.max(0.2, span * 0.1);
+    const minR = Math.max(0, rMin - pad);
+    const maxR = rMax + pad;
     const step = span <= 2 ? 0.5 : span <= 4 ? 1 : 2;
     const ticks = [];
     const start = Math.ceil(minR / step) * step;
