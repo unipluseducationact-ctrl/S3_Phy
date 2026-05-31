@@ -1155,8 +1155,10 @@ export function createThermometerLab(t, options = {}) {
 
   function getLiquidLengthBounds() {
     const span = Math.max(0.5, state.liquidL100 - state.liquidL0);
-    const pad = Math.max(1, span * 0.15);
-    const minL = Math.max(0, Math.round((state.liquidL0 - pad) * 10) / 10);
+    // Expand the upper bound padding significantly (e.g. 50% padding) to ensure high temperatures (130°C+)
+    // do not go off the top of the graph canvas.
+    const pad = Math.max(1, span * 0.55);
+    const minL = Math.max(0, Math.round((state.liquidL0 - span * 0.15) * 10) / 10);
     const maxL = Math.round((state.liquidL100 + pad) * 10) / 10;
     return { minL, maxL };
   }
@@ -1167,8 +1169,10 @@ export function createThermometerLab(t, options = {}) {
 
   function getResistanceBounds() {
     const span = Math.max(0.1, state.resistanceR100 - state.resistanceR0);
-    const pad = Math.max(0.2, span * 0.15);
-    const minR = Math.max(0, state.resistanceR0 - pad);
+    // Expand the upper bound padding significantly to ensure high temperatures (130°C+)
+    // do not go off the top of the graph canvas.
+    const pad = Math.max(0.2, span * 0.55);
+    const minR = Math.max(0, state.resistanceR0 - span * 0.15);
     const maxR = state.resistanceR100 + pad;
     const step = span <= 2 ? 0.5 : span <= 4 ? 1 : 2;
     const ticks = [];
