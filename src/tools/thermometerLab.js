@@ -1708,7 +1708,7 @@ export function createThermometerLab(t, options = {}) {
     ctx.textAlign = 'center';
     ctx.fillText('temperature / °C', gx + gw / 2, xLabelY);
 
-    const tLineEnd = Math.min(maxT, 100);
+    const tLineEnd = maxT;
     const px0 = mapGraphX(0, minT, maxT, gx, gw);
     const py0 = mapGraphY(liquidLengthAtTemp(0), minL, maxL, gy, gh);
     const pxEnd = mapGraphX(tLineEnd, minT, maxT, gx, gw);
@@ -1754,7 +1754,7 @@ export function createThermometerLab(t, options = {}) {
     ctx.fillText('temperature / °C', gx + gw / 2, xLabelY);
 
     const { minT, maxT } = tempScale;
-    const tEnd = Math.min(maxT, 100);
+    const tEnd = maxT;
     const px0 = mapGraphX(0, minT, maxT, gx, gw);
     const py0 = mapGraphY(resistanceAtTemp(0), minR, maxR, gy, gh);
     const pxEnd = mapGraphX(tEnd, minT, maxT, gx, gw);
