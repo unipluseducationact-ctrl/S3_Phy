@@ -73,9 +73,9 @@ const CSS = `
   background: #121214;
   border-radius: 12px;
   width: 100%;
-  max-width: 680px;
+  max-width: 800px;
   height: auto;
-  aspect-ratio: 680 / 480;
+  aspect-ratio: 800 / 560;
   display: block;
 }
 .tl-wrap .tl-bath-bar {
@@ -224,13 +224,14 @@ const CSS = `
     margin-top: 0;
   }
   .tl-wrap .tl-canvas-container {
-    display: grid;
-    grid-template-columns: minmax(0, 460px) minmax(0, 680px);
-    gap: 12px;
-    align-items: end;
+    display: flex;
+    flex-direction: column;
+    gap: 16px;
+    align-items: center;
     justify-content: center;
     flex: 0 0 auto;
     min-height: 0;
+    width: 100%;
   }
   .tl-wrap .tl-canvas-phys,
   .tl-wrap .tl-canvas-graph {
@@ -698,7 +699,7 @@ export function createThermometerLab(t, options = {}) {
       <div class="tl-viz">
         <div class="tl-canvas-container">
           <canvas class="tl-canvas-phys" id="tl-thermometerCanvas" width="460" height="340"></canvas>
-          <canvas class="tl-canvas-graph" id="tl-graphCanvas" width="680" height="480"></canvas>
+          <canvas class="tl-canvas-graph" id="tl-graphCanvas" width="800" height="560"></canvas>
         </div>
       </div>
 
@@ -1060,8 +1061,8 @@ export function createThermometerLab(t, options = {}) {
   const PHYS_WIDTH = 460;
   const PHYS_HEIGHT = 340;
   const PHYS_SCENE_OFFSET_X = 80;
-  const GRAPH_WIDTH = 680;
-  const GRAPH_HEIGHT = 480;
+  const GRAPH_WIDTH = 800;
+  const GRAPH_HEIGHT = 560;
 
   function getGraphLayout() {
     const margin = { left: 80, top: 48, right: 30, bottom: 65 };
