@@ -670,7 +670,7 @@ ${D}</body></html>`}function c(v){const g=d(v),D=new Blob(["\uFEFF",g],{type:"ap
 @media (min-width: 900px) {
   .tl-wrap .tl-dash {
     display: grid;
-    grid-template-columns: 1fr minmax(340px, 420px);
+    grid-template-columns: minmax(0, 460px) 1fr;
     grid-template-rows: auto auto auto;
     gap: 12px;
     align-items: stretch;
@@ -683,26 +683,25 @@ ${D}</body></html>`}function c(v){const g=d(v),D=new Blob(["\uFEFF",g],{type:"ap
     justify-content: center;
     align-items: center;
   }
-  .tl-wrap .tl-controls {
+  .tl-wrap .tl-viz-graph {
     grid-column: 2;
     grid-row: 1;
-    max-height: 420px;
-    min-height: 0;
-    overflow: hidden;
-    align-self: start;
-  }
-  .tl-wrap .tl-controls-scroll {
-    flex: 1;
-    min-height: 0;
-    max-height: 360px;
-  }
-  .tl-wrap .tl-viz-graph {
-    grid-column: 1 / -1;
-    grid-row: 2;
     min-height: 0;
     display: flex;
     justify-content: center;
     align-items: center;
+  }
+  .tl-wrap .tl-controls {
+    grid-column: 1 / -1;
+    grid-row: 2;
+    max-height: none;
+    min-height: 0;
+    overflow: visible;
+  }
+  .tl-wrap .tl-controls-scroll {
+    flex: none;
+    overflow-y: visible;
+    max-height: none;
   }
   .tl-wrap .tl-bath-bar {
     grid-column: 1 / -1;
@@ -1151,14 +1150,13 @@ ${D}</body></html>`}function c(v){const g=d(v),D=new Blob(["\uFEFF",g],{type:"ap
         <canvas class="tl-canvas-phys" id="tl-thermometerCanvas" width="460" height="340"></canvas>
       </div>
 
-      <!-- RIGHT PANEL: CONTROLS & SOLVERS -->
+      <!-- TOP ROW RIGHT: GRAPH -->
+      <div class="tl-viz-graph">
+        <canvas class="tl-canvas-graph" id="tl-graphCanvas" width="800" height="560"></canvas>
+      </div>
+
+      <!-- BOTTOM ROW: CONTROLS & SOLVERS -->
       <div class="tl-controls">
-        <nav class="tl-tabs-container">
-          <button class="tl-tab-btn active" data-tl-tab="liquid">Liquid</button>
-          <button class="tl-tab-btn" data-tl-tab="resistance">Pt RTD</button>
-          <button class="tl-tab-btn" data-tl-tab="thermistor">NTC</button>
-        </nav>
-        <div class="tl-controls-scroll">
 
         <!-- TAB 1: LIQUID-IN-GLASS -->
         <div class="tl-tab-content active" id="tl-tab-liquid">
@@ -1220,10 +1218,9 @@ ${D}</body></html>`}function c(v){const g=d(v),D=new Blob(["\uFEFF",g],{type:"ap
             τ = <b id="tl-val-response-time">0.65 s</b> · larger V<sub>b</sub> → slower equilibration
           </div>
 
-          <details class="tl-details">
-            <summary>Live calibration formula</summary>
-            <div class="tl-details-body">
-          <div class="tl-worked-solution">
+          <!-- Live calibration formula -->
+          <div class="tl-info-label" style="margin-top:10px;font-size:0.8rem;color:var(--tl-cyan)">Live calibration formula</div>
+          <div class="tl-worked-solution" style="margin-bottom:10px">
             <div class="tl-math-formula">
               T = <div class="tl-math-fraction">
                 <div class="tl-math-num">L<sub>T</sub> - L<sub>0</sub></div>
@@ -1240,14 +1237,12 @@ ${D}</body></html>`}function c(v){const g=d(v),D=new Blob(["\uFEFF",g],{type:"ap
               &times; 100°C <span class="tl-math-symbol">=</span> <b class="tl-final-ans" id="tl-live-liquid-ans">25.0°C</b>
             </div>
           </div>
-            </div>
-          </details>
 
-          <details class="tl-details">
-            <summary>Faulty thermometer solver</summary>
-            <div class="tl-details-body">
+          <!-- Faulty thermometer solver -->
+          <div class="tl-info-label" style="margin-top:10px;font-size:0.8rem;color:var(--tl-cyan)">Faulty thermometer solver</div>
+          <div style="display:flex;flex-direction:column;gap:8px">
             <p style="font-size:0.7rem;color:var(--tl-muted);margin:0">Set faulty readings at ice (0°C) and steam (100°C), then solve for T or C.</p>
-            <div class="tl-info-card" style="margin-bottom:8px">
+            <div class="tl-info-card" style="margin-bottom:4px">
               <div class="tl-info-label">Faulty scale calibration</div>
               <p style="margin:0;font-size:0.68rem">T / 100 = (C − C<sub>f</sub>) / (C<sub>u</sub> − C<sub>f</sub>)</p>
             </div>
@@ -1314,8 +1309,7 @@ ${D}</body></html>`}function c(v){const g=d(v),D=new Blob(["\uFEFF",g],{type:"ap
                 </div>
               </div>
             </div>
-            </div>
-          </details>
+          </div>
         </div>
 
         <!-- TAB 2: PLATINUM RESISTANCE -->
@@ -1353,10 +1347,9 @@ ${D}</body></html>`}function c(v){const g=d(v),D=new Blob(["\uFEFF",g],{type:"ap
             <p>To calculate temperature using linear calibration, it is <b>fundamentally assumed that electrical resistance varies linearly with temperature</b>.</p>
           </div>
 
-          <details class="tl-details">
-            <summary>Live calibration formula</summary>
-            <div class="tl-details-body">
-          <div class="tl-worked-solution">
+          <!-- Live calibration formula -->
+          <div class="tl-info-label" style="margin-top:10px;font-size:0.8rem;color:var(--tl-cyan)">Live calibration formula</div>
+          <div class="tl-worked-solution" style="margin-bottom:10px">
             <div class="tl-math-formula">
               T = <div class="tl-math-fraction">
                 <div class="tl-math-num">R<sub>T</sub> - R<sub>0</sub></div>
@@ -1373,12 +1366,10 @@ ${D}</body></html>`}function c(v){const g=d(v),D=new Blob(["\uFEFF",g],{type:"ap
               &times; 100°C <span class="tl-math-symbol">=</span> <b class="tl-final-ans" id="tl-live-resistance-ans">25.0°C</b>
             </div>
           </div>
-            </div>
-          </details>
 
-          <details class="tl-details">
-            <summary>Resistance-to-temperature solver</summary>
-            <div class="tl-details-body">
+          <!-- Resistance-to-temperature solver -->
+          <div class="tl-info-label" style="margin-top:10px;font-size:0.8rem;color:var(--tl-cyan)">Resistance-to-temperature solver</div>
+          <div style="display:flex;flex-direction:column;gap:8px">
             <div class="tl-calc-inputs">
               <span>Measured Resistance (R):</span>
               <div class="tl-input-with-unit">
@@ -1395,8 +1386,7 @@ ${D}</body></html>`}function c(v){const g=d(v),D=new Blob(["\uFEFF",g],{type:"ap
                 &times; 100 <span class="tl-math-symbol">=</span> <b class="tl-final-ans" id="tl-ans-q11">225.0 °C</b>
               </div>
             </div>
-            </div>
-          </details>
+          </div>
         </div>
 
         <!-- TAB 3: THERMISTOR -->
@@ -1429,9 +1419,8 @@ ${D}</body></html>`}function c(v){const g=d(v),D=new Blob(["\uFEFF",g],{type:"ap
             </div>
           </div>
 
-          <details class="tl-details">
-            <summary>Live NTC beta calculation</summary>
-            <div class="tl-details-body">
+          <!-- Live NTC beta calculation -->
+          <div class="tl-info-label" style="margin-top:10px;font-size:0.8rem;color:var(--tl-green)">Live NTC beta calculation</div>
           <div class="tl-worked-solution" style="background-color:rgba(16,185,129,0.05);border-left-color:var(--tl-green)">
             <div class="tl-math-formula" style="font-size:0.75rem">
               T = <div class="tl-math-fraction">
@@ -1447,16 +1436,9 @@ ${D}</body></html>`}function c(v){const g=d(v),D=new Blob(["\uFEFF",g],{type:"ap
               T<sub>K</sub> = <span id="tl-live-thermistor-calc-tk">298.15</span> K <span class="tl-math-symbol">&rArr;</span> T = <b class="tl-final-ans" id="tl-live-thermistor-ans">25.0°C</b>
             </div>
           </div>
-            </div>
-          </details>
         </div>
 
         </div>
-      </div>
-
-      <!-- BOTTOM ROW FULL WIDTH: GRAPH -->
-      <div class="tl-viz-graph">
-        <canvas class="tl-canvas-graph" id="tl-graphCanvas" width="800" height="560"></canvas>
       </div>
 
       <div class="tl-bath-bar">
