@@ -43,22 +43,16 @@ const CSS = `
   margin: 0 auto;
   align-items: stretch;
 }
-.tl-wrap .tl-viz {
+.tl-wrap .tl-viz-phys,
+.tl-wrap .tl-viz-graph {
   min-width: 0;
   background: var(--tl-panel);
   padding: 10px;
   border-radius: 16px;
   border: 1px solid var(--tl-border);
   display: flex;
-  flex-direction: column;
-  gap: 8px;
-}
-.tl-wrap .tl-canvas-container {
-  display: flex;
-  flex-direction: column;
-  gap: 10px;
+  justify-content: center;
   align-items: center;
-  width: 100%;
 }
 .tl-wrap .tl-canvas-phys {
   background: #121214;
@@ -188,23 +182,22 @@ const CSS = `
   .tl-wrap .tl-dash {
     display: grid;
     grid-template-columns: 1fr minmax(340px, 420px);
-    grid-template-rows: auto auto;
+    grid-template-rows: auto auto auto;
     gap: 12px;
-    align-items: start;
+    align-items: stretch;
   }
-  .tl-wrap .tl-viz {
+  .tl-wrap .tl-viz-phys {
     grid-column: 1;
     grid-row: 1;
     min-height: 0;
     display: flex;
-    flex-direction: column;
-    justify-content: flex-start;
-    align-self: start;
+    justify-content: center;
+    align-items: center;
   }
   .tl-wrap .tl-controls {
     grid-column: 2;
     grid-row: 1;
-    max-height: min(88vh, 680px);
+    max-height: 420px;
     min-height: 0;
     overflow: hidden;
     align-self: start;
@@ -212,26 +205,24 @@ const CSS = `
   .tl-wrap .tl-controls-scroll {
     flex: 1;
     min-height: 0;
-    max-height: min(82vh, 640px);
+    max-height: 360px;
+  }
+  .tl-wrap .tl-viz-graph {
+    grid-column: 1 / -1;
+    grid-row: 2;
+    min-height: 0;
+    display: flex;
+    justify-content: center;
+    align-items: center;
   }
   .tl-wrap .tl-bath-bar {
     grid-column: 1 / -1;
-    grid-row: 2;
+    grid-row: 3;
     flex-direction: row;
     flex-wrap: wrap;
     align-items: center;
     gap: 10px 14px;
     margin-top: 0;
-  }
-  .tl-wrap .tl-canvas-container {
-    display: flex;
-    flex-direction: column;
-    gap: 16px;
-    align-items: center;
-    justify-content: center;
-    flex: 0 0 auto;
-    min-height: 0;
-    width: 100%;
   }
   .tl-wrap .tl-canvas-phys,
   .tl-wrap .tl-canvas-graph {
@@ -695,12 +686,9 @@ export function createThermometerLab(t, options = {}) {
       <div class="tl-sub">${subtitle}</div>
     </div>
     <div class="tl-dash">
-      <!-- LEFT PANEL: VISUALIZATIONS -->
-      <div class="tl-viz">
-        <div class="tl-canvas-container">
-          <canvas class="tl-canvas-phys" id="tl-thermometerCanvas" width="460" height="340"></canvas>
-          <canvas class="tl-canvas-graph" id="tl-graphCanvas" width="800" height="560"></canvas>
-        </div>
+      <!-- TOP ROW LEFT: THERMOMETER VIEW -->
+      <div class="tl-viz-phys">
+        <canvas class="tl-canvas-phys" id="tl-thermometerCanvas" width="460" height="340"></canvas>
       </div>
 
       <!-- RIGHT PANEL: CONTROLS & SOLVERS -->
@@ -1004,6 +992,11 @@ export function createThermometerLab(t, options = {}) {
         </div>
 
         </div>
+      </div>
+
+      <!-- BOTTOM ROW FULL WIDTH: GRAPH -->
+      <div class="tl-viz-graph">
+        <canvas class="tl-canvas-graph" id="tl-graphCanvas" width="800" height="560"></canvas>
       </div>
 
       <div class="tl-bath-bar">
