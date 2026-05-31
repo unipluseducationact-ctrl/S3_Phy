@@ -1065,7 +1065,7 @@ export function createThermometerLab(t, options = {}) {
   const GRAPH_HEIGHT = 560;
 
   function getGraphLayout() {
-    const margin = { left: 80, top: 48, right: 30, bottom: 65 };
+    const margin = { left: 110, top: 48, right: 30, bottom: 65 };
     return {
       gx: margin.left,
       gy: margin.top,
@@ -1074,7 +1074,7 @@ export function createThermometerLab(t, options = {}) {
       tickFont: `bold ${Math.round(GRAPH_WIDTH * 0.024)}px Arial`,
       axisFont: `bold ${Math.round(GRAPH_WIDTH * 0.026)}px Arial`,
       dotR: 7,
-      yLabelX: margin.left - 48,
+      yLabelX: margin.left - 75,
       xLabelY: GRAPH_HEIGHT - margin.bottom + 32,
     };
   }
@@ -1121,7 +1121,7 @@ export function createThermometerLab(t, options = {}) {
       ctx.moveTo(gx, yGrid);
       ctx.lineTo(gx + gw, yGrid);
       ctx.stroke();
-      ctx.fillText(tick.label, gx - 12, yGrid); // Better spacing from axis
+      ctx.fillText(tick.label, gx - 15, yGrid); // Better spacing from axis
     }
 
     ctx.textAlign = 'center';
