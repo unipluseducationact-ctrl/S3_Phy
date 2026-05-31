@@ -1064,17 +1064,17 @@ export function createThermometerLab(t, options = {}) {
   const GRAPH_HEIGHT = 480;
 
   function getGraphLayout() {
-    const margin = { left: 72, top: 48, right: 24, bottom: 52 };
+    const margin = { left: 80, top: 48, right: 30, bottom: 65 };
     return {
       gx: margin.left,
       gy: margin.top,
       gw: GRAPH_WIDTH - margin.left - margin.right,
       gh: GRAPH_HEIGHT - margin.top - margin.bottom,
-      tickFont: `${Math.round(GRAPH_WIDTH * 0.02)}px Arial`,
-      axisFont: `bold ${Math.round(GRAPH_WIDTH * 0.022)}px Arial`,
-      dotR: 5,
-      yLabelX: margin.left - 34,
-      xLabelY: GRAPH_HEIGHT - margin.bottom + 18,
+      tickFont: `bold ${Math.round(GRAPH_WIDTH * 0.024)}px Arial`,
+      axisFont: `bold ${Math.round(GRAPH_WIDTH * 0.026)}px Arial`,
+      dotR: 7,
+      yLabelX: margin.left - 48,
+      xLabelY: GRAPH_HEIGHT - margin.bottom + 32,
     };
   }
 
@@ -1100,7 +1100,7 @@ export function createThermometerLab(t, options = {}) {
     const { gx, gy, gw, gh, tickFont, axisFont, yLabelX, xLabelY } = layout;
 
     ctx.strokeStyle = '#4b5563';
-    ctx.lineWidth = 1.4;
+    ctx.lineWidth = 2.0;
     ctx.beginPath();
     ctx.moveTo(gx, gy);
     ctx.lineTo(gx, gy + gh);
@@ -1108,8 +1108,8 @@ export function createThermometerLab(t, options = {}) {
     ctx.stroke();
 
     ctx.strokeStyle = '#27272a';
-    ctx.lineWidth = 0.6;
-    ctx.fillStyle = '#a1a1aa';
+    ctx.lineWidth = 0.8;
+    ctx.fillStyle = '#e4e4e7'; // Brighter color for tick labels
     ctx.font = tickFont;
     ctx.textAlign = 'right';
     ctx.textBaseline = 'middle';
@@ -1120,7 +1120,7 @@ export function createThermometerLab(t, options = {}) {
       ctx.moveTo(gx, yGrid);
       ctx.lineTo(gx + gw, yGrid);
       ctx.stroke();
-      ctx.fillText(tick.label, gx - 8, yGrid);
+      ctx.fillText(tick.label, gx - 12, yGrid); // Better spacing from axis
     }
 
     ctx.textAlign = 'center';
@@ -1131,7 +1131,7 @@ export function createThermometerLab(t, options = {}) {
       ctx.moveTo(xGrid, gy);
       ctx.lineTo(xGrid, gy + gh);
       ctx.stroke();
-      ctx.fillText(`${Math.round(tVal)}`, xGrid, gy + gh + 6);
+      ctx.fillText(`${Math.round(tVal)}`, xGrid, gy + gh + 10); // Better spacing from axis
     }
 
     return { gx, gy, gw, gh, axisFont, yLabelX, xLabelY };
