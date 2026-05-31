@@ -691,8 +691,31 @@ export function createThermometerLab(t, options = {}) {
       </div>
 
       <!-- TOP ROW RIGHT: GRAPH -->
-      <div class="tl-viz-graph">
+      <div class="tl-viz-graph" style="display:flex;flex-direction:column;gap:8px;align-items:stretch;width:100%">
         <canvas class="tl-canvas-graph" id="tl-graphCanvas" width="800" height="560"></canvas>
+        
+        <!-- Interactive Temperature Slider aligned directly under the Graph -->
+        <div class="tl-bath-bar" style="margin-top:0;padding:8px 12px;background:rgba(255,255,255,0.02);border:1px solid var(--tl-border);border-radius:12px">
+          <div class="tl-bath-bar-top" style="display:flex;align-items:center;justify-content:space-between;gap:12px">
+            <div class="tl-beaker-overlay" style="padding:4px 8px;margin:0;font-size:0.75rem;background:transparent;border:none">
+              <span>Liquid: <b id="tl-bath-state">Water</b></span>
+              <span><b class="tl-temp-badge" id="tl-bath-temp-display" style="font-size:0.9rem">25.0°C</b></span>
+            </div>
+            <div class="tl-bath-slider-wrap" style="flex:1;display:flex;flex-direction:column;gap:2px">
+              <div class="tl-lr" style="font-size:0.72rem">
+                <span>T<sub>bath</sub></span>
+                <span class="tl-badge" id="tl-val-bath-temp" style="color:var(--tl-cyan);font-size:0.75rem">25.0 °C</span>
+              </div>
+              <input type="range" id="tl-bath-temp-slider" min="0" max="200" step="0.5" value="25.0" style="margin:0">
+            </div>
+          </div>
+          <div class="tl-btn-group" style="display:grid;grid-template-columns:repeat(4,1fr);gap:6px;margin-top:6px">
+            <button class="tl-btn" id="tl-btn-preset-ice" style="padding:4px;font-size:0.7rem">Ice 0°C</button>
+            <button class="tl-btn" id="tl-btn-preset-room" style="padding:4px;font-size:0.7rem">Room 25°C</button>
+            <button class="tl-btn" id="tl-btn-preset-steam" style="padding:4px;font-size:0.7rem">Steam 100°C</button>
+            <button class="tl-btn" id="tl-btn-preset-oil" style="padding:4px;font-size:0.7rem">Oil 150°C</button>
+          </div>
+        </div>
       </div>
 
       <!-- BOTTOM ROW: CONTROLS & SOLVERS -->
@@ -978,28 +1001,6 @@ export function createThermometerLab(t, options = {}) {
           </div>
         </div>
 
-        </div>
-      </div>
-
-      <div class="tl-bath-bar">
-        <div class="tl-bath-bar-top">
-          <div class="tl-beaker-overlay">
-            <span>Liquid: <b id="tl-bath-state">Water</b></span>
-            <span><b class="tl-temp-badge" id="tl-bath-temp-display">25.0°C</b></span>
-          </div>
-          <div class="tl-bath-slider-wrap">
-            <div class="tl-lr">
-              <span>T<sub>bath</sub></span>
-              <span class="tl-badge" id="tl-val-bath-temp" style="color:var(--tl-cyan)">25.0 °C</span>
-            </div>
-            <input type="range" id="tl-bath-temp-slider" min="0" max="200" step="0.5" value="25.0">
-          </div>
-        </div>
-        <div class="tl-btn-group">
-          <button class="tl-btn" id="tl-btn-preset-ice">Ice 0°C</button>
-          <button class="tl-btn" id="tl-btn-preset-room">Room 25°C</button>
-          <button class="tl-btn" id="tl-btn-preset-steam">Steam 100°C</button>
-          <button class="tl-btn" id="tl-btn-preset-oil">Oil 150°C</button>
         </div>
       </div>
     </div>
