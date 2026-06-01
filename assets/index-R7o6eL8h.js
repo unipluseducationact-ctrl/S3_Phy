@@ -1249,7 +1249,7 @@ ${B}</body></html>`}function d(v){const w=u(v),B=new Blob(["\uFEFF",w],{type:"ap
                 <span>Steam Point Column Length (L<sub>100</sub>)</span>
                 <span class="tl-badge" id="tl-val-liquid-l100">13.0 cm</span>
               </div>
-              <input type="range" id="tl-slider-liquid-l100" min="5.0" max="35.0" step="0.1" value="13.0">
+              <input type="range" id="tl-slider-liquid-l100" min="5.0" max="30.0" step="0.1" value="13.0">
             </div>
           </div>
 
