@@ -761,35 +761,35 @@ export function createThermometerLab(t, options = {}) {
                 <span>Bulb Volume (V<sub>b</sub>)</span>
                 <span class="tl-badge" id="tl-val-bulb-vol">200 mm³</span>
               </div>
-              <input type="range" id="tl-slider-bulb-vol" min="50" max="500" step="10" value="200">
+              <input type="range" id="tl-slider-bulb-vol" min="10" max="1000" step="10" value="200">
             </div>
             <div class="tl-cg">
               <div class="tl-lr">
                 <span>Wall Thickness (w)</span>
                 <span class="tl-badge" id="tl-val-wall-thickness">0.5 mm</span>
               </div>
-              <input type="range" id="tl-slider-wall-thick" min="0.1" max="2.0" step="0.1" value="0.5">
+              <input type="range" id="tl-slider-wall-thick" min="0.05" max="3.0" step="0.05" value="0.5">
             </div>
             <div class="tl-cg">
               <div class="tl-lr">
                 <span>Capillary Bore Diameter (d)</span>
                 <span class="tl-badge" id="tl-val-capillary-bore">0.3 mm</span>
               </div>
-              <input type="range" id="tl-slider-capillary-bore" min="0.1" max="1.2" step="0.05" value="0.3">
+              <input type="range" id="tl-slider-capillary-bore" min="0.05" max="2.0" step="0.05" value="0.3">
             </div>
             <div class="tl-cg">
               <div class="tl-lr">
                 <span>Ice Point Column Length (L<sub>0</sub>)</span>
                 <span class="tl-badge" id="tl-val-liquid-l0">3.0 cm</span>
               </div>
-              <input type="range" id="tl-slider-liquid-l0" min="1.0" max="10.0" step="0.1" value="3.0">
+              <input type="range" id="tl-slider-liquid-l0" min="0.5" max="15.0" step="0.1" value="3.0">
             </div>
             <div class="tl-cg">
               <div class="tl-lr">
                 <span>Steam Point Column Length (L<sub>100</sub>)</span>
                 <span class="tl-badge" id="tl-val-liquid-l100">13.0 cm</span>
               </div>
-              <input type="range" id="tl-slider-liquid-l100" min="10.0" max="25.0" step="0.1" value="13.0">
+              <input type="range" id="tl-slider-liquid-l100" min="5.0" max="35.0" step="0.1" value="13.0">
             </div>
           </div>
 
@@ -898,14 +898,14 @@ export function createThermometerLab(t, options = {}) {
                 <span>Ice Point Resistance (R<sub>0</sub>)</span>
                 <span class="tl-badge" id="tl-val-resistance-r0">5.0 Ω</span>
               </div>
-              <input type="range" id="tl-slider-resistance-r0" min="1.0" max="10.0" step="0.1" value="5.0">
+              <input type="range" id="tl-slider-resistance-r0" min="0.5" max="20.0" step="0.1" value="5.0">
             </div>
             <div class="tl-cg">
               <div class="tl-lr">
                 <span>Steam Point Resistance (R<sub>100</sub>)</span>
                 <span class="tl-badge" id="tl-val-resistance-r100">6.2 Ω</span>
               </div>
-              <input type="range" id="tl-slider-resistance-r100" min="5.0" max="15.0" step="0.1" value="6.2">
+              <input type="range" id="tl-slider-resistance-r100" min="2.0" max="30.0" step="0.1" value="6.2">
             </div>
           </div>
 
@@ -963,14 +963,14 @@ export function createThermometerLab(t, options = {}) {
                 <span>Resistance at 25°C (R<sub>25</sub>)</span>
                 <span class="tl-badge" id="tl-val-thermistor-r25">10.0 kΩ</span>
               </div>
-              <input type="range" id="tl-slider-thermistor-r25" min="1.0" max="20.0" step="0.1" value="10.0">
+              <input type="range" id="tl-slider-thermistor-r25" min="0.5" max="50.0" step="0.1" value="10.0">
             </div>
             <div class="tl-cg">
               <div class="tl-lr">
                 <span>Beta Parameter (β)</span>
                 <span class="tl-badge" id="tl-val-thermistor-beta">3500 K</span>
               </div>
-              <input type="range" id="tl-slider-thermistor-beta" min="2000" max="5000" step="50" value="3500">
+              <input type="range" id="tl-slider-thermistor-beta" min="1000" max="8000" step="50" value="3500">
             </div>
           </div>
 
