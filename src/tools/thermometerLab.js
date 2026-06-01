@@ -4,40 +4,45 @@ const STYLE_ID = 's3phy-thermometer-lab-css';
 
 const CSS = `
 .tl-wrap {
-  --tl-bg: #0d0d10;
-  --tl-panel: #18181b;
+  --tl-bg: #09090b;
+  --tl-panel: #151518;
   --tl-border: #27272a;
   --tl-green: #10b981;
-  --tl-cyan: #22d3ee;
-  --tl-yellow: #ffcc00;
+  --tl-cyan: #06b6d4;
+  --tl-yellow: #f59e0b;
   --tl-red: #ef4444;
-  --tl-text: #e4e4e7;
+  --tl-text: #f4f4f5;
   --tl-muted: #a1a1aa;
-  --tl-primary: #4f46e5;
+  --tl-primary: #6366f1;
+  --tl-primary-hover: #4f46e5;
+  --tl-glow-cyan: rgba(6, 182, 212, 0.15);
+  --tl-glow-primary: rgba(99, 102, 241, 0.15);
   font-family: system-ui, -apple-system, "Segoe UI", sans-serif;
   color: var(--tl-text);
   background: var(--tl-bg);
-  border-radius: 12px;
-  padding: 12px;
+  border-radius: 16px;
+  padding: 16px;
   max-width: 100%;
   box-sizing: border-box;
+  box-shadow: 0 10px 30px rgba(0, 0, 0, 0.5);
 }
 .tl-wrap * { box-sizing: border-box; }
-.tl-wrap .tl-head { text-align: center; margin: 0 0 14px; }
+.tl-wrap .tl-head { text-align: center; margin: 0 0 20px; }
 .tl-wrap .tl-title {
   margin: 0;
-  font-weight: 800;
-  font-size: 1.35rem;
-  background: linear-gradient(90deg, #4db8ff, #10b981);
+  font-weight: 850;
+  font-size: 1.6rem;
+  background: linear-gradient(135deg, #22d3ee, #6366f1, #10b981);
   -webkit-background-clip: text;
   -webkit-text-fill-color: transparent;
   background-clip: text;
+  letter-spacing: -0.02em;
 }
-.tl-wrap .tl-sub { color: var(--tl-muted); font-size: 0.82rem; margin-top: 4px; }
+.tl-wrap .tl-sub { color: var(--tl-muted); font-size: 0.88rem; margin-top: 6px; }
 .tl-wrap .tl-dash {
   display: flex;
   flex-direction: column;
-  gap: 12px;
+  gap: 16px;
   width: 100%;
   max-width: min(1400px, 100%);
   margin: 0 auto;
@@ -47,75 +52,83 @@ const CSS = `
 .tl-wrap .tl-viz-graph {
   min-width: 0;
   background: var(--tl-panel);
-  padding: 10px;
+  padding: 12px;
   border-radius: 16px;
   border: 1px solid var(--tl-border);
   display: flex;
   justify-content: center;
   align-items: center;
+  position: relative;
+  overflow: hidden;
 }
 .tl-wrap .tl-canvas-phys {
-  background: #121214;
+  background: #0d0d10;
   border-radius: 12px;
   width: 100%;
   max-width: 460px;
   height: auto;
   aspect-ratio: 460 / 340;
   display: block;
+  border: 1px solid rgba(255, 255, 255, 0.03);
 }
 .tl-wrap .tl-canvas-graph {
-  background: #121214;
+  background: #0d0d10;
   border-radius: 12px;
   width: 100%;
   max-width: 800px;
   height: auto;
   aspect-ratio: 800 / 560;
   display: block;
+  border: 1px solid rgba(255, 255, 255, 0.03);
 }
 .tl-wrap .tl-bath-bar {
   display: flex;
   flex-direction: column;
-  gap: 8px;
+  gap: 10px;
   width: 100%;
   margin-top: 2px;
-  padding: 8px 12px;
+  padding: 12px 16px;
   background: var(--tl-panel);
   border: 1px solid var(--tl-border);
-  border-radius: 12px;
+  border-radius: 14px;
   align-items: stretch;
+  box-shadow: inset 0 1px 2px rgba(255, 255, 255, 0.05);
 }
 .tl-wrap .tl-bath-bar-top {
   display: flex;
   flex-wrap: wrap;
   align-items: center;
   justify-content: space-between;
-  gap: 8px 12px;
-  font-size: 0.75rem;
+  gap: 10px 16px;
+  font-size: 0.8rem;
   font-weight: 600;
 }
 .tl-wrap .tl-bath-bar-top .tl-beaker-overlay {
   flex: 1 1 auto;
-  min-width: 140px;
-  padding: 6px 10px;
+  min-width: 150px;
+  padding: 8px 12px;
   margin: 0;
+  background: rgba(255, 255, 255, 0.02);
+  border-radius: 8px;
+  border: 1px solid rgba(255, 255, 255, 0.05);
 }
 .tl-wrap .tl-bath-slider-wrap {
-  flex: 1 1 200px;
-  min-width: 160px;
+  flex: 1 1 220px;
+  min-width: 180px;
 }
 .tl-wrap .tl-bath-slider-wrap .tl-lr {
-  font-size: 0.72rem;
-  margin-bottom: 2px;
+  font-size: 0.78rem;
+  margin-bottom: 4px;
 }
 .tl-wrap .tl-controls {
   min-width: min(100%, 280px);
   background: var(--tl-panel);
   border-radius: 16px;
-  padding: 12px;
+  padding: 16px;
   border: 1px solid var(--tl-border);
   display: flex;
   flex-direction: column;
-  gap: 10px;
+  gap: 14px;
   min-height: 0;
 }
 .tl-wrap .tl-controls-scroll {
@@ -124,7 +137,7 @@ const CSS = `
   overflow-y: auto;
   display: flex;
   flex-direction: column;
-  gap: 8px;
+  gap: 12px;
   padding-right: 2px;
   scrollbar-width: thin;
   scrollbar-color: #3f3f46 transparent;
@@ -136,15 +149,15 @@ const CSS = `
 }
 .tl-wrap .tl-details {
   border: 1px solid var(--tl-border);
-  border-radius: 8px;
-  background: rgba(255,255,255,0.02);
+  border-radius: 10px;
+  background: rgba(255,255,255,0.01);
 }
 .tl-wrap .tl-details summary {
   cursor: pointer;
-  font-size: 0.75rem;
+  font-size: 0.8rem;
   font-weight: 700;
   color: var(--tl-cyan);
-  padding: 8px 10px;
+  padding: 10px 12px;
   list-style: none;
   user-select: none;
 }
@@ -155,10 +168,10 @@ const CSS = `
 }
 .tl-wrap .tl-details[open] summary::before { content: "▾ "; }
 .tl-wrap .tl-details-body {
-  padding: 0 10px 10px;
+  padding: 0 12px 12px;
   display: flex;
   flex-direction: column;
-  gap: 8px;
+  gap: 10px;
 }
 @media (min-width: 700px) {
   .tl-wrap .tl-btn-group {
@@ -168,13 +181,13 @@ const CSS = `
     flex-direction: row;
     flex-wrap: wrap;
     align-items: center;
-    gap: 10px 14px;
+    gap: 12px 16px;
   }
   .tl-wrap .tl-bath-bar-top {
     flex: 1 1 auto;
   }
   .tl-wrap .tl-btn-group {
-    flex: 1 1 280px;
+    flex: 1 1 300px;
     max-width: none;
   }
 }
@@ -183,7 +196,7 @@ const CSS = `
     display: grid;
     grid-template-columns: minmax(0, 460px) 1fr;
     grid-template-rows: auto auto auto;
-    gap: 16px;
+    gap: 20px;
     align-items: stretch;
   }
   .tl-wrap .tl-viz-phys {
@@ -194,7 +207,7 @@ const CSS = `
     justify-content: center;
     align-items: center;
     border: 2px solid #3b82f6; /* Highlight physical view */
-    box-shadow: 0 0 15px rgba(59, 130, 246, 0.15);
+    box-shadow: 0 0 20px rgba(59, 130, 246, 0.2);
   }
   .tl-wrap .tl-viz-graph {
     grid-column: 2;
@@ -204,7 +217,7 @@ const CSS = `
     justify-content: center;
     align-items: center;
     border: 2px solid #10b981; /* Highlight graph view */
-    box-shadow: 0 0 15px rgba(16, 185, 129, 0.15);
+    box-shadow: 0 0 20px rgba(16, 185, 129, 0.2);
   }
   .tl-wrap .tl-controls {
     grid-column: 1 / -1;
@@ -212,8 +225,8 @@ const CSS = `
     max-height: none;
     min-height: 0;
     overflow: visible;
-    border: 1px solid #4b5563;
-    background: #111115;
+    border: 1px solid #3f3f46;
+    background: #0f0f12;
   }
   .tl-wrap .tl-controls-scroll {
     flex: none;
@@ -226,7 +239,7 @@ const CSS = `
     flex-direction: row;
     flex-wrap: wrap;
     align-items: center;
-    gap: 10px 14px;
+    gap: 12px 16px;
     margin-top: 0;
   }
   .tl-wrap .tl-canvas-phys,
@@ -240,110 +253,116 @@ const CSS = `
     max-width: none;
   }
   .tl-wrap .tl-bath-slider-wrap {
-    flex: 1 1 240px;
-    max-width: 320px;
+    flex: 1 1 260px;
+    max-width: 360px;
   }
   .tl-wrap .tl-worked-solution {
-    padding: 12px 16px;
-    font-size: 0.85rem; /* Larger font for classroom projector */
-    border-radius: 8px;
+    padding: 14px 20px;
+    font-size: 0.9rem;
+    border-radius: 10px;
     border-left-width: 6px;
-    box-shadow: 0 2px 8px rgba(0,0,0,0.25);
-  }
-  .tl-wrap .tl-math-formula {
-    font-size: 1.05rem; /* Highly readable math on projector */
-    margin: 8px 0;
-    padding: 8px;
+    box-shadow: 0 4px 12px rgba(0,0,0,0.3);
   }
 }
 .tl-wrap .tl-tabs-container {
   display: flex;
-  background-color: #27272a;
-  border-radius: 8px;
-  padding: 3px;
-  gap: 3px;
+  background-color: #1f1f23;
+  border-radius: 10px;
+  padding: 4px;
+  gap: 4px;
   overflow-x: auto;
   scrollbar-width: none;
+  border: 1px solid var(--tl-border);
 }
 .tl-wrap .tl-tabs-container::-webkit-scrollbar { display: none; }
 .tl-wrap .tl-tab-btn {
   flex: 1;
   min-width: 0;
-  padding: 7px 4px;
+  padding: 8px 6px;
   background: none;
   border: none;
-  font-size: 0.72rem;
+  font-size: 0.78rem;
   line-height: 1.2;
   font-weight: 700;
   color: var(--tl-muted);
   cursor: pointer;
-  border-radius: 6px;
-  transition: all 0.2s;
+  border-radius: 8px;
+  transition: all 0.2s ease;
   text-align: center;
   white-space: nowrap;
 }
 .tl-wrap .tl-tab-btn:hover {
   color: #fff;
+  background-color: rgba(255, 255, 255, 0.03);
 }
 .tl-wrap .tl-tab-btn.active {
-  color: var(--tl-primary);
-  background-color: #fff;
+  color: #fff;
+  background-color: var(--tl-primary);
+  box-shadow: 0 2px 8px rgba(99, 102, 241, 0.4);
 }
 .tl-wrap .tl-tab-content {
   display: none;
   flex-direction: column;
-  gap: 8px;
+  gap: 10px;
 }
 .tl-wrap .tl-tab-content.active {
   display: flex;
 }
 .tl-wrap .tl-beaker-overlay {
-  background-color: rgba(24, 24, 27, 0.9);
+  background-color: rgba(20, 20, 23, 0.95);
   border: 1px solid var(--tl-border);
-  padding: 8px 12px;
-  border-radius: 8px;
-  font-size: 0.8rem;
+  padding: 10px 14px;
+  border-radius: 10px;
+  font-size: 0.85rem;
   font-weight: 600;
   display: flex;
   justify-content: space-between;
+  align-items: center;
 }
 .tl-wrap .tl-temp-badge {
-  font-size: 1rem;
+  font-size: 1.1rem;
   font-weight: 800;
   color: var(--tl-cyan);
+  text-shadow: 0 0 10px var(--tl-glow-cyan);
 }
-.tl-wrap .tl-cg { display: flex; flex-direction: column; gap: 4px; }
-.tl-wrap .tl-lr { display: flex; justify-content: space-between; align-items: center; font-size: 0.75rem; font-weight: 600; }
+.tl-wrap .tl-cg { display: flex; flex-direction: column; gap: 6px; }
+.tl-wrap .tl-lr { display: flex; justify-content: space-between; align-items: center; font-size: 0.8rem; font-weight: 600; }
 .tl-wrap .tl-section-label {
-  font-size: 0.7rem;
-  font-weight: 700;
+  font-size: 0.75rem;
+  font-weight: 800;
   color: var(--tl-muted);
   text-transform: uppercase;
-  letter-spacing: 0.04em;
-  margin: 0 0 2px;
+  letter-spacing: 0.06em;
+  margin: 4px 0 2px;
 }
 .tl-wrap .tl-param-grid {
   display: flex;
   flex-direction: column;
-  gap: 12px;
+  gap: 14px;
 }
 .tl-wrap .tl-param-grid .tl-cg { min-width: 0; }
 .tl-wrap .tl-param-grid input[type="range"] { margin: 2px 0; }
 .tl-wrap .tl-badge {
   background: #27272a;
-  padding: 2px 8px;
-  border-radius: 4px;
+  padding: 3px 10px;
+  border-radius: 6px;
   font-family: ui-monospace, monospace;
-  font-size: 0.78rem;
+  font-size: 0.82rem;
+  border: 1px solid rgba(255, 255, 255, 0.05);
 }
-.tl-wrap input[type="range"] { -webkit-appearance: none; width: 100%; background: transparent; margin: 4px 0; }
+.tl-wrap input[type="range"] { -webkit-appearance: none; width: 100%; background: transparent; margin: 6px 0; }
 .tl-wrap input[type="range"]:focus { outline: none; }
 .tl-wrap input[type="range"]::-webkit-slider-runnable-track {
-  width: 100%; height: 6px; cursor: pointer; background: #3f3f46; border-radius: 3px;
+  width: 100%; height: 6px; cursor: pointer; background: #27272a; border-radius: 3px;
+  border: 1px solid rgba(255, 255, 255, 0.03);
 }
 .tl-wrap input[type="range"]::-webkit-slider-thumb {
   height: 16px; width: 16px; border-radius: 50%; background: #fff; cursor: pointer;
-  -webkit-appearance: none; margin-top: -5px; box-shadow: 0 2px 4px rgba(0,0,0,0.5);
+  -webkit-appearance: none; margin-top: -5px; box-shadow: 0 0 8px rgba(255,255,255,0.8), 0 2px 4px rgba(0,0,0,0.5);
+  transition: transform 0.1s;
+}
+.tl-wrap input[type="range"]::-webkit-slider-thumb:hover {
+  transform: scale(1.2);
 }
 .tl-wrap .tl-btn-group {
   display: grid;
@@ -351,201 +370,190 @@ const CSS = `
   gap: 8px;
 }
 .tl-wrap .tl-btn {
-  background-color: #27272a;
+  background-color: #1f1f23;
   border: 1px solid var(--tl-border);
   color: var(--tl-text);
-  padding: 8px 10px;
-  border-radius: 8px;
-  font-size: 0.78rem;
-  font-weight: 600;
+  padding: 10px 12px;
+  border-radius: 10px;
+  font-size: 0.82rem;
+  font-weight: 650;
   cursor: pointer;
   text-align: center;
-  transition: all 0.2s;
+  transition: all 0.2s ease;
+  box-shadow: 0 2px 4px rgba(0,0,0,0.15);
 }
 .tl-wrap .tl-btn:hover {
-  background-color: #3f3f46;
+  background-color: #27272a;
+  border-color: #3f3f46;
+  transform: translateY(-1px);
 }
 .tl-wrap .tl-btn.primary {
   background-color: var(--tl-primary);
   border-color: var(--tl-primary);
 }
 .tl-wrap .tl-btn.primary:hover {
-  background-color: #4338ca;
+  background-color: var(--tl-primary-hover);
+  box-shadow: 0 4px 12px var(--tl-glow-primary);
 }
 .tl-wrap .tl-seg {
   display: flex;
-  background-color: #27272a;
-  border-radius: 8px;
-  padding: 3px;
-  gap: 3px;
+  background-color: #1f1f23;
+  border-radius: 10px;
+  padding: 4px;
+  gap: 4px;
+  border: 1px solid var(--tl-border);
 }
 .tl-wrap .tl-seg-btn {
   flex: 1;
   border: 1px solid transparent;
   background: none;
-  border-radius: 6px;
-  padding: 7px 8px;
-  font-size: 0.78rem;
+  border-radius: 8px;
+  padding: 8px 10px;
+  font-size: 0.82rem;
   font-weight: 700;
   color: var(--tl-muted);
   cursor: pointer;
-  transition: all 0.2s;
+  transition: all 0.2s ease;
   display: flex;
   align-items: center;
   justify-content: center;
-  gap: 6px;
+  gap: 8px;
   font-family: inherit;
 }
-.tl-wrap .tl-seg-btn:hover { color: #fff; }
+.tl-wrap .tl-seg-btn:hover { color: #fff; background-color: rgba(255, 255, 255, 0.02); }
 .tl-wrap .tl-seg-btn.active-mercury {
   color: #fff;
-  background-color: #3f3f46;
+  background-color: #27272a;
   border-color: var(--tl-muted);
+  box-shadow: 0 2px 6px rgba(0, 0, 0, 0.2);
 }
 .tl-wrap .tl-seg-btn.active-alcohol {
   color: #fff;
-  background-color: rgba(239, 68, 68, 0.2);
+  background-color: rgba(239, 68, 68, 0.15);
   border-color: var(--tl-red);
+  box-shadow: 0 2px 6px rgba(239, 68, 68, 0.1);
 }
 .tl-wrap .tl-dot {
-  width: 6px;
-  height: 6px;
+  width: 8px;
+  height: 8px;
   border-radius: 50%;
   display: inline-block;
   flex-shrink: 0;
 }
-.tl-wrap .tl-dot.mercury { background-color: var(--tl-muted); }
-.tl-wrap .tl-dot.alcohol { background-color: var(--tl-red); }
+.tl-wrap .tl-dot.mercury { background-color: var(--tl-muted); box-shadow: 0 0 6px var(--tl-muted); }
+.tl-wrap .tl-dot.alcohol { background-color: var(--tl-red); box-shadow: 0 0 6px var(--tl-red); }
 .tl-wrap .tl-warning-banner {
-  background-color: rgba(245, 158, 11, 0.15);
-  border: 1px solid rgba(245, 158, 11, 0.3);
-  border-left: 4px solid var(--tl-yellow);
-  padding: 10px;
-  border-radius: 8px;
-  font-size: 0.75rem;
-  color: #f59e0b;
-  line-height: 1.3;
+  background-color: rgba(239, 68, 68, 0.1);
+  border: 1px solid rgba(239, 68, 68, 0.25);
+  border-left: 4px solid var(--tl-red);
+  padding: 12px;
+  border-radius: 10px;
+  font-size: 0.8rem;
+  color: #fca5a5;
+  line-height: 1.4;
   display: none;
+  animation: tl-pulse 2s infinite alternate;
+}
+@keyframes tl-pulse {
+  0% { box-shadow: 0 0 4px rgba(239, 68, 68, 0.1); }
+  100% { box-shadow: 0 0 12px rgba(239, 68, 68, 0.3); }
 }
 .tl-wrap .tl-info-card {
-  background-color: rgba(255,255,255,0.03);
+  background-color: rgba(255,255,255,0.02);
   border: 1px dashed var(--tl-border);
-  border-radius: 8px;
-  padding: 6px 10px;
+  border-radius: 10px;
+  padding: 8px 12px;
 }
 .tl-wrap .tl-info-card--compact {
-  font-size: 0.72rem;
+  font-size: 0.78rem;
   color: var(--tl-muted);
-  line-height: 1.35;
+  line-height: 1.4;
 }
 .tl-wrap .tl-info-card--compact b { color: var(--tl-cyan); }
 .tl-wrap .tl-info-label {
-  font-size: 0.75rem;
-  font-weight: 700;
+  font-size: 0.85rem;
+  font-weight: 750;
   color: var(--tl-cyan);
-  margin-bottom: 2px;
+  margin-bottom: 4px;
 }
 .tl-wrap .tl-info-card p {
   margin: 0;
-  font-size: 0.72rem;
+  font-size: 0.78rem;
   color: var(--tl-muted);
-  line-height: 1.3;
-}
-.tl-wrap .tl-details-body .tl-math-formula {
-  margin: 6px 0;
-  padding: 5px;
-  font-size: 0.82rem;
+  line-height: 1.4;
 }
 .tl-wrap .tl-worked-solution {
-  background-color: rgba(79, 70, 229, 0.08);
+  background-color: rgba(99, 102, 241, 0.05);
   border-left: 6px solid var(--tl-primary);
-  border-radius: 0 8px 8px 0;
+  border-radius: 0 10px 10px 0;
   padding: 12px 16px;
-  font-size: 0.85rem;
-  line-height: 1.45;
+  font-size: 0.88rem;
+  line-height: 1.5;
 }
 .tl-wrap .tl-solution-header {
   font-weight: 800;
   color: var(--tl-cyan);
-  font-size: 0.75rem;
+  font-size: 0.8rem;
   text-transform: uppercase;
-  letter-spacing: 0.05em;
-  margin-bottom: 6px;
+  letter-spacing: 0.06em;
+  margin-bottom: 8px;
 }
 .tl-wrap .tl-worked-solution p {
-  margin: 4px 0;
+  margin: 6px 0;
 }
 .tl-wrap .tl-math-formula {
   display: flex;
   align-items: center;
   justify-content: center;
-  margin: 10px 0;
-  font-family: 'Cambria', 'Georgia', serif;
-  font-size: 1.05rem;
+  margin: 12px 0;
+  font-size: 1.1rem;
   color: #fff;
-  background-color: rgba(0,0,0,0.2);
-  padding: 8px;
-  border-radius: 6px;
-}
-.tl-wrap .tl-math-fraction {
-  display: inline-flex;
-  flex-direction: column;
-  align-items: center;
-  vertical-align: middle;
-  padding: 0 4px;
-}
-.tl-wrap .tl-math-num {
-  border-bottom: 1px solid #fff;
-  text-align: center;
-  width: 100%;
-  padding-bottom: 1px;
-}
-.tl-wrap .tl-math-den {
-  text-align: center;
-  width: 100%;
-  padding-top: 1px;
-}
-.tl-wrap .tl-math-symbol {
-  font-size: 1rem;
-  padding: 0 4px;
+  background-color: rgba(0,0,0,0.25);
+  padding: 10px;
+  border-radius: 8px;
+  border: 1px solid rgba(255, 255, 255, 0.03);
 }
 .tl-wrap .tl-final-ans {
   color: var(--tl-green);
-  font-size: 0.95rem;
-  font-weight: 800;
+  font-size: 1.05rem;
+  font-weight: 850;
   background-color: rgba(16, 185, 129, 0.15);
-  padding: 2px 6px;
-  border-radius: 4px;
+  padding: 3px 8px;
+  border-radius: 6px;
+  border: 1px solid rgba(16, 185, 129, 0.2);
+  text-shadow: 0 0 8px rgba(16, 185, 129, 0.3);
 }
 .tl-wrap .tl-solver-tabs {
   display: flex;
-  background-color: #27272a;
-  border-radius: 6px;
-  padding: 2px;
-  gap: 2px;
-  margin-bottom: 10px;
+  background-color: #1f1f23;
+  border-radius: 8px;
+  padding: 3px;
+  gap: 3px;
+  margin-bottom: 12px;
+  border: 1px solid var(--tl-border);
 }
 .tl-wrap .tl-solver-tab-btn {
   flex: 1;
   background: none;
   border: none;
-  padding: 6px;
-  font-size: 0.72rem;
+  padding: 8px;
+  font-size: 0.78rem;
   font-weight: 700;
   color: var(--tl-muted);
   cursor: pointer;
-  border-radius: 4px;
-  transition: all 0.2s;
+  border-radius: 6px;
+  transition: all 0.2s ease;
   text-align: center;
 }
 .tl-wrap .tl-solver-tab-btn.active {
-  background-color: #3f3f46;
+  background-color: #27272a;
   color: #fff;
+  box-shadow: 0 2px 4px rgba(0,0,0,0.15);
 }
 .tl-wrap .tl-solver-pane {
   display: none;
   flex-direction: column;
-  gap: 10px;
+  gap: 12px;
 }
 .tl-wrap .tl-solver-pane.active {
   display: flex;
@@ -554,79 +562,74 @@ const CSS = `
   display: flex;
   align-items: center;
   justify-content: space-between;
-  background-color: rgba(255,255,255,0.02);
-  padding: 8px 10px;
-  border-radius: 8px;
+  background-color: rgba(255,255,255,0.01);
+  padding: 10px 12px;
+  border-radius: 10px;
   border: 1px solid var(--tl-border);
 }
 .tl-wrap .tl-calc-inputs span {
-  font-size: 0.75rem;
+  font-size: 0.8rem;
   font-weight: 600;
   color: var(--tl-muted);
 }
 .tl-wrap .tl-input-with-unit {
   display: flex;
   align-items: center;
-  background-color: #121214;
+  background-color: #0d0d10;
   border: 1px solid var(--tl-border);
-  border-radius: 4px;
-  padding-right: 6px;
+  border-radius: 6px;
+  padding-right: 8px;
 }
 .tl-wrap .tl-calc-input {
-  width: 60px;
-  padding: 4px;
+  width: 70px;
+  padding: 6px;
   border: none;
   background: transparent;
   color: #fff;
-  font-size: 0.8rem;
+  font-size: 0.88rem;
   font-weight: 700;
   text-align: center;
   outline: none;
 }
 .tl-wrap .tl-input-with-unit .tl-unit {
-  font-size: 0.72rem;
+  font-size: 0.78rem;
   font-weight: 700;
   color: var(--tl-muted);
 }
 .tl-wrap .tl-probe-specs {
   display: grid;
   grid-template-columns: 1fr 1fr;
-  gap: 10px;
+  gap: 12px;
 }
 .tl-wrap .tl-spec-tile {
-  background-color: rgba(255,255,255,0.02);
+  background-color: rgba(255,255,255,0.01);
   border: 1px solid var(--tl-border);
-  border-radius: 8px;
-  padding: 8px;
+  border-radius: 10px;
+  padding: 10px;
   text-align: center;
 }
 .tl-wrap .tl-tile-label {
   display: block;
-  font-size: 0.65rem;
+  font-size: 0.7rem;
   font-weight: 700;
   color: var(--tl-muted);
 }
 .tl-wrap .tl-tile-val {
-  font-size: 1rem;
-  font-weight: 800;
+  font-size: 1.1rem;
+  font-weight: 850;
   color: var(--tl-cyan);
-  margin-top: 2px;
-}
-.tl-wrap .tl-help-grid {
-  display: grid;
-  grid-template-columns: 1fr 1fr;
-  gap: 10px;
+  margin-top: 4px;
 }
 .tl-wrap .tl-faulty-cal {
   display: grid;
   grid-template-columns: 1fr 1fr;
-  gap: 10px;
+  gap: 12px;
   margin-bottom: 4px;
 }
 .tl-wrap .tl-faulty-cal .tl-calc-inputs {
   flex-direction: column;
   align-items: stretch;
-  gap: 6px;
+  gap: 8px;
 }
 .tl-wrap .tl-faulty-cal .tl-input-with-unit {
   width: 100%;
@@ -640,21 +643,21 @@ const CSS = `
   display: flex;
   align-items: center;
   justify-content: space-between;
-  font-size: 0.75rem;
+  font-size: 0.8rem;
   font-weight: 600;
   color: var(--tl-muted);
-  padding: 6px 10px;
-  background: rgba(255,255,255,0.03);
-  border-radius: 8px;
+  padding: 8px 12px;
+  background: rgba(255,255,255,0.02);
+  border-radius: 10px;
   border: 1px dashed var(--tl-border);
-  margin-bottom: 8px;
+  margin-bottom: 10px;
 }
 .tl-wrap .tl-faulty-interval b {
   color: var(--tl-cyan);
   font-family: ui-monospace, monospace;
 }
 .tl-wrap .tl-solver-error {
-  font-size: 0.72rem;
+  font-size: 0.78rem;
   color: var(--tl-red);
   font-weight: 600;
   margin: 0;
@@ -695,8 +698,12 @@ export function createThermometerLab(t, options = {}) {
     </div>
     <div class="tl-dash">
       <!-- TOP ROW LEFT: THERMOMETER VIEW -->
-      <div class="tl-viz-phys">
+      <div class="tl-viz-phys" style="display:flex;flex-direction:column;gap:8px;align-items:stretch;">
         <canvas class="tl-canvas-phys" id="tl-thermometerCanvas" width="460" height="340"></canvas>
+        <button class="tl-btn" id="tl-btn-toggle-labels" style="margin-top:4px;width:100%;display:flex;align-items:center;justify-content:center;gap:6px;font-size:0.75rem;padding:6px 10px;">
+          <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"></circle><line x1="12" y1="16" x2="12" y2="12"></line><line x1="12" y1="8" x2="12.01" y2="8"></line></svg>
+          <span id="tl-lbl-toggle-labels">${t('tools.thermometerLab.labels.hide')}</span>
+        </button>
       </div>
 
       <!-- TOP ROW RIGHT: GRAPH -->
@@ -793,20 +800,12 @@ export function createThermometerLab(t, options = {}) {
           <!-- Live calibration formula -->
           <div class="tl-info-label" style="margin-top:10px;font-size:0.8rem;color:var(--tl-cyan)">Live calibration formula</div>
           <div class="tl-worked-solution" style="margin-bottom:10px">
-            <div class="tl-math-formula">
-              T = <div class="tl-math-fraction">
-                <div class="tl-math-num">L<sub>T</sub> - L<sub>0</sub></div>
-                <div class="tl-math-den">L<sub>100</sub> - L<sub>0</sub></div>
-              </div>
-              &times; 100°C
+            <div id="tl-svg-formula-liquid" class="tl-math-formula">
+              <!-- Inline SVG for beautiful LaTeX-like formula rendering -->
             </div>
             <p>Substitute current reading <b id="tl-live-liquid-lt">5.50 cm</b>:</p>
-            <div class="tl-math-formula">
-              T = <div class="tl-math-fraction">
-                <div class="tl-math-num" id="tl-live-liquid-sub-num">5.50 - 3.0</div>
-                <div class="tl-math-den" id="tl-live-liquid-sub-den">13.0 - 3.0</div>
-              </div>
-              &times; 100°C <span class="tl-math-symbol">=</span> <b class="tl-final-ans" id="tl-live-liquid-ans">25.0°C</b>
+            <div id="tl-svg-formula-liquid-sub" class="tl-math-formula">
+              <!-- Substituted numbers formula -->
             </div>
           </div>
 
@@ -818,6 +817,11 @@ export function createThermometerLab(t, options = {}) {
               <div class="tl-info-label">Faulty scale calibration</div>
               <p style="margin:0;font-size:0.68rem">T / 100 = (C − C<sub>f</sub>) / (C<sub>u</sub> − C<sub>f</sub>)</p>
             </div>
+            
+            <!-- Dual-Scale Diagram Container -->
+            <div class="tl-info-label" style="font-size:0.75rem;color:var(--tl-muted);margin-top:4px;">${t('tools.thermometerLab.faulty.dualScale')}</div>
+            <div id="tl-faulty-svg-container" style="width:100%; height:190px; margin:4px 0; background:rgba(0,0,0,0.25); border-radius:10px; border:1px solid var(--tl-border); display:flex; justify-content:center; align-items:center; padding:8px;"></div>
+
             <div class="tl-faulty-cal">
               <div class="tl-calc-inputs">
                 <span>Ice reading C<sub>f</sub> (true 0°C)</span>
@@ -852,12 +856,8 @@ export function createThermometerLab(t, options = {}) {
               </div>
               <p class="tl-solver-error" id="tl-faulty-error-a" hidden></p>
               <div class="tl-worked-solution" style="background:rgba(0,0,0,0.15)">
-                <div class="tl-math-formula" style="font-size:0.8rem">
-                  T = <div class="tl-math-fraction">
-                    <div class="tl-math-num" id="tl-faulty-sub-num-a">25.0 − (−1.5)</div>
-                    <div class="tl-math-den" id="tl-faulty-sub-den-a">105.0 − (−1.5)</div>
-                  </div>
-                  &times; 100 <span class="tl-math-symbol">=</span> <b class="tl-final-ans" id="tl-ans-q10a">24.9 °C</b>
+                <div id="tl-svg-formula-faulty-a" class="tl-math-formula" style="font-size:0.85rem">
+                  <!-- Formula A -->
                 </div>
               </div>
             </div>
@@ -871,13 +871,8 @@ export function createThermometerLab(t, options = {}) {
               </div>
               <p class="tl-solver-error" id="tl-faulty-error-b" hidden></p>
               <div class="tl-worked-solution" style="background:rgba(0,0,0,0.15)">
-                <div class="tl-math-formula" style="font-size:0.8rem">
-                  C = <div class="tl-math-fraction">
-                    <div class="tl-math-num" id="tl-faulty-sub-num-b">70.0 × 106.5</div>
-                    <div class="tl-math-den">100</div>
-                  </div>
-                  <span id="tl-faulty-sub-cf-b">+ (−1.5)</span>
-                  <span class="tl-math-symbol">=</span> <b class="tl-final-ans" id="tl-ans-q10b">73.05 °C</b>
+                <div id="tl-svg-formula-faulty-b" class="tl-math-formula" style="font-size:0.85rem">
+                  <!-- Formula B -->
                 </div>
               </div>
             </div>
@@ -922,20 +917,12 @@ export function createThermometerLab(t, options = {}) {
           <!-- Live calibration formula -->
           <div class="tl-info-label" style="margin-top:10px;font-size:0.8rem;color:var(--tl-cyan)">Live calibration formula</div>
           <div class="tl-worked-solution" style="margin-bottom:10px">
-            <div class="tl-math-formula">
-              T = <div class="tl-math-fraction">
-                <div class="tl-math-num">R<sub>T</sub> - R<sub>0</sub></div>
-                <div class="tl-math-den">R<sub>100</sub> - R<sub>0</sub></div>
-              </div>
-              &times; 100°C
+            <div id="tl-svg-formula-resistance" class="tl-math-formula">
+              <!-- Resistance formula -->
             </div>
             <p>Substitute current resistance <b id="tl-live-resistance-rt">5.30 Ω</b>:</p>
-            <div class="tl-math-formula">
-              T = <div class="tl-math-fraction">
-                <div class="tl-math-num" id="tl-live-resistance-sub-num">5.30 - 5.0</div>
-                <div class="tl-math-den" id="tl-live-resistance-sub-den">6.2 - 5.0</div>
-              </div>
-              &times; 100°C <span class="tl-math-symbol">=</span> <b class="tl-final-ans" id="tl-live-resistance-ans">25.0°C</b>
+            <div id="tl-svg-formula-resistance-sub" class="tl-math-formula">
+              <!-- Resistance sub formula -->
             </div>
           </div>
 
@@ -950,12 +937,8 @@ export function createThermometerLab(t, options = {}) {
               </div>
             </div>
             <div class="tl-worked-solution" style="background:rgba(0,0,0,0.15)">
-              <div class="tl-math-formula" style="font-size:0.8rem">
-                &theta; = <div class="tl-math-fraction">
-                  <div class="tl-math-num"><span id="tl-formula-q11-rsub">7.7</span> - R<sub>0</sub></div>
-                  <div class="tl-math-den">R<sub>100</sub> - R<sub>0</sub></div>
-                </div>
-                &times; 100 <span class="tl-math-symbol">=</span> <b class="tl-final-ans" id="tl-ans-q11">225.0 °C</b>
+              <div id="tl-svg-formula-resistance-solver" class="tl-math-formula" style="font-size:0.85rem">
+                <!-- Solver formula -->
               </div>
             </div>
           </div>
@@ -994,18 +977,12 @@ export function createThermometerLab(t, options = {}) {
           <!-- Live NTC beta calculation -->
           <div class="tl-info-label" style="margin-top:10px;font-size:0.8rem;color:var(--tl-green)">Live NTC beta calculation</div>
           <div class="tl-worked-solution" style="background-color:rgba(16,185,129,0.05);border-left-color:var(--tl-green)">
-            <div class="tl-math-formula" style="font-size:0.75rem">
-              T = <div class="tl-math-fraction">
-                <div class="tl-math-num">1</div>
-                <div class="tl-math-den">
-                  (1/&beta;) &bull; ln(R<sub>T</sub>/R<sub>25</sub>) + 1/298.15
-                </div>
-              </div>
-              - 273.15
+            <div id="tl-svg-formula-thermistor" class="tl-math-formula" style="font-size:0.85rem">
+              <!-- Thermistor formula -->
             </div>
             <p>Substitute current resistance <b id="tl-live-thermistor-rt">10.00 kΩ</b>:</p>
-            <div class="tl-math-formula" style="font-size:0.75rem">
-              T<sub>K</sub> = <span id="tl-live-thermistor-calc-tk">298.15</span> K <span class="tl-math-symbol">&rArr;</span> T = <b class="tl-final-ans" id="tl-live-thermistor-ans">25.0°C</b>
+            <div id="tl-svg-formula-thermistor-sub" class="tl-math-formula" style="font-size:0.85rem">
+              <!-- Thermistor sub formula -->
             </div>
           </div>
         </div>
@@ -1035,12 +1012,14 @@ export function createThermometerLab(t, options = {}) {
     bubbles: [],
     iceCubes: [],
     heatWaves: [],
+    steamParticles: [],
 
     currentLength: 5.5,
     currentResistance: 5.3,
     currentThermistorR: 10.0,
 
-    lastTimestamp: 0
+    lastTimestamp: 0,
+    showLabels: true
   };
 
   const PHYS_WIDTH = 460;
@@ -1058,7 +1037,7 @@ export function createThermometerLab(t, options = {}) {
       gh: GRAPH_HEIGHT - margin.top - margin.bottom,
       tickFont: `bold ${Math.round(GRAPH_WIDTH * 0.024)}px Arial`,
       axisFont: `bold ${Math.round(GRAPH_WIDTH * 0.026)}px Arial`,
-      dotR: 7,
+      dotR: 8,
       yLabelX: margin.left - 75,
       xLabelY: GRAPH_HEIGHT - margin.bottom + 32,
     };
@@ -1085,39 +1064,48 @@ export function createThermometerLab(t, options = {}) {
   function drawGraphAxes(ctx, layout, minT, maxT, tStep, yTicks) {
     const { gx, gy, gw, gh, tickFont, axisFont, yLabelX, xLabelY } = layout;
 
-    ctx.strokeStyle = '#4b5563';
-    ctx.lineWidth = 2.0;
-    ctx.beginPath();
-    ctx.moveTo(gx, gy);
-    ctx.lineTo(gx, gy + gh);
-    ctx.lineTo(gx + gw, gy + gh);
-    ctx.stroke();
-
-    ctx.strokeStyle = '#27272a';
-    ctx.lineWidth = 0.8;
-    ctx.fillStyle = '#e4e4e7'; // Brighter color for tick labels
-    ctx.font = tickFont;
-    ctx.textAlign = 'right';
-    ctx.textBaseline = 'middle';
-
+    // Grid lines background
+    ctx.strokeStyle = '#1e1e24';
+    ctx.lineWidth = 1.0;
     for (const tick of yTicks) {
       const yGrid = mapGraphY(tick.value, tick.min, tick.max, gy, gh);
       ctx.beginPath();
       ctx.moveTo(gx, yGrid);
       ctx.lineTo(gx + gw, yGrid);
       ctx.stroke();
-      ctx.fillText(tick.label, gx - 15, yGrid); // Better spacing from axis
     }
-
-    ctx.textAlign = 'center';
-    ctx.textBaseline = 'top';
     for (let tVal = minT; tVal <= maxT + 0.01; tVal += tStep) {
       const xGrid = mapGraphX(tVal, minT, maxT, gx, gw);
       ctx.beginPath();
       ctx.moveTo(xGrid, gy);
       ctx.lineTo(xGrid, gy + gh);
       ctx.stroke();
-      ctx.fillText(`${Math.round(tVal)}`, xGrid, gy + gh + 10); // Better spacing from axis
+    }
+
+    // Main Axes
+    ctx.strokeStyle = '#4b5563';
+    ctx.lineWidth = 2.5;
+    ctx.beginPath();
+    ctx.moveTo(gx, gy);
+    ctx.lineTo(gx, gy + gh);
+    ctx.lineTo(gx + gw, gy + gh);
+    ctx.stroke();
+
+    ctx.fillStyle = '#e4e4e7';
+    ctx.font = tickFont;
+    ctx.textAlign = 'right';
+    ctx.textBaseline = 'middle';
+
+    for (const tick of yTicks) {
+      const yGrid = mapGraphY(tick.value, tick.min, tick.max, gy, gh);
+      ctx.fillText(tick.label, gx - 15, yGrid);
+    }
+
+    ctx.textAlign = 'center';
+    ctx.textBaseline = 'top';
+    for (let tVal = minT; tVal <= maxT + 0.01; tVal += tStep) {
+      const xGrid = mapGraphX(tVal, minT, maxT, gx, gw);
+      ctx.fillText(`${Math.round(tVal)}`, xGrid, gy + gh + 10);
     }
 
     return { gx, gy, gw, gh, axisFont, yLabelX, xLabelY };
@@ -1221,35 +1209,46 @@ export function createThermometerLab(t, options = {}) {
   // Particles
   function initParticles() {
     state.iceCubes = [];
-    for (let i = 0; i < 4; i++) {
+    for (let i = 0; i < 5; i++) {
       state.iceCubes.push({
         x: 60 + Math.random() * 120,
         y: 200 + Math.random() * 15,
-        size: 10 + Math.random() * 8,
+        size: 12 + Math.random() * 8,
         angle: Math.random() * Math.PI,
         speedX: (Math.random() - 0.5) * 0.15,
         speedY: (Math.random() - 0.5) * 0.15
       });
     }
     state.bubbles = [];
-    for (let i = 0; i < 15; i++) {
+    for (let i = 0; i < 20; i++) {
       state.bubbles.push({
         x: 60 + Math.random() * 120,
         y: 190 + Math.random() * 70,
-        r: 1 + Math.random() * 3,
-        speedY: 0.6 + Math.random() * 1.2,
+        r: 1 + Math.random() * 3.5,
+        speedY: 0.8 + Math.random() * 1.5,
         phase: Math.random() * Math.PI * 2,
         wobbleSpeed: 0.08 + Math.random() * 0.08
       });
     }
     state.heatWaves = [];
-    for (let i = 0; i < 6; i++) {
+    for (let i = 0; i < 8; i++) {
       state.heatWaves.push({
         x: 65 + Math.random() * 110,
         y: 190 + Math.random() * 60,
-        length: 12 + Math.random() * 15,
-        speedY: 0.4 + Math.random() * 0.5,
-        opacity: 0.1 + Math.random() * 0.25
+        length: 15 + Math.random() * 15,
+        speedY: 0.5 + Math.random() * 0.6,
+        opacity: 0.15 + Math.random() * 0.25
+      });
+    }
+    state.steamParticles = [];
+    for (let i = 0; i < 12; i++) {
+      state.steamParticles.push({
+        x: 60 + Math.random() * 120,
+        y: 175 + Math.random() * 10,
+        r: 2 + Math.random() * 4,
+        vx: (Math.random() - 0.5) * 0.3,
+        vy: -0.4 - Math.random() * 0.6,
+        alpha: 0.2 + Math.random() * 0.4
       });
     }
   }
@@ -1295,10 +1294,22 @@ export function createThermometerLab(t, options = {}) {
       state.bubbles.forEach(bubble => {
         bubble.y -= bubble.speedY * (1.0 + (state.bathTemp - 80) / 40);
         bubble.phase += bubble.wobbleSpeed;
-        bubble.x += Math.sin(bubble.phase) * 0.2;
+        bubble.x += Math.sin(bubble.phase) * 0.3;
         if (bubble.y < 185) {
           bubble.y = 260 + Math.random() * 10;
           bubble.x = 60 + Math.random() * 120;
+        }
+      });
+    }
+    if (state.bathTemp >= 95) {
+      state.steamParticles.forEach(p => {
+        p.x += p.vx;
+        p.y += p.vy;
+        p.alpha -= 0.005;
+        if (p.alpha <= 0 || p.y < 130) {
+          p.x = 60 + Math.random() * 120;
+          p.y = 175 + Math.random() * 5;
+          p.alpha = 0.2 + Math.random() * 0.4;
         }
       });
     }
@@ -1324,36 +1335,46 @@ export function createThermometerLab(t, options = {}) {
       b = Math.round(246 - ratio * 190);
     }
 
+    // Glowing heating element at the bottom (burner)
     if (state.bathTemp > 40) {
       const intensity = Math.min(1.0, (state.bathTemp - 40) / 100);
       const t = Date.now() * 0.02;
+      
+      // Draw glowing burner base
+      ctx.fillStyle = `rgba(239, 68, 68, ${intensity * 0.25})`;
+      ctx.beginPath();
+      ctx.roundRect(bx - 10, by + bh + 4, bw + 20, 10, 4);
+      ctx.fill();
+
       ctx.fillStyle = 'rgba(249, 115, 22, 0.85)';
       ctx.beginPath();
-      ctx.moveTo(bx + bw/2 - 20, by + bh + 4);
-      for (let dx = -20; dx <= 20; dx += 8) {
-        const fHeight = intensity * (10 + Math.sin(dx * 0.3 + t) * 4);
+      ctx.moveTo(bx + bw/2 - 25, by + bh + 4);
+      for (let dx = -25; dx <= 25; dx += 6) {
+        const fHeight = intensity * (12 + Math.sin(dx * 0.4 + t) * 5);
         ctx.lineTo(bx + bw/2 + dx, by + bh + 4 - fHeight);
       }
-      ctx.lineTo(bx + bw/2 + 20, by + bh + 4);
+      ctx.lineTo(bx + bw/2 + 25, by + bh + 4);
       ctx.closePath();
       ctx.fill();
     }
 
-    ctx.strokeStyle = '#9ca3af';
+    // Beaker shadow/background
+    ctx.strokeStyle = '#4b5563';
     ctx.lineWidth = 2;
-    ctx.fillStyle = '#1f1f23';
+    ctx.fillStyle = '#121214';
     ctx.beginPath();
     ctx.roundRect(bx, by, bw, bh, [0, 0, 10, 10]);
     ctx.fill();
 
+    // Water/Liquid
     const waterGrad = ctx.createLinearGradient(bx, waterY, bx, by + bh);
-    waterGrad.addColorStop(0, `rgba(${r}, ${g}, ${b}, 0.3)`);
-    waterGrad.addColorStop(1, `rgba(${r}, ${g}, ${b}, 0.6)`);
+    waterGrad.addColorStop(0, `rgba(${r}, ${g}, ${b}, 0.25)`);
+    waterGrad.addColorStop(1, `rgba(${r}, ${g}, ${b}, 0.55)`);
     ctx.fillStyle = waterGrad;
     ctx.beginPath();
     ctx.moveTo(bx, waterY);
-    const waveAmp = state.bathTemp >= 80 ? 1.5 : 0.4;
-    const waveFreq = state.bathTemp >= 80 ? 0.08 : 0.03;
+    const waveAmp = state.bathTemp >= 80 ? 2.0 : 0.5;
+    const waveFreq = state.bathTemp >= 80 ? 0.09 : 0.03;
     const t = Date.now() * waveFreq;
     for (let x = bx; x <= bx + bw; x += 5) {
       const y = waterY + Math.sin(x * 0.15 + t) * waveAmp;
@@ -1364,37 +1385,40 @@ export function createThermometerLab(t, options = {}) {
     ctx.closePath();
     ctx.fill();
 
+    // Heat waves
     if (state.bathTemp > 35) {
-      ctx.strokeStyle = `rgba(239, 68, 68, ${Math.min(0.4, (state.bathTemp-35)/120)})`;
-      ctx.lineWidth = 1;
+      ctx.strokeStyle = `rgba(239, 68, 68, ${Math.min(0.5, (state.bathTemp-35)/120)})`;
+      ctx.lineWidth = 1.2;
       state.heatWaves.forEach(wave => {
         ctx.beginPath();
         ctx.moveTo(wave.x, wave.y);
-        ctx.quadraticCurveTo(wave.x + Math.sin(wave.y*0.06)*4, wave.y - wave.length/2, wave.x, wave.y - wave.length);
+        ctx.quadraticCurveTo(wave.x + Math.sin(wave.y*0.06)*5, wave.y - wave.length/2, wave.x, wave.y - wave.length);
         ctx.stroke();
       });
     }
 
+    // Floating Ice Cubes
     if (state.bathTemp <= 8) {
-      ctx.fillStyle = 'rgba(255, 255, 255, 0.6)';
-      ctx.strokeStyle = 'rgba(147, 197, 253, 0.8)';
-      ctx.lineWidth = 0.8;
+      ctx.fillStyle = 'rgba(224, 242, 254, 0.55)';
+      ctx.strokeStyle = 'rgba(186, 230, 253, 0.8)';
+      ctx.lineWidth = 1.0;
       state.iceCubes.forEach(ice => {
         ctx.save();
         ctx.translate(ice.x, ice.y);
         ctx.rotate(ice.angle);
         ctx.beginPath();
-        ctx.roundRect(-ice.size/2, -ice.size/2, ice.size, ice.size, 2);
+        ctx.roundRect(-ice.size/2, -ice.size/2, ice.size, ice.size, 3);
         ctx.fill();
         ctx.stroke();
         ctx.restore();
       });
     }
 
+    // Boiling Bubbles
     if (state.bathTemp >= 80) {
-      ctx.fillStyle = 'rgba(255, 255, 255, 0.5)';
-      ctx.strokeStyle = 'rgba(255, 255, 255, 0.7)';
-      ctx.lineWidth = 0.5;
+      ctx.fillStyle = 'rgba(255, 255, 255, 0.4)';
+      ctx.strokeStyle = 'rgba(255, 255, 255, 0.65)';
+      ctx.lineWidth = 0.6;
       state.bubbles.forEach(bubble => {
         ctx.beginPath();
         ctx.arc(bubble.x, bubble.y, bubble.r, 0, Math.PI * 2);
@@ -1403,8 +1427,19 @@ export function createThermometerLab(t, options = {}) {
       });
     }
 
-    ctx.strokeStyle = '#4b5563';
-    ctx.lineWidth = 3;
+    // Steam particles rising above the beaker
+    if (state.bathTemp >= 95) {
+      state.steamParticles.forEach(p => {
+        ctx.fillStyle = `rgba(255, 255, 255, ${p.alpha})`;
+        ctx.beginPath();
+        ctx.arc(p.x, p.y, p.r, 0, Math.PI * 2);
+        ctx.fill();
+      });
+    }
+
+    // Beaker Glass Outline (High Fidelity)
+    ctx.strokeStyle = '#9ca3af';
+    ctx.lineWidth = 3.5;
     ctx.beginPath();
     ctx.moveTo(bx - 1, by);
     ctx.lineTo(bx - 1, by + bh - 8);
@@ -1413,6 +1448,56 @@ export function createThermometerLab(t, options = {}) {
     ctx.arcTo(bx + bw + 1, by + bh + 1, bx + bw + 1, by + bh - 8, 8);
     ctx.lineTo(bx + bw + 1, by);
     ctx.stroke();
+
+    // Glass reflection highlights
+    ctx.strokeStyle = 'rgba(255, 255, 255, 0.4)';
+    ctx.lineWidth = 1.5;
+    ctx.beginPath();
+    ctx.moveTo(bx + 4, by + 10);
+    ctx.lineTo(bx + 4, by + bh - 10);
+    ctx.stroke();
+  }
+
+  function drawLabelLine(ctx, startX, startY, endX, endY, text, align = 'left') {
+    if (!state.showLabels) return;
+    ctx.strokeStyle = 'rgba(6, 182, 212, 0.7)';
+    ctx.lineWidth = 1.0;
+    ctx.setLineDash([3, 3]);
+    
+    // Draw line
+    ctx.beginPath();
+    ctx.moveTo(startX, startY);
+    ctx.lineTo(endX, endY);
+    ctx.stroke();
+    ctx.setLineDash([]);
+
+    // Draw glowing anchor dot
+    ctx.fillStyle = '#06b6d4';
+    ctx.beginPath();
+    ctx.arc(startX, startY, 3, 0, Math.PI * 2);
+    ctx.fill();
+
+    // Draw label text background box
+    ctx.font = 'bold 9px system-ui, sans-serif';
+    const textWidth = ctx.measureText(text).width;
+    const boxW = textWidth + 10;
+    const boxH = 16;
+    const bx = align === 'left' ? endX : endX - boxW;
+    const by = endY - boxH / 2;
+
+    ctx.fillStyle = 'rgba(21, 21, 24, 0.9)';
+    ctx.strokeStyle = '#06b6d4';
+    ctx.lineWidth = 1.0;
+    ctx.beginPath();
+    ctx.roundRect(bx, by, boxW, boxH, 4);
+    ctx.fill();
+    ctx.stroke();
+
+    // Draw text
+    ctx.fillStyle = '#f4f4f5';
+    ctx.textAlign = 'center';
+    ctx.textBaseline = 'middle';
+    ctx.fillText(text, bx + boxW / 2, by + boxH / 2 + 0.5);
   }
 
   function drawLiquidThermometer(ctx) {
@@ -1421,14 +1506,15 @@ export function createThermometerLab(t, options = {}) {
     const bulbRadius = getBulbVisualRadius();
     const bulbCenterY = 250 + Math.max(0, bulbRadius - BULB_RADIUS_REF) * 0.35;
     const stemBottom = bulbCenterY - bulbRadius - 1;
-    const glassWidth = 8 + state.wallThickness * 8;
+    const glassWidth = 10 + state.wallThickness * 8;
     const leftX = x - glassWidth / 2;
     const rightX = x + glassWidth / 2;
 
+    // Glass Stem Shading (3D effect)
     const glassGrad = ctx.createLinearGradient(leftX, stemTop, rightX, stemTop);
     glassGrad.addColorStop(0, 'rgba(209, 213, 219, 0.85)');
     glassGrad.addColorStop(0.2, 'rgba(255, 255, 255, 0.95)');
-    glassGrad.addColorStop(0.5, 'rgba(243, 244, 246, 0.2)');
+    glassGrad.addColorStop(0.5, 'rgba(243, 244, 246, 0.15)');
     glassGrad.addColorStop(0.8, 'rgba(255, 255, 255, 0.95)');
     glassGrad.addColorStop(1, 'rgba(156, 163, 175, 0.9)');
 
@@ -1445,12 +1531,13 @@ export function createThermometerLab(t, options = {}) {
     ctx.fill();
     ctx.stroke();
 
+    // Bulb Glass Shell
     const bulbGrad = ctx.createRadialGradient(
       x - bulbRadius*0.2, bulbCenterY - bulbRadius*0.2, bulbRadius*0.1,
       x, bulbCenterY, bulbRadius
     );
-    bulbGrad.addColorStop(0, 'rgba(255, 255, 255, 0.7)');
-    bulbGrad.addColorStop(1, 'rgba(156, 163, 175, 0.3)');
+    bulbGrad.addColorStop(0, 'rgba(255, 255, 255, 0.8)');
+    bulbGrad.addColorStop(1, 'rgba(156, 163, 175, 0.35)');
     ctx.fillStyle = bulbGrad;
     ctx.strokeStyle = '#6b7280';
     ctx.lineWidth = 0.8 + state.wallThickness * 0.6;
@@ -1459,13 +1546,14 @@ export function createThermometerLab(t, options = {}) {
     ctx.fill();
     ctx.stroke();
 
-    const boreWidth = Math.min(glassWidth * 0.72, 0.6 + state.capillaryBore * 4.5);
-    ctx.fillStyle = '#111827';
+    // Capillary Bore (Dark inner channel)
+    const boreWidth = Math.min(glassWidth * 0.72, 0.8 + state.capillaryBore * 4.5);
+    ctx.fillStyle = '#0a0a0c';
     ctx.fillRect(x - boreWidth / 2, stemTop + 8, boreWidth, stemBottom - stemTop - 8);
 
     const isMercury = state.liquidType === 'mercury';
-    const color = isMercury ? '#9ca3af' : '#ef4444';
-    const reflectionColor = isMercury ? '#f3f4f6' : '#fecaca';
+    const color = isMercury ? '#a1a1aa' : '#ef4444';
+    const reflectionColor = isMercury ? '#f4f4f5' : '#fee2e2';
 
     const zeroY = 210;
     const maxC = 220;
@@ -1473,21 +1561,30 @@ export function createThermometerLab(t, options = {}) {
     const pixelsPerC = (zeroY - maxCY) / maxC;
     const currentY = zeroY - Math.min(maxC, state.thermometerTemp) * pixelsPerC;
 
+    // Draw Liquid column inside capillary
     ctx.fillStyle = color;
     ctx.fillRect(x - boreWidth/2, currentY, boreWidth, stemBottom - currentY);
+    
+    // Draw liquid meniscus (curved top)
+    ctx.beginPath();
+    ctx.ellipse(x, currentY, boreWidth/2, 1.5, 0, 0, Math.PI * 2);
+    ctx.fill();
+
+    // Liquid reflection highlight
     ctx.fillStyle = reflectionColor;
     ctx.fillRect(x - boreWidth/6, currentY, boreWidth/3, stemBottom - currentY);
 
+    // Liquid in Bulb
     const bulbCoreRadius = bulbRadius * 0.9;
     const liquidBulbGrad = ctx.createRadialGradient(
       x - bulbCoreRadius*0.2, bulbCenterY - bulbCoreRadius*0.2, bulbCoreRadius*0.1,
       x, bulbCenterY, bulbCoreRadius
     );
     if (isMercury) {
-      liquidBulbGrad.addColorStop(0, '#f3f4f6');
-      liquidBulbGrad.addColorStop(0.3, '#d1d5db');
-      liquidBulbGrad.addColorStop(0.8, '#9ca3af');
-      liquidBulbGrad.addColorStop(1, '#4b5563');
+      liquidBulbGrad.addColorStop(0, '#f4f4f5');
+      liquidBulbGrad.addColorStop(0.3, '#d4d4d8');
+      liquidBulbGrad.addColorStop(0.8, '#71717a');
+      liquidBulbGrad.addColorStop(1, '#3f3f46');
     } else {
       liquidBulbGrad.addColorStop(0, '#fee2e2');
       liquidBulbGrad.addColorStop(0.2, '#fca5a5');
@@ -1499,13 +1596,8 @@ export function createThermometerLab(t, options = {}) {
     ctx.arc(x, bulbCenterY, bulbCoreRadius, 0, Math.PI * 2);
     ctx.fill();
 
-    ctx.font = 'bold 7px Arial';
-    ctx.fillStyle = '#9ca3af';
-    ctx.textAlign = 'center';
-    ctx.textBaseline = 'top';
-    ctx.fillText(`Vb = ${state.bulbVolume} mm³`, x, bulbCenterY + bulbRadius + 5);
-
-    ctx.strokeStyle = '#4b5563';
+    // Scale markings
+    ctx.strokeStyle = 'rgba(161, 161, 170, 0.6)';
     ctx.lineWidth = 0.5;
     ctx.font = '6.5px Arial';
     ctx.fillStyle = '#a1a1aa';
@@ -1519,29 +1611,57 @@ export function createThermometerLab(t, options = {}) {
       ctx.stroke();
       ctx.fillText(`${tVal}°C`, leftX - 22, yTick + 2.5);
     }
+
+    // Structure Labels
+    if (state.showLabels) {
+      drawLabelLine(ctx, leftX + 1, stemTop + 60, 10, stemTop + 30, t('tools.thermometerLab.labels.thinWall'), 'left');
+      drawLabelLine(ctx, x, currentY, 230, currentY - 15, t('tools.thermometerLab.labels.meniscus'), 'left');
+      drawLabelLine(ctx, x - boreWidth/2, stemTop + 110, 10, stemTop + 110, t('tools.thermometerLab.labels.narrowBore'), 'left');
+      drawLabelLine(ctx, x, bulbCenterY, 230, bulbCenterY + 15, t('tools.thermometerLab.labels.largeBulb'), 'left');
+    }
   }
 
   function drawResistanceProbe(ctx) {
     const x = 120;
     const probeTop = 20;
     const probeBottom = 245;
-    const width = 8;
+    const width = 10;
     const rx = x - width / 2;
 
+    // Metallic probe sheath
     const probeGrad = ctx.createLinearGradient(rx, probeTop, rx + width, probeTop);
-    probeGrad.addColorStop(0, '#9ca3af');
-    probeGrad.addColorStop(0.3, '#f3f4f6');
-    probeGrad.addColorStop(0.7, '#d1d5db');
-    probeGrad.addColorStop(1, '#6b7280');
+    probeGrad.addColorStop(0, '#71717a');
+    probeGrad.addColorStop(0.3, '#f4f4f5');
+    probeGrad.addColorStop(0.7, '#d4d4d8');
+    probeGrad.addColorStop(1, '#3f3f46');
 
     ctx.fillStyle = probeGrad;
     ctx.strokeStyle = '#4b5563';
     ctx.lineWidth = 1;
     ctx.beginPath();
-    ctx.roundRect(rx, probeTop, width, probeBottom - probeTop, [0, 0, 3, 3]);
+    ctx.roundRect(rx, probeTop, width, probeBottom - probeTop, [0, 0, 4, 4]);
     ctx.fill();
     ctx.stroke();
 
+    // Platinum Coil Cutaway (Schematic view inside the tip)
+    ctx.fillStyle = 'rgba(21, 21, 24, 0.8)';
+    ctx.fillRect(rx + 2, probeBottom - 45, width - 4, 40);
+    
+    // Draw platinum coil wire
+    ctx.strokeStyle = '#e2e8f0';
+    ctx.lineWidth = 1.2;
+    ctx.beginPath();
+    let cy = probeBottom - 40;
+    ctx.moveTo(x - 2, cy);
+    for (let i = 0; i < 8; i++) {
+      cy += 4;
+      ctx.lineTo(x + 2, cy);
+      cy += 4;
+      ctx.lineTo(x - 2, cy);
+    }
+    ctx.stroke();
+
+    // Connecting wires from probe top to meter
     ctx.lineWidth = 1.5;
     ctx.strokeStyle = '#ef4444';
     ctx.beginPath();
@@ -1555,26 +1675,29 @@ export function createThermometerLab(t, options = {}) {
     ctx.bezierCurveTo(x + 10, probeTop - 12, 210, 45, 245, 75);
     ctx.stroke();
 
+    // Digital Meter
     const ox = 245;
     const oy = 40;
     const ow = 135;
     const oh = 90;
 
-    ctx.fillStyle = '#1e1b4b';
-    ctx.strokeStyle = '#4f46e5';
+    ctx.fillStyle = '#18181b';
+    ctx.strokeStyle = '#6366f1';
     ctx.lineWidth = 2.5;
     ctx.beginPath();
     ctx.roundRect(ox, oy, ow, oh, 10);
     ctx.fill();
     ctx.stroke();
 
+    // Meter screen
     ctx.fillStyle = '#022c22';
     ctx.beginPath();
     ctx.roundRect(ox + 10, oy + 12, ow - 20, 34, 4);
     ctx.fill();
 
+    // Glowing resistance display
     ctx.font = 'bold 14px "Courier New"';
-    ctx.fillStyle = '#34d399';
+    ctx.fillStyle = '#10b981';
     ctx.textAlign = 'right';
     ctx.fillText(state.currentResistance.toFixed(2) + ' Ω', ox + ow - 16, oy + 34);
 
@@ -1582,6 +1705,12 @@ export function createThermometerLab(t, options = {}) {
     ctx.fillStyle = '#a7f3d0';
     ctx.textAlign = 'left';
     ctx.fillText('PLATINUM RTD METER', ox + 14, oy + 21);
+
+    // Structure Labels
+    if (state.showLabels) {
+      drawLabelLine(ctx, rx + 1, probeTop + 80, 10, probeTop + 50, t('tools.thermometerLab.labels.metalSheath'), 'left');
+      drawLabelLine(ctx, x, probeBottom - 20, 230, probeBottom - 40, t('tools.thermometerLab.labels.platinumCoil'), 'left');
+    }
   }
 
   function drawThermistorProbe(ctx) {
@@ -1589,6 +1718,7 @@ export function createThermometerLab(t, options = {}) {
     const probeTop = 20;
     const beadY = 245;
 
+    // Fine wires
     ctx.strokeStyle = '#111827';
     ctx.lineWidth = 1.2;
     ctx.beginPath();
@@ -1601,9 +1731,10 @@ export function createThermometerLab(t, options = {}) {
     ctx.lineTo(x + 2, beadY);
     ctx.stroke();
 
+    // Glass tube sheath
     const tubeTop = 20;
     const tubeBottom = 225;
-    const tubeWidth = 10;
+    const tubeWidth = 12;
     const tx = x - tubeWidth / 2;
 
     const tubeGrad = ctx.createLinearGradient(tx, tubeTop, tx + tubeWidth, tubeTop);
@@ -1616,27 +1747,29 @@ export function createThermometerLab(t, options = {}) {
     ctx.strokeStyle = 'rgba(156, 163, 175, 0.6)';
     ctx.lineWidth = 0.8;
     ctx.beginPath();
-    ctx.roundRect(tx, tubeTop, tubeWidth, tubeBottom - tubeTop, [0, 0, 2, 2]);
+    ctx.roundRect(tx, tubeTop, tubeWidth, tubeBottom - tubeTop, [0, 0, 3, 3]);
     ctx.fill();
     ctx.stroke();
 
-    const beadRadius = 6;
+    // Semiconductor Bead (3D Radial Gradient)
+    const beadRadius = 7;
     const beadGrad = ctx.createRadialGradient(
       x - beadRadius * 0.2, beadY - beadRadius * 0.2, beadRadius * 0.1,
       x, beadY, beadRadius
     );
-    beadGrad.addColorStop(0, '#4b5563');
+    beadGrad.addColorStop(0, '#6b7280');
     beadGrad.addColorStop(0.7, '#1f2937');
-    beadGrad.addColorStop(1, '#111827');
+    beadGrad.addColorStop(1, '#09090b');
 
     ctx.fillStyle = beadGrad;
     ctx.strokeStyle = '#030712';
-    ctx.lineWidth = 1;
+    ctx.lineWidth = 1.2;
     ctx.beginPath();
     ctx.arc(x, beadY, beadRadius, 0, Math.PI * 2);
     ctx.fill();
     ctx.stroke();
 
+    // Leads to meter
     ctx.lineWidth = 1.5;
     ctx.strokeStyle = '#ef4444';
     ctx.beginPath();
@@ -1650,12 +1783,13 @@ export function createThermometerLab(t, options = {}) {
     ctx.bezierCurveTo(x + 10, probeTop - 12, 210, 45, 245, 75);
     ctx.stroke();
 
+    // Digital Meter
     const ox = 245;
     const oy = 40;
     const ow = 135;
     const oh = 90;
 
-    ctx.fillStyle = '#111827';
+    ctx.fillStyle = '#18181b';
     ctx.strokeStyle = '#10b981';
     ctx.lineWidth = 2.5;
     ctx.beginPath();
@@ -1677,6 +1811,57 @@ export function createThermometerLab(t, options = {}) {
     ctx.fillStyle = '#a7f3d0';
     ctx.textAlign = 'left';
     ctx.fillText('NTC THERMISTOR METER', ox + 14, oy + 21);
+
+    // Structure Labels
+    if (state.showLabels) {
+      drawLabelLine(ctx, x - 2, probeTop + 100, 10, probeTop + 70, t('tools.thermometerLab.labels.leads'), 'left');
+      drawLabelLine(ctx, x, beadY, 230, beadY - 20, t('tools.thermometerLab.labels.semiconductorBead'), 'left');
+    }
+  }
+
+  function drawGraphCrosshair(ctx, layout, px, py, xVal, yVal, xUnit, yUnit, color) {
+    const { gx, gy, gw, gh } = layout;
+    
+    ctx.strokeStyle = 'rgba(255, 255, 255, 0.2)';
+    ctx.lineWidth = 1.0;
+    ctx.setLineDash([4, 4]);
+
+    // Projection to X-axis
+    ctx.beginPath();
+    ctx.moveTo(px, py);
+    ctx.lineTo(px, gy + gh);
+    ctx.stroke();
+
+    // Projection to Y-axis
+    ctx.beginPath();
+    ctx.moveTo(px, py);
+    ctx.lineTo(gx, py);
+    ctx.stroke();
+    ctx.setLineDash([]);
+
+    // Glowing labels on axes
+    ctx.font = 'bold 11px Arial';
+    ctx.textAlign = 'center';
+    ctx.textBaseline = 'top';
+    const xText = `${xVal.toFixed(1)}${xUnit}`;
+    const xTextW = ctx.measureText(xText).width + 10;
+    ctx.fillStyle = color;
+    ctx.beginPath();
+    ctx.roundRect(px - xTextW/2, gy + gh + 2, xTextW, 15, 3);
+    ctx.fill();
+    ctx.fillStyle = '#000';
+    ctx.fillText(xText, px, gy + gh + 4);
+
+    ctx.textAlign = 'right';
+    ctx.textBaseline = 'middle';
+    const yText = `${yVal.toFixed(2)} ${yUnit}`;
+    const yTextW = ctx.measureText(yText).width + 10;
+    ctx.fillStyle = color;
+    ctx.beginPath();
+    ctx.roundRect(gx - yTextW - 2, py - 7, yTextW, 15, 3);
+    ctx.fill();
+    ctx.fillStyle = '#000';
+    ctx.fillText(yText, gx - 7, py);
   }
 
   function drawLiquidGraph(ctx) {
@@ -1706,8 +1891,9 @@ export function createThermometerLab(t, options = {}) {
     const pxEnd = mapGraphX(tLineEnd, minT, maxT, gx, gw);
     const pyEnd = mapGraphY(liquidLengthAtTemp(tLineEnd), minL, maxL, gy, gh);
 
+    // Linear line
     ctx.strokeStyle = '#ef4444';
-    ctx.lineWidth = 2;
+    ctx.lineWidth = 3;
     ctx.beginPath();
     ctx.moveTo(px0, py0);
     ctx.lineTo(pxEnd, pyEnd);
@@ -1718,10 +1904,18 @@ export function createThermometerLab(t, options = {}) {
     if (currentT >= minT && currentT <= maxT) {
       const px = mapGraphX(currentT, minT, maxT, gx, gw);
       const py = mapGraphY(currentL, minL, maxL, gy, gh);
+
+      // Draw crosshair projection
+      drawGraphCrosshair(ctx, layout, px, py, currentT, currentL, '°C', 'cm', '#ef4444');
+
+      // Glowing dot
+      ctx.shadowColor = '#ef4444';
+      ctx.shadowBlur = 10;
       ctx.fillStyle = '#ef4444';
       ctx.beginPath();
       ctx.arc(px, py, dotR, 0, Math.PI * 2);
       ctx.fill();
+      ctx.shadowBlur = 0; // Reset
     }
   }
 
@@ -1752,8 +1946,9 @@ export function createThermometerLab(t, options = {}) {
     const pxEnd = mapGraphX(tEnd, minT, maxT, gx, gw);
     const pyEnd = mapGraphY(resistanceAtTemp(tEnd), minR, maxR, gy, gh);
 
-    ctx.strokeStyle = '#4f46e5';
-    ctx.lineWidth = 2;
+    // Linear line
+    ctx.strokeStyle = '#6366f1';
+    ctx.lineWidth = 3;
     ctx.beginPath();
     ctx.moveTo(px0, py0);
     ctx.lineTo(pxEnd, pyEnd);
@@ -1764,10 +1959,18 @@ export function createThermometerLab(t, options = {}) {
     if (currentT >= minT && currentT <= maxT) {
       const px = mapGraphX(currentT, minT, maxT, gx, gw);
       const py = mapGraphY(currentR, minR, maxR, gy, gh);
-      ctx.fillStyle = '#4f46e5';
+
+      // Draw crosshair projection
+      drawGraphCrosshair(ctx, layout, px, py, currentT, currentR, '°C', 'Ω', '#6366f1');
+
+      // Glowing dot
+      ctx.shadowColor = '#6366f1';
+      ctx.shadowBlur = 10;
+      ctx.fillStyle = '#6366f1';
       ctx.beginPath();
       ctx.arc(px, py, dotR, 0, Math.PI * 2);
       ctx.fill();
+      ctx.shadowBlur = 0;
     }
   }
 
@@ -1792,11 +1995,12 @@ export function createThermometerLab(t, options = {}) {
     ctx.textAlign = 'center';
     ctx.fillText('temperature / °C', gx + gw / 2, xLabelY);
 
+    // Exponential curve
     ctx.strokeStyle = '#10b981';
-    ctx.lineWidth = 2;
+    ctx.lineWidth = 3;
     ctx.beginPath();
     let started = false;
-    for (let tVal = minT; tVal <= maxT; tVal += 2) {
+    for (let tVal = minT; tVal <= maxT; tVal += 1) {
       const tempK = tVal + 273.15;
       const r = state.thermistorR25 * Math.exp(state.thermistorBeta * (1 / tempK - 1 / 298.15));
       const px = mapGraphX(tVal, minT, maxT, gx, gw);
@@ -1817,10 +2021,18 @@ export function createThermometerLab(t, options = {}) {
     if (currentT >= minT && currentT <= maxT) {
       const px = mapGraphX(currentT, minT, maxT, gx, gw);
       const py = mapGraphY(Math.min(maxR, currentR), minR, maxR, gy, gh);
+
+      // Draw crosshair projection
+      drawGraphCrosshair(ctx, layout, px, py, currentT, currentR, '°C', 'kΩ', '#10b981');
+
+      // Glowing dot
+      ctx.shadowColor = '#10b981';
+      ctx.shadowBlur = 10;
       ctx.fillStyle = '#10b981';
       ctx.beginPath();
       ctx.arc(px, py, dotR, 0, Math.PI * 2);
       ctx.fill();
+      ctx.shadowBlur = 0;
     }
   }
 
@@ -1849,6 +2061,168 @@ export function createThermometerLab(t, options = {}) {
     }
   }
 
+  // Generate beautiful inline SVGs for LaTeX-like math equations
+  function renderSVGFormulas() {
+    const liquidFormula = wrap.querySelector('#tl-svg-formula-liquid');
+    if (liquidFormula) {
+      liquidFormula.innerHTML = `
+        <svg height="45" width="220" style="background:transparent; overflow:visible;">
+          <text x="10" y="26" fill="#fff" font-family="Cambria, Georgia, serif" font-size="16">T =</text>
+          <line x1="45" y1="21" x2="145" y2="21" stroke="#fff" stroke-width="1.5" />
+          <text x="95" y="15" fill="#fff" font-family="Cambria, Georgia, serif" font-size="13" text-anchor="middle">L<sub>T</sub> - L<sub>0</sub></text>
+          <text x="95" y="36" fill="#fff" font-family="Cambria, Georgia, serif" font-size="13" text-anchor="middle">L<sub>100</sub> - L<sub>0</sub></text>
+          <text x="155" y="26" fill="#fff" font-family="Cambria, Georgia, serif" font-size="16">&times; 100°C</text>
+        </svg>
+      `;
+    }
+
+    const liquidFormulaSub = wrap.querySelector('#tl-svg-formula-liquid-sub');
+    if (liquidFormulaSub) {
+      liquidFormulaSub.innerHTML = `
+        <svg height="45" width="260" style="background:transparent; overflow:visible;">
+          <text x="10" y="26" fill="#fff" font-family="Cambria, Georgia, serif" font-size="16">T =</text>
+          <line x1="45" y1="21" x2="155" y2="21" stroke="#fff" stroke-width="1.5" />
+          <text x="100" y="15" fill="#06b6d4" font-family="Cambria, Georgia, serif" font-weight="bold" font-size="13" text-anchor="middle">${state.currentLength.toFixed(2)} - ${state.liquidL0.toFixed(1)}</text>
+          <text x="100" y="36" fill="#a1a1aa" font-family="Cambria, Georgia, serif" font-size="13" text-anchor="middle">${state.liquidL100.toFixed(1)} - ${state.liquidL0.toFixed(1)}</text>
+          <text x="165" y="26" fill="#fff" font-family="Cambria, Georgia, serif" font-size="16">&times; 100°C =</text>
+          <text x="245" y="27" fill="#10b981" font-family="system-ui, sans-serif" font-weight="900" font-size="16" text-anchor="middle" class="tl-final-ans">${state.thermometerTemp.toFixed(1)}°C</text>
+        </svg>
+      `;
+    }
+
+    const resistanceFormula = wrap.querySelector('#tl-svg-formula-resistance');
+    if (resistanceFormula) {
+      resistanceFormula.innerHTML = `
+        <svg height="45" width="220" style="background:transparent; overflow:visible;">
+          <text x="10" y="26" fill="#fff" font-family="Cambria, Georgia, serif" font-size="16">T =</text>
+          <line x1="45" y1="21" x2="145" y2="21" stroke="#fff" stroke-width="1.5" />
+          <text x="95" y="15" fill="#fff" font-family="Cambria, Georgia, serif" font-size="13" text-anchor="middle">R<sub>T</sub> - R<sub>0</sub></text>
+          <text x="95" y="36" fill="#fff" font-family="Cambria, Georgia, serif" font-size="13" text-anchor="middle">R<sub>100</sub> - R<sub>0</sub></text>
+          <text x="155" y="26" fill="#fff" font-family="Cambria, Georgia, serif" font-size="16">&times; 100°C</text>
+        </svg>
+      `;
+    }
+
+    const resistanceFormulaSub = wrap.querySelector('#tl-svg-formula-resistance-sub');
+    if (resistanceFormulaSub) {
+      resistanceFormulaSub.innerHTML = `
+        <svg height="45" width="260" style="background:transparent; overflow:visible;">
+          <text x="10" y="26" fill="#fff" font-family="Cambria, Georgia, serif" font-size="16">T =</text>
+          <line x1="45" y1="21" x2="155" y2="21" stroke="#fff" stroke-width="1.5" />
+          <text x="100" y="15" fill="#6366f1" font-family="Cambria, Georgia, serif" font-weight="bold" font-size="13" text-anchor="middle">${state.currentResistance.toFixed(2)} - ${state.resistanceR0.toFixed(1)}</text>
+          <text x="100" y="36" fill="#a1a1aa" font-family="Cambria, Georgia, serif" font-size="13" text-anchor="middle">${state.resistanceR100.toFixed(1)} - ${state.resistanceR0.toFixed(1)}</text>
+          <text x="165" y="26" fill="#fff" font-family="Cambria, Georgia, serif" font-size="16">&times; 100°C =</text>
+          <text x="245" y="27" fill="#10b981" font-family="system-ui, sans-serif" font-weight="900" font-size="16" text-anchor="middle" class="tl-final-ans">${state.thermometerTemp.toFixed(1)}°C</text>
+        </svg>
+      `;
+    }
+
+    const thermistorFormula = wrap.querySelector('#tl-svg-formula-thermistor');
+    if (thermistorFormula) {
+      thermistorFormula.innerHTML = `
+        <svg height="50" width="280" style="background:transparent; overflow:visible;">
+          <text x="10" y="28" fill="#fff" font-family="Cambria, Georgia, serif" font-size="15">T =</text>
+          <line x1="40" y1="23" x2="220" y2="23" stroke="#fff" stroke-width="1.5" />
+          <text x="130" y="15" fill="#fff" font-family="Cambria, Georgia, serif" font-size="13" text-anchor="middle">1</text>
+          <text x="130" y="38" fill="#fff" font-family="Cambria, Georgia, serif" font-size="11" text-anchor="middle">(1/&beta;) &bull; ln(R<sub>T</sub>/R<sub>25</sub>) + 1/298.15</text>
+          <text x="230" y="28" fill="#fff" font-family="Cambria, Georgia, serif" font-size="15">- 273.15</text>
+        </svg>
+      `;
+    }
+
+    const thermistorFormulaSub = wrap.querySelector('#tl-svg-formula-thermistor-sub');
+    if (thermistorFormulaSub) {
+      const tempK = state.thermometerTemp + 273.15;
+      thermistorFormulaSub.innerHTML = `
+        <svg height="45" width="280" style="background:transparent; overflow:visible;">
+          <text x="10" y="26" fill="#fff" font-family="Cambria, Georgia, serif" font-size="15">T<sub>K</sub> =</text>
+          <text x="50" y="26" fill="#10b981" font-family="Cambria, Georgia, serif" font-weight="bold" font-size="15">${tempK.toFixed(2)} K</text>
+          <text x="115" y="26" fill="#fff" font-family="Cambria, Georgia, serif" font-size="15">&rArr; T =</text>
+          <text x="210" y="27" fill="#10b981" font-family="system-ui, sans-serif" font-weight="900" font-size="15" text-anchor="middle" class="tl-final-ans">${state.thermometerTemp.toFixed(1)}°C</text>
+        </svg>
+      `;
+    }
+  }
+
+  // Draw interactive dual-scale comparison for faulty thermometer solver
+  function drawDualScaleSVG() {
+    const container = wrap.querySelector('#tl-faulty-svg-container');
+    if (!container) return;
+
+    const { cf, cu, interval } = getFaultyCalibration();
+    const cm = parseFloat(wrap.querySelector('#tl-input-q10a-cm').value) || 0;
+    const tVal = parseFloat(wrap.querySelector('#tl-input-q10b-t').value) || 0;
+
+    // Determine current active solver pane
+    const isPaneA = wrap.querySelector('#tl-pane-q10a').classList.contains('active');
+    const displayT = isPaneA ? ((cm - cf) / interval) * 100 : tVal;
+    const displayC = isPaneA ? cm : (tVal / 100) * interval + cf;
+
+    // Map temperature to Y position (height is 120px, from y=30 to y=150)
+    // 0°C -> y=130, 100°C -> y=50
+    const mapY = (t) => 130 - (t / 100) * 80;
+    const currentY = mapY(displayT);
+
+    container.innerHTML = `
+      <svg width="100%" height="100%" viewBox="0 0 340 180" style="background:transparent; overflow:visible;">
+        <!-- Left Scale: True Scale -->
+        <g transform="translate(0, 0)">
+          <!-- Glass Tube -->
+          <rect x="80" y="25" width="12" height="115" rx="6" fill="rgba(255,255,255,0.05)" stroke="#4b5563" stroke-width="1" />
+          <!-- Bulb -->
+          <circle cx="86" cy="144" r="10" fill="rgba(255,255,255,0.05)" stroke="#4b5563" stroke-width="1" />
+          <!-- Liquid Core -->
+          <rect x="84" y="${currentY}" width="4" height="${144 - currentY}" fill="#3b82f6" />
+          <circle cx="86" cy="144" r="8" fill="#3b82f6" />
+          
+          <!-- Ticks -->
+          <!-- Ice Point 0°C -->
+          <line x1="70" y1="130" x2="78" y2="130" stroke="#3b82f6" stroke-width="1.5" />
+          <text x="65" y="133" fill="#3b82f6" font-size="10" font-weight="bold" text-anchor="end">0°C</text>
+          
+          <!-- Steam Point 100°C -->
+          <line x1="70" y1="50" x2="78" y2="50" stroke="#ef4444" stroke-width="1.5" />
+          <text x="65" y="53" fill="#ef4444" font-size="10" font-weight="bold" text-anchor="end">100°C</text>
+
+          <!-- Current Point -->
+          <text x="65" y="${currentY + 3}" fill="#34d399" font-size="10" font-weight="bold" text-anchor="end">${displayT.toFixed(1)}°C</text>
+
+          <text x="86" y="170" fill="#a1a1aa" font-size="9" font-weight="bold" text-anchor="middle">${t('tools.thermometerLab.faulty.trueScale')}</text>
+        </g>
+
+        <!-- Right Scale: Faulty Scale -->
+        <g transform="translate(130, 0)">
+          <!-- Glass Tube -->
+          <rect x="100" y="25" width="12" height="115" rx="6" fill="rgba(255,255,255,0.05)" stroke="#4b5563" stroke-width="1" />
+          <!-- Bulb -->
+          <circle cx="106" cy="144" r="10" fill="rgba(255,255,255,0.05)" stroke="#4b5563" stroke-width="1" />
+          <!-- Liquid Core -->
+          <rect x="104" y="${currentY}" width="4" height="${144 - currentY}" fill="#f59e0b" />
+          <circle cx="106" cy="144" r="8" fill="#f59e0b" />
+          
+          <!-- Ticks -->
+          <!-- Faulty Ice Point Cf -->
+          <line x1="112" y1="130" x2="120" y2="130" stroke="#f59e0b" stroke-width="1.5" />
+          <text x="125" y="133" fill="#f59e0b" font-size="10" font-weight="bold" text-anchor="start">C<sub>f</sub> = ${cf.toFixed(1)}°C</text>
+          
+          <!-- Faulty Steam Point Cu -->
+          <line x1="112" y1="50" x2="120" y2="50" stroke="#ef4444" stroke-width="1.5" />
+          <text x="125" y="53" fill="#ef4444" font-size="10" font-weight="bold" text-anchor="start">C<sub>u</sub> = ${cu.toFixed(1)}°C</text>
+
+          <!-- Current Faulty Point -->
+          <text x="125" y="${currentY + 3}" fill="#34d399" font-size="10" font-weight="bold" text-anchor="start">C = ${displayC.toFixed(1)}°C</text>
+
+          <text x="106" y="170" fill="#a1a1aa" font-size="9" font-weight="bold" text-anchor="middle">${t('tools.thermometerLab.faulty.faultyScale')}</text>
+        </g>
+
+        <!-- Connecting Ratio Indicator Line -->
+        <line x1="86" y1="${currentY}" x2="236" y2="${currentY}" stroke="#34d399" stroke-dasharray="3,3" stroke-width="1.5" />
+        <circle cx="86" cy="${currentY}" r="3" fill="#34d399" />
+        <circle cx="236" cy="${currentY}" r="3" fill="#34d399" />
+      </svg>
+    `;
+  }
+
   function updateHTMLDisplays(tau) {
     wrap.querySelector('#tl-bath-temp-display').innerHTML = state.bathTemp.toFixed(1) + '°C';
     wrap.querySelector('#tl-val-bath-temp').innerHTML = state.bathTemp.toFixed(1) + ' °C';
@@ -1875,20 +2249,13 @@ export function createThermometerLab(t, options = {}) {
 
     if (state.thermometerType === 'liquid') {
       wrap.querySelector('#tl-live-liquid-lt').textContent = state.currentLength.toFixed(2) + ' cm';
-      wrap.querySelector('#tl-live-liquid-sub-num').textContent = `${state.currentLength.toFixed(2)} - ${state.liquidL0.toFixed(1)}`;
-      wrap.querySelector('#tl-live-liquid-sub-den').textContent = `${state.liquidL100.toFixed(1)} - ${state.liquidL0.toFixed(1)}`;
-      wrap.querySelector('#tl-live-liquid-ans').textContent = state.thermometerTemp.toFixed(1) + '°C';
     } else if (state.thermometerType === 'resistance') {
       wrap.querySelector('#tl-live-resistance-rt').textContent = state.currentResistance.toFixed(2) + ' Ω';
-      wrap.querySelector('#tl-live-resistance-sub-num').textContent = `${state.currentResistance.toFixed(2)} - ${state.resistanceR0.toFixed(1)}`;
-      wrap.querySelector('#tl-live-resistance-sub-den').textContent = `${state.resistanceR100.toFixed(1)} - ${state.resistanceR0.toFixed(1)}`;
-      wrap.querySelector('#tl-live-resistance-ans').textContent = state.thermometerTemp.toFixed(1) + '°C';
     } else {
       wrap.querySelector('#tl-live-thermistor-rt').textContent = state.currentThermistorR.toFixed(2) + ' kΩ';
-      const tempK = state.thermometerTemp + 273.15;
-      wrap.querySelector('#tl-live-thermistor-calc-tk').textContent = tempK.toFixed(2);
-      wrap.querySelector('#tl-live-thermistor-ans').textContent = state.thermometerTemp.toFixed(1) + '°C';
     }
+
+    renderSVGFormulas();
   }
 
   let animationFrameId = null;
@@ -1934,19 +2301,20 @@ export function createThermometerLab(t, options = {}) {
     const intervalEl = wrap.querySelector('#tl-val-faulty-interval');
     const errA = wrap.querySelector('#tl-faulty-error-a');
     const errB = wrap.querySelector('#tl-faulty-error-b');
-    const ansA = wrap.querySelector('#tl-ans-q10a');
-    const ansB = wrap.querySelector('#tl-ans-q10b');
     const invalid = Math.abs(interval) < 0.01;
 
     intervalEl.textContent = interval.toFixed(1) + ' °C';
+
+    const formulaPaneA = wrap.querySelector('#tl-svg-formula-faulty-a');
+    const formulaPaneB = wrap.querySelector('#tl-svg-formula-faulty-b');
 
     if (invalid) {
       errA.hidden = false;
       errA.textContent = 'C_u must differ from C_f (interval cannot be zero).';
       errB.hidden = false;
       errB.textContent = errA.textContent;
-      ansA.textContent = '—';
-      ansB.textContent = '—';
+      if (formulaPaneA) formulaPaneA.innerHTML = '';
+      if (formulaPaneB) formulaPaneB.innerHTML = '';
       return;
     }
     errA.hidden = true;
@@ -1957,23 +2325,52 @@ export function createThermometerLab(t, options = {}) {
     const trueT = ((cm - cf) / interval) * 100;
     const faultyC = (tVal / 100) * interval + cf;
 
-    wrap.querySelector('#tl-faulty-sub-num-a').textContent =
-      `${cm.toFixed(1)} − ${formatFaultyNum(cf)}`;
-    wrap.querySelector('#tl-faulty-sub-den-a').textContent =
-      `${cu.toFixed(1)} − ${formatFaultyNum(cf)}`;
-    wrap.querySelector('#tl-faulty-sub-num-b').textContent =
-      `${tVal.toFixed(1)} × ${interval.toFixed(1)}`;
-    wrap.querySelector('#tl-faulty-sub-cf-b').textContent =
-      `+ ${formatFaultyNum(cf)}`;
-    ansA.textContent = trueT.toFixed(1) + ' °C';
-    ansB.textContent = faultyC.toFixed(2) + ' °C';
+    if (formulaPaneA) {
+      formulaPaneA.innerHTML = `
+        <svg height="45" width="280" style="background:transparent; overflow:visible;">
+          <text x="10" y="26" fill="#fff" font-family="Cambria, Georgia, serif" font-size="15">T =</text>
+          <line x1="40" y1="21" x2="160" y2="21" stroke="#fff" stroke-width="1.5" />
+          <text x="100" y="15" fill="#06b6d4" font-family="Cambria, Georgia, serif" font-weight="bold" font-size="12" text-anchor="middle">${cm.toFixed(1)} - ${formatFaultyNum(cf)}</text>
+          <text x="100" y="36" fill="#a1a1aa" font-family="Cambria, Georgia, serif" font-size="12" text-anchor="middle">${cu.toFixed(1)} - ${formatFaultyNum(cf)}</text>
+          <text x="170" y="26" fill="#fff" font-family="Cambria, Georgia, serif" font-size="15">&times; 100 =</text>
+          <text x="245" y="27" fill="#10b981" font-family="system-ui, sans-serif" font-weight="900" font-size="15" text-anchor="middle" class="tl-final-ans">${trueT.toFixed(1)}°C</text>
+        </svg>
+      `;
+    }
+
+    if (formulaPaneB) {
+      formulaPaneB.innerHTML = `
+        <svg height="45" width="280" style="background:transparent; overflow:visible;">
+          <text x="10" y="26" fill="#fff" font-family="Cambria, Georgia, serif" font-size="15">C =</text>
+          <line x1="40" y1="21" x2="150" y2="21" stroke="#fff" stroke-width="1.5" />
+          <text x="95" y="15" fill="#06b6d4" font-family="Cambria, Georgia, serif" font-weight="bold" font-size="12" text-anchor="middle">${tVal.toFixed(1)} &times; ${interval.toFixed(1)}</text>
+          <text x="95" y="36" fill="#a1a1aa" font-family="Cambria, Georgia, serif" font-size="12" text-anchor="middle">100</text>
+          <text x="158" y="26" fill="#fff" font-family="Cambria, Georgia, serif" font-size="14">+ ${formatFaultyNum(cf)} =</text>
+          <text x="245" y="27" fill="#10b981" font-family="system-ui, sans-serif" font-weight="900" font-size="15" text-anchor="middle" class="tl-final-ans">${faultyC.toFixed(2)}°C</text>
+        </svg>
+      `;
+    }
+
+    drawDualScaleSVG();
   }
 
   function calculateQ11() {
     const r = parseFloat(wrap.querySelector('#tl-input-q11-r').value) || 0;
     const theta = ((r - state.resistanceR0) / (state.resistanceR100 - state.resistanceR0)) * 100;
-    wrap.querySelector('#tl-formula-q11-rsub').textContent = r.toFixed(1);
-    wrap.querySelector('#tl-ans-q11').textContent = theta.toFixed(1) + ' °C';
+    
+    const formulaPane = wrap.querySelector('#tl-svg-formula-resistance-solver');
+    if (formulaPane) {
+      formulaPane.innerHTML = `
+        <svg height="45" width="280" style="background:transparent; overflow:visible;">
+          <text x="10" y="26" fill="#fff" font-family="Cambria, Georgia, serif" font-size="15">&theta; =</text>
+          <line x1="40" y1="21" x2="160" y2="21" stroke="#fff" stroke-width="1.5" />
+          <text x="100" y="15" fill="#6366f1" font-family="Cambria, Georgia, serif" font-weight="bold" font-size="13" text-anchor="middle">${r.toFixed(1)} - ${state.resistanceR0.toFixed(1)}</text>
+          <text x="100" y="36" fill="#a1a1aa" font-family="Cambria, Georgia, serif" font-size="13" text-anchor="middle">${state.resistanceR100.toFixed(1)} - ${state.resistanceR0.toFixed(1)}</text>
+          <text x="170" y="26" fill="#fff" font-family="Cambria, Georgia, serif" font-size="15">&times; 100 =</text>
+          <text x="245" y="27" fill="#10b981" font-family="system-ui, sans-serif" font-weight="900" font-size="15" text-anchor="middle" class="tl-final-ans">${theta.toFixed(1)}°C</text>
+        </svg>
+      `;
+    }
   }
 
   function updateCalculations() {
@@ -2003,6 +2400,15 @@ export function createThermometerLab(t, options = {}) {
         state.thermometerType = tabId;
         updateCalculations();
       });
+    });
+
+    // Structure labels toggle button
+    const toggleLabelsBtn = wrap.querySelector('#tl-btn-toggle-labels');
+    toggleLabelsBtn.addEventListener('click', () => {
+      state.showLabels = !state.showLabels;
+      wrap.querySelector('#tl-lbl-toggle-labels').textContent = state.showLabels 
+        ? t('tools.thermometerLab.labels.hide') 
+        : t('tools.thermometerLab.labels.show');
     });
 
     const tempSlider = wrap.querySelector('#tl-bath-temp-slider');
@@ -2090,6 +2496,7 @@ export function createThermometerLab(t, options = {}) {
       wrap.querySelector('#tl-btn-solve-q10b').classList.remove('active');
       wrap.querySelector('#tl-pane-q10a').classList.add('active');
       wrap.querySelector('#tl-pane-q10b').classList.remove('active');
+      updateFaultySolver();
     });
 
     wrap.querySelector('#tl-btn-solve-q10b').addEventListener('click', () => {
@@ -2097,6 +2504,7 @@ export function createThermometerLab(t, options = {}) {
       wrap.querySelector('#tl-btn-solve-q10b').classList.add('active');
       wrap.querySelector('#tl-pane-q10a').classList.remove('active');
       wrap.querySelector('#tl-pane-q10b').classList.add('active');
+      updateFaultySolver();
     });
 
     wrap.querySelector('#tl-input-faulty-cf').addEventListener('input', updateFaultySolver);
