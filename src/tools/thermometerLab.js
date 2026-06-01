@@ -798,29 +798,25 @@ export function createThermometerLab(t, options = {}) {
           </div>
 
           <!-- Live calibration formula -->
-          <div class="tl-info-label" style="margin-top:10px;font-size:0.8rem;color:var(--tl-cyan)">Live calibration formula</div>
-          <div class="tl-worked-solution" style="margin-bottom:10px">
-            <div id="tl-svg-formula-liquid" class="tl-math-formula" style="height:45px">
-              <!-- Inline SVG for beautiful LaTeX-like formula rendering -->
-            </div>
-            <p>Substitute current reading <b id="tl-live-liquid-lt">5.50 cm</b>:</p>
-            <div id="tl-svg-formula-liquid-sub" class="tl-math-formula" style="height:100px">
-              <!-- Substituted numbers formula -->
-            </div>
-          </div>
-
-          <!-- Temperature-to-Length Solver -->
-          <div class="tl-info-label" style="margin-top:10px;font-size:0.8rem;color:var(--tl-cyan)">Temperature-to-Length Solver</div>
-          <div style="display:flex;flex-direction:column;gap:8px;margin-bottom:12px">
-            <div class="tl-calc-inputs">
-              <span>Given Temperature (T):</span>
-              <div class="tl-input-with-unit">
-                <input type="number" id="tl-input-t-to-l" value="50.0" step="1.0" class="tl-calc-input">
-                <span class="tl-unit">°C</span>
+          <div class="tl-info-label" style="margin-top:10px;font-size:0.8rem;color:var(--tl-cyan)">Live calibration formula (Dual-Directional Realtime Calculations)</div>
+          <div class="tl-worked-solution" style="margin-bottom:10px; display:flex; flex-direction:column; gap:12px">
+            <!-- Direction A: Length to Temperature -->
+            <div style="border-bottom:1px solid rgba(255,255,255,0.05); padding-bottom:10px">
+              <div class="tl-info-label" style="font-size:0.75rem;color:var(--tl-cyan);margin-bottom:4px">Direction A: Length to Temperature (L<sub>T</sub> &rarr; T)</div>
+              <div id="tl-svg-formula-liquid" class="tl-math-formula" style="height:45px; margin:4px 0">
+                <!-- Inline SVG for beautiful LaTeX-like formula rendering -->
+              </div>
+              <p style="margin:2px 0; font-size:0.75rem">Substitute current reading <b id="tl-live-liquid-lt">5.50 cm</b>:</p>
+              <div id="tl-svg-formula-liquid-sub" class="tl-math-formula" style="height:100px; margin:4px 0">
+                <!-- Substituted numbers formula -->
               </div>
             </div>
-            <div class="tl-worked-solution" style="background:rgba(0,0,0,0.15)">
-              <div id="tl-svg-formula-t-to-l" class="tl-math-formula" style="font-size:0.85rem;height:100px">
+
+            <!-- Direction B: Temperature to Length -->
+            <div>
+              <div class="tl-info-label" style="font-size:0.75rem;color:var(--tl-cyan);margin-bottom:4px">Direction B: Temperature to Length (T &rarr; L<sub>T</sub>)</div>
+              <p style="margin:2px 0; font-size:0.75rem">Substitute current bath temperature <b id="tl-live-liquid-t-sub">25.0°C</b>:</p>
+              <div id="tl-svg-formula-t-to-l" class="tl-math-formula" style="font-size:0.85rem;height:100px; margin:4px 0">
                 <!-- T to L Formula -->
               </div>
             </div>
@@ -932,29 +928,25 @@ export function createThermometerLab(t, options = {}) {
           </div>
 
           <!-- Live calibration formula -->
-          <div class="tl-info-label" style="margin-top:10px;font-size:0.8rem;color:var(--tl-cyan)">Live calibration formula</div>
-          <div class="tl-worked-solution" style="margin-bottom:10px">
-            <div id="tl-svg-formula-resistance" class="tl-math-formula" style="height:45px">
-              <!-- Resistance formula -->
-            </div>
-            <p>Substitute current resistance <b id="tl-live-resistance-rt">5.30 Ω</b>:</p>
-            <div id="tl-svg-formula-resistance-sub" class="tl-math-formula" style="height:100px">
-              <!-- Resistance sub formula -->
-            </div>
-          </div>
-
-          <!-- Temperature-to-Resistance Solver -->
-          <div class="tl-info-label" style="margin-top:10px;font-size:0.8rem;color:var(--tl-cyan)">Temperature-to-Resistance Solver</div>
-          <div style="display:flex;flex-direction:column;gap:8px;margin-bottom:12px">
-            <div class="tl-calc-inputs">
-              <span>Given Temperature (T):</span>
-              <div class="tl-input-with-unit">
-                <input type="number" id="tl-input-t-to-r" value="50.0" step="1.0" class="tl-calc-input">
-                <span class="tl-unit">°C</span>
+          <div class="tl-info-label" style="margin-top:10px;font-size:0.8rem;color:var(--tl-cyan)">Live calibration formula (Dual-Directional Realtime Calculations)</div>
+          <div class="tl-worked-solution" style="margin-bottom:10px; display:flex; flex-direction:column; gap:12px">
+            <!-- Direction A: Resistance to Temperature -->
+            <div style="border-bottom:1px solid rgba(255,255,255,0.05); padding-bottom:10px">
+              <div class="tl-info-label" style="font-size:0.75rem;color:var(--tl-cyan);margin-bottom:4px">Direction A: Resistance to Temperature (R<sub>T</sub> &rarr; T)</div>
+              <div id="tl-svg-formula-resistance" class="tl-math-formula" style="height:45px; margin:4px 0">
+                <!-- Resistance formula -->
+              </div>
+              <p style="margin:2px 0; font-size:0.75rem">Substitute current resistance <b id="tl-live-resistance-rt">5.30 Ω</b>:</p>
+              <div id="tl-svg-formula-resistance-sub" class="tl-math-formula" style="height:100px; margin:4px 0">
+                <!-- Resistance sub formula -->
               </div>
             </div>
-            <div class="tl-worked-solution" style="background:rgba(0,0,0,0.15)">
-              <div id="tl-svg-formula-t-to-r" class="tl-math-formula" style="font-size:0.85rem;height:100px">
+
+            <!-- Direction B: Temperature to Resistance -->
+            <div>
+              <div class="tl-info-label" style="font-size:0.75rem;color:var(--tl-cyan);margin-bottom:4px">Direction B: Temperature to Resistance (T &rarr; R<sub>T</sub>)</div>
+              <p style="margin:2px 0; font-size:0.75rem">Substitute current bath temperature <b id="tl-live-resistance-t-sub">25.0°C</b>:</p>
+              <div id="tl-svg-formula-t-to-r" class="tl-math-formula" style="font-size:0.85rem;height:100px; margin:4px 0">
                 <!-- T to R Formula -->
               </div>
             </div>
@@ -2309,8 +2301,10 @@ export function createThermometerLab(t, options = {}) {
 
     if (state.thermometerType === 'liquid') {
       wrap.querySelector('#tl-live-liquid-lt').textContent = state.currentLength.toFixed(2) + ' cm';
+      wrap.querySelector('#tl-live-liquid-t-sub').textContent = state.thermometerTemp.toFixed(1) + '°C';
     } else if (state.thermometerType === 'resistance') {
       wrap.querySelector('#tl-live-resistance-rt').textContent = state.currentResistance.toFixed(2) + ' Ω';
+      wrap.querySelector('#tl-live-resistance-t-sub').textContent = state.thermometerTemp.toFixed(1) + '°C';
     } else {
       wrap.querySelector('#tl-live-thermistor-rt').textContent = state.currentThermistorR.toFixed(2) + ' kΩ';
     }
@@ -2437,7 +2431,8 @@ export function createThermometerLab(t, options = {}) {
   }
 
   function calculateTtoL() {
-    const tInput = parseFloat(wrap.querySelector('#tl-input-t-to-l').value) || 0;
+    // Direction B: Given current bath temperature, find corresponding length
+    const tInput = state.thermometerTemp; 
     const slope = (state.liquidL100 - state.liquidL0) / 100;
     const length = state.liquidL0 + slope * tInput;
     
@@ -2463,7 +2458,8 @@ export function createThermometerLab(t, options = {}) {
   }
 
   function calculateTtoR() {
-    const tInput = parseFloat(wrap.querySelector('#tl-input-t-to-r').value) || 0;
+    // Direction B: Given current bath temperature, find corresponding resistance
+    const tInput = state.thermometerTemp;
     const slope = (state.resistanceR100 - state.resistanceR0) / 100;
     const resistance = state.resistanceR0 + slope * tInput;
     
