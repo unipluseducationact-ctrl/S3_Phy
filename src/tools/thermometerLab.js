@@ -2627,8 +2627,14 @@ export function createThermometerLab(t, options = {}) {
     wrap.querySelector('#tl-input-q11-r').addEventListener('input', calculateQ11);
     
     // T to L and T to R solvers
-    wrap.querySelector('#tl-input-t-to-l').addEventListener('input', updateCalculations);
-    wrap.querySelector('#tl-input-t-to-r').addEventListener('input', updateCalculations);
+    const inputTtoL = wrap.querySelector('#tl-input-t-to-l');
+    if (inputTtoL) {
+      inputTtoL.addEventListener('input', updateCalculations);
+    }
+    const inputTtoR = wrap.querySelector('#tl-input-t-to-r');
+    if (inputTtoR) {
+      inputTtoR.addEventListener('input', updateCalculations);
+    }
   }
 
   // Programmatic tab activation based on defaultType
