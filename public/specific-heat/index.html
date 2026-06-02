@@ -147,18 +147,18 @@
         </h3>
         <div class="relative bg-gradient-to-b from-slate-900 to-slate-950 rounded-xl overflow-hidden aspect-[4/3] flex items-center justify-center border border-slate-800 shadow-inner">
           <canvas id="heatingCanvas" class="w-full h-full"></canvas>
-          <!-- Live HUD Bar -->
-          <div class="absolute top-0 inset-x-0 bg-slate-950/80 backdrop-blur-md border-b border-white/10 px-3 py-1.5 flex justify-between items-center text-white text-xs font-semibold shadow-md z-10">
-            <div class="flex items-center gap-1.5">
-              <span class="w-2 h-2 rounded-full bg-emerald-500 animate-pulse"></span>
-              <span class="text-[10px] uppercase tracking-wider text-slate-400 font-bold" data-i18n="liveStats">Live Stats</span>
-            </div>
-            <div class="flex items-center gap-3 font-mono text-[11px]">
-              <span class="text-orange-400 font-black text-xs" id="liveTemp">20.0 °C</span>
-              <span class="text-slate-300" id="liveEnergy">E = 0 J</span>
-              <span class="text-slate-300" id="liveTime">t = 0 / 60 s</span>
-              <span class="text-red-400 hidden" id="liveHeatLoss">Heat Loss: 0 W</span>
-            </div>
+        </div>
+        <!-- Live HUD Bar (Below Animation) -->
+        <div class="bg-slate-900 border border-slate-800 rounded-xl px-3.5 py-2.5 flex justify-between items-center text-white text-xs font-semibold shadow-sm">
+          <div class="flex items-center gap-1.5">
+            <span class="w-2 h-2 rounded-full bg-emerald-500 animate-pulse"></span>
+            <span class="text-[10px] uppercase tracking-wider text-slate-400 font-bold" data-i18n="liveStats">Live Stats</span>
+          </div>
+          <div class="flex flex-wrap items-center gap-2.5 font-mono text-[11px] justify-end">
+            <span class="text-orange-400 font-black text-xs" id="liveTemp">20.0 °C</span>
+            <span class="text-slate-300" id="liveEnergy">E = 0 J</span>
+            <span class="text-slate-300" id="liveTime">t = 0 / 60 s</span>
+            <span class="text-red-400 hidden" id="liveHeatLoss">Heat Loss: 0 W</span>
           </div>
         </div>
       </div>
