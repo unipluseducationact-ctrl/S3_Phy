@@ -564,14 +564,14 @@
         stateState.phase = "liquidCooling";
       }
 
-      // Initialize Ice Cubes visuals
+      // Initialize Ice Cubes visuals (using coordinates relative to centerX and beakerY)
       stateState.iceCubes = [];
       if (stateState.substance === "water" && stateState.mode === "heating") {
         const iceCount = Math.max(5, Math.ceil(stateState.mass * 16));
         for (let i = 0; i < iceCount; i++) {
           stateState.iceCubes.push({
-            x: 80 + Math.random() * 80,
-            y: 190 + Math.random() * 40,
+            rx: -55 + Math.random() * 110, // relative to centerX (beaker width is 160)
+            ry: -15 - Math.random() * 30,  // relative to beakerY (beaker bottom)
             size: 15 + Math.random() * 10,
             angle: Math.random() * Math.PI * 2
           });
@@ -689,9 +689,15 @@
                 stateState.phase = "waterBoiling";
                 stateState.temp = Tb;
                 if (Math.random() < 0.25) {
+                  const w = stateCanvas.width / window.devicePixelRatio;
+                  const h = stateCanvas.height / window.devicePixelRatio;
+                  const centerX = w / 2;
+                  const beakerW = 160;
+                  const beakerY = h - 40;
+                  const beakerX = centerX - beakerW / 2;
                   stateState.bubbles.push({
-                    x: 65 + Math.random() * 110,
-                    y: 190 + Math.random() * 15,
+                    x: beakerX + 15 + Math.random() * (beakerW - 30),
+                    y: beakerY - 10 - Math.random() * 15,
                     r: 1.5 + Math.random() * 4,
                     speed: 1.2 + Math.random() * 2
                   });
@@ -814,7 +820,9 @@
 
         stateState.iceCubes.forEach(cube => {
           stateCtx.save();
-          stateCtx.translate(cube.x, cube.y);
+          const absX = centerX + cube.rx;
+          const absY = beakerY + cube.ry;
+          stateCtx.translate(absX, absY);
           stateCtx.rotate(cube.angle);
           stateCtx.beginPath();
           stateCtx.roundRect(-cube.size/2, -cube.size/2, cube.size, cube.size, 2);
@@ -852,7 +860,9 @@
           const size = cube.meltedSize !== undefined ? cube.meltedSize : cube.size;
           if (size > 2) {
             stateCtx.save();
-            stateCtx.translate(cube.x, cube.y + (1 - (size/cube.size)) * 20); // ice sinks a bit as it melts
+            const absX = centerX + cube.rx;
+            const absY = beakerY + cube.ry;
+            stateCtx.translate(absX, absY + (1 - (size/cube.size)) * 20); // ice sinks a bit as it melts
             stateCtx.rotate(cube.angle);
             stateCtx.beginPath();
             stateCtx.roundRect(-size/2, -size/2, size, size, 2);
