@@ -586,13 +586,20 @@ a {
 
 .tool-lens-simulator,
 .tool-tir-escape,
-.tool-em-spectrum,
+.tool-em-spectrum {
+  width: 100%;
+  height: var(--tool-viewport-min-h);
+  min-height: var(--tool-viewport-min-h);
+  display: flex;
+  flex-direction: column;
+}
+
 .tool-specific-heat,
 .tool-thermal-mixing,
 .tool-change-of-state {
   width: 100%;
-  height: var(--tool-viewport-min-h);
-  min-height: var(--tool-viewport-min-h);
+  height: clamp(760px, 90vh, 1200px);
+  min-height: clamp(760px, 90vh, 1200px);
   display: flex;
   flex-direction: column;
 }
