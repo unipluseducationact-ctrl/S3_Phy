@@ -2,6 +2,9 @@ import { t, getLang } from '../i18n.js';
 import questions from '../data/questions.json';
 import flashcards from '../data/flashcards.json';
 import { createThermometerLab } from '../tools/thermometerLab.js';
+import { createSpecificHeatLab } from '../tools/specificHeatLab.js';
+import { createThermalMixingLab } from '../tools/thermalMixingLab.js';
+import { createChangeOfStateLab } from '../tools/changeOfStateLab.js';
 import { mountHubShell } from '../hubShell.js';
 import { renderWorksheets, hydrateWorksheets } from '../worksheets/mcqWorksheet.js';
 
@@ -18,12 +21,14 @@ const HEAT_TOPICS = [
     titleKey: 'topic.heatInternalEnergy',
     fileEn: 'heat-internal-energy-en.pdf',
     fileZh: 'heat-internal-energy-zhHant.pdf',
+    tool: 'specificHeat',
   },
   {
     id: 'changeOfState',
     titleKey: 'topic.changeOfState',
     fileEn: 'change-of-state-en.pdf',
     fileZh: 'change-of-state-zhHant.pdf',
+    tool: 'changeOfState',
   },
   {
     id: 'heatTransfer',
@@ -44,12 +49,18 @@ const HEAT_WORKSHEET_TOPICS = [
   ['thermometer', 'topic.thermometer'],
 ];
 
-const TOOL_ORDER = ['liquid', 'resistance', 'thermistor'];
+const TOOL_ORDER = [
+  'liquid', 'resistance', 'thermistor',
+  'specificHeat', 'thermalMixing', 'changeOfState'
+];
 
 const TOOL_FACTORIES = {
   liquid: (tr) => createThermometerLab(tr, { type: 'liquid' }),
   resistance: (tr) => createThermometerLab(tr, { type: 'resistance' }),
   thermistor: (tr) => createThermometerLab(tr, { type: 'thermistor' }),
+  specificHeat: (tr) => createSpecificHeatLab(tr),
+  thermalMixing: (tr) => createThermalMixingLab(tr),
+  changeOfState: (tr) => createChangeOfStateLab(tr),
 };
 
 function toolLabel(id) {
@@ -57,6 +68,9 @@ function toolLabel(id) {
     liquid: 'tools.thermometerLab.liquid.title',
     resistance: 'tools.thermometerLab.resistance.title',
     thermistor: 'tools.thermometerLab.thermistor.title',
+    specificHeat: 'tools.specificHeat.title',
+    thermalMixing: 'tools.thermalMixing.title',
+    changeOfState: 'tools.changeOfState.title',
   };
   return t(map[id] || id);
 }

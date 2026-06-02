@@ -586,7 +586,10 @@ a {
 
 .tool-lens-simulator,
 .tool-tir-escape,
-.tool-em-spectrum {
+.tool-em-spectrum,
+.tool-specific-heat,
+.tool-thermal-mixing,
+.tool-change-of-state {
   width: 100%;
   height: var(--tool-viewport-min-h);
   min-height: var(--tool-viewport-min-h);
@@ -596,7 +599,10 @@ a {
 
 .tool-lens-simulator iframe,
 .tool-tir-escape iframe,
-.tool-em-spectrum iframe {
+.tool-em-spectrum iframe,
+.tool-specific-heat iframe,
+.tool-thermal-mixing iframe,
+.tool-change-of-state iframe {
   flex: 1;
   width: 100%;
   height: 100%;
