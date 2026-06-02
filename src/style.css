@@ -24,7 +24,7 @@
   --font-display: "Montserrat", "Inter", system-ui, sans-serif;
   --mono: ui-monospace, "Cascadia Code", monospace;
   --tool-viewport-min-h: clamp(680px, 88vh, 1200px);
-  --tool-stage-pad: 8px;
+  --tool-stage-pad: 6px;
 }
 
 *,
@@ -55,6 +55,18 @@ a {
 
 #app:has(.panel--tools) {
   max-width: min(1400px, 96vw);
+}
+
+@media (min-width: 900px) {
+  #app {
+    padding: 14px 14px 44px;
+  }
+}
+
+@media (min-width: 1200px) {
+  :root {
+    --tool-stage-pad: 5px;
+  }
 }
 
 /* Entry splash �X colors and motion aligned with S3-CH5-table onboardingController */
@@ -602,6 +614,15 @@ a {
   min-height: clamp(760px, 90vh, 1200px);
   display: flex;
   flex-direction: column;
+}
+
+@supports (height: 100dvh) {
+  .tool-specific-heat,
+  .tool-thermal-mixing,
+  .tool-change-of-state {
+    height: clamp(760px, calc(100dvh - 140px), 1400px);
+    min-height: clamp(760px, calc(100dvh - 140px), 1400px);
+  }
 }
 
 .tool-lens-simulator iframe,
