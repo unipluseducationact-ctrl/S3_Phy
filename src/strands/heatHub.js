@@ -5,6 +5,7 @@ import { createThermometerLab } from '../tools/thermometerLab.js';
 import { createSpecificHeatLab } from '../tools/specificHeatLab.js';
 import { createThermalMixingLab } from '../tools/thermalMixingLab.js';
 import { createChangeOfStateLab } from '../tools/changeOfStateLab.js';
+import { createHeatTransferLab } from '../tools/heatTransferLab.js';
 import { mountHubShell } from '../hubShell.js';
 import { renderWorksheets, hydrateWorksheets } from '../worksheets/mcqWorksheet.js';
 
@@ -35,6 +36,7 @@ const HEAT_TOPICS = [
     titleKey: 'topic.heatTransfer',
     fileEn: 'heat-transfer-en.pdf',
     fileZh: 'heat-transfer-zhHant.pdf',
+    tool: 'heatTransfer',
   },
 ];
 
@@ -51,7 +53,7 @@ const HEAT_WORKSHEET_TOPICS = [
 
 const TOOL_ORDER = [
   'liquid', 'resistance', 'thermistor',
-  'specificHeat', 'thermalMixing', 'changeOfState'
+  'specificHeat', 'thermalMixing', 'changeOfState', 'heatTransfer'
 ];
 
 const TOOL_FACTORIES = {
@@ -61,6 +63,7 @@ const TOOL_FACTORIES = {
   specificHeat: (tr) => createSpecificHeatLab(tr),
   thermalMixing: (tr) => createThermalMixingLab(tr),
   changeOfState: (tr) => createChangeOfStateLab(tr),
+  heatTransfer: (tr) => createHeatTransferLab(tr),
 };
 
 function toolLabel(id) {
@@ -71,6 +74,7 @@ function toolLabel(id) {
     specificHeat: 'tools.specificHeat.title',
     thermalMixing: 'tools.thermalMixing.title',
     changeOfState: 'tools.changeOfState.title',
+    heatTransfer: 'tools.heatTransfer.title',
   };
   return t(map[id] || id);
 }

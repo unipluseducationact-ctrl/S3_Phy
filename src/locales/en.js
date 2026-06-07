@@ -179,6 +179,7 @@ export const en = {
   'tools.specificHeat.title': 'Specific Heat Capacity Lab',
   'tools.thermalMixing.title': 'Thermal Mixing Lab',
   'tools.changeOfState.title': 'Change of State Lab',
+  'tools.heatTransfer.title': 'Heat Transfer Laboratory',
   'tools.thermometerLab.subtitle': 'Interactive study companion for liquid-in-glass, platinum resistance, and thermistor thermometers.',
   'tools.thermometerLab.liquid.title': 'Liquid-in-Glass Thermometer',
   'tools.thermometerLab.liquid.subtitle': 'Explore the effects of bulb volume, capillary bore, and liquid type on sensitivity and response time.',

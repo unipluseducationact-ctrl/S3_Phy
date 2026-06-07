@@ -179,6 +179,7 @@ export const zhHant = {
   'tools.specificHeat.title': '比熱容量實驗室',
   'tools.thermalMixing.title': '熱混合實驗室',
   'tools.changeOfState.title': '物態變化實驗室',
+  'tools.heatTransfer.title': '熱的轉移實驗室',
   'tools.thermometerLab.subtitle': '\u6db2\u9ad4\u73bb\u7483\u3001\u9210\u96fb\u963b\u53ca\u71b1\u654f\u96fb\u963b\u6eab\u5ea6\u8a08\u7684\u4e92\u52d5\u5b78\u7fd2\u4f34\u4fb6\u3002',
   'tools.thermometerLab.liquid.title': '\u6db2\u9ad4\u73bb\u7483\u6eab\u5ea6\u8a08',
   'tools.thermometerLab.liquid.subtitle': '\u63a2\u7d22\u73bb\u7483\u6ce1\u5bb9\u7a4d\u3001\u6bdb\u7d30\u7ba1\u5167\u5916\u5f91\u548c\u6db2\u9ad4\u7a2e\u985e\u5c0d\u9749\u654f\u5ea6\u53ca\u53cd\u61c9\u6642\u9593\u7684\u5f71\u97ff\u3002',
