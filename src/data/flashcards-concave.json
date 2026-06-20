@@ -1,0 +1,50 @@
+[
+  {
+    "id": 1,
+    "topic": "concave",
+    "title": "Ray Rule 1",
+    "front": "./flashcards/concave/01-front.webp",
+    "alt": "Flashcard 1 - Concave Ray Rule 1",
+    "back": "./flashcards/concave/01-front.webp"
+  },
+  {
+    "id": 2,
+    "topic": "concave",
+    "title": "Ray Rule 2",
+    "front": "./flashcards/concave/02-front.webp",
+    "alt": "Flashcard 2 - Concave Ray Rule 2",
+    "back": "./flashcards/concave/02-front.webp"
+  },
+  {
+    "id": 3,
+    "topic": "concave",
+    "title": "Ray Rule 3",
+    "front": "./flashcards/concave/03-front.webp",
+    "alt": "Flashcard 3 - Concave Ray Rule 3",
+    "back": "./flashcards/concave/03-front.webp"
+  },
+  {
+    "id": 4,
+    "topic": "concave",
+    "title": "Image Formation",
+    "front": "./flashcards/concave/04-front.webp",
+    "alt": "Flashcard 4 - Concave Image Formation",
+    "back": "./flashcards/concave/04-front.webp"
+  },
+  {
+    "id": 5,
+    "topic": "concave",
+    "title": "Formula",
+    "front": "./flashcards/concave/05-front.webp",
+    "alt": "Flashcard 5 - Concave Formula",
+    "back": "./flashcards/concave/05-back.webp"
+  },
+  {
+    "id": 6,
+    "topic": "concave",
+    "title": "Key Remarks",
+    "front": "./flashcards/concave/06-front.webp",
+    "alt": "Flashcard 6 - Concave Key Remarks",
+    "back": "./flashcards/concave/06-front.webp"
+  }
+]

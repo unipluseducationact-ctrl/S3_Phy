@@ -3,6 +3,7 @@ import questions from '../data/questions.json';
 import flashcards from '../data/flashcards.json';
 import reflectionImages from '../data/flashcards-reflection.json';
 import convexImages from '../data/flashcards-convex.json';
+import concaveImages from '../data/flashcards-concave.json';
 import { createRotatingMirrorLab } from '../tools/rotatingMirrorLab.js';
 import { createTirEscapeLab } from '../tools/tirEscapeLab.js';
 import { createLensLab } from '../tools/lensLab.js';
@@ -286,15 +287,12 @@ export function mountOpticsHub(root) {
     const deck = flashDeck === 'rotatingMirror' ? 'reflection' : flashDeck;
 
     if (deck === 'all') {
-      const textNoConvex = text.filter((c) => c.topic !== 'convex');
-      return [...reflectionImages, ...convexImages, ...textNoConvex];
+      const textNoLensImages = text.filter((c) => c.topic !== 'convex' && c.topic !== 'concave');
+      return [...reflectionImages, ...convexImages, ...concaveImages, ...textNoLensImages];
     }
     if (deck === 'reflection') return reflectionImages.slice();
     if (deck === 'convex') return convexImages.slice();
-    if (deck === 'concave') {
-      const list = text.filter((c) => c.topic === 'concave');
-      return list.length ? list : text;
-    }
+    if (deck === 'concave') return concaveImages.slice();
     if (deck === 'refractionTir') {
       const list = text.filter((c) => c.topic === 'refraction' || c.topic === 'tir');
       return list.length ? list : text;
