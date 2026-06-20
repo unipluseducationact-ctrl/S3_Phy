@@ -49,8 +49,8 @@ def resize_and_save(src: Path, dest: Path) -> tuple[int, int]:
         return im.size
 
 
-def scan_sources(src: Path) -> tuple[dict[str, dict[str, Path]], list[str]]:
-    groups: dict[str, dict[str, Path]] = {}
+def scan_sources(src: Path) -> tuple[dict[str, dict], list[str]]:
+    groups: dict[str, dict] = {}
     skipped: list[str] = []
 
     for f in sorted(src.iterdir()):
@@ -66,17 +66,32 @@ def scan_sources(src: Path) -> tuple[dict[str, dict[str, Path]], list[str]]:
         side = m.group(2).lower()
         variant = (m.group(3) or "").strip().lower()
 
-        if variant:
-            skipped.append(f.name)
+        groups.setdefault(title, {"front": None, "backs": {}})
+        g = groups[title]
+
+        if side == "front":
+            if variant:
+                skipped.append(f.name)
+                continue
+            if g["front"] is None:
+                g["front"] = f
+            else:
+                skipped.append(f.name)
             continue
 
-        groups.setdefault(title, {})
-        if side not in groups[title]:
-            groups[title][side] = f
-        else:
-            skipped.append(f.name)
+        if side == "back":
+            key = variant or "plain"
+            if key not in g["backs"]:
+                g["backs"][key] = f
+            else:
+                skipped.append(f.name)
 
     return groups, skipped
+
+
+def pick_back(g: dict) -> Path | None:
+    backs = g.get("backs") or {}
+    return backs.get("plain") or backs.get("rays sketched")
 
 
 def main() -> int:
@@ -106,13 +121,13 @@ def main() -> int:
 
     for num, title in enumerate(CARD_ORDER, start=1):
         g = groups.get(title)
-        if not g or "front" not in g:
+        if not g or not g.get("front"):
             missing.append(title)
             report.append(f"- **Card {num}** ({title}): no front image - skipped\n")
             continue
 
         front_src = g["front"]
-        back_src = g.get("back")
+        back_src = pick_back(g)
         prefix = f"{num:02d}"
         front_rel = f"./flashcards/concave/{prefix}-front.webp"
         back_rel = f"./flashcards/concave/{prefix}-back.webp"
