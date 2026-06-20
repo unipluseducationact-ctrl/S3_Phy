@@ -443,6 +443,20 @@ export function mountOpticsHub(root) {
       const card = root.querySelector(`[data-summary-card="${r.key}"]`);
       if (!card) continue;
       const body = card.querySelector('[data-summary-body]');
+
+      if (r.type === 'image') {
+        const ok = await assetExists('summary', r.file);
+        const url = `${import.meta.env.BASE_URL}summary/${r.file}`;
+        if (ok) {
+          body.innerHTML = `
+          <img class="summary-thumb" src="${url}" alt="${t(`summary.item.${r.key}`)}" loading="lazy" />
+          <p style="margin-top:8px"><a href="${url}" target="_blank" rel="noopener">${t('summary.viewImage')}</a></p>`;
+        } else {
+          body.innerHTML = `<p class="lead">${t('summary.missing')}</p>`;
+        }
+        continue;
+      }
+
       const file = lk === 'zhHant' ? r.fileZh : r.fileEn;
       const ok = await assetExists('summary-pdfs', file);
       const url = `${import.meta.env.BASE_URL}summary-pdfs/${file}`;
