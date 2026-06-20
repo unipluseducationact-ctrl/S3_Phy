@@ -15,7 +15,6 @@ TOPICS = [
     ("Reflection", "reflection"),
     ("Refraction and snells law", "refraction"),
     ("Total internal reflection", "tir"),
-    ("Convex lens", "convex"),
     ("Concave lens", "concave"),
     ("EM waves", "em"),
 ]
