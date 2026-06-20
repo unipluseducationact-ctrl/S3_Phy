@@ -1053,6 +1053,8 @@ canvas.lab-canvas {
 
 .flashcard-surface--image {
   padding: 10px;
+  max-width: 480px;
+  margin: 0 auto;
 }
 
 .flashcard-surface .label {
@@ -1074,7 +1076,10 @@ canvas.lab-canvas {
 
 .flashcard-surface .body img {
   max-width: 100%;
+  max-height: min(50vh, 360px);
+  width: auto;
   height: auto;
+  object-fit: contain;
   display: block;
   border-radius: 8px;
   margin: 0 auto;
