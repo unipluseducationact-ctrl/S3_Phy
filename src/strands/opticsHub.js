@@ -404,7 +404,7 @@ export function mountOpticsHub(root) {
       { key: 'refraction', fileEn: 'refraction-en.pdf', fileZh: 'refraction-zhHant.pdf' },
       { key: 'tir', fileEn: 'tir-en.pdf', fileZh: 'tir-zhHant.pdf' },
       { key: 'convex', type: 'image', file: 'convex.webp' },
-      { key: 'concave', fileEn: 'concave-en.pdf', fileZh: 'concave-zhHant.pdf' },
+      { key: 'concave', type: 'image', file: 'concave.webp' },
       { key: 'em', fileEn: 'em-en.pdf', fileZh: 'em-zhHant.pdf' },
     ];
     return `
@@ -433,7 +433,7 @@ export function mountOpticsHub(root) {
       { key: 'refraction', fileEn: 'refraction-en.pdf', fileZh: 'refraction-zhHant.pdf' },
       { key: 'tir', fileEn: 'tir-en.pdf', fileZh: 'tir-zhHant.pdf' },
       { key: 'convex', type: 'image', file: 'convex.webp' },
-      { key: 'concave', fileEn: 'concave-en.pdf', fileZh: 'concave-zhHant.pdf' },
+      { key: 'concave', type: 'image', file: 'concave.webp' },
       { key: 'em', fileEn: 'em-en.pdf', fileZh: 'em-zhHant.pdf' },
     ];
     const lk = langKey();

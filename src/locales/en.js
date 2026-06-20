@@ -149,7 +149,7 @@ export const en = {
   'flashcards.all': 'All topics',
   'flashcards.deck.refractionTir': 'Refraction & TIR',
   'summary.title': 'Topic summaries',
-  'summary.intro': 'HKDSE summary sheets (PDF). Preview below or open in a new tab to download.',
+  'summary.intro': 'HKDSE summary sheets (PDF or image). Preview below or open in a new tab.',
   'summary.viewImage': 'Open full image',
   'summary.download': 'Open / download PDF',
   'summary.missing': 'Summary PDF not found.',
