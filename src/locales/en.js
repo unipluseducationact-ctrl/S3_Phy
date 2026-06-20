@@ -137,7 +137,7 @@ export const en = {
   'worksheets.revisionLow': 'Needs work — study summaries and try again.',
   'worksheets.weakSections': 'Sections to review',
   'flashcards.title': 'Flashcards',
-  'flashcards.intro': 'Flip cards to revise key terms. Reflection uses picture cards from your flashcard set.',
+  'flashcards.intro': 'Flip cards to revise key terms. Reflection and Convex lens use picture cards from your flashcard sets.',
   'flashcards.progress': 'Card {current} of {total}',
   'flashcards.deck': 'Deck',
   'flashcards.question': 'Question',

@@ -137,7 +137,7 @@ export const zhHant = {
   'worksheets.revisionLow': '\u9700\u52aa\u529b \u2014 \u5148\u6e29\u7fd2\u7e3d\u7d50\u518d\u8a66\u3002',
   'worksheets.weakSections': '\u5efa\u8b70\u8907\u7fd2\u7bc0\u6b21',
   'flashcards.title': '\u9583\u5361',
-  'flashcards.intro': '\u7ffb\u5361\u8907\u7fd2\u91cd\u8981\u8a5e\u5f59\u3002\u53cd\u5c04\u8ab2\u984c\u4f7f\u7528\u5716\u7247\u9583\u5361\u3002',
+  'flashcards.intro': '\u7ffb\u5361\u8907\u7fd2\u91cd\u8981\u8a5e\u5f59\u3002\u53cd\u5c04\u8207\u51f8\u900f\u93e1\u8ab2\u984c\u4f7f\u7528\u5716\u7247\u9583\u5361\u3002',
   'flashcards.progress': '\u7b2c {current} \u5f35\uff0c\u5171 {total} \u5f35',
   'flashcards.deck': '\u5361\u7d44',
   'flashcards.question': '\u554f\u984c',

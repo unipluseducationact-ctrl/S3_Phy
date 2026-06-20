@@ -1,0 +1,98 @@
+[
+  {
+    "id": 1,
+    "topic": "convex",
+    "title": "Ray Rule 1",
+    "front": "./flashcards/convex/01-front.webp",
+    "alt": "Flashcard 1 - Ray Rule 1",
+    "back": "./flashcards/convex/01-back.webp"
+  },
+  {
+    "id": 2,
+    "topic": "convex",
+    "title": "Ray Rule 2",
+    "front": "./flashcards/convex/02-front.webp",
+    "alt": "Flashcard 2 - Ray Rule 2",
+    "back": "./flashcards/convex/02-back.webp"
+  },
+  {
+    "id": 3,
+    "topic": "convex",
+    "title": "Ray Rule 3",
+    "front": "./flashcards/convex/03-front.webp",
+    "alt": "Flashcard 3 - Ray Rule 3",
+    "back": "./flashcards/convex/03-back.webp"
+  },
+  {
+    "id": 4,
+    "topic": "convex",
+    "title": "Object at Infinity",
+    "front": "./flashcards/convex/04-front.webp",
+    "alt": "Flashcard 4 - Object at Infinity",
+    "back": "./flashcards/convex/04-back.webp"
+  },
+  {
+    "id": 5,
+    "topic": "convex",
+    "title": "Object beyond 2F",
+    "front": "./flashcards/convex/05-front.webp",
+    "alt": "Flashcard 5 - Object beyond 2F",
+    "back": "./flashcards/convex/05-back.webp"
+  },
+  {
+    "id": 6,
+    "topic": "convex",
+    "title": "Object at 2F",
+    "front": "./flashcards/convex/06-front.webp",
+    "alt": "Flashcard 6 - Object at 2F",
+    "back": "./flashcards/convex/06-back.webp"
+  },
+  {
+    "id": 7,
+    "topic": "convex",
+    "title": "Object between F-2F",
+    "front": "./flashcards/convex/07-front.webp",
+    "alt": "Flashcard 7 - Object between F-2F",
+    "back": "./flashcards/convex/07-back.webp"
+  },
+  {
+    "id": 8,
+    "topic": "convex",
+    "title": "Object between Lens-F",
+    "front": "./flashcards/convex/08-front.webp",
+    "alt": "Flashcard 8 - Object between Lens-F",
+    "back": "./flashcards/convex/08-back.webp"
+  },
+  {
+    "id": 9,
+    "topic": "convex",
+    "title": "Object at F",
+    "front": "./flashcards/convex/09-front.webp",
+    "alt": "Flashcard 9 - Object at F",
+    "back": "./flashcards/convex/09-back.webp"
+  },
+  {
+    "id": 10,
+    "topic": "convex",
+    "title": "Lens Formula",
+    "front": "./flashcards/convex/10-front.webp",
+    "alt": "Flashcard 10 - Lens Formula",
+    "back": "./flashcards/convex/10-back.webp"
+  },
+  {
+    "id": 11,
+    "topic": "convex",
+    "title": "Key Remarks",
+    "front": "./flashcards/convex/11-front.webp",
+    "alt": "Flashcard 11 - Key Remarks",
+    "back": "./flashcards/convex/11-back.webp"
+  },
+  {
+    "id": 12,
+    "topic": "convex",
+    "title": "Applications",
+    "front": "./flashcards/convex/12-front.webp",
+    "alt": "Flashcard 12 - Applications",
+    "back": "./flashcards/convex/12-back.webp"
+  }
+]
