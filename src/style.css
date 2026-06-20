@@ -1098,7 +1098,13 @@ canvas.lab-canvas {
 }
 
 .summary-thumb {
-  width: 100%;
+  max-width: 100%;
+  max-height: min(70vh, 720px);
+  width: auto;
+  height: auto;
+  object-fit: contain;
+  display: block;
+  margin: 0 auto;
   border-radius: 10px;
   border: 1px solid var(--border);
   background: var(--surface2);

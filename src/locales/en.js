@@ -150,6 +150,7 @@ export const en = {
   'flashcards.deck.refractionTir': 'Refraction & TIR',
   'summary.title': 'Topic summaries',
   'summary.intro': 'HKDSE summary sheets (PDF). Preview below or open in a new tab to download.',
+  'summary.viewImage': 'Open full image',
   'summary.download': 'Open / download PDF',
   'summary.missing': 'Summary PDF not found.',
   'footer.conventions': 'Ray diagrams use a consistent thin-lens sign convention stated in each lab.',
