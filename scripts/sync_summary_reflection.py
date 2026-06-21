@@ -1,0 +1,36 @@
+#!/usr/bin/env python3
+"""Sync Reflection summary poster v2 into public/summary/reflection.webp."""
+
+from __future__ import annotations
+
+import sys
+from pathlib import Path
+
+from PIL import Image
+
+ROOT = Path(__file__).resolve().parents[1]
+SRC = Path(r"C:\Users\UniplusUser02\Desktop\PHYS\S3\Optics\Summary\Convex lens") / "Convex Lens Summary Poster - v2.png"
+OUT = ROOT / "public" / "summary" / "reflection.webp"
+MAX_WIDTH = 1400
+WEBP_QUALITY = 82
+
+
+def main() -> int:
+    if not SRC.is_file():
+        print(f"Source not found: {SRC}", file=sys.stderr)
+        return 1
+
+    with Image.open(SRC) as im:
+        im = im.convert("RGB")
+        w, h = im.size
+        if w > MAX_WIDTH:
+            nh = int(h * MAX_WIDTH / w)
+            im = im.resize((MAX_WIDTH, nh), Image.Resampling.LANCZOS)
+        OUT.parent.mkdir(parents=True, exist_ok=True)
+        im.save(OUT, "WEBP", quality=WEBP_QUALITY, method=6)
+        print(f"Wrote {OUT} ({im.size[0]}x{im.size[1]})")
+    return 0
+
+
+if __name__ == "__main__":
+    sys.exit(main())

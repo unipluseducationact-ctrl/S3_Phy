@@ -4,7 +4,71 @@
     "topic": "reflection",
     "title": "Law of Reflection",
     "front": "./flashcards/reflection/01-front.webp",
-    "alt": "Flashcard 1 — Law of Reflection",
+    "alt": "Flashcard 1 - Law of Reflection",
     "back": "./flashcards/reflection/01-back.webp"
+  },
+  {
+    "id": 2,
+    "topic": "reflection",
+    "title": "Angle Definitions",
+    "front": "./flashcards/reflection/02-front.webp",
+    "alt": "Flashcard 2 - Angle Definitions",
+    "back": "./flashcards/reflection/02-back.webp"
+  },
+  {
+    "id": 3,
+    "topic": "reflection",
+    "title": "Ray Diagram Construction",
+    "front": "./flashcards/reflection/03-front.webp",
+    "alt": "Flashcard 3 - Ray Diagram Construction",
+    "back": "./flashcards/reflection/03-back.webp"
+  },
+  {
+    "id": 4,
+    "topic": "reflection",
+    "title": "Image Properties",
+    "front": "./flashcards/reflection/04-front.webp",
+    "alt": "Flashcard 4 - Image Properties",
+    "back": "./flashcards/reflection/04-back.webp"
+  },
+  {
+    "id": 5,
+    "topic": "reflection",
+    "title": "Object-Image Distance",
+    "front": "./flashcards/reflection/05-front.webp",
+    "alt": "Flashcard 5 - Object-Image Distance",
+    "back": "./flashcards/reflection/05-back.webp"
+  },
+  {
+    "id": 6,
+    "topic": "reflection",
+    "title": "Visibility Condition",
+    "front": "./flashcards/reflection/06-front.webp",
+    "alt": "Flashcard 6 - Visibility Condition",
+    "back": "./flashcards/reflection/06-back.webp"
+  },
+  {
+    "id": 7,
+    "topic": "reflection",
+    "title": "Reversibility of Light",
+    "front": "./flashcards/reflection/07-front.webp",
+    "alt": "Flashcard 7 - Reversibility of Light",
+    "back": "./flashcards/reflection/07-back.webp"
+  },
+  {
+    "id": 8,
+    "topic": "reflection",
+    "title": "Lateral Inversion",
+    "front": "./flashcards/reflection/08-front.webp",
+    "alt": "Flashcard 8 - Lateral Inversion",
+    "back": "./flashcards/reflection/08-back.webp"
+  },
+  {
+    "id": 9,
+    "topic": "reflection",
+    "title": "Applications",
+    "front": "./flashcards/reflection/09-front.webp",
+    "alt": "Flashcard 9 - Applications",
+    "back": "./flashcards/reflection/09-back.webp"
   }
 ]

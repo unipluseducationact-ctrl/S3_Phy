@@ -1,5 +1,5 @@
 #!/usr/bin/env python3
-"""Sync Reflection flashcard images from PHYS folder into public/ + manifest."""
+"""Sync Reflection set 2 flashcard images into public/ + manifest."""
 
 from __future__ import annotations
 
@@ -7,13 +7,14 @@ import argparse
 import json
 import re
 import sys
-from collections import defaultdict
 from pathlib import Path
 
 from PIL import Image
 
 ROOT = Path(__file__).resolve().parents[1]
-DEFAULT_SRC = Path(r"C:\Users\UniplusUser02\Desktop\PHYS\S3\Flashcards\Reflection")
+DEFAULT_SRC = Path(
+    r"C:\Users\UniplusUser02\Desktop\PHYS\S3\Optics\Flashcards\Reflection set 2"
+)
 OUT_DIR = ROOT / "public" / "flashcards" / "reflection"
 OUT_JSON = ROOT / "src" / "data" / "flashcards-reflection.json"
 REPORT = ROOT / "scripts" / "flashcards-reflection-sync-report.md"
@@ -21,9 +22,20 @@ REPORT = ROOT / "scripts" / "flashcards-reflection-sync-report.md"
 MAX_WIDTH = 1400
 WEBP_QUALITY = 82
 
-# Flashcard 3 - Title (1).png  |  Flashcard 3 - Title.jpg (no part)
+CARD_ORDER = [
+    "Law of Reflection",
+    "Angle Definitions",
+    "Ray Diagram Construction",
+    "Image Properties",
+    "Object-Image Distance",
+    "Visibility Condition",
+    "Reversibility of Light",
+    "Lateral Inversion",
+    "Applications",
+]
+
 PATTERN = re.compile(
-    r"^Flashcard\s+(\d+)\s*-\s*(.+?)(?:\s*\((\d+)\))?\s*\.(png|jpe?g)$",
+    r"^Reflection\s*-\s*(.+?)\s+(Front|Back)(?:\s*\((.+?)\))?\s*\.(png|jpe?g)$",
     re.IGNORECASE,
 )
 
@@ -40,8 +52,8 @@ def resize_and_save(src: Path, dest: Path) -> tuple[int, int]:
         return im.size
 
 
-def scan_sources(src: Path) -> dict[int, dict]:
-    groups: dict[int, dict] = defaultdict(lambda: {"title": "", "parts": []})
+def scan_sources(src: Path) -> tuple[dict[str, dict], list[str]]:
+    groups: dict[str, dict] = {}
     skipped: list[str] = []
 
     for f in sorted(src.iterdir()):
@@ -52,50 +64,46 @@ def scan_sources(src: Path) -> dict[int, dict]:
             if f.suffix.lower() in {".png", ".jpg", ".jpeg"}:
                 skipped.append(f.name)
             continue
-        num = int(m.group(1))
-        title = m.group(2).strip()
-        part = int(m.group(3)) if m.group(3) else 1
-        ext = m.group(4).lower()
-        groups[num]["title"] = title
-        groups[num]["parts"].append((part, ext, f))
+
+        title = m.group(1).strip()
+        side = m.group(2).lower()
+        variant = (m.group(3) or "").strip().lower()
+
+        groups.setdefault(title, {"front": None, "backs": {}})
+        g = groups[title]
+
+        if side == "front":
+            if variant:
+                skipped.append(f.name)
+                continue
+            if g["front"] is None:
+                g["front"] = f
+            else:
+                skipped.append(f.name)
+            continue
+
+        if side == "back":
+            key = variant or "plain"
+            if key not in g["backs"]:
+                g["backs"][key] = f
+            else:
+                skipped.append(f.name)
 
     return groups, skipped
 
 
-def pick_sides(parts: list[tuple[int, str, Path]]) -> tuple[Path | None, Path | None, list[str]]:
-    """Return (front_src, back_src, skipped_names)."""
-    skipped: list[str] = []
-    by_part: dict[int, list[tuple[str, Path]]] = defaultdict(list)
-    for part, ext, path in parts:
-        by_part[part].append((ext, path))
-
-    def best_for_part(part: int) -> Path | None:
-        items = by_part.get(part)
-        if not items:
-            return None
-        pngs = [p for e, p in items if e == "png"]
-        if pngs:
-            return pngs[0]
-        return items[0][1]
-
-    front = best_for_part(1)
-    back = best_for_part(2)
-
-    used = {front, back} - {None}
-    for part, items in sorted(by_part.items()):
-        for _, path in items:
-            if path not in used:
-                skipped.append(path.name)
-
-    # If only one unique file, single-sided
-    if front and back and front.samefile(back):
-        back = None
-
-    return front, back, skipped
+def pick_back(g: dict) -> Path | None:
+    backs = g.get("backs") or {}
+    if not backs:
+        return None
+    for key in sorted(backs.keys()):
+        if key != "plain":
+            return backs[key]
+    return backs.get("plain")
 
 
 def main() -> int:
-    parser = argparse.ArgumentParser(description="Sync Reflection flashcard images")
+    parser = argparse.ArgumentParser(description="Sync Reflection set 2 flashcard images")
     parser.add_argument("--src", type=Path, default=DEFAULT_SRC, help="Source image folder")
     args = parser.parse_args()
     src: Path = args.src
@@ -105,9 +113,9 @@ def main() -> int:
         return 1
 
     groups, unmapped = scan_sources(src)
-    report: list[str] = ["# Reflection flashcard image sync\n\n"]
+    report: list[str] = ["# Reflection set 2 flashcard image sync\n\n"]
     if unmapped:
-        report.append("## Unmapped image files\n\n")
+        report.append("## Skipped / unmapped files\n\n")
         for n in unmapped:
             report.append(f"- {n}\n")
         report.append("\n")
@@ -117,16 +125,17 @@ def main() -> int:
             old.unlink()
 
     cards: list[dict] = []
-    all_skipped: list[str] = []
+    missing: list[str] = []
 
-    for num in sorted(groups.keys()):
-        g = groups[num]
-        front_src, back_src, skipped = pick_sides(g["parts"])
-        all_skipped.extend(skipped)
-        if not front_src:
-            report.append(f"- **Card {num}**: no usable front image — skipped\n")
+    for num, title in enumerate(CARD_ORDER, start=1):
+        g = groups.get(title)
+        if not g or not g.get("front"):
+            missing.append(title)
+            report.append(f"- **Card {num}** ({title}): no front image - skipped\n")
             continue
 
+        front_src = g["front"]
+        back_src = pick_back(g)
         prefix = f"{num:02d}"
         front_rel = f"./flashcards/reflection/{prefix}-front.webp"
         back_rel = f"./flashcards/reflection/{prefix}-back.webp"
@@ -136,9 +145,9 @@ def main() -> int:
         entry: dict = {
             "id": num,
             "topic": "reflection",
-            "title": g["title"],
+            "title": title,
             "front": front_rel,
-            "alt": f"Flashcard {num} — {g['title']}",
+            "alt": f"Flashcard {num} - {title}",
         }
 
         if back_src:
@@ -146,29 +155,35 @@ def main() -> int:
             bw, bh = resize_and_save(back_src, back_dest)
             entry["back"] = back_rel
             report.append(
-                f"- **Card {num}** ({g['title']}): front {front_src.name} → {fw}×{fh}, "
-                f"back {back_src.name} → {bw}×{bh}\n"
+                f"- **Card {num}** ({title}): front {front_src.name} -> {fw}x{fh}, "
+                f"back {back_src.name} -> {bw}x{bh}\n"
             )
         else:
             entry["back"] = front_rel
             report.append(
-                f"- **Card {num}** ({g['title']}): single-sided from {front_src.name} → {fw}×{fh}\n"
+                f"- **Card {num}** ({title}): single-sided from {front_src.name} -> {fw}x{fh}\n"
             )
 
         cards.append(entry)
 
-    OUT_JSON.write_text(json.dumps(cards, ensure_ascii=False, indent=2) + "\n", encoding="utf-8")
+    if missing:
+        report.append("\n## Missing cards\n\n")
+        for t in missing:
+            report.append(f"- {t}\n")
 
-    if all_skipped:
-        report.append("\n## Duplicates skipped\n\n")
-        for n in sorted(set(all_skipped)):
-            report.append(f"- {n}\n")
+    extra_titles = sorted(set(groups.keys()) - set(CARD_ORDER))
+    if extra_titles:
+        report.append("\n## Source titles not in CARD_ORDER\n\n")
+        for t in extra_titles:
+            report.append(f"- {t}\n")
+
+    OUT_JSON.write_text(json.dumps(cards, ensure_ascii=False, indent=2) + "\n", encoding="utf-8")
 
     report.append(f"\n**Total cards:** {len(cards)}\n")
     REPORT.write_text("".join(report), encoding="utf-8")
     print(f"Wrote {len(cards)} cards -> {OUT_JSON}")
     print(f"Assets -> {OUT_DIR}")
-    return 0
+    return 0 if len(cards) == len(CARD_ORDER) else 1
 
 
 if __name__ == "__main__":

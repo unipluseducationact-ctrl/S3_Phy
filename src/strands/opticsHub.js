@@ -400,7 +400,7 @@ export function mountOpticsHub(root) {
 
   function renderSummary() {
     const items = [
-      { key: 'reflection', fileEn: 'reflection-en.pdf', fileZh: 'reflection-zhHant.pdf' },
+      { key: 'reflection', type: 'image', file: 'reflection.webp' },
       { key: 'refraction', fileEn: 'refraction-en.pdf', fileZh: 'refraction-zhHant.pdf' },
       { key: 'tir', fileEn: 'tir-en.pdf', fileZh: 'tir-zhHant.pdf' },
       { key: 'convex', type: 'image', file: 'convex.webp' },
@@ -429,7 +429,7 @@ export function mountOpticsHub(root) {
 
   async function hydrateSummary() {
     const rows = [
-      { key: 'reflection', fileEn: 'reflection-en.pdf', fileZh: 'reflection-zhHant.pdf' },
+      { key: 'reflection', type: 'image', file: 'reflection.webp' },
       { key: 'refraction', fileEn: 'refraction-en.pdf', fileZh: 'refraction-zhHant.pdf' },
       { key: 'tir', fileEn: 'tir-en.pdf', fileZh: 'tir-zhHant.pdf' },
       { key: 'convex', type: 'image', file: 'convex.webp' },
