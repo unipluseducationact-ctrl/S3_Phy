@@ -2,6 +2,7 @@ import { t, getLang } from '../i18n.js';
 import questions from '../data/questions.json';
 import flashcards from '../data/flashcards.json';
 import reflectionImages from '../data/flashcards-reflection.json';
+import refractionImages from '../data/flashcards-refraction.json';
 import convexImages from '../data/flashcards-convex.json';
 import concaveImages from '../data/flashcards-concave.json';
 import { createRotatingMirrorLab } from '../tools/rotatingMirrorLab.js';
@@ -287,15 +288,23 @@ export function mountOpticsHub(root) {
     const deck = flashDeck === 'rotatingMirror' ? 'reflection' : flashDeck;
 
     if (deck === 'all') {
-      const textNoLensImages = text.filter((c) => c.topic !== 'convex' && c.topic !== 'concave');
-      return [...reflectionImages, ...convexImages, ...concaveImages, ...textNoLensImages];
+      const textNoLensImages = text.filter(
+        (c) => c.topic !== 'convex' && c.topic !== 'concave' && c.topic !== 'refraction',
+      );
+      return [
+        ...reflectionImages,
+        ...refractionImages,
+        ...convexImages,
+        ...concaveImages,
+        ...textNoLensImages,
+      ];
     }
     if (deck === 'reflection') return reflectionImages.slice();
     if (deck === 'convex') return convexImages.slice();
     if (deck === 'concave') return concaveImages.slice();
     if (deck === 'refractionTir') {
-      const list = text.filter((c) => c.topic === 'refraction' || c.topic === 'tir');
-      return list.length ? list : text;
+      const tirText = text.filter((c) => c.topic === 'tir');
+      return [...refractionImages, ...tirText];
     }
     const list = text.filter((c) => c.topic === deck);
     return list.length ? list : text;
@@ -401,7 +410,7 @@ export function mountOpticsHub(root) {
   function renderSummary() {
     const items = [
       { key: 'reflection', type: 'image', file: 'reflection.webp' },
-      { key: 'refraction', fileEn: 'refraction-en.pdf', fileZh: 'refraction-zhHant.pdf' },
+      { key: 'refraction', type: 'image', file: 'refraction.webp' },
       { key: 'tir', fileEn: 'tir-en.pdf', fileZh: 'tir-zhHant.pdf' },
       { key: 'convex', type: 'image', file: 'convex.webp' },
       { key: 'concave', type: 'image', file: 'concave.webp' },
@@ -430,7 +439,7 @@ export function mountOpticsHub(root) {
   async function hydrateSummary() {
     const rows = [
       { key: 'reflection', type: 'image', file: 'reflection.webp' },
-      { key: 'refraction', fileEn: 'refraction-en.pdf', fileZh: 'refraction-zhHant.pdf' },
+      { key: 'refraction', type: 'image', file: 'refraction.webp' },
       { key: 'tir', fileEn: 'tir-en.pdf', fileZh: 'tir-zhHant.pdf' },
       { key: 'convex', type: 'image', file: 'convex.webp' },
       { key: 'concave', type: 'image', file: 'concave.webp' },

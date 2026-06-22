@@ -1,5 +1,5 @@
 #!/usr/bin/env python3
-"""Sync Reflection summary poster v2 into public/summary/reflection.webp."""
+"""Sync Refraction summary poster v2 into public/summary/refraction.webp."""
 
 from __future__ import annotations
 
@@ -9,11 +9,8 @@ from pathlib import Path
 from PIL import Image
 
 ROOT = Path(__file__).resolve().parents[1]
-SRC = (
-    Path(r"C:\Users\UniplusUser02\Desktop\PHYS\S3\Optics\Summary\Reflection")
-    / "Reflection - Summary Poster - v2.png"
-)
-OUT = ROOT / "public" / "summary" / "reflection.webp"
+SRC = Path(r"C:\Users\UniplusUser02\Desktop\PHYS\S3\Optics\Summary\Refraction and snells law") / "Refraction - Summary Poster - v2.png"
+OUT = ROOT / "public" / "summary" / "refraction.webp"
 MAX_WIDTH = 1400
 WEBP_QUALITY = 82
 
