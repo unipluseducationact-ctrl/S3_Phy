@@ -1,0 +1,82 @@
+[
+  {
+    "id": 1,
+    "topic": "heatInternalEnergy",
+    "title": "What is Heat?",
+    "front": "./flashcards/heat-internal-energy/01-front.webp",
+    "alt": "Flashcard 1 - What is Heat?",
+    "back": "./flashcards/heat-internal-energy/01-back.webp"
+  },
+  {
+    "id": 2,
+    "topic": "heatInternalEnergy",
+    "title": "Define Specific Heat Capacity",
+    "front": "./flashcards/heat-internal-energy/02-front.webp",
+    "alt": "Flashcard 2 - Define Specific Heat Capacity",
+    "back": "./flashcards/heat-internal-energy/02-back.webp"
+  },
+  {
+    "id": 3,
+    "topic": "heatInternalEnergy",
+    "title": "E = mcΔT Formula",
+    "front": "./flashcards/heat-internal-energy/03-front.webp",
+    "alt": "Flashcard 3 - E = mcΔT Formula",
+    "back": "./flashcards/heat-internal-energy/03-back.webp"
+  },
+  {
+    "id": 4,
+    "topic": "heatInternalEnergy",
+    "title": "Energy from Power",
+    "front": "./flashcards/heat-internal-energy/04-front.webp",
+    "alt": "Flashcard 4 - Energy from Power",
+    "back": "./flashcards/heat-internal-energy/04-back.webp"
+  },
+  {
+    "id": 5,
+    "topic": "heatInternalEnergy",
+    "title": "Simple SHC Calculation",
+    "front": "./flashcards/heat-internal-energy/05-front.webp",
+    "alt": "Flashcard 5 - Simple SHC Calculation",
+    "back": "./flashcards/heat-internal-energy/05-back.webp"
+  },
+  {
+    "id": 6,
+    "topic": "heatInternalEnergy",
+    "title": "Power-Heater Calculation",
+    "front": "./flashcards/heat-internal-energy/06-front.webp",
+    "alt": "Flashcard 6 - Power-Heater Calculation",
+    "back": "./flashcards/heat-internal-energy/06-back.webp"
+  },
+  {
+    "id": 7,
+    "topic": "heatInternalEnergy",
+    "title": "Conservation of Energy Mixture",
+    "front": "./flashcards/heat-internal-energy/07-front.webp",
+    "alt": "Flashcard 7 - Conservation of Energy Mixture",
+    "back": "./flashcards/heat-internal-energy/07-back.webp"
+  },
+  {
+    "id": 8,
+    "topic": "heatInternalEnergy",
+    "title": "Heat Capacity vs Specific Heat Capacity",
+    "front": "./flashcards/heat-internal-energy/08-front.webp",
+    "alt": "Flashcard 8 - Heat Capacity vs Specific Heat Capacity",
+    "back": "./flashcards/heat-internal-energy/08-back.webp"
+  },
+  {
+    "id": 9,
+    "topic": "heatInternalEnergy",
+    "title": "Factors Affecting Temperature Change",
+    "front": "./flashcards/heat-internal-energy/09-front.webp",
+    "alt": "Flashcard 9 - Factors Affecting Temperature Change",
+    "back": "./flashcards/heat-internal-energy/09-back.webp"
+  },
+  {
+    "id": 10,
+    "topic": "heatInternalEnergy",
+    "title": "Key Applications & Assumptions",
+    "front": "./flashcards/heat-internal-energy/10-front.webp",
+    "alt": "Flashcard 10 - Key Applications & Assumptions",
+    "back": "./flashcards/heat-internal-energy/10-back.webp"
+  }
+]

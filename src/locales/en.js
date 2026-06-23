@@ -176,6 +176,7 @@ export const en = {
   'summary.item.changeOfState': 'Change of state',
   'summary.item.heatTransfer': 'Heat transfer',
   'flashcards.deck.thermometry': 'Thermometry (all types)',
+  'flashcards.deck.heatInternalEnergy': 'Heat and internal energy',
   'tools.thermometerLab.title': 'Thermometry & Calibration Lab',
   'tools.specificHeat.title': 'Specific Heat Capacity Lab',
   'tools.thermalMixing.title': 'Thermal Mixing Lab',
