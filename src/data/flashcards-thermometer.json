@@ -1,0 +1,82 @@
+[
+  {
+    "id": 1,
+    "topic": "thermometer",
+    "title": "What is Temperature?",
+    "front": "./flashcards/thermometer/01-front.webp",
+    "alt": "Flashcard 1 - What is Temperature?",
+    "back": "./flashcards/thermometer/01-back.webp"
+  },
+  {
+    "id": 2,
+    "topic": "thermometer",
+    "title": "Celsius Scale & Fixed Points",
+    "front": "./flashcards/thermometer/02-front.webp",
+    "alt": "Flashcard 2 - Celsius Scale & Fixed Points",
+    "back": "./flashcards/thermometer/02-back.webp"
+  },
+  {
+    "id": 3,
+    "topic": "thermometer",
+    "title": "Calibration of Unmarked Thermometer",
+    "front": "./flashcards/thermometer/03-front.webp",
+    "alt": "Flashcard 3 - Calibration of Unmarked Thermometer",
+    "back": "./flashcards/thermometer/03-back.webp"
+  },
+  {
+    "id": 4,
+    "topic": "thermometer",
+    "title": "Liquid-in-Glass Thermometer",
+    "front": "./flashcards/thermometer/04-front.webp",
+    "alt": "Flashcard 4 - Liquid-in-Glass Thermometer",
+    "back": "./flashcards/thermometer/04-back.webp"
+  },
+  {
+    "id": 5,
+    "topic": "thermometer",
+    "title": "Mercury vs Alcohol Thermometer",
+    "front": "./flashcards/thermometer/05-front.webp",
+    "alt": "Flashcard 5 - Mercury vs Alcohol Thermometer",
+    "back": "./flashcards/thermometer/05-back.webp"
+  },
+  {
+    "id": 6,
+    "topic": "thermometer",
+    "title": "Types of Thermometers",
+    "front": "./flashcards/thermometer/06-front.webp",
+    "alt": "Flashcard 6 - Types of Thermometers",
+    "back": "./flashcards/thermometer/06-back.webp"
+  },
+  {
+    "id": 7,
+    "topic": "thermometer",
+    "title": "Temperature-Dependent Properties",
+    "front": "./flashcards/thermometer/07-front.webp",
+    "alt": "Flashcard 7 - Temperature-Dependent Properties",
+    "back": "./flashcards/thermometer/07-back.webp"
+  },
+  {
+    "id": 8,
+    "topic": "thermometer",
+    "title": "Sensitivity of Thermometer",
+    "front": "./flashcards/thermometer/08-front.webp",
+    "alt": "Flashcard 8 - Sensitivity of Thermometer",
+    "back": "./flashcards/thermometer/08-back.webp"
+  },
+  {
+    "id": 9,
+    "topic": "thermometer",
+    "title": "Calibration Calculation",
+    "front": "./flashcards/thermometer/09-front.webp",
+    "alt": "Flashcard 9 - Calibration Calculation",
+    "back": "./flashcards/thermometer/09-back.webp"
+  },
+  {
+    "id": 10,
+    "topic": "thermometer",
+    "title": "Faulty Thermometer Correction",
+    "front": "./flashcards/thermometer/10-front.webp",
+    "alt": "Flashcard 10 - Faulty Thermometer Correction",
+    "back": "./flashcards/thermometer/10-back.webp"
+  }
+]

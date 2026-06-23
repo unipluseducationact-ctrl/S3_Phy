@@ -1,6 +1,7 @@
 import { t, getLang } from '../i18n.js';
 import questions from '../data/questions.json';
 import flashcards from '../data/flashcards.json';
+import thermometerImages from '../data/flashcards-thermometer.json';
 import { createThermometerLab } from '../tools/thermometerLab.js';
 import { createSpecificHeatLab } from '../tools/specificHeatLab.js';
 import { createThermalMixingLab } from '../tools/thermalMixingLab.js';
@@ -314,10 +315,21 @@ export function mountHeatHub(root) {
     return flashcards.filter((c) => THERMOMETRY_SUBTOPICS.includes(c.topic));
   }
 
+  function isImageCard(card) {
+    return Boolean(card?.front);
+  }
+
+  function flashImageUrl(relPath) {
+    const clean = String(relPath).replace(/^\.\//, '');
+    return `${import.meta.env.BASE_URL}${clean}`;
+  }
+
   function flashDeckList() {
-    const list = heatFlashcards();
-    if (flashDeck === 'all' || flashDeck === 'thermometry') return list;
-    return list.filter((c) => c.topic === flashDeck);
+    if (flashDeck === 'all' || flashDeck === 'thermometry') {
+      return thermometerImages.slice();
+    }
+    const list = heatFlashcards().filter((c) => c.topic === flashDeck);
+    return list.length ? list : heatFlashcards();
   }
 
   function paintFlash() {
@@ -326,7 +338,9 @@ export function mountHeatHub(root) {
     if (!list.length) {
       flashIndex = 0;
       const front = root.querySelector('[data-flash-front]');
+      const surface = root.querySelector('[data-flip-card]');
       if (front) front.textContent = '';
+      if (surface) surface.classList.remove('flashcard-surface--image');
       if (progress) {
         progress.hidden = true;
         progress.textContent = '';
@@ -337,8 +351,9 @@ export function mountHeatHub(root) {
     flashIndex = Math.max(0, Math.min(flashIndex, list.length - 1));
     const card = list[flashIndex];
     const frontEl = root.querySelector('[data-flash-front]');
+    const surface = root.querySelector('[data-flip-card]');
     const labelEl = root.querySelector('[data-flash-label]');
-    if (!frontEl) return;
+    if (!frontEl || !surface) return;
 
     if (progress) {
       progress.hidden = false;
@@ -347,6 +362,24 @@ export function mountHeatHub(root) {
         .replace('{total}', String(list.length));
     }
 
+    if (isImageCard(card)) {
+      const twoSided = card.back && card.back !== card.front;
+      surface.classList.add('flashcard-surface--image');
+      if (labelEl) {
+        if (!twoSided) {
+          labelEl.hidden = true;
+        } else {
+          labelEl.hidden = false;
+          labelEl.textContent = flashShowBack ? t('flashcards.answer') : t('flashcards.question');
+        }
+      }
+      const src = flashShowBack && card.back ? card.back : card.front;
+      const alt = card.alt || card.title || '';
+      frontEl.innerHTML = `<img src="${flashImageUrl(src)}" alt="${alt.replace(/"/g, '&quot;')}" loading="lazy" />`;
+      return;
+    }
+
+    surface.classList.remove('flashcard-surface--image');
     const lk = langKey();
     const pack = card[lk] || card.en;
     if (labelEl) {
@@ -419,6 +452,20 @@ export function mountHeatHub(root) {
       const card = root.querySelector(`[data-summary-card="${r.id}"]`);
       if (!card) continue;
       const body = card.querySelector('[data-summary-body]');
+
+      if (r.id === 'thermometer') {
+        const ok = await assetExists('summary', 'thermometer.webp');
+        const url = `${import.meta.env.BASE_URL}summary/thermometer.webp`;
+        if (ok) {
+          body.innerHTML = `
+          <img class="summary-thumb" src="${url}" alt="${t('summary.item.thermometer')}" loading="lazy" />
+          <p style="margin-top:8px"><a href="${url}" target="_blank" rel="noopener">${t('summary.viewImage')}</a></p>`;
+        } else {
+          body.innerHTML = `<p class="lead">${t('summary.missing')}</p>`;
+        }
+        continue;
+      }
+
       const file = lk === 'zhHant' ? r.fileZh : r.fileEn;
       const ok = await noteExists(file);
       const url = `${import.meta.env.BASE_URL}notes/${file}`;
