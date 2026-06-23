@@ -1,0 +1,98 @@
+[
+  {
+    "id": 1,
+    "topic": "em",
+    "title": "EM Spectrum Order",
+    "front": "./flashcards/em/01-front.webp",
+    "alt": "Flashcard 1 - EM Spectrum Order",
+    "back": "./flashcards/em/01-back.webp"
+  },
+  {
+    "id": 2,
+    "topic": "em",
+    "title": "Common Properties",
+    "front": "./flashcards/em/02-front.webp",
+    "alt": "Flashcard 2 - Common Properties",
+    "back": "./flashcards/em/02-back.webp"
+  },
+  {
+    "id": 3,
+    "topic": "em",
+    "title": "Speed & Equation",
+    "front": "./flashcards/em/03-front.webp",
+    "alt": "Flashcard 3 - Speed & Equation",
+    "back": "./flashcards/em/03-back.webp"
+  },
+  {
+    "id": 4,
+    "topic": "em",
+    "title": "Radio Waves & Microwaves",
+    "front": "./flashcards/em/04-front.webp",
+    "alt": "Flashcard 4 - Radio Waves & Microwaves",
+    "back": "./flashcards/em/04-back.webp"
+  },
+  {
+    "id": 5,
+    "topic": "em",
+    "title": "Infrared",
+    "front": "./flashcards/em/05-front.webp",
+    "alt": "Flashcard 5 - Infrared",
+    "back": "./flashcards/em/05-back.webp"
+  },
+  {
+    "id": 6,
+    "topic": "em",
+    "title": "Visible Light & Ultraviolet",
+    "front": "./flashcards/em/06-front.webp",
+    "alt": "Flashcard 6 - Visible Light & Ultraviolet",
+    "back": "./flashcards/em/06-back.webp"
+  },
+  {
+    "id": 7,
+    "topic": "em",
+    "title": "X-rays & Gamma Rays",
+    "front": "./flashcards/em/07-front.webp",
+    "alt": "Flashcard 7 - X-rays & Gamma Rays",
+    "back": "./flashcards/em/07-back.webp"
+  },
+  {
+    "id": 8,
+    "topic": "em",
+    "title": "White Light & Spectrum",
+    "front": "./flashcards/em/08-front.webp",
+    "alt": "Flashcard 8 - White Light & Spectrum",
+    "back": "./flashcards/em/08-back.webp"
+  },
+  {
+    "id": 9,
+    "topic": "em",
+    "title": "Primary Colours",
+    "front": "./flashcards/em/09-front.webp",
+    "alt": "Flashcard 9 - Primary Colours",
+    "back": "./flashcards/em/09-back.webp"
+  },
+  {
+    "id": 10,
+    "topic": "em",
+    "title": "Secondary Colours",
+    "front": "./flashcards/em/10-front.webp",
+    "alt": "Flashcard 10 - Secondary Colours",
+    "back": "./flashcards/em/10-back.webp"
+  },
+  {
+    "id": 11,
+    "topic": "em",
+    "title": "Object Colours",
+    "front": "./flashcards/em/11-front.webp",
+    "alt": "Flashcard 11 - Object Colours",
+    "back": "./flashcards/em/11-back.webp"
+  },
+  {
+    "id": 12,
+    "topic": "em",
+    "title": "Wavelength & Frequency",
+    "front": "./flashcards/em/12-front.webp",
+    "alt": "Flashcard 12 - Wavelength & Frequency",
+    "back": "./flashcards/em/12-back.webp"
+  }
+]

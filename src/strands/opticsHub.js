@@ -4,6 +4,7 @@ import flashcards from '../data/flashcards.json';
 import reflectionImages from '../data/flashcards-reflection.json';
 import refractionImages from '../data/flashcards-refraction.json';
 import tirImages from '../data/flashcards-tir.json';
+import emImages from '../data/flashcards-em.json';
 import convexImages from '../data/flashcards-convex.json';
 import concaveImages from '../data/flashcards-concave.json';
 import { createRotatingMirrorLab } from '../tools/rotatingMirrorLab.js';
@@ -294,12 +295,14 @@ export function mountOpticsHub(root) {
           c.topic !== 'convex' &&
           c.topic !== 'concave' &&
           c.topic !== 'refraction' &&
-          c.topic !== 'tir',
+          c.topic !== 'tir' &&
+          c.topic !== 'em',
       );
       return [
         ...reflectionImages,
         ...refractionImages,
         ...tirImages,
+        ...emImages,
         ...convexImages,
         ...concaveImages,
         ...textNoLensImages,
@@ -311,6 +314,7 @@ export function mountOpticsHub(root) {
     if (deck === 'refractionTir') {
       return [...refractionImages, ...tirImages];
     }
+    if (deck === 'em') return emImages.slice();
     const list = text.filter((c) => c.topic === deck);
     return list.length ? list : text;
   }
@@ -419,7 +423,7 @@ export function mountOpticsHub(root) {
       { key: 'tir', type: 'image', file: 'tir.webp' },
       { key: 'convex', type: 'image', file: 'convex.webp' },
       { key: 'concave', type: 'image', file: 'concave.webp' },
-      { key: 'em', fileEn: 'em-en.pdf', fileZh: 'em-zhHant.pdf' },
+      { key: 'em', type: 'image', file: 'em.webp' },
     ];
     return `
       <section class="panel">
@@ -448,7 +452,7 @@ export function mountOpticsHub(root) {
       { key: 'tir', type: 'image', file: 'tir.webp' },
       { key: 'convex', type: 'image', file: 'convex.webp' },
       { key: 'concave', type: 'image', file: 'concave.webp' },
-      { key: 'em', fileEn: 'em-en.pdf', fileZh: 'em-zhHant.pdf' },
+      { key: 'em', type: 'image', file: 'em.webp' },
     ];
     const lk = langKey();
     for (const r of rows) {
