@@ -1,0 +1,74 @@
+[
+  {
+    "id": 1,
+    "topic": "tir",
+    "title": "What is TIR",
+    "front": "./flashcards/tir/01-front.webp",
+    "alt": "Flashcard 1 - What is TIR",
+    "back": "./flashcards/tir/01-back.webp"
+  },
+  {
+    "id": 2,
+    "topic": "tir",
+    "title": "Two Conditions",
+    "front": "./flashcards/tir/02-front.webp",
+    "alt": "Flashcard 2 - Two Conditions",
+    "back": "./flashcards/tir/02-back.webp"
+  },
+  {
+    "id": 3,
+    "topic": "tir",
+    "title": "Critical Angle",
+    "front": "./flashcards/tir/03-front.webp",
+    "alt": "Flashcard 3 - Critical Angle",
+    "back": "./flashcards/tir/03-back.webp"
+  },
+  {
+    "id": 4,
+    "topic": "tir",
+    "title": "Three Scenarios",
+    "front": "./flashcards/tir/04-front.webp",
+    "alt": "Flashcard 4 - Three Scenarios",
+    "back": "./flashcards/tir/04-back.webp"
+  },
+  {
+    "id": 5,
+    "topic": "tir",
+    "title": "Fish Eye View",
+    "front": "./flashcards/tir/05-front.webp",
+    "alt": "Flashcard 5 - Fish Eye View",
+    "back": "./flashcards/tir/05-back.webp"
+  },
+  {
+    "id": 6,
+    "topic": "tir",
+    "title": "Mirage",
+    "front": "./flashcards/tir/06-front.webp",
+    "alt": "Flashcard 6 - Mirage",
+    "back": "./flashcards/tir/06-back.webp"
+  },
+  {
+    "id": 7,
+    "topic": "tir",
+    "title": "Reflecting Prisms",
+    "front": "./flashcards/tir/07-front.webp",
+    "alt": "Flashcard 7 - Reflecting Prisms",
+    "back": "./flashcards/tir/07-back.webp"
+  },
+  {
+    "id": 8,
+    "topic": "tir",
+    "title": "Optical Fibres",
+    "front": "./flashcards/tir/08-front.webp",
+    "alt": "Flashcard 8 - Optical Fibres",
+    "back": "./flashcards/tir/08-back.webp"
+  },
+  {
+    "id": 9,
+    "topic": "tir",
+    "title": "Advantages",
+    "front": "./flashcards/tir/09-front.webp",
+    "alt": "Flashcard 9 - Advantages",
+    "back": "./flashcards/tir/09-back.webp"
+  }
+]
