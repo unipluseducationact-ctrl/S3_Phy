@@ -178,6 +178,7 @@ export const en = {
   'flashcards.deck.thermometry': 'Thermometry (all types)',
   'flashcards.deck.heatInternalEnergy': 'Heat and internal energy',
   'flashcards.deck.changeOfState': 'Change of state',
+  'flashcards.deck.heatTransfer': 'Heat transfer',
   'tools.thermometerLab.title': 'Thermometry & Calibration Lab',
   'tools.specificHeat.title': 'Specific Heat Capacity Lab',
   'tools.thermalMixing.title': 'Thermal Mixing Lab',

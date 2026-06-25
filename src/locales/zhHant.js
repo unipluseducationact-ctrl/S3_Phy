@@ -178,6 +178,7 @@ export const zhHant = {
   'flashcards.deck.thermometry': '\u6eab\u5ea6\u8a08\uff08\u5404\u985e\uff09',
   'flashcards.deck.heatInternalEnergy': '\u71b1\u8207\u5167\u80fd',
   'flashcards.deck.changeOfState': '\u7269\u614b\u8b8a\u5316',
+  'flashcards.deck.heatTransfer': '\u71b1\u50b3\u5165',
   'tools.thermometerLab.title': '\u6eab\u5ea6\u8a08\u8207\u6821\u6e96\u5be6\u9a57\u5ba4',
   'tools.specificHeat.title': '比熱容量實驗室',
   'tools.thermalMixing.title': '熱混合實驗室',

@@ -4,6 +4,7 @@ import flashcards from '../data/flashcards.json';
 import thermometerImages from '../data/flashcards-thermometer.json';
 import heatInternalEnergyImages from '../data/flashcards-heat-internal-energy.json';
 import changeOfStateImages from '../data/flashcards-change-of-state.json';
+import heatTransferImages from '../data/flashcards-heat-transfer.json';
 import { createThermometerLab } from '../tools/thermometerLab.js';
 import { createSpecificHeatLab } from '../tools/specificHeatLab.js';
 import { createThermalMixingLab } from '../tools/thermalMixingLab.js';
@@ -297,6 +298,7 @@ export function mountHeatHub(root) {
             <option value="thermometry">${t('flashcards.deck.thermometry')}</option>
             <option value="heatInternalEnergy">${t('flashcards.deck.heatInternalEnergy')}</option>
             <option value="changeOfState">${t('flashcards.deck.changeOfState')}</option>
+            <option value="heatTransfer">${t('flashcards.deck.heatTransfer')}</option>
           </select>
         </div>
         <div class="flashcard-box">
@@ -330,7 +332,7 @@ export function mountHeatHub(root) {
 
   function flashDeckList() {
     if (flashDeck === 'all') {
-      return [...thermometerImages, ...heatInternalEnergyImages, ...changeOfStateImages];
+      return [...thermometerImages, ...heatInternalEnergyImages, ...changeOfStateImages, ...heatTransferImages];
     }
     if (flashDeck === 'thermometry') {
       return thermometerImages.slice();
@@ -340,6 +342,9 @@ export function mountHeatHub(root) {
     }
     if (flashDeck === 'changeOfState') {
       return changeOfStateImages.slice();
+    }
+    if (flashDeck === 'heatTransfer') {
+      return heatTransferImages.slice();
     }
     const list = heatFlashcards().filter((c) => c.topic === flashDeck);
     return list.length ? list : heatFlashcards();
@@ -498,6 +503,19 @@ export function mountHeatHub(root) {
         if (ok) {
           body.innerHTML = `
           <img class="summary-thumb" src="${url}" alt="${t('summary.item.changeOfState')}" loading="lazy" />
+          <p style="margin-top:8px"><a href="${url}" target="_blank" rel="noopener">${t('summary.viewImage')}</a></p>`;
+        } else {
+          body.innerHTML = `<p class="lead">${t('summary.missing')}</p>`;
+        }
+        continue;
+      }
+
+      if (r.id === 'heatTransfer') {
+        const ok = await assetExists('summary', 'heat-transfer.webp');
+        const url = `${import.meta.env.BASE_URL}summary/heat-transfer.webp`;
+        if (ok) {
+          body.innerHTML = `
+          <img class="summary-thumb" src="${url}" alt="${t('summary.item.heatTransfer')}" loading="lazy" />
           <p style="margin-top:8px"><a href="${url}" target="_blank" rel="noopener">${t('summary.viewImage')}</a></p>`;
         } else {
           body.innerHTML = `<p class="lead">${t('summary.missing')}</p>`;
