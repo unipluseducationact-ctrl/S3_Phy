@@ -1,5 +1,5 @@
 #!/usr/bin/env python3
-"""Sync Reflection summary poster v2 into public/summary/reflection.webp."""
+"""Sync Reflection bilingual summary posters into public/summary/."""
 
 from __future__ import annotations
 
@@ -9,29 +9,43 @@ from pathlib import Path
 from PIL import Image
 
 ROOT = Path(__file__).resolve().parents[1]
-SRC = (
-    Path(r"C:\Users\UniplusUser02\Desktop\PHYS\S3\Optics\Summary\Reflection")
-    / "Reflection - Summary Poster - v2.png"
-)
-OUT = ROOT / "public" / "summary" / "reflection.webp"
+SRC_DIR = Path(r"C:\Users\UniplusUser02\Desktop\PHYS\S3\Optics\Summary\Reflection")
+POSTERS = {
+    "reflection-en.webp": SRC_DIR / "EN-Reflection-Summary-Poster-v10.png",
+    "reflection-zhHant.webp": SRC_DIR / "ZH-Reflection-Summary-Poster-v10.png",
+}
+OUT_DIR = ROOT / "public" / "summary"
 MAX_WIDTH = 1400
 WEBP_QUALITY = 82
 
 
-def main() -> int:
-    if not SRC.is_file():
-        print(f"Source not found: {SRC}", file=sys.stderr)
-        return 1
-
-    with Image.open(SRC) as im:
+def resize_and_save(src: Path, dest: Path) -> tuple[int, int]:
+    with Image.open(src) as im:
         im = im.convert("RGB")
         w, h = im.size
         if w > MAX_WIDTH:
             nh = int(h * MAX_WIDTH / w)
             im = im.resize((MAX_WIDTH, nh), Image.Resampling.LANCZOS)
-        OUT.parent.mkdir(parents=True, exist_ok=True)
-        im.save(OUT, "WEBP", quality=WEBP_QUALITY, method=6)
-        print(f"Wrote {OUT} ({im.size[0]}x{im.size[1]})")
+        OUT_DIR.mkdir(parents=True, exist_ok=True)
+        im.save(dest, "WEBP", quality=WEBP_QUALITY, method=6)
+        return im.size
+
+
+def main() -> int:
+    missing = [name for name, src in POSTERS.items() if not src.is_file()]
+    if missing:
+        for name in missing:
+            print(f"Source not found for {name}: {POSTERS[name]}", file=sys.stderr)
+        return 1
+
+    legacy = OUT_DIR / "reflection.webp"
+    if legacy.is_file():
+        legacy.unlink()
+
+    for out_name, src in POSTERS.items():
+        out = OUT_DIR / out_name
+        w, h = resize_and_save(src, out)
+        print(f"Wrote {out} ({w}x{h}) from {src.name}")
     return 0
 
 
