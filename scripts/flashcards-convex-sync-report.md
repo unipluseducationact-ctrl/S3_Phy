@@ -1,28 +1,28 @@
-# Convex lens set 2 flashcard image sync
+# Convex lens set 3 bilingual flashcard image sync
 
-## Skipped / unmapped files
-
-- Object at 2F - Back (symbol strict).png
-- Object at F - Back (symbol strict).png
-- Object at Infinity - Back (symbol strict).png
-- Object between F-2F - Back (symbol strict).png
-- Object between Lens-F - Back (symbol strict).png
-- Object beyond 2F - Back (symbol strict).png
-- Ray Rule 1 - Back (symbol strict).png
-- Ray Rule 2 - Back (symbol strict).png
-- Ray Rule 3 - Back (symbol strict).png
-
-- **Card 1** (Ray Rule 1): front Ray Rule 1 - Front.png -> 1400x2100, back Ray Rule 1 - Back.png -> 1400x2100
-- **Card 2** (Ray Rule 2): front Ray Rule 2 - Front.png -> 1400x2100, back Ray Rule 2 - Back.png -> 1400x2100
-- **Card 3** (Ray Rule 3): front Ray Rule 3 - Front.png -> 1400x2100, back Ray Rule 3 - Back.png -> 1400x2100
-- **Card 4** (Object at Infinity): front Object at Infinity - Front.png -> 1400x2100, back Object at Infinity - Back.png -> 1400x2100
-- **Card 5** (Object beyond 2F): front Object beyond 2F - Front.png -> 1400x2100, back Object beyond 2F - Back.png -> 1400x2100
-- **Card 6** (Object at 2F): front Object at 2F - Front.png -> 1400x2100, back Object at 2F - Back.png -> 1400x2100
-- **Card 7** (Object between F-2F): front Object between F-2F - Front.png -> 1400x2100, back Object between F-2F - Back.png -> 1400x2100
-- **Card 8** (Object between Lens-F): front Object between Lens-F - Front.png -> 1400x2100, back Object between Lens-F - Back.png -> 1400x2100
-- **Card 9** (Object at F): front Object at F - Front.png -> 1400x2100, back Object at F - Back.png -> 1400x2100
-- **Card 10** (Lens Formula): front Lens Formula - Front.png -> 1400x2100, back Lens Formula - Back.png -> 1400x2100
-- **Card 11** (Key Remarks): front Key Remarks - Front.png -> 1400x2100, back Key Remarks - Back.png -> 1400x2100
-- **Card 12** (Applications): front Applications - Front.png -> 1400x2100, back Applications - Back.png -> 1400x2100
+- **Card 1** (Ray Rule 1, en): front EN-CL-RayRule1-Front.png -> 1400x1400, back EN-CL-RayRule1-Back.png -> 1400x1400
+- **Card 1** (Ray Rule 1, zhHant): front ZH-CL-RayRule1-Front.png -> 1400x1400, back ZH-CL-RayRule1-Back.png -> 1400x1400
+- **Card 2** (Ray Rule 2, en): front EN-CL-RayRule2-Front.png -> 1400x1400, back EN-CL-RayRule2-Back.png -> 1400x1400
+- **Card 2** (Ray Rule 2, zhHant): front ZH-CL-RayRule2-Front.png -> 1400x1400, back ZH-CL-RayRule2-Back.png -> 1400x1400
+- **Card 3** (Ray Rule 3, en): front EN-CL-RayRule3-Front.png -> 1400x1400, back EN-CL-RayRule3-Back.png -> 1400x1400
+- **Card 3** (Ray Rule 3, zhHant): front ZH-CL-RayRule3-Front.png -> 1400x1400, back ZH-CL-RayRule3-Back.png -> 1400x1400
+- **Card 4** (Object at Infinity, en): front EN-CL-ObjectInfinity-Front-v2.png -> 1024x1536, back EN-CL-ObjectInfinity-Back-v2.png -> 1024x1536
+- **Card 4** (Object at Infinity, zhHant): front ZH-CL-ObjectInfinity-Front-v2.png -> 1024x1536, back ZH-CL-ObjectInfinity-Back-v2.png -> 1024x1536
+- **Card 5** (Object beyond 2F, en): front EN-CL-ObjectBeyond2F-Front.png -> 1400x1400, back EN-CL-ObjectBeyond2F-Back.png -> 1400x1400
+- **Card 5** (Object beyond 2F, zhHant): front ZH-CL-ObjectBeyond2F-Front.png -> 1400x1400, back ZH-CL-ObjectBeyond2F-Back.png -> 1400x1400
+- **Card 6** (Object at 2F, en): front EN-CL-ObjectAt2F-Front.png -> 1400x1400, back EN-CL-ObjectAt2F-Back.png -> 1400x1400
+- **Card 6** (Object at 2F, zhHant): front ZH-CL-ObjectAt2F-Front.png -> 1400x1400, back ZH-CL-ObjectAt2F-Back.png -> 1400x1400
+- **Card 7** (Object between F-2F, en): front EN-CL-ObjectF2F-Front.png -> 1400x1400, back EN-CL-ObjectF2F-Back.png -> 1400x1400
+- **Card 7** (Object between F-2F, zhHant): front ZH-CL-ObjectF2F-Front.png -> 1400x1400, back ZH-CL-ObjectF2F-Back.png -> 1400x1400
+- **Card 8** (Object between Lens-F, en): front EN-CL-ObjectLensF-Front.png -> 1400x1400, back EN-CL-ObjectLensF-Back.png -> 1400x1400
+- **Card 8** (Object between Lens-F, zhHant): front ZH-CL-ObjectLensF-Front.png -> 1024x1536, back ZH-CL-ObjectLensF-Back.png -> 1024x1536
+- **Card 9** (Object at F, en): front EN-CL-ObjectAtF-Front.png -> 1400x1400, back EN-CL-ObjectAtF-Back.png -> 1400x1400
+- **Card 9** (Object at F, zhHant): front ZH-CL-ObjectAtF-Front.png -> 1400x1400, back ZH-CL-ObjectAtF-Back.png -> 1400x1400
+- **Card 10** (Lens Formula, en): front EN-CL-LensFormula-Front.png -> 1400x1400, back EN-CL-LensFormula-Back.png -> 1400x1400
+- **Card 10** (Lens Formula, zhHant): front ZH-CL-LensFormula-Front.png -> 1024x1536, back ZH-CL-LensFormula-Back.png -> 1024x1536
+- **Card 11** (Key Remarks, en): front EN-CL-KeyRemarks-Front.png -> 1400x1400, back EN-CL-KeyRemarks-Back.png -> 1400x1400
+- **Card 11** (Key Remarks, zhHant): front ZH-CL-KeyRemarks-Front.png -> 1024x1536, back ZH-CL-KeyRemarks-Back.png -> 1024x1536
+- **Card 12** (Applications, en): front EN-CL-Applications-Front.png -> 1400x1400, back EN-CL-Applications-Back.png -> 1400x1400
+- **Card 12** (Applications, zhHant): front ZH-CL-Applications-Front.png -> 1024x1536, back ZH-CL-Applications-Back.png -> 1024x1536
 
 **Total cards:** 12

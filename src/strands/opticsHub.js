@@ -429,7 +429,7 @@ export function mountOpticsHub(root) {
       { key: 'reflection', type: 'image', file: 'reflection.webp' },
       { key: 'refraction', type: 'image', file: 'refraction.webp' },
       { key: 'tir', type: 'image', file: 'tir.webp' },
-      { key: 'convex', type: 'image', file: 'convex.webp' },
+      { key: 'convex', type: 'image', fileEn: 'convex-en.webp', fileZh: 'convex-zhHant.webp' },
       { key: 'concave', type: 'image', fileEn: 'concave-en.webp', fileZh: 'concave-zhHant.webp' },
       { key: 'em', type: 'image', file: 'em.webp' },
     ];
@@ -458,7 +458,7 @@ export function mountOpticsHub(root) {
       { key: 'reflection', type: 'image', file: 'reflection.webp' },
       { key: 'refraction', type: 'image', file: 'refraction.webp' },
       { key: 'tir', type: 'image', file: 'tir.webp' },
-      { key: 'convex', type: 'image', file: 'convex.webp' },
+      { key: 'convex', type: 'image', fileEn: 'convex-en.webp', fileZh: 'convex-zhHant.webp' },
       { key: 'concave', type: 'image', fileEn: 'concave-en.webp', fileZh: 'concave-zhHant.webp' },
       { key: 'em', type: 'image', file: 'em.webp' },
     ];
