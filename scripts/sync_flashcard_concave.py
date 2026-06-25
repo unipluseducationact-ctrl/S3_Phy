@@ -1,5 +1,5 @@
 #!/usr/bin/env python3
-"""Sync Concave lens set 2 flashcard images into public/ + manifest."""
+"""Sync Concave lens set 3 bilingual flashcard images into public/ + manifest."""
 
 from __future__ import annotations
 
@@ -13,7 +13,7 @@ from PIL import Image
 
 ROOT = Path(__file__).resolve().parents[1]
 DEFAULT_SRC = Path(
-    r"C:\Users\UniplusUser02\Desktop\PHYS\S3\Optics\Flashcards\Concave lens set 2"
+    r"C:\Users\UniplusUser02\Desktop\PHYS\S3\Optics\Flashcards\Concave lens set 3"
 )
 OUT_DIR = ROOT / "public" / "flashcards" / "concave"
 OUT_JSON = ROOT / "src" / "data" / "flashcards-concave.json"
@@ -23,16 +23,30 @@ MAX_WIDTH = 1400
 WEBP_QUALITY = 82
 
 CARD_ORDER = [
-    "Concave Ray Rule 1",
-    "Concave Ray Rule 2",
-    "Concave Ray Rule 3",
-    "Concave Image Formation",
-    "Concave Formula",
-    "Concave Key Remarks",
+    "RayRule1",
+    "RayRule2",
+    "RayRule3",
+    "ImageFormation",
+    "Formula",
+    "KeyRemarks",
 ]
 
+CARD_TITLES = {
+    "RayRule1": "Ray Rule 1",
+    "RayRule2": "Ray Rule 2",
+    "RayRule3": "Ray Rule 3",
+    "ImageFormation": "Image Formation",
+    "Formula": "Formula",
+    "KeyRemarks": "Key Remarks",
+}
+
+LANG_DIRS = {
+    "en": "English",
+    "zh": "Traditional Chinese",
+}
+
 PATTERN = re.compile(
-    r"^(.+?)\s*-\s*(Front|Back)(?:\s*\((.+?)\))?\s*\.(png|jpe?g)$",
+    r"^(EN|ZH)-Concave-(.+?)-(Front|Back)(?:\s*-\s*v\d+)?\.(png|jpe?g)$",
     re.IGNORECASE,
 )
 
@@ -49,11 +63,14 @@ def resize_and_save(src: Path, dest: Path) -> tuple[int, int]:
         return im.size
 
 
-def scan_sources(src: Path) -> tuple[dict[str, dict], list[str]]:
-    groups: dict[str, dict] = {}
+def scan_lang_folder(folder: Path) -> tuple[dict[str, dict[str, Path]], list[str]]:
+    groups: dict[str, dict[str, Path]] = {}
     skipped: list[str] = []
 
-    for f in sorted(src.iterdir()):
+    if not folder.is_dir():
+        return groups, skipped
+
+    for f in sorted(folder.iterdir()):
         if not f.is_file():
             continue
         m = PATTERN.match(f.name)
@@ -62,40 +79,21 @@ def scan_sources(src: Path) -> tuple[dict[str, dict], list[str]]:
                 skipped.append(f.name)
             continue
 
-        title = m.group(1).strip()
-        side = m.group(2).lower()
-        variant = (m.group(3) or "").strip().lower()
-
-        groups.setdefault(title, {"front": None, "backs": {}})
-        g = groups[title]
-
-        if side == "front":
-            if variant:
-                skipped.append(f.name)
-                continue
-            if g["front"] is None:
-                g["front"] = f
-            else:
-                skipped.append(f.name)
-            continue
-
-        if side == "back":
-            key = variant or "plain"
-            if key not in g["backs"]:
-                g["backs"][key] = f
-            else:
-                skipped.append(f.name)
+        title = m.group(2).strip()
+        side = m.group(3).lower()
+        groups.setdefault(title, {})
+        if side not in groups[title]:
+            groups[title][side] = f
+        else:
+            skipped.append(f.name)
 
     return groups, skipped
 
 
-def pick_back(g: dict) -> Path | None:
-    backs = g.get("backs") or {}
-    return backs.get("plain") or backs.get("rays sketched")
-
-
 def main() -> int:
-    parser = argparse.ArgumentParser(description="Sync Concave lens set 2 flashcard images")
+    parser = argparse.ArgumentParser(
+        description="Sync Concave lens set 3 bilingual flashcard images"
+    )
     parser.add_argument("--src", type=Path, default=DEFAULT_SRC, help="Source image folder")
     args = parser.parse_args()
     src: Path = args.src
@@ -104,11 +102,19 @@ def main() -> int:
         print(f"Source folder not found: {src}", file=sys.stderr)
         return 1
 
-    groups, unmapped = scan_sources(src)
-    report: list[str] = ["# Concave lens set 2 flashcard image sync\n\n"]
-    if unmapped:
+    lang_groups: dict[str, dict[str, dict[str, Path]]] = {}
+    all_skipped: list[str] = []
+
+    for lang_key, dir_name in LANG_DIRS.items():
+        folder = src / dir_name
+        groups, skipped = scan_lang_folder(folder)
+        lang_groups[lang_key] = groups
+        all_skipped.extend(f"{dir_name}/{n}" for n in skipped)
+
+    report: list[str] = ["# Concave lens set 3 bilingual flashcard image sync\n\n"]
+    if all_skipped:
         report.append("## Skipped / unmapped files\n\n")
-        for n in unmapped:
+        for n in all_skipped:
             report.append(f"- {n}\n")
         report.append("\n")
 
@@ -119,54 +125,59 @@ def main() -> int:
     cards: list[dict] = []
     missing: list[str] = []
 
-    for num, title in enumerate(CARD_ORDER, start=1):
-        g = groups.get(title)
-        if not g or not g.get("front"):
-            missing.append(title)
-            report.append(f"- **Card {num}** ({title}): no front image - skipped\n")
-            continue
-
-        front_src = g["front"]
-        back_src = pick_back(g)
+    for num, card_key in enumerate(CARD_ORDER, start=1):
         prefix = f"{num:02d}"
-        front_rel = f"./flashcards/concave/{prefix}-front.webp"
-        back_rel = f"./flashcards/concave/{prefix}-back.webp"
-        front_dest = OUT_DIR / f"{prefix}-front.webp"
-
-        fw, fh = resize_and_save(front_src, front_dest)
+        title = CARD_TITLES[card_key]
         entry: dict = {
             "id": num,
             "topic": "concave",
-            "title": title.replace("Concave ", "", 1),
-            "front": front_rel,
-            "alt": f"Flashcard {num} - {title}",
+            "title": title,
+            "alt": f"Flashcard {num} - Concave {title}",
         }
 
-        if back_src:
-            back_dest = OUT_DIR / f"{prefix}-back.webp"
-            bw, bh = resize_and_save(back_src, back_dest)
-            entry["back"] = back_rel
-            report.append(
-                f"- **Card {num}** ({title}): front {front_src.name} -> {fw}x{fh}, "
-                f"back {back_src.name} -> {bw}x{bh}\n"
-            )
-        else:
-            entry["back"] = front_rel
-            report.append(
-                f"- **Card {num}** ({title}): single-sided from {front_src.name} -> {fw}x{fh}\n"
-            )
+        card_ok = True
+        for lang_key, json_key in (("en", "en"), ("zh", "zhHant")):
+            g = lang_groups.get(lang_key, {}).get(card_key)
+            if not g or "front" not in g:
+                missing.append(f"{json_key}:{card_key}")
+                card_ok = False
+                report.append(
+                    f"- **Card {num}** ({title}, {json_key}): no front image - skipped lang pack\n"
+                )
+                continue
 
-        cards.append(entry)
+            front_src = g["front"]
+            back_src = g.get("back")
+            front_rel = f"./flashcards/concave/{prefix}-{lang_key}-front.webp"
+            back_rel = f"./flashcards/concave/{prefix}-{lang_key}-back.webp"
+            front_dest = OUT_DIR / f"{prefix}-{lang_key}-front.webp"
+
+            fw, fh = resize_and_save(front_src, front_dest)
+            pack: dict[str, str] = {"front": front_rel}
+
+            if back_src:
+                back_dest = OUT_DIR / f"{prefix}-{lang_key}-back.webp"
+                bw, bh = resize_and_save(back_src, back_dest)
+                pack["back"] = back_rel
+                report.append(
+                    f"- **Card {num}** ({title}, {json_key}): front {front_src.name} -> {fw}x{fh}, "
+                    f"back {back_src.name} -> {bw}x{bh}\n"
+                )
+            else:
+                pack["back"] = front_rel
+                report.append(
+                    f"- **Card {num}** ({title}, {json_key}): single-sided from "
+                    f"{front_src.name} -> {fw}x{fh}\n"
+                )
+
+            entry[json_key] = pack
+
+        if card_ok:
+            cards.append(entry)
 
     if missing:
         report.append("\n## Missing cards\n\n")
         for t in missing:
-            report.append(f"- {t}\n")
-
-    extra_titles = sorted(set(groups.keys()) - set(CARD_ORDER))
-    if extra_titles:
-        report.append("\n## Source titles not in CARD_ORDER\n\n")
-        for t in extra_titles:
             report.append(f"- {t}\n")
 
     OUT_JSON.write_text(json.dumps(cards, ensure_ascii=False, indent=2) + "\n", encoding="utf-8")

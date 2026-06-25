@@ -273,7 +273,14 @@ export function mountOpticsHub(root) {
   }
 
   function isImageCard(card) {
-    return Boolean(card?.front);
+    return Boolean(card?.front || card?.en?.front || card?.zhHant?.front);
+  }
+
+  function imageCardPack(card) {
+    const lk = langKey();
+    if (card?.[lk]?.front) return card[lk];
+    if (card?.front) return card;
+    return card?.en || card?.zhHant || {};
   }
 
   function flashImageUrl(relPath) {
@@ -350,7 +357,8 @@ export function mountOpticsHub(root) {
     }
 
     if (isImageCard(card)) {
-      const twoSided = card.back && card.back !== card.front;
+      const pack = imageCardPack(card);
+      const twoSided = pack.back && pack.back !== pack.front;
       surface.classList.add('flashcard-surface--image');
       if (labelEl) {
         if (!twoSided) {
@@ -360,7 +368,7 @@ export function mountOpticsHub(root) {
           labelEl.textContent = flashShowBack ? t('flashcards.answer') : t('flashcards.question');
         }
       }
-      const src = flashShowBack && card.back ? card.back : card.front;
+      const src = flashShowBack && pack.back ? pack.back : pack.front;
       const alt = card.alt || card.title || '';
       frontEl.innerHTML = `<img src="${flashImageUrl(src)}" alt="${alt.replace(/"/g, '&quot;')}" loading="lazy" />`;
       return;
@@ -422,7 +430,7 @@ export function mountOpticsHub(root) {
       { key: 'refraction', type: 'image', file: 'refraction.webp' },
       { key: 'tir', type: 'image', file: 'tir.webp' },
       { key: 'convex', type: 'image', file: 'convex.webp' },
-      { key: 'concave', type: 'image', file: 'concave.webp' },
+      { key: 'concave', type: 'image', fileEn: 'concave-en.webp', fileZh: 'concave-zhHant.webp' },
       { key: 'em', type: 'image', file: 'em.webp' },
     ];
     return `
@@ -451,7 +459,7 @@ export function mountOpticsHub(root) {
       { key: 'refraction', type: 'image', file: 'refraction.webp' },
       { key: 'tir', type: 'image', file: 'tir.webp' },
       { key: 'convex', type: 'image', file: 'convex.webp' },
-      { key: 'concave', type: 'image', file: 'concave.webp' },
+      { key: 'concave', type: 'image', fileEn: 'concave-en.webp', fileZh: 'concave-zhHant.webp' },
       { key: 'em', type: 'image', file: 'em.webp' },
     ];
     const lk = langKey();
@@ -461,8 +469,9 @@ export function mountOpticsHub(root) {
       const body = card.querySelector('[data-summary-body]');
 
       if (r.type === 'image') {
-        const ok = await assetExists('summary', r.file);
-        const url = `${import.meta.env.BASE_URL}summary/${r.file}`;
+        const file = r.fileEn && r.fileZh ? (lk === 'zhHant' ? r.fileZh : r.fileEn) : r.file;
+        const ok = await assetExists('summary', file);
+        const url = `${import.meta.env.BASE_URL}summary/${file}`;
         if (ok) {
           body.innerHTML = `
           <img class="summary-thumb" src="${url}" alt="${t(`summary.item.${r.key}`)}" loading="lazy" />
