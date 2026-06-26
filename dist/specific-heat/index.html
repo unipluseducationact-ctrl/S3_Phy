@@ -37,17 +37,17 @@
       .lab-section .lab-controls { grid-column: span 4 / span 4; }
       .lab-section .lab-viz { grid-column: span 4 / span 4; }
       .lab-section .lab-steps { grid-column: span 4 / span 4; }
-      .lab-section.controls-collapsed .lab-controls { grid-column: span 1 / span 1; }
-      .lab-section.controls-collapsed .lab-viz { grid-column: span 7 / span 7; }
+      .lab-section.controls-collapsed .lab-controls { grid-column: span 2 / span 2; }
+      .lab-section.controls-collapsed .lab-viz { grid-column: span 6 / span 6; }
       .lab-section.controls-collapsed .lab-steps { grid-column: span 4 / span 4; }
     }
     .lab-section.controls-collapsed .lab-controls-body,
     .lab-section.controls-collapsed .lab-controls-desc { display: none; }
     .lab-section.controls-collapsed .lab-controls-title-text { display: none; }
     .lab-section.controls-collapsed .lab-controls-header { justify-content: center; }
-    .lab-section.controls-collapsed .lab-controls-actions { flex-direction: column; gap: 0.5rem; }
-    .lab-section.controls-collapsed .lab-controls-actions .lab-btn-label { display: none; }
-    .lab-section.controls-collapsed .lab-controls-actions button { padding: 0.625rem; justify-content: center; }
+    .lab-section.controls-collapsed .lab-controls-actions { flex-direction: row; gap: 0.5rem; }
+    .lab-section.controls-collapsed .lab-controls-actions button { padding: 0.625rem 0.75rem; justify-content: center; }
+    .lab-controls-actions button.flex-1 { white-space: nowrap; min-width: 0; }
     .lab-viz { display: flex; flex-direction: column; min-height: 0; }
     .lab-viz-canvas { aspect-ratio: 4 / 3; }
     .lab-section.controls-collapsed .lab-viz-canvas { aspect-ratio: auto; flex: 1; min-height: 360px; }
@@ -61,7 +61,7 @@
 
   <main class="flex-grow w-full mx-auto px-2 py-1.5">
     <!-- SPECIFIC HEAT CAPACITY LAB -->
-    <section id="tabContent-heating" class="lab-section controls-collapsed grid grid-cols-1 lg:grid-cols-12 gap-4">
+    <section id="tabContent-heating" class="lab-section controls-collapsed grid grid-cols-1 lg:grid-cols-12 gap-2">
       <!-- Left: Controls -->
       <div class="lab-controls lg:col-span-4 bg-white p-3.5 rounded-2xl shadow-sm border border-slate-200 flex flex-col gap-3">
         <div class="lab-controls-header flex items-center gap-2">
@@ -304,16 +304,16 @@
       
       // Update Button Text
       if (heatState.running) {
-        document.getElementById("startHeatBtn").innerHTML = `<i data-lucide="pause" class="w-5 h-5"></i><span>${currentLang === 'en' ? 'Pause Lab' : '暫停實驗'}</span>`;
+        document.getElementById("startHeatBtn").innerHTML = `<i data-lucide="pause" class="w-5 h-5"></i><span class="lab-btn-label">${currentLang === 'en' ? 'Pause Lab' : '暫停實驗'}</span>`;
       } else {
         if (heatState.timeElapsed > 0) {
           if (heatState.timeElapsed >= heatState.duration) {
-            document.getElementById("startHeatBtn").innerHTML = `<i data-lucide="play" class="w-5 h-5"></i><span>${currentLang === 'en' ? 'Start Lab' : '開始實驗'}</span>`;
+            document.getElementById("startHeatBtn").innerHTML = `<i data-lucide="play" class="w-5 h-5"></i><span class="lab-btn-label">${currentLang === 'en' ? 'Start Lab' : '開始實驗'}</span>`;
           } else {
-            document.getElementById("startHeatBtn").innerHTML = `<i data-lucide="play" class="w-5 h-5"></i><span>${currentLang === 'en' ? 'Resume Lab' : '繼續實驗'}</span>`;
+            document.getElementById("startHeatBtn").innerHTML = `<i data-lucide="play" class="w-5 h-5"></i><span class="lab-btn-label">${currentLang === 'en' ? 'Resume Lab' : '繼續實驗'}</span>`;
           }
         } else {
-          document.getElementById("startHeatBtn").innerHTML = `<i data-lucide="play" class="w-5 h-5"></i><span>${currentLang === 'en' ? 'Start Lab' : '開始實驗'}</span>`;
+          document.getElementById("startHeatBtn").innerHTML = `<i data-lucide="play" class="w-5 h-5"></i><span class="lab-btn-label">${currentLang === 'en' ? 'Start Lab' : '開始實驗'}</span>`;
         }
       }
 
@@ -494,7 +494,7 @@
       document.getElementById("liveEnergy").textContent = "E = 0 J";
       document.getElementById("liveTime").textContent = `t = 0 / ${heatState.duration} s`;
       document.getElementById("liveHeatLoss").textContent = "Heat Loss: 0 W";
-      document.getElementById("startHeatBtn").innerHTML = `<i data-lucide="play" class="w-5 h-5"></i><span>${currentLang === 'en' ? 'Start Lab' : '開始實驗'}</span>`;
+      document.getElementById("startHeatBtn").innerHTML = `<i data-lucide="play" class="w-5 h-5"></i><span class="lab-btn-label">${currentLang === 'en' ? 'Start Lab' : '開始實驗'}</span>`;
       lucide.createIcons();
       document.getElementById("heatingSteps").innerHTML = `<div class="text-slate-400 text-center py-10">${currentLang === 'en' ? 'Click "Start Lab" to see calculation steps.' : '點擊「開始實驗」以顯示詳細計算步驟。'}</div>`;
       drawHeatingLab();
@@ -506,11 +506,11 @@
       if (heatState.running) {
         clearInterval(heatInterval);
         heatState.running = false;
-        document.getElementById("startHeatBtn").innerHTML = `<i data-lucide="play" class="w-5 h-5"></i><span>${currentLang === 'en' ? 'Resume Lab' : '繼續實驗'}</span>`;
+        document.getElementById("startHeatBtn").innerHTML = `<i data-lucide="play" class="w-5 h-5"></i><span class="lab-btn-label">${currentLang === 'en' ? 'Resume Lab' : '繼續實驗'}</span>`;
         lucide.createIcons();
       } else {
         heatState.running = true;
-        document.getElementById("startHeatBtn").innerHTML = `<i data-lucide="pause" class="w-5 h-5"></i><span>${currentLang === 'en' ? 'Pause Lab' : '暫停實驗'}</span>`;
+        document.getElementById("startHeatBtn").innerHTML = `<i data-lucide="pause" class="w-5 h-5"></i><span class="lab-btn-label">${currentLang === 'en' ? 'Pause Lab' : '暫停實驗'}</span>`;
         lucide.createIcons();
 
         const fps = 30;
@@ -562,7 +562,7 @@
           if (ended) {
             clearInterval(heatInterval);
             heatState.running = false;
-            document.getElementById("startHeatBtn").innerHTML = `<i data-lucide="play" class="w-5 h-5"></i><span>${currentLang === 'en' ? 'Start Lab' : '開始實驗'}</span>`;
+            document.getElementById("startHeatBtn").innerHTML = `<i data-lucide="play" class="w-5 h-5"></i><span class="lab-btn-label">${currentLang === 'en' ? 'Start Lab' : '開始實驗'}</span>`;
             lucide.createIcons();
           }
 

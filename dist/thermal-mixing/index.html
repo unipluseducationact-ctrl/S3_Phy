@@ -37,17 +37,17 @@
       .lab-section .lab-controls { grid-column: span 4 / span 4; }
       .lab-section .lab-viz { grid-column: span 4 / span 4; }
       .lab-section .lab-steps { grid-column: span 4 / span 4; }
-      .lab-section.controls-collapsed .lab-controls { grid-column: span 1 / span 1; }
-      .lab-section.controls-collapsed .lab-viz { grid-column: span 7 / span 7; }
+      .lab-section.controls-collapsed .lab-controls { grid-column: span 2 / span 2; }
+      .lab-section.controls-collapsed .lab-viz { grid-column: span 6 / span 6; }
       .lab-section.controls-collapsed .lab-steps { grid-column: span 4 / span 4; }
     }
     .lab-section.controls-collapsed .lab-controls-body,
     .lab-section.controls-collapsed .lab-controls-desc { display: none; }
     .lab-section.controls-collapsed .lab-controls-title-text { display: none; }
     .lab-section.controls-collapsed .lab-controls-header { justify-content: center; }
-    .lab-section.controls-collapsed .lab-controls-actions { flex-direction: column; gap: 0.5rem; }
-    .lab-section.controls-collapsed .lab-controls-actions .lab-btn-label { display: none; }
-    .lab-section.controls-collapsed .lab-controls-actions button { padding: 0.625rem; justify-content: center; }
+    .lab-section.controls-collapsed .lab-controls-actions { flex-direction: row; gap: 0.5rem; }
+    .lab-section.controls-collapsed .lab-controls-actions button { padding: 0.625rem 0.75rem; justify-content: center; }
+    .lab-controls-actions button.flex-1 { white-space: nowrap; min-width: 0; }
     .lab-viz { display: flex; flex-direction: column; min-height: 0; }
     .lab-viz-canvas { aspect-ratio: 4 / 3; }
     .lab-section.controls-collapsed .lab-viz-canvas { aspect-ratio: auto; flex: 1; min-height: 360px; }
@@ -61,7 +61,7 @@
 
   <main class="flex-grow w-full mx-auto px-2 py-1.5">
     <!-- TAB 2: LIQUID MIXING LAB -->
-    <section id="tabContent-mixing" class="lab-section controls-collapsed grid grid-cols-1 lg:grid-cols-12 gap-4">
+    <section id="tabContent-mixing" class="lab-section controls-collapsed grid grid-cols-1 lg:grid-cols-12 gap-2">
       <!-- Left: Controls -->
       <div class="lab-controls lg:col-span-4 bg-white p-3.5 rounded-2xl shadow-sm border border-slate-200 flex flex-col gap-3">
         <div class="lab-controls-header flex items-center gap-2">
@@ -341,9 +341,9 @@
 
       // Action Button Text
       if (mixState.running) {
-        document.getElementById("startMixBtn").innerHTML = `<i data-lucide="pause" class="w-5 h-5"></i><span>${currentLang === 'en' ? 'Pause' : '暫停'}</span>`;
+        document.getElementById("startMixBtn").innerHTML = `<i data-lucide="pause" class="w-5 h-5"></i><span class="lab-btn-label">${currentLang === 'en' ? 'Pause' : '暫停'}</span>`;
       } else {
-        document.getElementById("startMixBtn").innerHTML = `<i data-lucide="play" class="w-5 h-5"></i><span>${currentLang === 'en' ? 'Run Mixing' : '開始混合'}</span>`;
+        document.getElementById("startMixBtn").innerHTML = `<i data-lucide="play" class="w-5 h-5"></i><span class="lab-btn-label">${currentLang === 'en' ? 'Run Mixing' : '開始混合'}</span>`;
       }
 
       // Calculation steps or placeholder
@@ -540,7 +540,7 @@
       document.getElementById("liveTempA").textContent = `${currentLang === 'en' ? 'Substance A' : '物質 A'} (${nameA}): ${mixState.tempA.toFixed(1)} °C`;
       document.getElementById("liveTempB").textContent = `${currentLang === 'en' ? 'Substance B' : '物質 B'} (${nameB}): ${mixState.tempB.toFixed(1)} °C`;
       document.getElementById("liveTempMix").textContent = `${currentLang === 'en' ? 'Equilibrium' : '平衡溫度'}: -- °C`;
-      document.getElementById("startMixBtn").innerHTML = `<i data-lucide="play" class="w-5 h-5"></i><span>${currentLang === 'en' ? 'Run Mixing' : '開始混合'}</span>`;
+      document.getElementById("startMixBtn").innerHTML = `<i data-lucide="play" class="w-5 h-5"></i><span class="lab-btn-label">${currentLang === 'en' ? 'Run Mixing' : '開始混合'}</span>`;
       lucide.createIcons();
       document.getElementById("mixingSteps").innerHTML = `<div class="text-slate-400 text-center py-10">${currentLang === 'en' ? 'Click "Run Mixing" to see calculation steps.' : '點擊「開始混合」以顯示詳細計算步驟。'}</div>`;
       drawMixingLab();
@@ -552,11 +552,11 @@
       if (mixState.running) {
         clearInterval(mixInterval);
         mixState.running = false;
-        document.getElementById("startMixBtn").innerHTML = `<i data-lucide="play" class="w-5 h-5"></i><span>${currentLang === 'en' ? 'Run Mixing' : '開始混合'}</span>`;
+        document.getElementById("startMixBtn").innerHTML = `<i data-lucide="play" class="w-5 h-5"></i><span class="lab-btn-label">${currentLang === 'en' ? 'Run Mixing' : '開始混合'}</span>`;
         lucide.createIcons();
       } else {
         mixState.running = true;
-        document.getElementById("startMixBtn").innerHTML = `<i data-lucide="pause" class="w-5 h-5"></i><span>${currentLang === 'en' ? 'Pause' : '暫停'}</span>`;
+        document.getElementById("startMixBtn").innerHTML = `<i data-lucide="pause" class="w-5 h-5"></i><span class="lab-btn-label">${currentLang === 'en' ? 'Pause' : '暫停'}</span>`;
         lucide.createIcons();
 
         const fps = 30;
@@ -641,7 +641,7 @@
                   mixState.tempCurA = 0;
                   clearInterval(mixInterval);
                   mixState.running = false;
-                  document.getElementById("startMixBtn").innerHTML = `<i data-lucide="play" class="w-5 h-5"></i><span>${currentLang === 'en' ? 'Run Mixing' : '開始混合'}</span>`;
+                  document.getElementById("startMixBtn").innerHTML = `<i data-lucide="play" class="w-5 h-5"></i><span class="lab-btn-label">${currentLang === 'en' ? 'Run Mixing' : '開始混合'}</span>`;
                   lucide.createIcons();
                 }
               }
@@ -663,7 +663,7 @@
                 mixState.tempCurB = finalEquilibrium;
                 clearInterval(mixInterval);
                 mixState.running = false;
-                document.getElementById("startMixBtn").innerHTML = `<i data-lucide="play" class="w-5 h-5"></i><span>${currentLang === 'en' ? 'Run Mixing' : '開始混合'}</span>`;
+                document.getElementById("startMixBtn").innerHTML = `<i data-lucide="play" class="w-5 h-5"></i><span class="lab-btn-label">${currentLang === 'en' ? 'Run Mixing' : '開始混合'}</span>`;
                 lucide.createIcons();
               } else {
                 const deltaTA = (tempDiff * rate * totalCapB / (totalCapA + totalCapB)) * dt;

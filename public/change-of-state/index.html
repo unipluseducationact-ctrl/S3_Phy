@@ -39,17 +39,17 @@
       .lab-section .lab-controls { grid-column: span 4 / span 4; }
       .lab-section .lab-viz { grid-column: span 4 / span 4; }
       .lab-section .lab-steps { grid-column: span 4 / span 4; }
-      .lab-section.controls-collapsed .lab-controls { grid-column: span 1 / span 1; }
-      .lab-section.controls-collapsed .lab-viz { grid-column: span 7 / span 7; }
+      .lab-section.controls-collapsed .lab-controls { grid-column: span 2 / span 2; }
+      .lab-section.controls-collapsed .lab-viz { grid-column: span 6 / span 6; }
       .lab-section.controls-collapsed .lab-steps { grid-column: span 4 / span 4; }
     }
     .lab-section.controls-collapsed .lab-controls-body,
     .lab-section.controls-collapsed .lab-controls-desc { display: none; }
     .lab-section.controls-collapsed .lab-controls-title-text { display: none; }
     .lab-section.controls-collapsed .lab-controls-header { justify-content: center; }
-    .lab-section.controls-collapsed .lab-controls-actions { flex-direction: column; gap: 0.5rem; }
-    .lab-section.controls-collapsed .lab-controls-actions .lab-btn-label { display: none; }
-    .lab-section.controls-collapsed .lab-controls-actions button { padding: 0.625rem; justify-content: center; }
+    .lab-section.controls-collapsed .lab-controls-actions { flex-direction: row; gap: 0.5rem; }
+    .lab-section.controls-collapsed .lab-controls-actions button { padding: 0.625rem 0.75rem; justify-content: center; }
+    .lab-controls-actions button.flex-1 { white-space: nowrap; min-width: 0; }
     .lab-viz { display: flex; flex-direction: column; min-height: 0; }
     .lab-viz-canvas { aspect-ratio: 4 / 3; }
     .lab-section.controls-collapsed .lab-viz-canvas { aspect-ratio: auto; flex: 1; min-height: 360px; }
@@ -63,7 +63,7 @@
 
   <main class="flex-grow w-full mx-auto px-2 py-1.5">
     <!-- TAB 3: CHANGE OF STATE LAB -->
-    <section id="tabContent-state" class="lab-section controls-collapsed grid grid-cols-1 lg:grid-cols-12 gap-4">
+    <section id="tabContent-state" class="lab-section controls-collapsed grid grid-cols-1 lg:grid-cols-12 gap-2">
       <!-- Left: Controls -->
       <div class="lab-controls lg:col-span-4 bg-white p-3.5 rounded-2xl shadow-sm border border-slate-200 flex flex-col gap-3">
         <div class="lab-controls-header flex items-center gap-2">
@@ -359,15 +359,15 @@
 
       // Action Button
       if (stateState.running) {
-        document.getElementById("startStateBtn").innerHTML = `<i data-lucide="pause" class="w-5 h-5"></i><span>${currentLang === 'en' ? 'Pause' : '暫停'}</span>`;
+        document.getElementById("startStateBtn").innerHTML = `<i data-lucide="pause" class="w-5 h-5"></i><span class="lab-btn-label">${currentLang === 'en' ? 'Pause' : '暫停'}</span>`;
       } else {
         const isPaused = stateState.timeElapsed > 0;
         if (isPaused) {
           const btnText = stateState.mode === "heating" ? (currentLang === 'en' ? 'Resume Heating' : '繼續加熱') : (currentLang === 'en' ? 'Resume Cooling' : '繼續冷卻');
-          document.getElementById("startStateBtn").innerHTML = `<i data-lucide="play" class="w-5 h-5"></i><span>${btnText}</span>`;
+          document.getElementById("startStateBtn").innerHTML = `<i data-lucide="play" class="w-5 h-5"></i><span class="lab-btn-label">${btnText}</span>`;
         } else {
           const btnText = stateState.mode === "heating" ? (currentLang === 'en' ? 'Start Heating' : '開始加熱') : (currentLang === 'en' ? 'Start Cooling' : '開始冷卻');
-          document.getElementById("startStateBtn").innerHTML = `<i data-lucide="play" class="w-5 h-5"></i><span>${btnText}</span>`;
+          document.getElementById("startStateBtn").innerHTML = `<i data-lucide="play" class="w-5 h-5"></i><span class="lab-btn-label">${btnText}</span>`;
         }
       }
 
@@ -649,7 +649,7 @@
       document.getElementById("liveStateLoss").textContent = "Heat Loss: 0 W";
 
       const btnText = stateState.mode === "heating" ? (currentLang === 'en' ? 'Start Heating' : '開始加熱') : (currentLang === 'en' ? 'Start Cooling' : '開始冷卻');
-      document.getElementById("startStateBtn").innerHTML = `<i data-lucide="play" class="w-5 h-5"></i><span>${btnText}</span>`;
+      document.getElementById("startStateBtn").innerHTML = `<i data-lucide="play" class="w-5 h-5"></i><span class="lab-btn-label">${btnText}</span>`;
       lucide.createIcons();
       document.getElementById("stateSteps").innerHTML = `<div class="text-slate-400 text-center py-10">${currentLang === 'en' ? 'Click "Start" to see calculation steps.' : '點擊「開始」以顯示詳細計算步驟。'}</div>`;
 
@@ -665,11 +665,11 @@
         stateState.running = false;
         
         const btnText = stateState.mode === "heating" ? (currentLang === 'en' ? 'Resume Heating' : '繼續加熱') : (currentLang === 'en' ? 'Resume Cooling' : '繼續冷卻');
-        document.getElementById("startStateBtn").innerHTML = `<i data-lucide="play" class="w-5 h-5"></i><span>${btnText}</span>`;
+        document.getElementById("startStateBtn").innerHTML = `<i data-lucide="play" class="w-5 h-5"></i><span class="lab-btn-label">${btnText}</span>`;
         lucide.createIcons();
       } else {
         stateState.running = true;
-        document.getElementById("startStateBtn").innerHTML = `<i data-lucide="pause" class="w-5 h-5"></i><span>${currentLang === 'en' ? 'Pause' : '暫停'}</span>`;
+        document.getElementById("startStateBtn").innerHTML = `<i data-lucide="pause" class="w-5 h-5"></i><span class="lab-btn-label">${currentLang === 'en' ? 'Pause' : '暫停'}</span>`;
         lucide.createIcons();
 
         const fps = 30;
@@ -768,7 +768,7 @@
                 stateState.phase = "vaporized";
                 clearInterval(stateInterval);
                 stateState.running = false;
-                document.getElementById("startStateBtn").innerHTML = `<i data-lucide="play" class="w-5 h-5"></i><span>${currentLang === 'en' ? 'Start Heating' : '開始加熱'}</span>`;
+                document.getElementById("startStateBtn").innerHTML = `<i data-lucide="play" class="w-5 h-5"></i><span class="lab-btn-label">${currentLang === 'en' ? 'Start Heating' : '開始加熱'}</span>`;
                 lucide.createIcons();
               }
             } else if (stateState.isSealed && E < E5) {
@@ -785,7 +785,7 @@
               stateState.temp = stateState.isSealed ? 140 : Tb;
               clearInterval(stateInterval);
               stateState.running = false;
-              document.getElementById("startStateBtn").innerHTML = `<i data-lucide="play" class="w-5 h-5"></i><span>${currentLang === 'en' ? 'Start Heating' : '開始加熱'}</span>`;
+              document.getElementById("startStateBtn").innerHTML = `<i data-lucide="play" class="w-5 h-5"></i><span class="lab-btn-label">${currentLang === 'en' ? 'Start Heating' : '開始加熱'}</span>`;
               lucide.createIcons();
             }
           } else {
@@ -812,7 +812,7 @@
               stateState.phase = "vaporized";
               clearInterval(stateInterval);
               stateState.running = false;
-              document.getElementById("startStateBtn").innerHTML = `<i data-lucide="play" class="w-5 h-5"></i><span>${currentLang === 'en' ? 'Start Cooling' : '開始冷卻'}</span>`;
+              document.getElementById("startStateBtn").innerHTML = `<i data-lucide="play" class="w-5 h-5"></i><span class="lab-btn-label">${currentLang === 'en' ? 'Start Cooling' : '開始冷卻'}</span>`;
               lucide.createIcons();
             }
           }
