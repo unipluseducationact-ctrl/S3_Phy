@@ -4,15 +4,19 @@
  */
 export function assetUrl(relPath) {
   const clean = String(relPath).replace(/^\.\//, '');
+  const origin = window.location.origin;
+  const path = window.location.pathname;
+
+  const distMatch = path.match(/^(.*\/dist)\/?/);
+  if (distMatch) {
+    return `${origin}${distMatch[1]}/${clean}`;
+  }
+
   let base = import.meta.env.BASE_URL || './';
   if (!base.endsWith('/')) base += '/';
+  const pageDir = path.endsWith('/')
+    ? path
+    : path.replace(/\/[^/]*$/, '/') || '/';
 
-  const pagePath = window.location.pathname;
-  const pageDir = pagePath.endsWith('/')
-    ? pagePath
-    : pagePath.endsWith('/dist')
-      ? `${pagePath}/`
-      : pagePath.replace(/\/[^/]*$/, '/') || '/';
-
-  return new URL(`${base}${clean}`, `${window.location.origin}${pageDir}`).href;
+  return new URL(`${base}${clean}`, `${origin}${pageDir}`).href;
 }
