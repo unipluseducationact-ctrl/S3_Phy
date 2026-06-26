@@ -51,16 +51,53 @@
     .lab-section.controls-collapsed .lab-controls-actions button { padding: 0.625rem 0.75rem; justify-content: center; }
     .lab-controls-actions button.flex-1 { white-space: nowrap; min-width: 0; }
     .lab-viz { display: flex; flex-direction: column; min-height: 0; }
-    .lab-viz-canvas { aspect-ratio: 4 / 3; }
-    .lab-section.controls-collapsed .lab-viz-canvas { aspect-ratio: auto; flex: 1; min-height: 360px; }
-    /* Dual-panel viz (animation + chart): keep fixed canvas ratio, no flex-grow overlap */
-    .lab-viz-dual { overflow-y: auto; min-height: 0; }
+    .lab-viz-canvas { aspect-ratio: 4 / 3; width: 100%; }
+    .lab-section.controls-collapsed .lab-viz:not(.lab-viz-dual) .lab-viz-canvas { aspect-ratio: auto; flex: 1; min-height: 360px; }
+    /* Dual-panel viz (animation + chart): grid stack, bounded heights, no flex-grow overlap */
+    .lab-viz-dual {
+      display: grid;
+      grid-template-rows: auto auto;
+      gap: 0.75rem;
+      align-content: start;
+      min-height: 0;
+      overflow-y: auto;
+      overflow-x: hidden;
+    }
     @media (min-width: 1024px) {
       .lab-viz-dual { max-height: calc(100dvh - 44px); }
     }
-    .lab-viz-dual .lab-viz-panel { flex: none; flex-shrink: 0; }
-    .lab-viz-dual .lab-viz-canvas { aspect-ratio: 4 / 3; flex: none; min-height: 0; }
-    .lab-section.controls-collapsed .lab-viz-dual .lab-viz-canvas { aspect-ratio: 3 / 2; flex: none; min-height: unset; }
+    .lab-viz-dual .lab-viz-panel {
+      flex: none;
+      flex-shrink: 0;
+      min-height: 0;
+      overflow: hidden;
+      position: relative;
+      z-index: 1;
+    }
+    .lab-viz-dual .lab-viz-panel-chart { z-index: 2; }
+    .lab-viz-dual .lab-viz-canvas {
+      aspect-ratio: 16 / 10;
+      width: 100%;
+      height: auto;
+      max-height: 240px;
+      flex: none !important;
+      min-height: 0 !important;
+      overflow: hidden;
+    }
+    .lab-viz-dual .lab-viz-chart-wrap {
+      aspect-ratio: 16 / 10;
+      width: 100%;
+      height: auto;
+      max-height: 220px;
+      overflow: hidden;
+    }
+    .lab-viz-dual .lab-viz-canvas canvas,
+    .lab-viz-dual .lab-viz-chart-wrap canvas {
+      display: block;
+      width: 100% !important;
+      height: 100% !important;
+      max-height: 100%;
+    }
     .lab-controls-toggle { display: flex; align-items: center; gap: 0.5rem; width: 100%; text-align: left; background: none; border: none; cursor: pointer; padding: 0; }
     .lab-controls-toggle:hover { opacity: 0.85; }
     .lab-controls-toggle-icon { transition: transform 0.2s ease; flex-shrink: 0; }
@@ -169,15 +206,15 @@
       </div>
 
       <!-- Center: Visual Lab & Heating Curve Graph -->
-      <div class="lab-viz lab-viz-dual lg:col-span-4 flex flex-col gap-4">
+      <div class="lab-viz lab-viz-dual lg:col-span-4">
         <!-- Visual View -->
         <div class="lab-viz-panel bg-white p-3.5 rounded-2xl shadow-sm border border-slate-200 flex flex-col gap-3">
-          <h3 class="text-lg font-bold text-slate-900 flex items-center gap-2">
+          <h3 class="text-lg font-bold text-slate-900 flex items-center gap-2 shrink-0">
             <i data-lucide="eye" class="w-5 h-5 text-indigo-600"></i>
             <span data-i18n="visualLab">Interactive Lab View</span>
           </h3>
-          <div class="lab-viz-canvas relative bg-gradient-to-b from-slate-900 to-slate-950 rounded-xl overflow-hidden flex items-center justify-center border border-slate-800 shadow-inner">
-            <canvas id="stateCanvas" class="w-full h-full"></canvas>
+          <div class="lab-viz-canvas relative bg-gradient-to-b from-slate-900 to-slate-950 rounded-xl overflow-hidden border border-slate-800 shadow-inner">
+            <canvas id="stateCanvas" class="block w-full h-full"></canvas>
           </div>
           <!-- Live HUD Bar (Below Animation) -->
           <div class="bg-slate-900 border border-slate-800 rounded-xl px-3.5 py-2.5 flex justify-between items-center text-white text-xs font-semibold shadow-sm">
@@ -195,13 +232,13 @@
         </div>
 
         <!-- Chart -->
-        <div class="lab-viz-panel bg-white p-3.5 rounded-2xl shadow-sm border border-slate-200 flex flex-col gap-2">
-          <h3 class="text-base font-bold text-slate-900 flex items-center gap-2">
+        <div class="lab-viz-panel lab-viz-panel-chart bg-white p-3.5 rounded-2xl shadow-sm border border-slate-200 flex flex-col gap-2">
+          <h3 class="text-base font-bold text-slate-900 flex items-center gap-2 shrink-0">
             <i data-lucide="trending-up" class="w-5 h-5 text-blue-600"></i>
             <span data-i18n="heatingCurve">Heating Curve (T vs. Time)</span>
           </h3>
-          <div class="relative w-full aspect-[16/10] bg-slate-50 rounded-xl border border-slate-100 p-2 flex items-center justify-center">
-            <canvas id="stateChartCanvas" class="w-full h-full"></canvas>
+          <div class="lab-viz-chart-wrap relative bg-slate-50 rounded-xl border border-slate-100 p-2">
+            <canvas id="stateChartCanvas"></canvas>
           </div>
         </div>
       </div>
@@ -471,18 +508,27 @@
     };
 
     function resizeCanvas(canvas) {
-      const rect = canvas.parentNode.getBoundingClientRect();
+      const parent = canvas.parentNode;
+      if (!parent) return;
+      const rect = parent.getBoundingClientRect();
+      if (rect.width <= 0 || rect.height <= 0) return;
       canvas.width = rect.width * window.devicePixelRatio;
       canvas.height = rect.height * window.devicePixelRatio;
       canvas.style.width = rect.width + "px";
       canvas.style.height = rect.height + "px";
       const ctx = canvas.getContext("2d");
+      ctx.setTransform(1, 0, 0, 1, 0, 0);
       ctx.scale(window.devicePixelRatio, window.devicePixelRatio);
     }
 
-    window.addEventListener("resize", () => {
+    function layoutLabCanvases() {
       resizeCanvas(stateCanvas);
       drawStateLab();
+      if (stateChart) stateChart.resize();
+    }
+
+    window.addEventListener("resize", () => {
+      layoutLabCanvases();
     });
 
     const substanceC_water = {
@@ -1388,10 +1434,11 @@
 
     initLabControlsCollapse();
 
-    setTimeout(() => {
-      resizeCanvas(stateCanvas);
+    requestAnimationFrame(() => {
+      layoutLabCanvases();
       updateStateDefaults();
-    }, 100);
+      setTimeout(layoutLabCanvases, 150);
+    });
 
   </script>
 </body>
