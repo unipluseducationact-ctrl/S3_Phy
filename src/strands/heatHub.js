@@ -1,10 +1,5 @@
 import { t, getLang } from '../i18n.js';
 import questions from '../data/questions.json';
-import flashcards from '../data/flashcards.json';
-import thermometerImages from '../data/flashcards-thermometer.json';
-import heatInternalEnergyImages from '../data/flashcards-heat-internal-energy.json';
-import changeOfStateImages from '../data/flashcards-change-of-state.json';
-import heatTransferImages from '../data/flashcards-heat-transfer.json';
 import { createThermometerLab } from '../tools/thermometerLab.js';
 import { createSpecificHeatLab } from '../tools/specificHeatLab.js';
 import { createThermalMixingLab } from '../tools/thermalMixingLab.js';
@@ -12,6 +7,8 @@ import { createChangeOfStateLab } from '../tools/changeOfStateLab.js';
 import { createHeatTransferLab } from '../tools/heatTransferLab.js';
 import { mountHubShell } from '../hubShell.js';
 import { renderWorksheets, hydrateWorksheets } from '../worksheets/mcqWorksheet.js';
+import { mountFlashcardStudy } from '../flashcards/flashcardStudy.js';
+import { buildHeatDeck } from '../flashcards/flashcardDeck.js';
 
 const HEAT_TOPICS = [
   {
@@ -104,16 +101,25 @@ async function noteExists(name) {
 export function mountHeatHub(root) {
   let section = 'topics';
   let toolId = 'liquid';
-  let flashIndex = 0;
-  let flashDeck = 'all';
-  let flashShowBack = false;
 
   let shell = null;
   let el = { main: null };
   let activeLabInstance = null;
+  let destroyFlashcards = null;
+
+  const HEAT_DECK_OPTIONS = [
+    { value: 'all', labelKey: 'flashcards.all' },
+    { value: 'thermometry', labelKey: 'flashcards.deck.thermometry' },
+    { value: 'heatInternalEnergy', labelKey: 'flashcards.deck.heatInternalEnergy' },
+    { value: 'changeOfState', labelKey: 'flashcards.deck.changeOfState' },
+    { value: 'heatTransfer', labelKey: 'flashcards.deck.heatTransfer' },
+  ];
 
   function renderMain() {
     if (!el.main) return;
+
+    destroyFlashcards?.();
+    destroyFlashcards = null;
 
     if (section === 'topics') el.main.innerHTML = renderTopics();
     else if (section === 'notes') el.main.innerHTML = renderNotesShell();
@@ -123,8 +129,15 @@ export function mountHeatHub(root) {
         topics: HEAT_WORKSHEET_TOPICS,
         paperTitleKey: 'worksheets.paperTitleHeat',
       });
-    } else if (section === 'flashcards') el.main.innerHTML = renderFlashcardsShell();
-    else if (section === 'summary') el.main.innerHTML = renderSummary();
+    } else if (section === 'flashcards') {
+      destroyFlashcards = mountFlashcardStudy(el.main, {
+        deckOptions: HEAT_DECK_OPTIONS.map((o) => ({
+          value: o.value,
+          label: t(o.labelKey),
+        })),
+        buildDeck: (key) => buildHeatDeck(key, getLang()),
+      });
+    } else if (section === 'summary') el.main.innerHTML = renderSummary();
 
     if (section === 'notes') void hydrateNotes();
     if (section === 'tools') hydrateTools();
@@ -141,7 +154,6 @@ export function mountHeatHub(root) {
         },
       });
     }
-    if (section === 'flashcards') hydrateFlashcards();
     if (section === 'summary') void hydrateSummary();
   }
 
@@ -286,166 +298,6 @@ export function mountHeatHub(root) {
     stage.appendChild(activeLabInstance);
   }
 
-  function renderFlashcardsShell() {
-    return `
-      <section class="panel">
-        <h2>${t('flashcards.title')}</h2>
-        <p class="lead">${t('flashcards.intro')}</p>
-        <div class="control" style="margin-bottom:10px">
-          <label>${t('flashcards.deck')}</label>
-          <select data-flash-deck>
-            <option value="all">${t('flashcards.all')}</option>
-            <option value="thermometry">${t('flashcards.deck.thermometry')}</option>
-            <option value="heatInternalEnergy">${t('flashcards.deck.heatInternalEnergy')}</option>
-            <option value="changeOfState">${t('flashcards.deck.changeOfState')}</option>
-            <option value="heatTransfer">${t('flashcards.deck.heatTransfer')}</option>
-          </select>
-        </div>
-        <div class="flashcard-box">
-          <div class="flashcard-surface" data-flip-card>
-            <div class="label" data-flash-label>${t('flashcards.question')}</div>
-            <div class="body" data-flash-front></div>
-          </div>
-          <p class="flashcard-progress muted" data-flash-progress hidden></p>
-          <div class="flash-toolbar no-print">
-            <button class="btn" type="button" data-flash-prev>${t('flashcards.prev')}</button>
-            <button class="btn primary" type="button" data-flash-flip>${t('flashcards.flip')}</button>
-            <button class="btn" type="button" data-flash-next>${t('flashcards.next')}</button>
-            <button class="btn" type="button" data-flash-shuf>${t('flashcards.shuffle')}</button>
-          </div>
-        </div>
-      </section>`;
-  }
-
-  function heatFlashcards() {
-    return flashcards.filter((c) => THERMOMETRY_SUBTOPICS.includes(c.topic));
-  }
-
-  function isImageCard(card) {
-    return Boolean(card?.front);
-  }
-
-  function flashImageUrl(relPath) {
-    const clean = String(relPath).replace(/^\.\//, '');
-    return `${import.meta.env.BASE_URL}${clean}`;
-  }
-
-  function flashDeckList() {
-    if (flashDeck === 'all') {
-      return [...thermometerImages, ...heatInternalEnergyImages, ...changeOfStateImages, ...heatTransferImages];
-    }
-    if (flashDeck === 'thermometry') {
-      return thermometerImages.slice();
-    }
-    if (flashDeck === 'heatInternalEnergy') {
-      return heatInternalEnergyImages.slice();
-    }
-    if (flashDeck === 'changeOfState') {
-      return changeOfStateImages.slice();
-    }
-    if (flashDeck === 'heatTransfer') {
-      return heatTransferImages.slice();
-    }
-    const list = heatFlashcards().filter((c) => c.topic === flashDeck);
-    return list.length ? list : heatFlashcards();
-  }
-
-  function paintFlash() {
-    const list = flashDeckList();
-    const progress = root.querySelector('[data-flash-progress]');
-    if (!list.length) {
-      flashIndex = 0;
-      const front = root.querySelector('[data-flash-front]');
-      const surface = root.querySelector('[data-flip-card]');
-      if (front) front.textContent = '';
-      if (surface) surface.classList.remove('flashcard-surface--image');
-      if (progress) {
-        progress.hidden = true;
-        progress.textContent = '';
-      }
-      return;
-    }
-
-    flashIndex = Math.max(0, Math.min(flashIndex, list.length - 1));
-    const card = list[flashIndex];
-    const frontEl = root.querySelector('[data-flash-front]');
-    const surface = root.querySelector('[data-flip-card]');
-    const labelEl = root.querySelector('[data-flash-label]');
-    if (!frontEl || !surface) return;
-
-    if (progress) {
-      progress.hidden = false;
-      progress.textContent = t('flashcards.progress')
-        .replace('{current}', String(flashIndex + 1))
-        .replace('{total}', String(list.length));
-    }
-
-    if (isImageCard(card)) {
-      const twoSided = card.back && card.back !== card.front;
-      surface.classList.add('flashcard-surface--image');
-      if (labelEl) {
-        if (!twoSided) {
-          labelEl.hidden = true;
-        } else {
-          labelEl.hidden = false;
-          labelEl.textContent = flashShowBack ? t('flashcards.answer') : t('flashcards.question');
-        }
-      }
-      const src = flashShowBack && card.back ? card.back : card.front;
-      const alt = card.alt || card.title || '';
-      frontEl.innerHTML = `<img src="${flashImageUrl(src)}" alt="${alt.replace(/"/g, '&quot;')}" loading="lazy" />`;
-      return;
-    }
-
-    surface.classList.remove('flashcard-surface--image');
-    const lk = langKey();
-    const pack = card[lk] || card.en;
-    if (labelEl) {
-      labelEl.hidden = false;
-      labelEl.textContent = flashShowBack ? t('flashcards.answer') : t('flashcards.question');
-    }
-    frontEl.textContent = flashShowBack ? pack.a : pack.q;
-  }
-
-  function hydrateFlashcards() {
-    const deckSel = root.querySelector('[data-flash-deck]');
-    deckSel.value = flashDeck;
-    deckSel.addEventListener('change', () => {
-      flashDeck = deckSel.value;
-      flashIndex = 0;
-      flashShowBack = false;
-      paintFlash();
-    });
-    root.querySelector('[data-flip-card]').addEventListener('click', () => {
-      flashShowBack = !flashShowBack;
-      paintFlash();
-    });
-    root.querySelector('[data-flash-flip]').addEventListener('click', (e) => {
-      e.stopPropagation();
-      flashShowBack = !flashShowBack;
-      paintFlash();
-    });
-    root.querySelector('[data-flash-prev]').addEventListener('click', () => {
-      const list = flashDeckList();
-      flashIndex = (flashIndex - 1 + list.length) % list.length;
-      flashShowBack = false;
-      paintFlash();
-    });
-    root.querySelector('[data-flash-next]').addEventListener('click', () => {
-      const list = flashDeckList();
-      flashIndex = (flashIndex + 1) % list.length;
-      flashShowBack = false;
-      paintFlash();
-    });
-    root.querySelector('[data-flash-shuf]').addEventListener('click', () => {
-      const list = flashDeckList();
-      flashIndex = Math.floor(Math.random() * list.length);
-      flashShowBack = false;
-      paintFlash();
-    });
-    paintFlash();
-  }
-
   function renderSummary() {
     return `
       <section class="panel">
@@ -547,6 +399,7 @@ export function mountHeatHub(root) {
   return () => {
     window.removeEventListener('s3phy:lang', onLang);
     root.removeEventListener('click', onClick);
+    destroyFlashcards?.();
     if (activeLabInstance?._thermometerLabCleanup) {
       activeLabInstance._thermometerLabCleanup();
     }

@@ -23,7 +23,10 @@
   --font: "Inter", system-ui, -apple-system, "Segoe UI", Roboto, "Noto Sans TC", sans-serif;
   --font-display: "Montserrat", "Inter", system-ui, sans-serif;
   --mono: ui-monospace, "Cascadia Code", monospace;
-  --tool-viewport-min-h: clamp(680px, 88vh, 1200px);
+  --vp-pad: clamp(12px, 2vw, 24px);
+  --content-max-w: min(1120px, calc(100dvw - var(--vp-pad) * 2));
+  --hub-scale: 1;
+  --tool-viewport-min-h: clamp(680px, 88dvh, 1200px);
   --tool-stage-pad: 6px;
 }
 
@@ -36,7 +39,7 @@
 html,
 body {
   margin: 0;
-  min-height: 100%;
+  min-height: 100dvh;
   background: var(--bg);
   color: var(--text);
   font-family: var(--font);
@@ -48,19 +51,14 @@ a {
 }
 
 #app {
-  max-width: 1120px;
+  max-width: var(--content-max-w);
   margin: 0 auto;
-  padding: 16px 18px 48px;
+  padding: var(--vp-pad);
+  padding-bottom: 48px;
 }
 
 #app:has(.panel--tools) {
-  max-width: min(1400px, 96vw);
-}
-
-@media (min-width: 900px) {
-  #app {
-    padding: 14px 14px 44px;
-  }
+  max-width: min(1400px, calc(100dvw - var(--vp-pad) * 2));
 }
 
 @media (min-width: 1200px) {
@@ -255,7 +253,7 @@ a {
 }
 
 .brand-logo-img {
-  height: 52px;
+  height: calc(52px * var(--hub-scale));
   width: auto;
   max-width: min(220px, 42vw);
   object-fit: contain;
@@ -368,16 +366,18 @@ a {
   border-radius: 999px;
   width: fit-content;
   max-width: 100%;
+  transform: scale(var(--hub-scale));
+  transform-origin: top center;
 }
 
 .main-nav button {
   background: transparent;
   border: none;
   color: var(--muted);
-  padding: 9px 14px;
+  padding: calc(9px * var(--hub-scale)) calc(14px * var(--hub-scale));
   border-radius: 999px;
   cursor: pointer;
-  font-size: 0.88rem;
+  font-size: calc(0.88rem * var(--hub-scale));
   display: flex;
   align-items: center;
   gap: 8px;
@@ -522,6 +522,28 @@ a {
   cursor: not-allowed;
 }
 
+.btn.danger {
+  background: #fef2f2;
+  border-color: #fca5a5;
+  color: var(--danger);
+}
+
+.btn.danger:hover:not(:disabled) {
+  background: #fee2e2;
+  border-color: #f87171;
+}
+
+.btn.success {
+  background: #ecfdf5;
+  border-color: #6ee7b7;
+  color: #047857;
+}
+
+.btn.success:hover:not(:disabled) {
+  background: #d1fae5;
+  border-color: #34d399;
+}
+
 .panel--tools .lead {
   margin-bottom: 12px;
 }
@@ -610,32 +632,18 @@ a {
 .tool-thermal-mixing,
 .tool-change-of-state {
   width: 100%;
-  height: clamp(760px, 90vh, 1200px);
-  min-height: clamp(760px, 90vh, 1200px);
+  height: clamp(560px, calc(100dvh - 140px), 1400px);
+  min-height: clamp(560px, calc(100dvh - 140px), 1400px);
   display: flex;
   flex-direction: column;
 }
 
 .tool-heat-transfer {
   width: 100%;
-  height: clamp(920px, 90vh, 1500px);
-  min-height: clamp(920px, 90vh, 1500px);
+  height: clamp(680px, calc(100dvh - 100px), 1500px);
+  min-height: clamp(680px, calc(100dvh - 100px), 1500px);
   display: flex;
   flex-direction: column;
-}
-
-@supports (height: 100dvh) {
-  .tool-specific-heat,
-  .tool-thermal-mixing,
-  .tool-change-of-state {
-    height: clamp(760px, calc(100dvh - 140px), 1400px);
-    min-height: clamp(760px, calc(100dvh - 140px), 1400px);
-  }
-
-  .tool-heat-transfer {
-    height: clamp(920px, calc(100dvh - 100px), 1500px);
-    min-height: clamp(920px, calc(100dvh - 100px), 1500px);
-  }
 }
 
 .tool-lens-simulator iframe,
@@ -1034,6 +1042,95 @@ canvas.lab-canvas {
   }
 }
 
+.flash-study-controls {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 12px 18px;
+  align-items: flex-end;
+  margin-bottom: 12px;
+}
+
+.flash-mode-toggle {
+  display: flex;
+  gap: 4px;
+  padding: 3px;
+  background: var(--pill-rail);
+  border-radius: 999px;
+}
+
+.flash-mode-toggle button {
+  border: none;
+  background: transparent;
+  color: var(--muted);
+  padding: 7px 14px;
+  border-radius: 999px;
+  cursor: pointer;
+  font-size: 0.82rem;
+  font-family: inherit;
+}
+
+.flash-mode-toggle button.active {
+  background: var(--surface);
+  color: var(--navy);
+  box-shadow: var(--shadow);
+}
+
+.flash-study-header {
+  display: flex;
+  flex-wrap: wrap;
+  justify-content: space-between;
+  align-items: center;
+  gap: 8px;
+  margin-bottom: 10px;
+}
+
+.flash-round-badge {
+  font-size: 0.82rem;
+  font-weight: 600;
+  color: var(--navy);
+  background: var(--accent-soft);
+  padding: 4px 12px;
+  border-radius: 999px;
+}
+
+.flash-rating-hint {
+  margin: 8px 0 0;
+  font-size: 0.8rem;
+  text-align: center;
+}
+
+.flash-rating-row {
+  justify-content: center;
+}
+
+.flash-summary-panel {
+  text-align: center;
+  padding: 20px 16px;
+}
+
+.flash-summary-panel h3 {
+  margin: 0 0 8px;
+  color: var(--navy);
+}
+
+.flash-summary-counts {
+  display: flex;
+  flex-wrap: wrap;
+  justify-content: center;
+  gap: 12px 20px;
+  margin: 14px 0 18px;
+  font-size: 0.9rem;
+  font-weight: 600;
+}
+
+.flash-summary-counts span:first-child {
+  color: var(--danger);
+}
+
+.flash-summary-counts span:last-child {
+  color: #047857;
+}
+
 .flashcard-box {
   min-height: 280px;
   display: flex;
@@ -1049,11 +1146,12 @@ canvas.lab-canvas {
   padding: 18px;
   cursor: pointer;
   box-shadow: var(--shadow);
+  container-type: inline-size;
 }
 
 .flashcard-surface--image {
   padding: 10px;
-  max-width: 480px;
+  max-width: min(480px, 100%);
   margin: 0 auto;
 }
 
@@ -1065,9 +1163,10 @@ canvas.lab-canvas {
 }
 
 .flashcard-surface .body {
-  font-size: 1.05rem;
+  font-size: clamp(0.95rem, 4cqi, 1.1rem);
   margin-top: 8px;
   color: var(--text);
+  white-space: pre-line;
 }
 
 .flashcard-surface--image .body {
@@ -1076,7 +1175,7 @@ canvas.lab-canvas {
 
 .flashcard-surface .body img {
   max-width: 100%;
-  max-height: min(50vh, 360px);
+  max-height: min(50dvh, 42dvh, 480px);
   width: auto;
   height: auto;
   object-fit: contain;
@@ -1099,7 +1198,7 @@ canvas.lab-canvas {
 
 .summary-thumb {
   max-width: 100%;
-  max-height: min(70vh, 720px);
+  max-height: min(70dvh, 720px);
   width: auto;
   height: auto;
   object-fit: contain;
@@ -1327,4 +1426,97 @@ canvas.lab-canvas {
 .rgb-presets button:hover {
   background: var(--surface2);
   border-color: #9aa0a8;
+}
+
+/* Responsive — width, height, aspect-ratio (Chem-inspired) */
+@media (max-width: 900px) {
+  .site-header {
+    gap: 10px;
+  }
+
+  .main-nav button {
+    padding: 8px 11px;
+    font-size: 0.82rem;
+  }
+
+  .strand-back-btn,
+  .lang-toggle button {
+    font-size: 0.8rem;
+    padding: 7px 11px;
+  }
+}
+
+@media (max-height: 820px) {
+  .flashcard-surface .body img {
+    max-height: min(34dvh, 360px);
+  }
+
+  .summary-thumb {
+    max-height: min(58dvh, 560px);
+  }
+
+  .tool-specific-heat,
+  .tool-thermal-mixing,
+  .tool-change-of-state {
+    height: clamp(480px, calc(100dvh - 120px), 1200px);
+    min-height: clamp(480px, calc(100dvh - 120px), 1200px);
+  }
+
+  .tool-heat-transfer {
+    height: clamp(560px, calc(100dvh - 100px), 1300px);
+    min-height: clamp(560px, calc(100dvh - 100px), 1300px);
+  }
+}
+
+@media (max-height: 680px) {
+  .site-title {
+    font-size: 1rem;
+  }
+
+  .site-subtitle {
+    font-size: 0.8rem;
+  }
+
+  .main-nav {
+    margin-bottom: 12px;
+  }
+
+  .main-nav button {
+    padding: 7px 10px;
+    font-size: 0.78rem;
+  }
+}
+
+@media (max-width: 960px) {
+  .flash-rating-row .btn {
+    padding: 7px 10px;
+    font-size: 0.82rem;
+  }
+}
+
+@media (max-width: 720px) {
+  .flash-study-controls {
+    flex-direction: column;
+    align-items: stretch;
+  }
+
+  .flash-rating-row {
+    gap: 6px;
+  }
+
+  .flash-rating-row .btn {
+    flex: 1 1 calc(50% - 6px);
+    min-width: 0;
+  }
+}
+
+@media (max-aspect-ratio: 5/4) and (max-width: 1200px) {
+  .tools-layout {
+    grid-template-columns: 1fr;
+  }
+
+  .panel--flashcards .flash-study-controls {
+    flex-direction: column;
+    align-items: stretch;
+  }
 }
