@@ -1146,12 +1146,17 @@ canvas.lab-canvas {
   padding: 18px;
   cursor: pointer;
   box-shadow: var(--shadow);
+}
+
+.flashcard-surface:not(.flashcard-surface--image) {
   container-type: inline-size;
 }
 
 .flashcard-surface--image {
   padding: 10px;
+  width: 100%;
   max-width: min(480px, 100%);
+  min-height: min(280px, 42dvh);
   margin: 0 auto;
 }
 
@@ -1171,6 +1176,10 @@ canvas.lab-canvas {
 
 .flashcard-surface--image .body {
   margin-top: 4px;
+  min-height: min(240px, 38dvh);
+  display: flex;
+  align-items: center;
+  justify-content: center;
 }
 
 .flashcard-surface .body img {

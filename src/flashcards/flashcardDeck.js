@@ -1,3 +1,4 @@
+import { assetUrl } from '../assetUrl.js';
 import flashcards from '../data/flashcards.json';
 import reflectionImages from '../data/flashcards-reflection.json';
 import refractionImages from '../data/flashcards-refraction.json';
@@ -22,8 +23,7 @@ function langKey(lang) {
 }
 
 function flashImageUrl(relPath) {
-  const clean = String(relPath).replace(/^\.\//, '');
-  return `${import.meta.env.BASE_URL}${clean}`;
+  return assetUrl(relPath);
 }
 
 /**

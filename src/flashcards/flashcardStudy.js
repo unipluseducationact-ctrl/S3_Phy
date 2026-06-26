@@ -126,7 +126,20 @@ export function mountFlashcardStudy(container, { deckOptions, buildDeck, initial
       }
       const src = flipped && card.backImage ? card.backImage : card.frontImage;
       const alt = (card.alt || '').replace(/"/g, '&quot;');
-      els.body.innerHTML = `<img src="${src}" alt="${alt}" loading="lazy" />`;
+      const fallback = (card.alt || t('flashcards.question')).replace(/</g, '&lt;');
+      els.body.innerHTML = `<img src="${src}" alt="${alt}" loading="lazy" data-fc-img /><p class="flash-img-fallback muted" data-fc-img-fallback hidden>${fallback}</p>`;
+      const img = els.body.querySelector('[data-fc-img]');
+      const fb = els.body.querySelector('[data-fc-img-fallback]');
+      if (img && fb) {
+        img.onerror = () => {
+          img.hidden = true;
+          fb.hidden = false;
+        };
+        img.onload = () => {
+          img.hidden = false;
+          fb.hidden = true;
+        };
+      }
     } else {
       els.card.classList.remove('flashcard-surface--image');
       els.label.hidden = false;
