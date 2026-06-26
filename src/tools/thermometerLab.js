@@ -308,6 +308,9 @@ const CSS = `
 .tl-wrap .tl-tab-content.active {
   display: flex;
 }
+.tl-wrap .tl-controls-steps {
+  order: -1;
+}
 .tl-wrap .tl-beaker-overlay {
   background-color: rgba(20, 20, 23, 0.95);
   border: 1px solid var(--tl-border);
@@ -320,13 +323,24 @@ const CSS = `
   align-items: center;
 }
 .tl-wrap .tl-temp-badge {
-  font-size: 1.1rem;
+  font-size: 1.35rem;
   font-weight: 800;
   color: var(--tl-cyan);
   text-shadow: 0 0 10px var(--tl-glow-cyan);
 }
+.tl-wrap .tl-live-value {
+  font-size: 1.05rem;
+  font-weight: 700;
+  color: var(--tl-cyan);
+}
+.tl-wrap .tl-lr-value {
+  font-size: 1.1rem;
+}
+.tl-wrap .tl-bath-bar-top {
+  font-size: 0.95rem;
+}
 .tl-wrap .tl-cg { display: flex; flex-direction: column; gap: 6px; }
-.tl-wrap .tl-lr { display: flex; justify-content: space-between; align-items: center; font-size: 0.8rem; font-weight: 600; }
+.tl-wrap .tl-lr { display: flex; justify-content: space-between; align-items: center; font-size: 0.95rem; font-weight: 600; }
 .tl-wrap .tl-section-label {
   font-size: 0.75rem;
   font-weight: 800;
@@ -347,7 +361,7 @@ const CSS = `
   padding: 3px 10px;
   border-radius: 6px;
   font-family: ui-monospace, monospace;
-  font-size: 0.82rem;
+  font-size: 1rem;
   border: 1px solid rgba(255, 255, 255, 0.05);
 }
 .tl-wrap input[type="range"] { -webkit-appearance: none; width: 100%; background: transparent; margin: 6px 0; }
@@ -715,12 +729,12 @@ export function createThermometerLab(t, options = {}) {
           <div class="tl-bath-bar-top" style="display:flex;align-items:center;justify-content:space-between;gap:12px">
             <div class="tl-beaker-overlay" style="padding:4px 8px;margin:0;font-size:0.75rem;background:transparent;border:none">
               <span>Liquid: <b id="tl-bath-state">Water</b></span>
-              <span><b class="tl-temp-badge" id="tl-bath-temp-display" style="font-size:0.9rem">25.0°C</b></span>
+              <span><b class="tl-temp-badge" id="tl-bath-temp-display">25.0°C</b></span>
             </div>
             <div class="tl-bath-slider-wrap" style="flex:1;display:flex;flex-direction:column;gap:2px">
-              <div class="tl-lr" style="font-size:0.72rem">
+              <div class="tl-lr">
                 <span>T<sub>bath</sub></span>
-                <span class="tl-badge" id="tl-val-bath-temp" style="color:var(--tl-cyan);font-size:0.75rem">25.0 °C</span>
+                <span class="tl-badge tl-lr-value" id="tl-val-bath-temp" style="color:var(--tl-cyan)">25.0 °C</span>
               </div>
               <input type="range" id="tl-bath-temp-slider" min="0" max="200" step="0.5" value="25.0" style="margin:0">
             </div>
@@ -739,278 +753,262 @@ export function createThermometerLab(t, options = {}) {
 
         <!-- TAB 1: LIQUID-IN-GLASS -->
         <div class="tl-tab-content active" id="tl-tab-liquid">
-          <div class="tl-cg">
-            <span class="tl-section-label">Thermometric liquid</span>
-            <div class="tl-seg" role="group" aria-label="Thermometric liquid">
-              <button type="button" class="tl-seg-btn active-mercury" id="tl-card-mercury" title="Mercury — boils at 356.7°C; suitable for high temperatures">
-                <span class="tl-dot mercury"></span> Hg
-              </button>
-              <button type="button" class="tl-seg-btn" id="tl-card-alcohol" title="Alcohol — boils at 78.4°C; vaporizes at high temperatures">
-                <span class="tl-dot alcohol"></span> Alcohol
-              </button>
-            </div>
-          </div>
-
-          <div class="tl-warning-banner" id="tl-alcohol-boiling-warning">
-            <strong>CRITICAL PHYSICS ALERT!</strong> Alcohol boils at 78.4°C. Dipping it into this temperature vaporizes the liquid, creating extreme pressure and breaking the thermometer. This is why alcohol <b>cannot</b> be used to measure hot oil (150°C)!
-          </div>
-
-          <div class="tl-param-grid">
-            <div class="tl-cg">
-              <div class="tl-lr">
-                <span>Bulb Volume (V<sub>b</sub>)</span>
-                <span class="tl-badge" id="tl-val-bulb-vol">200 mm³</span>
+          <!-- Live calibration formula (always visible) -->
+          <div class="tl-controls-steps">
+            <div class="tl-info-label" style="margin-top:0;font-size:0.8rem;color:var(--tl-cyan)">Live calibration formula (Dual-Directional Realtime Calculations)</div>
+            <div class="tl-worked-solution" style="margin-bottom:10px; display:flex; flex-direction:column; gap:12px">
+              <div style="border-bottom:1px solid rgba(255,255,255,0.05); padding-bottom:10px">
+                <div class="tl-info-label" style="font-size:0.75rem;color:var(--tl-cyan);margin-bottom:4px">Direction A: Length to Temperature (L<sub>T</sub> &rarr; T)</div>
+                <div id="tl-svg-formula-liquid" class="tl-math-formula" style="height:45px; margin:4px 0"></div>
+                <p style="margin:2px 0; font-size:0.85rem">Substitute current reading <b class="tl-live-value" id="tl-live-liquid-lt">5.50 cm</b>:</p>
+                <div id="tl-svg-formula-liquid-sub" class="tl-math-formula" style="height:100px; margin:4px 0"></div>
               </div>
-              <input type="range" id="tl-slider-bulb-vol" min="10" max="1000" step="10" value="200">
-            </div>
-            <div class="tl-cg">
-              <div class="tl-lr">
-                <span>Wall Thickness (w)</span>
-                <span class="tl-badge" id="tl-val-wall-thickness">0.5 mm</span>
-              </div>
-              <input type="range" id="tl-slider-wall-thick" min="0.05" max="3.0" step="0.05" value="0.5">
-            </div>
-            <div class="tl-cg">
-              <div class="tl-lr">
-                <span>Capillary Bore Diameter (d)</span>
-                <span class="tl-badge" id="tl-val-capillary-bore">0.3 mm</span>
-              </div>
-              <input type="range" id="tl-slider-capillary-bore" min="0.05" max="2.0" step="0.05" value="0.3">
-            </div>
-            <div class="tl-cg">
-              <div class="tl-lr">
-                <span>Ice Point Column Length (L<sub>0</sub>)</span>
-                <span class="tl-badge" id="tl-val-liquid-l0">3.0 cm</span>
-              </div>
-              <input type="range" id="tl-slider-liquid-l0" min="0.5" max="15.0" step="0.1" value="3.0">
-            </div>
-            <div class="tl-cg">
-              <div class="tl-lr">
-                <span>Steam Point Column Length (L<sub>100</sub>)</span>
-                <span class="tl-badge" id="tl-val-liquid-l100">13.0 cm</span>
-              </div>
-              <input type="range" id="tl-slider-liquid-l100" min="5.0" max="30.0" step="0.1" value="13.0">
-            </div>
-          </div>
-
-          <div class="tl-info-card tl-info-card--compact">
-            τ = <b id="tl-val-response-time">0.65 s</b> · larger V<sub>b</sub> → slower equilibration
-          </div>
-
-          <!-- Live calibration formula -->
-          <div class="tl-info-label" style="margin-top:10px;font-size:0.8rem;color:var(--tl-cyan)">Live calibration formula (Dual-Directional Realtime Calculations)</div>
-          <div class="tl-worked-solution" style="margin-bottom:10px; display:flex; flex-direction:column; gap:12px">
-            <!-- Direction A: Length to Temperature -->
-            <div style="border-bottom:1px solid rgba(255,255,255,0.05); padding-bottom:10px">
-              <div class="tl-info-label" style="font-size:0.75rem;color:var(--tl-cyan);margin-bottom:4px">Direction A: Length to Temperature (L<sub>T</sub> &rarr; T)</div>
-              <div id="tl-svg-formula-liquid" class="tl-math-formula" style="height:45px; margin:4px 0">
-                <!-- Inline SVG for beautiful LaTeX-like formula rendering -->
-              </div>
-              <p style="margin:2px 0; font-size:0.75rem">Substitute current reading <b id="tl-live-liquid-lt">5.50 cm</b>:</p>
-              <div id="tl-svg-formula-liquid-sub" class="tl-math-formula" style="height:100px; margin:4px 0">
-                <!-- Substituted numbers formula -->
-              </div>
-            </div>
-
-            <!-- Direction B: Temperature to Length -->
-            <div>
-              <div class="tl-info-label" style="font-size:0.75rem;color:var(--tl-cyan);margin-bottom:4px">Direction B: Temperature to Length (T &rarr; L<sub>T</sub>)</div>
-              <p style="margin:2px 0; font-size:0.75rem">Substitute current bath temperature <b id="tl-live-liquid-t-sub">25.0°C</b>:</p>
-              <div id="tl-svg-formula-t-to-l" class="tl-math-formula" style="font-size:0.85rem;height:110px; margin:4px 0">
-                <!-- T to L Formula -->
+              <div>
+                <div class="tl-info-label" style="font-size:0.75rem;color:var(--tl-cyan);margin-bottom:4px">Direction B: Temperature to Length (T &rarr; L<sub>T</sub>)</div>
+                <p style="margin:2px 0; font-size:0.85rem">Substitute current bath temperature <b class="tl-live-value" id="tl-live-liquid-t-sub">25.0°C</b>:</p>
+                <div id="tl-svg-formula-t-to-l" class="tl-math-formula" style="font-size:0.85rem;height:110px; margin:4px 0"></div>
               </div>
             </div>
           </div>
 
-          <!-- Faulty thermometer solver -->
-          <div class="tl-info-label" style="margin-top:10px;font-size:0.8rem;color:var(--tl-cyan)">Faulty thermometer solver</div>
-          <div style="display:flex;flex-direction:column;gap:8px">
-            <p style="font-size:0.7rem;color:var(--tl-muted);margin:0">Set faulty readings at ice (0°C) and steam (100°C), then solve for T or C.</p>
-            <div class="tl-info-card" style="margin-bottom:4px">
-              <div class="tl-info-label">Faulty scale calibration</div>
-              <p style="margin:0;font-size:0.68rem">T / 100 = (C − C<sub>f</sub>) / (C<sub>u</sub> − C<sub>f</sub>)</p>
+          <details class="tl-details">
+            <summary>${t('tools.thermometerLab.paramSettings')}</summary>
+            <div class="tl-details-body">
+              <div class="tl-cg">
+                <span class="tl-section-label">Thermometric liquid</span>
+                <div class="tl-seg" role="group" aria-label="Thermometric liquid">
+                  <button type="button" class="tl-seg-btn active-mercury" id="tl-card-mercury" title="Mercury — boils at 356.7°C; suitable for high temperatures">
+                    <span class="tl-dot mercury"></span> Hg
+                  </button>
+                  <button type="button" class="tl-seg-btn" id="tl-card-alcohol" title="Alcohol — boils at 78.4°C; vaporizes at high temperatures">
+                    <span class="tl-dot alcohol"></span> Alcohol
+                  </button>
+                </div>
+              </div>
+              <div class="tl-warning-banner" id="tl-alcohol-boiling-warning">
+                <strong>CRITICAL PHYSICS ALERT!</strong> Alcohol boils at 78.4°C. Dipping it into this temperature vaporizes the liquid, creating extreme pressure and breaking the thermometer. This is why alcohol <b>cannot</b> be used to measure hot oil (150°C)!
+              </div>
+              <div class="tl-param-grid">
+                <div class="tl-cg">
+                  <div class="tl-lr">
+                    <span>Bulb Volume (V<sub>b</sub>)</span>
+                    <span class="tl-badge" id="tl-val-bulb-vol">200 mm³</span>
+                  </div>
+                  <input type="range" id="tl-slider-bulb-vol" min="10" max="1000" step="10" value="200">
+                </div>
+                <div class="tl-cg">
+                  <div class="tl-lr">
+                    <span>Wall Thickness (w)</span>
+                    <span class="tl-badge" id="tl-val-wall-thickness">0.5 mm</span>
+                  </div>
+                  <input type="range" id="tl-slider-wall-thick" min="0.05" max="3.0" step="0.05" value="0.5">
+                </div>
+                <div class="tl-cg">
+                  <div class="tl-lr">
+                    <span>Capillary Bore Diameter (d)</span>
+                    <span class="tl-badge" id="tl-val-capillary-bore">0.3 mm</span>
+                  </div>
+                  <input type="range" id="tl-slider-capillary-bore" min="0.05" max="2.0" step="0.05" value="0.3">
+                </div>
+                <div class="tl-cg">
+                  <div class="tl-lr">
+                    <span>Ice Point Column Length (L<sub>0</sub>)</span>
+                    <span class="tl-badge" id="tl-val-liquid-l0">3.0 cm</span>
+                  </div>
+                  <input type="range" id="tl-slider-liquid-l0" min="0.5" max="15.0" step="0.1" value="3.0">
+                </div>
+                <div class="tl-cg">
+                  <div class="tl-lr">
+                    <span>Steam Point Column Length (L<sub>100</sub>)</span>
+                    <span class="tl-badge" id="tl-val-liquid-l100">13.0 cm</span>
+                  </div>
+                  <input type="range" id="tl-slider-liquid-l100" min="5.0" max="30.0" step="0.1" value="13.0">
+                </div>
+              </div>
+              <div class="tl-info-card tl-info-card--compact">
+                τ = <b id="tl-val-response-time">0.65 s</b> · larger V<sub>b</sub> → slower equilibration
+              </div>
             </div>
-            
-            <!-- Dual-Scale Diagram Container -->
-            <div class="tl-info-label" style="font-size:0.75rem;color:var(--tl-muted);margin-top:4px;">${t('tools.thermometerLab.faulty.dualScale')}</div>
-            <div id="tl-faulty-svg-container" style="width:100%; height:190px; margin:4px 0; background:rgba(0,0,0,0.25); border-radius:10px; border:1px solid var(--tl-border); display:flex; justify-content:center; align-items:center; padding:8px;"></div>
+          </details>
 
-            <div class="tl-faulty-cal">
-              <div class="tl-calc-inputs">
-                <span>Ice reading C<sub>f</sub> (true 0°C)</span>
-                <div class="tl-input-with-unit">
-                  <input type="number" id="tl-input-faulty-cf" value="-1.5" step="0.1" class="tl-calc-input" aria-label="Ice point faulty reading">
-                  <span class="tl-unit">°C</span>
+          <details class="tl-details">
+            <summary>${t('tools.thermometerLab.faultySolver')}</summary>
+            <div class="tl-details-body">
+              <p style="font-size:0.75rem;color:var(--tl-muted);margin:0">Set faulty readings at ice (0°C) and steam (100°C), then solve for T or C.</p>
+              <div class="tl-info-card" style="margin-bottom:4px">
+                <div class="tl-info-label">Faulty scale calibration</div>
+                <p style="margin:0;font-size:0.75rem">T / 100 = (C − C<sub>f</sub>) / (C<sub>u</sub> − C<sub>f</sub>)</p>
+              </div>
+              <div class="tl-info-label" style="font-size:0.75rem;color:var(--tl-muted);margin-top:4px;">${t('tools.thermometerLab.faulty.dualScale')}</div>
+              <div id="tl-faulty-svg-container" style="width:100%; height:190px; margin:4px 0; background:rgba(0,0,0,0.25); border-radius:10px; border:1px solid var(--tl-border); display:flex; justify-content:center; align-items:center; padding:8px;"></div>
+              <div class="tl-faulty-cal">
+                <div class="tl-calc-inputs">
+                  <span>Ice reading C<sub>f</sub> (true 0°C)</span>
+                  <div class="tl-input-with-unit">
+                    <input type="number" id="tl-input-faulty-cf" value="-1.5" step="0.1" class="tl-calc-input" aria-label="Ice point faulty reading">
+                    <span class="tl-unit">°C</span>
+                  </div>
+                </div>
+                <div class="tl-calc-inputs">
+                  <span>Steam reading C<sub>u</sub> (true 100°C)</span>
+                  <div class="tl-input-with-unit">
+                    <input type="number" id="tl-input-faulty-cu" value="105" step="0.1" class="tl-calc-input" aria-label="Steam point faulty reading">
+                    <span class="tl-unit">°C</span>
+                  </div>
                 </div>
               </div>
-              <div class="tl-calc-inputs">
-                <span>Steam reading C<sub>u</sub> (true 100°C)</span>
-                <div class="tl-input-with-unit">
-                  <input type="number" id="tl-input-faulty-cu" value="105" step="0.1" class="tl-calc-input" aria-label="Steam point faulty reading">
-                  <span class="tl-unit">°C</span>
+              <div class="tl-faulty-interval">
+                <span>Proportional interval (C<sub>u</sub> − C<sub>f</sub>)</span>
+                <b id="tl-val-faulty-interval">106.5 °C</b>
+              </div>
+              <div class="tl-solver-tabs">
+                <button class="tl-solver-tab-btn active" id="tl-btn-solve-q10a">Find True Temp (T)</button>
+                <button class="tl-solver-tab-btn" id="tl-btn-solve-q10b">Find Faulty Reading (C)</button>
+              </div>
+              <div id="tl-pane-q10a" class="tl-solver-pane active">
+                <div class="tl-calc-inputs">
+                  <span>Faulty reading C</span>
+                  <div class="tl-input-with-unit">
+                    <input type="number" id="tl-input-q10a-cm" value="25.0" step="0.5" class="tl-calc-input">
+                    <span class="tl-unit">°C</span>
+                  </div>
+                </div>
+                <p class="tl-solver-error" id="tl-faulty-error-a" hidden></p>
+                <div class="tl-worked-solution" style="background:rgba(0,0,0,0.15)">
+                  <div id="tl-svg-formula-faulty-a" class="tl-math-formula" style="font-size:0.85rem"></div>
+                </div>
+              </div>
+              <div id="tl-pane-q10b" class="tl-solver-pane">
+                <div class="tl-calc-inputs">
+                  <span>True temperature T</span>
+                  <div class="tl-input-with-unit">
+                    <input type="number" id="tl-input-q10b-t" value="70.0" step="1.0" class="tl-calc-input">
+                    <span class="tl-unit">°C</span>
+                  </div>
+                </div>
+                <p class="tl-solver-error" id="tl-faulty-error-b" hidden></p>
+                <div class="tl-worked-solution" style="background:rgba(0,0,0,0.15)">
+                  <div id="tl-svg-formula-faulty-b" class="tl-math-formula" style="font-size:0.85rem"></div>
                 </div>
               </div>
             </div>
-            <div class="tl-faulty-interval">
-              <span>Proportional interval (C<sub>u</sub> − C<sub>f</sub>)</span>
-              <b id="tl-val-faulty-interval">106.5 °C</b>
-            </div>
-            <div class="tl-solver-tabs">
-              <button class="tl-solver-tab-btn active" id="tl-btn-solve-q10a">Find True Temp (T)</button>
-              <button class="tl-solver-tab-btn" id="tl-btn-solve-q10b">Find Faulty Reading (C)</button>
-            </div>
-            <div id="tl-pane-q10a" class="tl-solver-pane active">
-              <div class="tl-calc-inputs">
-                <span>Faulty reading C</span>
-                <div class="tl-input-with-unit">
-                  <input type="number" id="tl-input-q10a-cm" value="25.0" step="0.5" class="tl-calc-input">
-                  <span class="tl-unit">°C</span>
-                </div>
-              </div>
-              <p class="tl-solver-error" id="tl-faulty-error-a" hidden></p>
-              <div class="tl-worked-solution" style="background:rgba(0,0,0,0.15)">
-                <div id="tl-svg-formula-faulty-a" class="tl-math-formula" style="font-size:0.85rem">
-                  <!-- Formula A -->
-                </div>
-              </div>
-            </div>
-            <div id="tl-pane-q10b" class="tl-solver-pane">
-              <div class="tl-calc-inputs">
-                <span>True temperature T</span>
-                <div class="tl-input-with-unit">
-                  <input type="number" id="tl-input-q10b-t" value="70.0" step="1.0" class="tl-calc-input">
-                  <span class="tl-unit">°C</span>
-                </div>
-              </div>
-              <p class="tl-solver-error" id="tl-faulty-error-b" hidden></p>
-              <div class="tl-worked-solution" style="background:rgba(0,0,0,0.15)">
-                <div id="tl-svg-formula-faulty-b" class="tl-math-formula" style="font-size:0.85rem">
-                  <!-- Formula B -->
-                </div>
-              </div>
-            </div>
-          </div>
+          </details>
         </div>
 
         <!-- TAB 2: PLATINUM RESISTANCE -->
         <div class="tl-tab-content" id="tl-tab-resistance">
-          <div class="tl-probe-specs">
-            <div class="tl-spec-tile">
-              <span class="tl-tile-label">Ice Point Resistance (R<sub>0</sub>)</span>
-              <span class="tl-tile-val" id="tl-spec-resistance-r0">5.0 Ω</span>
-            </div>
-            <div class="tl-spec-tile">
-              <span class="tl-tile-label">Steam Point Resistance (R<sub>100</sub>)</span>
-              <span class="tl-tile-val" id="tl-spec-resistance-r100">6.2 Ω</span>
-            </div>
-          </div>
-
-          <div class="tl-param-grid">
-            <div class="tl-cg">
-              <div class="tl-lr">
-                <span>Ice Point Resistance (R<sub>0</sub>)</span>
-                <span class="tl-badge" id="tl-val-resistance-r0">5.0 Ω</span>
+          <div class="tl-controls-steps">
+            <div class="tl-info-label" style="margin-top:0;font-size:0.8rem;color:var(--tl-cyan)">Live calibration formula (Dual-Directional Realtime Calculations)</div>
+            <div class="tl-worked-solution" style="margin-bottom:10px; display:flex; flex-direction:column; gap:12px">
+              <div style="border-bottom:1px solid rgba(255,255,255,0.05); padding-bottom:10px">
+                <div class="tl-info-label" style="font-size:0.75rem;color:var(--tl-cyan);margin-bottom:4px">Direction A: Resistance to Temperature (R<sub>T</sub> &rarr; T)</div>
+                <div id="tl-svg-formula-resistance" class="tl-math-formula" style="height:45px; margin:4px 0"></div>
+                <p style="margin:2px 0; font-size:0.85rem">Substitute current resistance <b class="tl-live-value" id="tl-live-resistance-rt">5.30 Ω</b>:</p>
+                <div id="tl-svg-formula-resistance-sub" class="tl-math-formula" style="height:100px; margin:4px 0"></div>
               </div>
-              <input type="range" id="tl-slider-resistance-r0" min="0.5" max="20.0" step="0.1" value="5.0">
-            </div>
-            <div class="tl-cg">
-              <div class="tl-lr">
-                <span>Steam Point Resistance (R<sub>100</sub>)</span>
-                <span class="tl-badge" id="tl-val-resistance-r100">6.2 Ω</span>
-              </div>
-              <input type="range" id="tl-slider-resistance-r100" min="2.0" max="30.0" step="0.1" value="6.2">
-            </div>
-          </div>
-
-          <div class="tl-info-card" style="border-color:rgba(245,158,11,0.3)">
-            <div class="tl-info-label" style="color:#f59e0b">Fundamental Assumption</div>
-            <p>To calculate temperature using linear calibration, it is <b>fundamentally assumed that electrical resistance varies linearly with temperature</b>.</p>
-          </div>
-
-          <!-- Live calibration formula -->
-          <div class="tl-info-label" style="margin-top:10px;font-size:0.8rem;color:var(--tl-cyan)">Live calibration formula (Dual-Directional Realtime Calculations)</div>
-          <div class="tl-worked-solution" style="margin-bottom:10px; display:flex; flex-direction:column; gap:12px">
-            <!-- Direction A: Resistance to Temperature -->
-            <div style="border-bottom:1px solid rgba(255,255,255,0.05); padding-bottom:10px">
-              <div class="tl-info-label" style="font-size:0.75rem;color:var(--tl-cyan);margin-bottom:4px">Direction A: Resistance to Temperature (R<sub>T</sub> &rarr; T)</div>
-              <div id="tl-svg-formula-resistance" class="tl-math-formula" style="height:45px; margin:4px 0">
-                <!-- Resistance formula -->
-              </div>
-              <p style="margin:2px 0; font-size:0.75rem">Substitute current resistance <b id="tl-live-resistance-rt">5.30 Ω</b>:</p>
-              <div id="tl-svg-formula-resistance-sub" class="tl-math-formula" style="height:100px; margin:4px 0">
-                <!-- Resistance sub formula -->
-              </div>
-            </div>
-
-            <!-- Direction B: Temperature to Resistance -->
-            <div>
-              <div class="tl-info-label" style="font-size:0.75rem;color:var(--tl-cyan);margin-bottom:4px">Direction B: Temperature to Resistance (T &rarr; R<sub>T</sub>)</div>
-              <p style="margin:2px 0; font-size:0.75rem">Substitute current bath temperature <b id="tl-live-resistance-t-sub">25.0°C</b>:</p>
-              <div id="tl-svg-formula-t-to-r" class="tl-math-formula" style="font-size:0.85rem;height:110px; margin:4px 0">
-                <!-- T to R Formula -->
+              <div>
+                <div class="tl-info-label" style="font-size:0.75rem;color:var(--tl-cyan);margin-bottom:4px">Direction B: Temperature to Resistance (T &rarr; R<sub>T</sub>)</div>
+                <p style="margin:2px 0; font-size:0.85rem">Substitute current bath temperature <b class="tl-live-value" id="tl-live-resistance-t-sub">25.0°C</b>:</p>
+                <div id="tl-svg-formula-t-to-r" class="tl-math-formula" style="font-size:0.85rem;height:110px; margin:4px 0"></div>
               </div>
             </div>
           </div>
 
-          <!-- Resistance-to-temperature solver -->
-          <div class="tl-info-label" style="margin-top:10px;font-size:0.8rem;color:var(--tl-cyan)">Resistance-to-temperature solver</div>
-          <div style="display:flex;flex-direction:column;gap:8px">
-            <div class="tl-calc-inputs">
-              <span>Measured Resistance (R):</span>
-              <div class="tl-input-with-unit">
-                <input type="number" id="tl-input-q11-r" value="7.7" step="0.1" class="tl-calc-input">
-                <span class="tl-unit">Ω</span>
+          <details class="tl-details">
+            <summary>${t('tools.thermometerLab.paramSettings')}</summary>
+            <div class="tl-details-body">
+              <div class="tl-probe-specs">
+                <div class="tl-spec-tile">
+                  <span class="tl-tile-label">Ice Point Resistance (R<sub>0</sub>)</span>
+                  <span class="tl-tile-val" id="tl-spec-resistance-r0">5.0 Ω</span>
+                </div>
+                <div class="tl-spec-tile">
+                  <span class="tl-tile-label">Steam Point Resistance (R<sub>100</sub>)</span>
+                  <span class="tl-tile-val" id="tl-spec-resistance-r100">6.2 Ω</span>
+                </div>
+              </div>
+              <div class="tl-param-grid">
+                <div class="tl-cg">
+                  <div class="tl-lr">
+                    <span>Ice Point Resistance (R<sub>0</sub>)</span>
+                    <span class="tl-badge" id="tl-val-resistance-r0">5.0 Ω</span>
+                  </div>
+                  <input type="range" id="tl-slider-resistance-r0" min="0.5" max="20.0" step="0.1" value="5.0">
+                </div>
+                <div class="tl-cg">
+                  <div class="tl-lr">
+                    <span>Steam Point Resistance (R<sub>100</sub>)</span>
+                    <span class="tl-badge" id="tl-val-resistance-r100">6.2 Ω</span>
+                  </div>
+                  <input type="range" id="tl-slider-resistance-r100" min="2.0" max="30.0" step="0.1" value="6.2">
+                </div>
+              </div>
+              <div class="tl-info-card" style="border-color:rgba(245,158,11,0.3)">
+                <div class="tl-info-label" style="color:#f59e0b">Fundamental Assumption</div>
+                <p>To calculate temperature using linear calibration, it is <b>fundamentally assumed that electrical resistance varies linearly with temperature</b>.</p>
               </div>
             </div>
-            <div class="tl-worked-solution" style="background:rgba(0,0,0,0.15)">
-              <div id="tl-svg-formula-resistance-solver" class="tl-math-formula" style="font-size:0.85rem">
-                <!-- Solver formula -->
+          </details>
+
+          <details class="tl-details">
+            <summary>${t('tools.thermometerLab.resistanceSolver')}</summary>
+            <div class="tl-details-body">
+              <div class="tl-calc-inputs">
+                <span>Measured Resistance (R):</span>
+                <div class="tl-input-with-unit">
+                  <input type="number" id="tl-input-q11-r" value="7.7" step="0.1" class="tl-calc-input">
+                  <span class="tl-unit">Ω</span>
+                </div>
+              </div>
+              <div class="tl-worked-solution" style="background:rgba(0,0,0,0.15)">
+                <div id="tl-svg-formula-resistance-solver" class="tl-math-formula" style="font-size:0.85rem"></div>
               </div>
             </div>
-          </div>
+          </details>
         </div>
 
         <!-- TAB 3: THERMISTOR -->
         <div class="tl-tab-content" id="tl-tab-thermistor">
-          <div class="tl-probe-specs">
-            <div class="tl-spec-tile">
-              <span class="tl-tile-label">Resistance at 25°C (R<sub>25</sub>)</span>
-              <span class="tl-tile-val" id="tl-spec-thermistor-r25">10.0 kΩ</span>
-            </div>
-            <div class="tl-spec-tile">
-              <span class="tl-tile-label">Beta Parameter (β)</span>
-              <span class="tl-tile-val" id="tl-spec-thermistor-beta">3500 K</span>
+          <div class="tl-controls-steps">
+            <div class="tl-info-label" style="margin-top:0;font-size:0.8rem;color:var(--tl-green)">Live NTC beta calculation</div>
+            <div class="tl-worked-solution" style="background-color:rgba(16,185,129,0.05);border-left-color:var(--tl-green)">
+              <div id="tl-svg-formula-thermistor" class="tl-math-formula" style="font-size:0.85rem"></div>
+              <p style="font-size:0.85rem">Substitute current resistance <b class="tl-live-value" id="tl-live-thermistor-rt">10.00 kΩ</b>:</p>
+              <div id="tl-svg-formula-thermistor-sub" class="tl-math-formula" style="font-size:0.85rem"></div>
             </div>
           </div>
 
-          <div class="tl-param-grid">
-            <div class="tl-cg">
-              <div class="tl-lr">
-                <span>Resistance at 25°C (R<sub>25</sub>)</span>
-                <span class="tl-badge" id="tl-val-thermistor-r25">10.0 kΩ</span>
+          <details class="tl-details">
+            <summary>${t('tools.thermometerLab.paramSettings')}</summary>
+            <div class="tl-details-body">
+              <div class="tl-probe-specs">
+                <div class="tl-spec-tile">
+                  <span class="tl-tile-label">Resistance at 25°C (R<sub>25</sub>)</span>
+                  <span class="tl-tile-val" id="tl-spec-thermistor-r25">10.0 kΩ</span>
+                </div>
+                <div class="tl-spec-tile">
+                  <span class="tl-tile-label">Beta Parameter (β)</span>
+                  <span class="tl-tile-val" id="tl-spec-thermistor-beta">3500 K</span>
+                </div>
               </div>
-              <input type="range" id="tl-slider-thermistor-r25" min="0.5" max="50.0" step="0.1" value="10.0">
-            </div>
-            <div class="tl-cg">
-              <div class="tl-lr">
-                <span>Beta Parameter (β)</span>
-                <span class="tl-badge" id="tl-val-thermistor-beta">3500 K</span>
+              <div class="tl-param-grid">
+                <div class="tl-cg">
+                  <div class="tl-lr">
+                    <span>Resistance at 25°C (R<sub>25</sub>)</span>
+                    <span class="tl-badge" id="tl-val-thermistor-r25">10.0 kΩ</span>
+                  </div>
+                  <input type="range" id="tl-slider-thermistor-r25" min="0.5" max="50.0" step="0.1" value="10.0">
+                </div>
+                <div class="tl-cg">
+                  <div class="tl-lr">
+                    <span>Beta Parameter (β)</span>
+                    <span class="tl-badge" id="tl-val-thermistor-beta">3500 K</span>
+                  </div>
+                  <input type="range" id="tl-slider-thermistor-beta" min="1000" max="8000" step="50" value="3500">
+                </div>
               </div>
-              <input type="range" id="tl-slider-thermistor-beta" min="1000" max="8000" step="50" value="3500">
             </div>
-          </div>
-
-          <!-- Live NTC beta calculation -->
-          <div class="tl-info-label" style="margin-top:10px;font-size:0.8rem;color:var(--tl-green)">Live NTC beta calculation</div>
-          <div class="tl-worked-solution" style="background-color:rgba(16,185,129,0.05);border-left-color:var(--tl-green)">
-            <div id="tl-svg-formula-thermistor" class="tl-math-formula" style="font-size:0.85rem">
-              <!-- Thermistor formula -->
-            </div>
-            <p>Substitute current resistance <b id="tl-live-thermistor-rt">10.00 kΩ</b>:</p>
-            <div id="tl-svg-formula-thermistor-sub" class="tl-math-formula" style="font-size:0.85rem">
-              <!-- Thermistor sub formula -->
-            </div>
-          </div>
+          </details>
         </div>
 
         </div>
@@ -1722,7 +1720,7 @@ export function createThermometerLab(t, options = {}) {
     ctx.fill();
 
     // Glowing resistance display
-    ctx.font = 'bold 14px "Courier New"';
+    ctx.font = 'bold 17px "Courier New"';
     ctx.fillStyle = '#10b981';
     ctx.textAlign = 'right';
     ctx.fillText(state.currentResistance.toFixed(2) + ' Ω', ox + ow - 16, oy + 34);
@@ -1828,7 +1826,7 @@ export function createThermometerLab(t, options = {}) {
     ctx.roundRect(ox + 10, oy + 12, ow - 20, 34, 4);
     ctx.fill();
 
-    ctx.font = 'bold 14px "Courier New"';
+    ctx.font = 'bold 17px "Courier New"';
     ctx.fillStyle = '#34d399';
     ctx.textAlign = 'right';
     ctx.fillText(state.currentThermistorR.toFixed(2) + ' kΩ', ox + ow - 16, oy + 34);

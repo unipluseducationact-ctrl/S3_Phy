@@ -1,4 +1,4 @@
-(function(){const n=document.createElement("link").relList;if(n&&n.supports&&n.supports("modulepreload"))return;for(const s of document.querySelectorAll('link[rel="modulepreload"]'))i(s);new MutationObserver(s=>{for(const a of s)if(a.type==="childList")for(const r of a.addedNodes)r.tagName==="LINK"&&r.rel==="modulepreload"&&i(r)}).observe(document,{childList:!0,subtree:!0});function o(s){const a={};return s.integrity&&(a.integrity=s.integrity),s.referrerPolicy&&(a.referrerPolicy=s.referrerPolicy),s.crossOrigin==="use-credentials"?a.credentials="include":s.crossOrigin==="anonymous"?a.credentials="omit":a.credentials="same-origin",a}function i(s){if(s.ep)return;s.ep=!0;const a=o(s);fetch(s.href,a)}})();const $e={"app.title":"Uni+ HKDSE Physics Hub","app.subtitle":"S3 Physics — Optics & Heat","strands.title":"Choose a strand","strands.intro":"Select Optics or Heat to open that learning hub.","strand.optics.title":"Optics","strand.optics.desc":"Light and waves: reflection, refraction, lenses, and electromagnetic waves.","strand.optics.subtitle":"Optics — light and waves","strand.heat.title":"Heat","strand.heat.desc":"Temperature, heat transfer, and thermal physics (interactive labs, worksheets, flashcards).","strand.heat.subtitle":"Heat — temperature and energy transfer","strand.open":"Open strand","strand.back":"All strands","heat.section.empty":"Heat strand content.","splash.start":"Start","splash.unitEducation":"Unit Education","lang.en":"English","lang.zhHant":"Traditional Chinese","nav.topics":"Topics","nav.notes":"Notes","nav.tools":"Interactive Tools","nav.worksheets":"Worksheets","nav.flashcards":"Flashcards","nav.summary":"Summary","topics.title":"Topic map","topics.intro":"Choose a strand to study. Each topic links to the interactive lab.","topic.reflection":"Reflection","topic.rotatingMirror":"Rotating plane mirror","topic.refraction":"Refraction","topic.refractionSnell":"Refraction and Snell’s law","topic.tir":"Total internal reflection","topic.refractionTir":"Refraction, Snell’s law & total internal reflection","topic.convex":"Convex lens","topic.concave":"Concave lens","topic.em":"Electromagnetic waves","topic.openTool":"Open lab","notes.title":"Study notes (PDF)","notes.intro":"Add PDFs under public/notes/ (see README there). Until then, use the topic list and interactive tools.","notes.card.reflection":"Reflection","notes.card.refraction":"Refraction and Snell law","notes.card.tir":"Total internal reflection","notes.card.convexLens":"Convex lens","notes.card.concaveLens":"Concave lens","notes.card.em":"Electromagnetic spectrum","notes.openPdf":"Open PDF","notes.embedHint":"If the preview is blank, open the PDF in a new tab.","notes.missing":"PDF not uploaded yet.","tools.title":"Interactive labs","tools.pick":"Select a lab","tools.rotatingMirror.title":"Rotating plane mirror","tools.rotatingMirror.subtitle":"Ray shift when the mirror turns (?θ_ray = 2θ_mirror).","tools.rotatingMirror.toggle.origNormal":"Orig. normal","tools.rotatingMirror.toggle.origRay":"Orig. reflected","tools.rotatingMirror.toggle.newNormal":"New normal","tools.rotatingMirror.toggle.newRay":"New reflected","tools.rotatingMirror.incidentAngle":"Incident direction (°)","tools.rotatingMirror.mirrorRotation":"Mirror rotation θ (°)","tools.rotatingMirror.statIncidence":"Incidence angle i","tools.rotatingMirror.statReflection":"Reflection angle r","tools.rotatingMirror.rayShift":"Ray shift","tools.rotatingMirror.logicBadge":"Rule: 2 ? θ","tools.rotatingMirror.reset":"Reset rotation","tools.rotatingMirror.canvas.incident":"Incident ray","tools.rotatingMirror.canvas.originalReflected":"Original reflected","tools.rotatingMirror.canvas.newReflected":"New reflected","tools.rotatingMirror.canvas.n":"n","tools.rotatingMirror.canvas.nPrime":"n′","tools.rotatingMirror.canvas.shift":"Shift","tools.refractionTir.title":"Prison Break lab — refraction, Snell & TIR","tools.refraction.title":"Refraction — Snell law","tools.refraction.n1":"n1 incident medium","tools.refraction.n2":"n2 second medium","tools.refraction.angle":"Angle of incidence (deg)","tools.tir.title":"Total internal reflection","tools.tir.n1":"n dense inside","tools.tir.n2":"n rare outside","tools.tir.angle":"Incidence in dense medium (deg)","tools.tir.critical":"Critical angle","tools.tir.state":"State","tools.tir.partial":"Partial refraction","tools.tir.full":"Total internal reflection","tools.lens.title":"Lens ray sketch","tools.convexLens.title":"Convex lens — ray sketch","tools.concaveLens.title":"Concave lens — ray sketch","tools.lens.type":"Lens type","tools.lens.convex":"Convex converging","tools.lens.concave":"Concave diverging","tools.lens.u":"Object distance u (cm)","tools.lens.f":"Focal length magnitude f (cm)","tools.lens.h":"Object height relative","tools.lens.note":"Convention: real u and v positive; convex f positive, concave f negative. Diagram is qualitative.","tools.rgbMixer.title":"RGB colour mixer","tools.rgbMixer.intro":"Additive mixing: red, green and blue light combine on screens. Drag sliders or use presets.","tools.rgbMixer.canvas":"RGB light overlap diagram","tools.rgbMixer.controls":"Colour controls","tools.rgbMixer.red":"Red","tools.rgbMixer.green":"Green","tools.rgbMixer.blue":"Blue","tools.rgbMixer.preview":"Mixed colour preview","tools.rgbMixer.presets":"Presets","tools.rgbMixer.presetRed":"Red","tools.rgbMixer.presetGreen":"Green","tools.rgbMixer.presetBlue":"Blue","tools.rgbMixer.presetYellow":"Yellow","tools.rgbMixer.presetCyan":"Cyan","tools.rgbMixer.presetMagenta":"Magenta","tools.rgbMixer.presetWhite":"White","tools.rgbMixer.presetBlack":"Black","topic.rgbMixer":"RGB colour mixing","tools.em.title":"Electromagnetic spectrum","tools.em.pick":"Explore wavelength, frequency, and simulation labs","worksheets.title":"Worksheet generator","worksheets.intro":"Generate practice worksheets with online checking, hints, and export.","worksheets.count":"Number of questions","worksheets.topics":"Topics","worksheets.generate":"Generate worksheet","worksheets.printPractice":"Print practice","worksheets.printAnswers":"Print answer key","worksheets.empty":"Click Generate to create questions.","worksheets.tabPractice":"Practice","worksheets.tabAnswer":"Answer key","worksheets.paperTitle":"S3 Optics — Multiple choice worksheet","worksheets.score":"Score","worksheets.hint":"Hint","worksheets.answer":"Answer","worksheets.today":"Today","worksheets.date":"Date","worksheets.exportWord":"Download Word","worksheets.exportWordAnswers":"Download answers (Word)","worksheets.sessionSummary":"Session summary","worksheets.firstTry":"Correct on first try","worksheets.revisionSuggestions":"Revision suggestions","worksheets.revisionExcellent":"Excellent — keep revising with flashcards.","worksheets.revisionGood":"Good progress — review any missed sections.","worksheets.revisionFair":"Fair — revisit summary notes for weak topics.","worksheets.revisionLow":"Needs work — study summaries and try again.","worksheets.weakSections":"Sections to review","flashcards.title":"Flashcards","flashcards.intro":"Study with spaced repetition — cards you find harder appear more often in later rounds. Picture decks for reflection, refraction, TIR, EM waves, and lenses.","flashcards.progress":"Card {current} of {total}","flashcards.deck":"Deck","flashcards.question":"Question","flashcards.answer":"Answer","flashcards.flip":"Flip","flashcards.next":"Next","flashcards.prev":"Previous","flashcards.all":"All topics","flashcards.deck.refractionTir":"Refraction & TIR","flashcards.mode.sequence":"Sequence","flashcards.mode.random":"Random","flashcards.again":"Again","flashcards.gotIt":"Got it","flashcards.round":"Round {round} · {total} cards","flashcards.flipFirst":"Tap the card, press Space, or Flip to reveal the answer first.","flashcards.hint.rated":"← Again · Got it →  (or keys 1 / 2)","flashcards.summary.title":"Round {round} complete","flashcards.summary.stats":"{total} cards studied · Again {again} · Got it {gotIt} · Next {neutral}","flashcards.summary.keep":"{count} to keep practising","flashcards.summary.confident":"{count} confident","flashcards.summary.nextRound":"Next round","flashcards.summary.restart":"Restart session","flashcards.summary.complete":"Session complete","flashcards.summary.completeStats":"Great work — you have finished all scheduled copies.","summary.title":"Topic summaries","summary.intro":"HKDSE summary sheets (PDF or image). Preview below or open in a new tab.","summary.viewImage":"Open full image","summary.download":"Open / download PDF","summary.missing":"Summary PDF not found.","footer.conventions":"Ray diagrams use a consistent thin-lens sign convention stated in each lab.","summary.item.reflection":"Reflection","summary.item.refraction":"Refraction and Snell’s law","summary.item.tir":"Total internal reflection","summary.item.convex":"Convex lens","summary.item.concave":"Concave lens","summary.item.em":"Electromagnetic waves","topic.thermometer":"Thermometer","topic.heatInternalEnergy":"Heat and internal energy","topic.changeOfState":"Change of state","topic.heatTransfer":"Heat transfer","topic.thermometerLab":"Thermometry & Calibration Lab","topic.viewNotes":"View notes","notes.card.thermometer":"Ch.1.1 Thermometer","notes.card.heatInternalEnergy":"Ch.1.2 Heat and internal energy","notes.card.changeOfState":"Ch.1.3 Change of state","notes.card.heatTransfer":"Ch.1.4 Heat transfer process","summary.item.thermometer":"Thermometer","summary.item.heatInternalEnergy":"Heat and internal energy","summary.item.changeOfState":"Change of state","summary.item.heatTransfer":"Heat transfer","flashcards.deck.thermometry":"Thermometry (all types)","flashcards.deck.heatInternalEnergy":"Heat and internal energy","flashcards.deck.changeOfState":"Change of state","flashcards.deck.heatTransfer":"Heat transfer","tools.thermometerLab.title":"Thermometry & Calibration Lab","tools.specificHeat.title":"Specific Heat Capacity Lab","tools.thermalMixing.title":"Thermal Mixing Lab","tools.changeOfState.title":"Change of State Lab","tools.heatTransfer.title":"Heat Transfer Laboratory","tools.thermometerLab.subtitle":"Interactive study companion for liquid-in-glass, platinum resistance, and thermistor thermometers.","tools.thermometerLab.liquid.title":"Liquid-in-Glass Thermometer","tools.thermometerLab.liquid.subtitle":"Explore the effects of bulb volume, capillary bore, and liquid type on sensitivity and response time.","tools.thermometerLab.resistance.title":"Platinum Resistance Thermometer","tools.thermometerLab.resistance.subtitle":"Investigate how platinum resistance varies linearly with temperature and solve calibration problems.","tools.thermometerLab.thermistor.title":"NTC Thermistor","tools.thermometerLab.thermistor.subtitle":"Study the non-linear resistance-temperature relationship of NTC thermistors and live beta calculations.","tools.thermometerLab.labels.show":"Show Structure Labels","tools.thermometerLab.labels.hide":"Hide Structure Labels","tools.thermometerLab.labels.thinWall":"Thin glass wall (fast heat transfer)","tools.thermometerLab.labels.largeBulb":"Large bulb (contains more liquid, increases sensitivity)","tools.thermometerLab.labels.narrowBore":"Narrow capillary bore (liquid rises higher, increases sensitivity)","tools.thermometerLab.labels.meniscus":"Meniscus (reading point)","tools.thermometerLab.labels.platinumCoil":"Platinum coil (resistance increases linearly with temp)","tools.thermometerLab.labels.metalSheath":"Metal sheath (protects & conducts heat quickly)","tools.thermometerLab.labels.semiconductorBead":"Semiconductor bead (resistance decreases exponentially with temp)","tools.thermometerLab.labels.leads":"Connecting leads","tools.thermometerLab.faulty.dualScale":"Dual-Scale Comparison Diagram","tools.thermometerLab.faulty.trueScale":"True Scale (°C)","tools.thermometerLab.faulty.faultyScale":"Faulty Scale (°C)","worksheets.paperTitleHeat":"S3 Heat — Multiple choice worksheet"},Tt={"app.title":"Uni+ HKDSE 物理學習中心","app.subtitle":"中三物理 — 光與熱","strands.title":"選擇單元","strands.intro":"選擇光學或熱學，進入該學習中心。","strand.optics.title":"光學","strand.optics.desc":"光與波動：反射、折射、透鏡與電磁波。","strand.optics.subtitle":"光學 — 光與波動","strand.heat.title":"熱學","strand.heat.desc":"溫度、熱傳入與熱力學（互動實驗室。工作紙、閃卡）。","strand.heat.subtitle":"熱學 — 溫度與熱傳入","strand.open":"進入單元","strand.back":"全部單元","heat.section.empty":"熱學單元內容。","splash.start":"開始","splash.unitEducation":"Unit Education","lang.en":"English","lang.zhHant":"繁體中文","nav.topics":"課題","nav.notes":"筆記","nav.tools":"互動實驗室","nav.worksheets":"工作紙","nav.flashcards":"閃卡","nav.summary":"總結","topics.title":"課題地圖","topics.intro":"選擇學習主題。每個主題可連到互動實驗室。","topic.reflection":"反射","topic.rotatingMirror":"旋轉平面鏡","topic.refraction":"折射","topic.refractionSnell":"折射與司乃耳定律","topic.tir":"全反射","topic.refractionTir":"折射、司乃耳定律與全內反射","topic.convex":"凸透鏡","topic.concave":"凹透鏡","topic.em":"電磁波","topic.openTool":"開啟實驗室","notes.title":"學習筆記（PDF）","notes.intro":"請把 PDF 放到 public/notes/ (見該資料夾 README)。完成前可先使用課題列表與互動工具。","notes.card.reflection":"反射","notes.card.refraction":"折射與司乃耳定律","notes.card.tir":"全內反射","notes.card.convexLens":"凸透鏡","notes.card.concaveLens":"凹透鏡","notes.card.em":"電磁波譜","notes.openPdf":"開啟 PDF","notes.embedHint":"若預覽空白，請在新分頁開啟 PDF。","notes.missing":"尚未上載 PDF。","tools.title":"互動實驗室","tools.pick":"選擇實驗","tools.rotatingMirror.title":"旋轉平面鏡","tools.rotatingMirror.subtitle":"鏡面轉動時反射光線的偏移（光線偏角 = 2 × 鏡角）。","tools.rotatingMirror.toggle.origNormal":"原法線","tools.rotatingMirror.toggle.origRay":"原反射光","tools.rotatingMirror.toggle.newNormal":"新法線","tools.rotatingMirror.toggle.newRay":"新反射光","tools.rotatingMirror.incidentAngle":"入射方向（°）","tools.rotatingMirror.mirrorRotation":"鏡面轉角 θ（°）","tools.rotatingMirror.statIncidence":"入射觔 i","tools.rotatingMirror.statReflection":"反射觔 r","tools.rotatingMirror.rayShift":"光線偏移","tools.rotatingMirror.logicBadge":"關係：2 × θ","tools.rotatingMirror.reset":"重設轉角","tools.rotatingMirror.canvas.incident":"入射光線","tools.rotatingMirror.canvas.originalReflected":"原反射光線","tools.rotatingMirror.canvas.newReflected":"新反射光線","tools.rotatingMirror.canvas.n":"n","tools.rotatingMirror.canvas.nPrime":"n′","tools.rotatingMirror.canvas.shift":"偏移","tools.refractionTir.title":"逃獄遊戲 — 折射、司乃耳與全內反射","tools.refraction.title":"折射 — 司乃耳定律","tools.refraction.n1":"n1 入射介質","tools.refraction.n2":"n2 第二介質","tools.refraction.angle":"入射觔（度）","tools.tir.title":"全內反射","tools.tir.n1":"n 密（光密）","tools.tir.n2":"n 疏（光疏）","tools.tir.angle":"光密介質內入射觔（度）","tools.tir.critical":"臨界觔","tools.tir.state":"狀態","tools.tir.partial":"部分折射","tools.tir.full":"全內反射","tools.lens.title":"透鏡 — 光線示意","tools.convexLens.title":"凸透鏡 — 光線示意","tools.concaveLens.title":"凹透鏡 — 光線示意","tools.lens.type":"透鏡類型","tools.lens.convex":"凸透鏡（會聚）","tools.lens.concave":"凹透鏡（發散）","tools.lens.u":"物距 u（厘米）","tools.lens.f":"焦距大小 f（厘米）","tools.lens.h":"物高（相對）","tools.lens.note":"符號：實物、實像距離取正；凸透鏡 f 為正，凹透鏡 f 為負。圖示為定性示意。","tools.rgbMixer.title":"RGB 顏色混合","tools.rgbMixer.intro":"加法混色：紅、綠、藍光在蟻幕上疊加。拖動滑棒或使用預設。","tools.rgbMixer.canvas":"RGB 光線疊加示意圖","tools.rgbMixer.controls":"顏色控制","tools.rgbMixer.red":"紅","tools.rgbMixer.green":"綠","tools.rgbMixer.blue":"藍","tools.rgbMixer.preview":"混合顏色預覽","tools.rgbMixer.presets":"預設","tools.rgbMixer.presetRed":"紅","tools.rgbMixer.presetGreen":"綠","tools.rgbMixer.presetBlue":"藍","tools.rgbMixer.presetYellow":"黃","tools.rgbMixer.presetCyan":"青","tools.rgbMixer.presetMagenta":"品紅","tools.rgbMixer.presetWhite":"白","tools.rgbMixer.presetBlack":"黑","topic.rgbMixer":"RGB 顏色混合","tools.em.title":"電磁波譜","tools.em.pick":"探索波長、頻率與模擬實驗","worksheets.title":"工作紙產生器","worksheets.intro":"產生練習工作紙，支援線上核對、提示與匯出。","worksheets.count":"題數","worksheets.topics":"課題","worksheets.generate":"產生工作紙","worksheets.printPractice":"列印練習","worksheets.printAnswers":"列印答案","worksheets.empty":"按產生工作紙建立題目。","worksheets.tabPractice":"練習模式","worksheets.tabAnswer":"答案","worksheets.paperTitle":"S3 光學 — 多項選擇題工作紙","worksheets.score":"得分","worksheets.hint":"提示","worksheets.answer":"答案","worksheets.today":"今日","worksheets.date":"日期","worksheets.exportWord":"下載 Word","worksheets.exportWordAnswers":"下載答案（Word）","worksheets.sessionSummary":"本次練習摘要","worksheets.firstTry":"首次即答對","worksheets.revisionSuggestions":"複習建議","worksheets.revisionExcellent":"優秀 — 繼續用閃卡複習。","worksheets.revisionGood":"良好 — 重溫錯題所屬節。","worksheets.revisionFair":"一般 — 回顧總結針對弱項。","worksheets.revisionLow":"需努力 — 先温習總結再試。","worksheets.weakSections":"建議複習節次","flashcards.title":"閃卡","flashcards.intro":"使用間隔重複習—難記的卡片在下一輪會更頻繁出現。反射、折射、全內反射、電磁波、凸透鏡與凹透鏡課題使用圖片閃卡。","flashcards.progress":"第 {current} 張，共 {total} 張","flashcards.deck":"卡組","flashcards.question":"問題","flashcards.answer":"答案","flashcards.flip":"翻面","flashcards.next":"下一張","flashcards.prev":"上一張","flashcards.all":"全部課題","flashcards.deck.refractionTir":"折射與全內反射","flashcards.mode.sequence":"順序","flashcards.mode.random":"隨機","flashcards.again":"再來","flashcards.gotIt":"懂了","flashcards.round":"第 {round} 輪 · {total} 張卡","flashcards.flipFirst":"請先點擊卡片、按空白鍵或翻面查看答案。","flashcards.hint.rated":"← 再來 · 懂了 →（或按 1 / 2）","flashcards.summary.title":"第 {round} 輪完成","flashcards.summary.stats":"共 {total} 張 · 再來 {again} · 懂了 {gotIt} · 下一張 {neutral}","flashcards.summary.keep":"{count} 張需繼續練習","flashcards.summary.confident":"{count} 張已掌握","flashcards.summary.nextRound":"下一輪","flashcards.summary.restart":"重新開始","flashcards.summary.complete":"練習完成","flashcards.summary.completeStats":"很好！你已完成所有排程的卡片。","summary.title":"課題總結","summary.intro":"HKDSE 總結表（PDF 或圖片）。可於下方預覽，或新分頁開啟。","summary.viewImage":"開啟完整圖片","summary.download":"開啟 / 下載 PDF","summary.missing":"找不到總結 PDF。","footer.conventions":"透鏡光線圖採用與各實驗室說明一致的薄透鏡符號規定。","summary.item.reflection":"反射","summary.item.refraction":"折射與司乃耳定律","summary.item.tir":"全內反射","summary.item.convex":"凸透鏡","summary.item.concave":"凹透鏡","summary.item.em":"電磁波","topic.thermometer":"溫度計","topic.heatInternalEnergy":"熱與內能","topic.changeOfState":"物態變化","topic.heatTransfer":"熱傳入","topic.thermometerLab":"溫度計與校準實驗室","topic.viewNotes":"查閱筆記","notes.card.thermometer":"Ch.1.1 溫度計","notes.card.heatInternalEnergy":"Ch.1.2 熱與內能","notes.card.changeOfState":"Ch.1.3 物態變化","notes.card.heatTransfer":"Ch.1.4 熱傳入","summary.item.thermometer":"溫度計","summary.item.heatInternalEnergy":"熱與內能","summary.item.changeOfState":"物態變化","summary.item.heatTransfer":"熱傳入","flashcards.deck.thermometry":"溫度計（各類）","flashcards.deck.heatInternalEnergy":"熱與內能","flashcards.deck.changeOfState":"物態變化","flashcards.deck.heatTransfer":"熱傳入","tools.thermometerLab.title":"溫度計與校準實驗室","tools.specificHeat.title":"比熱容量實驗室","tools.thermalMixing.title":"熱混合實驗室","tools.changeOfState.title":"物態變化實驗室","tools.heatTransfer.title":"熱的轉移實驗室","tools.thermometerLab.subtitle":"液體玻璃、鈐電阻及熱敏電阻溫度計的互動學習伴侶。","tools.thermometerLab.liquid.title":"液體玻璃溫度計","tools.thermometerLab.liquid.subtitle":"探索玻璃泡容積、毛細管內外徑和液體種類對靉敏度及反應時間的影響。","tools.thermometerLab.resistance.title":"鈐電阻溫度計","tools.thermometerLab.resistance.subtitle":"研究鈐電阻如何隨溫度呈線性變化，並解決溫度校準問題。","tools.thermometerLab.thermistor.title":"NTC 熱敏電阻溫度計","tools.thermometerLab.thermistor.subtitle":"學習負溫度係數（NTC）熱敏電阻的非線性電阻-溫度關係，並進行實時 Beta 計算。","tools.thermometerLab.labels.show":"顯示結構標註","tools.thermometerLab.labels.hide":"隱藏結構標註","tools.thermometerLab.labels.thinWall":"薄玻璃壁 (快速傳熱)","tools.thermometerLab.labels.largeBulb":"大玻璃泡 (容納更多液體，提高靉敏度)","tools.thermometerLab.labels.narrowBore":"細毛細管 (液柱升得更高，提高靉敏度)","tools.thermometerLab.labels.meniscus":"彎月面 (讀數位置)","tools.thermometerLab.labels.platinumCoil":"鈐絲線圈 (電阻隨溫度線性增加)","tools.thermometerLab.labels.metalSheath":"金屬保護套 (保護並快速導熱)","tools.thermometerLab.labels.semiconductorBead":"半導體小珠 (電阻隨溫度指數級減少)","tools.thermometerLab.labels.leads":"連接導線","tools.thermometerLab.faulty.dualScale":"雙刻度對比示意圖","tools.thermometerLab.faulty.trueScale":"標準溫標 (°C)","tools.thermometerLab.faulty.faultyScale":"偏差溫標 (°C)","worksheets.paperTitleHeat":"S3 熱學 — 多項選擇題工作紙"},ft="s3phy.lang",ht={en:$e,"zh-Hant":Tt};let Ie="en";function zt(){try{const t=localStorage.getItem(ft);if(t==="zh-Hant"||t==="en")return t}catch{}return"en"}function Rt(){Ie=zt()}function pt(t){if(ht[t]){Ie=t;try{localStorage.setItem(ft,t)}catch{}document.documentElement.lang=t==="zh-Hant"?"zh-Hant":"en",window.dispatchEvent(new CustomEvent("s3phy:lang"))}}function oe(){return Ie}function l(t){const n=ht[Ie]||$e;return Object.prototype.hasOwnProperty.call(n,t)?n[t]:Object.prototype.hasOwnProperty.call($e,t)?$e[t]:t}const Lt=.78;function We(){const t=document.documentElement,n=window.innerWidth,o=Math.max(window.innerHeight,1),i=n/o;let s=1;if(n<=1360?s=.88:n<=1500&&(s=.94),n>1700&&i>1.7){const a=Math.min(.07,(i-1.7)*.09),r=Math.min(.05,(n-1700)/1800*.05);s-=a+r}o<=700&&(s=Math.min(s,.82)),s=Math.max(Lt,Math.min(1,s)),t.style.setProperty("--hub-scale",s.toFixed(3))}function Mt(){return We(),window.addEventListener("resize",We),()=>window.removeEventListener("resize",We)}const _t=[{id:"optics",titleKey:"strand.optics.title",descKey:"strand.optics.desc"},{id:"heat",titleKey:"strand.heat.title",descKey:"strand.heat.desc"}];function Ht(t){function n(){t.innerHTML=`
+(function(){const n=document.createElement("link").relList;if(n&&n.supports&&n.supports("modulepreload"))return;for(const s of document.querySelectorAll('link[rel="modulepreload"]'))i(s);new MutationObserver(s=>{for(const a of s)if(a.type==="childList")for(const r of a.addedNodes)r.tagName==="LINK"&&r.rel==="modulepreload"&&i(r)}).observe(document,{childList:!0,subtree:!0});function o(s){const a={};return s.integrity&&(a.integrity=s.integrity),s.referrerPolicy&&(a.referrerPolicy=s.referrerPolicy),s.crossOrigin==="use-credentials"?a.credentials="include":s.crossOrigin==="anonymous"?a.credentials="omit":a.credentials="same-origin",a}function i(s){if(s.ep)return;s.ep=!0;const a=o(s);fetch(s.href,a)}})();const $e={"app.title":"Uni+ HKDSE Physics Hub","app.subtitle":"S3 Physics — Optics & Heat","strands.title":"Choose a strand","strands.intro":"Select Optics or Heat to open that learning hub.","strand.optics.title":"Optics","strand.optics.desc":"Light and waves: reflection, refraction, lenses, and electromagnetic waves.","strand.optics.subtitle":"Optics — light and waves","strand.heat.title":"Heat","strand.heat.desc":"Temperature, heat transfer, and thermal physics (interactive labs, worksheets, flashcards).","strand.heat.subtitle":"Heat — temperature and energy transfer","strand.open":"Open strand","strand.back":"All strands","heat.section.empty":"Heat strand content.","splash.start":"Start","splash.unitEducation":"Unit Education","lang.en":"English","lang.zhHant":"Traditional Chinese","nav.topics":"Topics","nav.notes":"Notes","nav.tools":"Interactive Tools","nav.worksheets":"Worksheets","nav.flashcards":"Flashcards","nav.summary":"Summary","topics.title":"Topic map","topics.intro":"Choose a strand to study. Each topic links to the interactive lab.","topic.reflection":"Reflection","topic.rotatingMirror":"Rotating plane mirror","topic.refraction":"Refraction","topic.refractionSnell":"Refraction and Snell’s law","topic.tir":"Total internal reflection","topic.refractionTir":"Refraction, Snell’s law & total internal reflection","topic.convex":"Convex lens","topic.concave":"Concave lens","topic.em":"Electromagnetic waves","topic.openTool":"Open lab","notes.title":"Study notes (PDF)","notes.intro":"Add PDFs under public/notes/ (see README there). Until then, use the topic list and interactive tools.","notes.card.reflection":"Reflection","notes.card.refraction":"Refraction and Snell law","notes.card.tir":"Total internal reflection","notes.card.convexLens":"Convex lens","notes.card.concaveLens":"Concave lens","notes.card.em":"Electromagnetic spectrum","notes.openPdf":"Open PDF","notes.embedHint":"If the preview is blank, open the PDF in a new tab.","notes.missing":"PDF not uploaded yet.","tools.title":"Interactive labs","tools.pick":"Select a lab","tools.rotatingMirror.title":"Rotating plane mirror","tools.rotatingMirror.subtitle":"Ray shift when the mirror turns (?θ_ray = 2θ_mirror).","tools.rotatingMirror.toggle.origNormal":"Orig. normal","tools.rotatingMirror.toggle.origRay":"Orig. reflected","tools.rotatingMirror.toggle.newNormal":"New normal","tools.rotatingMirror.toggle.newRay":"New reflected","tools.rotatingMirror.incidentAngle":"Incident direction (°)","tools.rotatingMirror.mirrorRotation":"Mirror rotation θ (°)","tools.rotatingMirror.statIncidence":"Incidence angle i","tools.rotatingMirror.statReflection":"Reflection angle r","tools.rotatingMirror.rayShift":"Ray shift","tools.rotatingMirror.logicBadge":"Rule: 2 ? θ","tools.rotatingMirror.reset":"Reset rotation","tools.rotatingMirror.canvas.incident":"Incident ray","tools.rotatingMirror.canvas.originalReflected":"Original reflected","tools.rotatingMirror.canvas.newReflected":"New reflected","tools.rotatingMirror.canvas.n":"n","tools.rotatingMirror.canvas.nPrime":"n′","tools.rotatingMirror.canvas.shift":"Shift","tools.refractionTir.title":"Prison Break lab — refraction, Snell & TIR","tools.refraction.title":"Refraction — Snell law","tools.refraction.n1":"n1 incident medium","tools.refraction.n2":"n2 second medium","tools.refraction.angle":"Angle of incidence (deg)","tools.tir.title":"Total internal reflection","tools.tir.n1":"n dense inside","tools.tir.n2":"n rare outside","tools.tir.angle":"Incidence in dense medium (deg)","tools.tir.critical":"Critical angle","tools.tir.state":"State","tools.tir.partial":"Partial refraction","tools.tir.full":"Total internal reflection","tools.lens.title":"Lens ray sketch","tools.convexLens.title":"Convex lens — ray sketch","tools.concaveLens.title":"Concave lens — ray sketch","tools.lens.type":"Lens type","tools.lens.convex":"Convex converging","tools.lens.concave":"Concave diverging","tools.lens.u":"Object distance u (cm)","tools.lens.f":"Focal length magnitude f (cm)","tools.lens.h":"Object height relative","tools.lens.note":"Convention: real u and v positive; convex f positive, concave f negative. Diagram is qualitative.","tools.rgbMixer.title":"RGB colour mixer","tools.rgbMixer.intro":"Additive mixing: red, green and blue light combine on screens. Drag sliders or use presets.","tools.rgbMixer.canvas":"RGB light overlap diagram","tools.rgbMixer.controls":"Colour controls","tools.rgbMixer.red":"Red","tools.rgbMixer.green":"Green","tools.rgbMixer.blue":"Blue","tools.rgbMixer.preview":"Mixed colour preview","tools.rgbMixer.presets":"Presets","tools.rgbMixer.presetRed":"Red","tools.rgbMixer.presetGreen":"Green","tools.rgbMixer.presetBlue":"Blue","tools.rgbMixer.presetYellow":"Yellow","tools.rgbMixer.presetCyan":"Cyan","tools.rgbMixer.presetMagenta":"Magenta","tools.rgbMixer.presetWhite":"White","tools.rgbMixer.presetBlack":"Black","topic.rgbMixer":"RGB colour mixing","tools.em.title":"Electromagnetic spectrum","tools.em.pick":"Explore wavelength, frequency, and simulation labs","worksheets.title":"Worksheet generator","worksheets.intro":"Generate practice worksheets with online checking, hints, and export.","worksheets.count":"Number of questions","worksheets.topics":"Topics","worksheets.generate":"Generate worksheet","worksheets.printPractice":"Print practice","worksheets.printAnswers":"Print answer key","worksheets.empty":"Click Generate to create questions.","worksheets.tabPractice":"Practice","worksheets.tabAnswer":"Answer key","worksheets.paperTitle":"S3 Optics — Multiple choice worksheet","worksheets.score":"Score","worksheets.hint":"Hint","worksheets.answer":"Answer","worksheets.today":"Today","worksheets.date":"Date","worksheets.exportWord":"Download Word","worksheets.exportWordAnswers":"Download answers (Word)","worksheets.sessionSummary":"Session summary","worksheets.firstTry":"Correct on first try","worksheets.revisionSuggestions":"Revision suggestions","worksheets.revisionExcellent":"Excellent — keep revising with flashcards.","worksheets.revisionGood":"Good progress — review any missed sections.","worksheets.revisionFair":"Fair — revisit summary notes for weak topics.","worksheets.revisionLow":"Needs work — study summaries and try again.","worksheets.weakSections":"Sections to review","flashcards.title":"Flashcards","flashcards.intro":"Study with spaced repetition — cards you find harder appear more often in later rounds. Picture decks for reflection, refraction, TIR, EM waves, and lenses.","flashcards.progress":"Card {current} of {total}","flashcards.deck":"Deck","flashcards.question":"Question","flashcards.answer":"Answer","flashcards.flip":"Flip","flashcards.next":"Next","flashcards.prev":"Previous","flashcards.all":"All topics","flashcards.deck.refractionTir":"Refraction & TIR","flashcards.mode.sequence":"Sequence","flashcards.mode.random":"Random","flashcards.again":"Again","flashcards.gotIt":"Got it","flashcards.round":"Round {round} · {total} cards","flashcards.flipFirst":"Tap the card, press Space, or Flip to reveal the answer first.","flashcards.hint.rated":"← Again · Got it →  (or keys 1 / 2)","flashcards.summary.title":"Round {round} complete","flashcards.summary.stats":"{total} cards studied · Again {again} · Got it {gotIt} · Next {neutral}","flashcards.summary.keep":"{count} to keep practising","flashcards.summary.confident":"{count} confident","flashcards.summary.nextRound":"Next round","flashcards.summary.restart":"Restart session","flashcards.summary.complete":"Session complete","flashcards.summary.completeStats":"Great work — you have finished all scheduled copies.","summary.title":"Topic summaries","summary.intro":"HKDSE summary sheets (PDF or image). Preview below or open in a new tab.","summary.viewImage":"Open full image","summary.download":"Open / download PDF","summary.missing":"Summary PDF not found.","footer.conventions":"Ray diagrams use a consistent thin-lens sign convention stated in each lab.","summary.item.reflection":"Reflection","summary.item.refraction":"Refraction and Snell’s law","summary.item.tir":"Total internal reflection","summary.item.convex":"Convex lens","summary.item.concave":"Concave lens","summary.item.em":"Electromagnetic waves","topic.thermometer":"Thermometer","topic.heatInternalEnergy":"Heat and internal energy","topic.changeOfState":"Change of state","topic.heatTransfer":"Heat transfer","topic.thermometerLab":"Thermometry & Calibration Lab","topic.viewNotes":"View notes","notes.card.thermometer":"Ch.1.1 Thermometer","notes.card.heatInternalEnergy":"Ch.1.2 Heat and internal energy","notes.card.changeOfState":"Ch.1.3 Change of state","notes.card.heatTransfer":"Ch.1.4 Heat transfer process","summary.item.thermometer":"Thermometer","summary.item.heatInternalEnergy":"Heat and internal energy","summary.item.changeOfState":"Change of state","summary.item.heatTransfer":"Heat transfer","flashcards.deck.thermometry":"Thermometry (all types)","flashcards.deck.heatInternalEnergy":"Heat and internal energy","flashcards.deck.changeOfState":"Change of state","flashcards.deck.heatTransfer":"Heat transfer","tools.thermometerLab.title":"Thermometry & Calibration Lab","tools.specificHeat.title":"Specific Heat Capacity Lab","tools.thermalMixing.title":"Thermal Mixing Lab","tools.changeOfState.title":"Change of State Lab","tools.heatTransfer.title":"Heat Transfer Laboratory","tools.thermometerLab.subtitle":"Interactive study companion for liquid-in-glass, platinum resistance, and thermistor thermometers.","tools.thermometerLab.liquid.title":"Liquid-in-Glass Thermometer","tools.thermometerLab.liquid.subtitle":"Explore the effects of bulb volume, capillary bore, and liquid type on sensitivity and response time.","tools.thermometerLab.resistance.title":"Platinum Resistance Thermometer","tools.thermometerLab.resistance.subtitle":"Investigate how platinum resistance varies linearly with temperature and solve calibration problems.","tools.thermometerLab.thermistor.title":"NTC Thermistor","tools.thermometerLab.thermistor.subtitle":"Study the non-linear resistance-temperature relationship of NTC thermistors and live beta calculations.","tools.thermometerLab.labels.show":"Show Structure Labels","tools.thermometerLab.labels.hide":"Hide Structure Labels","tools.thermometerLab.labels.thinWall":"Thin glass wall (fast heat transfer)","tools.thermometerLab.labels.largeBulb":"Large bulb (contains more liquid, increases sensitivity)","tools.thermometerLab.labels.narrowBore":"Narrow capillary bore (liquid rises higher, increases sensitivity)","tools.thermometerLab.labels.meniscus":"Meniscus (reading point)","tools.thermometerLab.labels.platinumCoil":"Platinum coil (resistance increases linearly with temp)","tools.thermometerLab.labels.metalSheath":"Metal sheath (protects & conducts heat quickly)","tools.thermometerLab.labels.semiconductorBead":"Semiconductor bead (resistance decreases exponentially with temp)","tools.thermometerLab.labels.leads":"Connecting leads","tools.thermometerLab.faulty.dualScale":"Dual-Scale Comparison Diagram","tools.thermometerLab.faulty.trueScale":"True Scale (°C)","tools.thermometerLab.faulty.faultyScale":"Faulty Scale (°C)","tools.thermometerLab.paramSettings":"Parameter settings","tools.thermometerLab.faultySolver":"Faulty thermometer solver","tools.thermometerLab.resistanceSolver":"Resistance-to-temperature solver","worksheets.paperTitleHeat":"S3 Heat — Multiple choice worksheet"},Tt={"app.title":"Uni+ HKDSE 物理學習中心","app.subtitle":"中三物理 — 光與熱","strands.title":"選擇單元","strands.intro":"選擇光學或熱學，進入該學習中心。","strand.optics.title":"光學","strand.optics.desc":"光與波動：反射、折射、透鏡與電磁波。","strand.optics.subtitle":"光學 — 光與波動","strand.heat.title":"熱學","strand.heat.desc":"溫度、熱傳入與熱力學（互動實驗室。工作紙、閃卡）。","strand.heat.subtitle":"熱學 — 溫度與熱傳入","strand.open":"進入單元","strand.back":"全部單元","heat.section.empty":"熱學單元內容。","splash.start":"開始","splash.unitEducation":"Unit Education","lang.en":"English","lang.zhHant":"繁體中文","nav.topics":"課題","nav.notes":"筆記","nav.tools":"互動實驗室","nav.worksheets":"工作紙","nav.flashcards":"閃卡","nav.summary":"總結","topics.title":"課題地圖","topics.intro":"選擇學習主題。每個主題可連到互動實驗室。","topic.reflection":"反射","topic.rotatingMirror":"旋轉平面鏡","topic.refraction":"折射","topic.refractionSnell":"折射與司乃耳定律","topic.tir":"全反射","topic.refractionTir":"折射、司乃耳定律與全內反射","topic.convex":"凸透鏡","topic.concave":"凹透鏡","topic.em":"電磁波","topic.openTool":"開啟實驗室","notes.title":"學習筆記（PDF）","notes.intro":"請把 PDF 放到 public/notes/ (見該資料夾 README)。完成前可先使用課題列表與互動工具。","notes.card.reflection":"反射","notes.card.refraction":"折射與司乃耳定律","notes.card.tir":"全內反射","notes.card.convexLens":"凸透鏡","notes.card.concaveLens":"凹透鏡","notes.card.em":"電磁波譜","notes.openPdf":"開啟 PDF","notes.embedHint":"若預覽空白，請在新分頁開啟 PDF。","notes.missing":"尚未上載 PDF。","tools.title":"互動實驗室","tools.pick":"選擇實驗","tools.rotatingMirror.title":"旋轉平面鏡","tools.rotatingMirror.subtitle":"鏡面轉動時反射光線的偏移（光線偏角 = 2 × 鏡角）。","tools.rotatingMirror.toggle.origNormal":"原法線","tools.rotatingMirror.toggle.origRay":"原反射光","tools.rotatingMirror.toggle.newNormal":"新法線","tools.rotatingMirror.toggle.newRay":"新反射光","tools.rotatingMirror.incidentAngle":"入射方向（°）","tools.rotatingMirror.mirrorRotation":"鏡面轉角 θ（°）","tools.rotatingMirror.statIncidence":"入射觔 i","tools.rotatingMirror.statReflection":"反射觔 r","tools.rotatingMirror.rayShift":"光線偏移","tools.rotatingMirror.logicBadge":"關係：2 × θ","tools.rotatingMirror.reset":"重設轉角","tools.rotatingMirror.canvas.incident":"入射光線","tools.rotatingMirror.canvas.originalReflected":"原反射光線","tools.rotatingMirror.canvas.newReflected":"新反射光線","tools.rotatingMirror.canvas.n":"n","tools.rotatingMirror.canvas.nPrime":"n′","tools.rotatingMirror.canvas.shift":"偏移","tools.refractionTir.title":"逃獄遊戲 — 折射、司乃耳與全內反射","tools.refraction.title":"折射 — 司乃耳定律","tools.refraction.n1":"n1 入射介質","tools.refraction.n2":"n2 第二介質","tools.refraction.angle":"入射觔（度）","tools.tir.title":"全內反射","tools.tir.n1":"n 密（光密）","tools.tir.n2":"n 疏（光疏）","tools.tir.angle":"光密介質內入射觔（度）","tools.tir.critical":"臨界觔","tools.tir.state":"狀態","tools.tir.partial":"部分折射","tools.tir.full":"全內反射","tools.lens.title":"透鏡 — 光線示意","tools.convexLens.title":"凸透鏡 — 光線示意","tools.concaveLens.title":"凹透鏡 — 光線示意","tools.lens.type":"透鏡類型","tools.lens.convex":"凸透鏡（會聚）","tools.lens.concave":"凹透鏡（發散）","tools.lens.u":"物距 u（厘米）","tools.lens.f":"焦距大小 f（厘米）","tools.lens.h":"物高（相對）","tools.lens.note":"符號：實物、實像距離取正；凸透鏡 f 為正，凹透鏡 f 為負。圖示為定性示意。","tools.rgbMixer.title":"RGB 顏色混合","tools.rgbMixer.intro":"加法混色：紅、綠、藍光在蟻幕上疊加。拖動滑棒或使用預設。","tools.rgbMixer.canvas":"RGB 光線疊加示意圖","tools.rgbMixer.controls":"顏色控制","tools.rgbMixer.red":"紅","tools.rgbMixer.green":"綠","tools.rgbMixer.blue":"藍","tools.rgbMixer.preview":"混合顏色預覽","tools.rgbMixer.presets":"預設","tools.rgbMixer.presetRed":"紅","tools.rgbMixer.presetGreen":"綠","tools.rgbMixer.presetBlue":"藍","tools.rgbMixer.presetYellow":"黃","tools.rgbMixer.presetCyan":"青","tools.rgbMixer.presetMagenta":"品紅","tools.rgbMixer.presetWhite":"白","tools.rgbMixer.presetBlack":"黑","topic.rgbMixer":"RGB 顏色混合","tools.em.title":"電磁波譜","tools.em.pick":"探索波長、頻率與模擬實驗","worksheets.title":"工作紙產生器","worksheets.intro":"產生練習工作紙，支援線上核對、提示與匯出。","worksheets.count":"題數","worksheets.topics":"課題","worksheets.generate":"產生工作紙","worksheets.printPractice":"列印練習","worksheets.printAnswers":"列印答案","worksheets.empty":"按產生工作紙建立題目。","worksheets.tabPractice":"練習模式","worksheets.tabAnswer":"答案","worksheets.paperTitle":"S3 光學 — 多項選擇題工作紙","worksheets.score":"得分","worksheets.hint":"提示","worksheets.answer":"答案","worksheets.today":"今日","worksheets.date":"日期","worksheets.exportWord":"下載 Word","worksheets.exportWordAnswers":"下載答案（Word）","worksheets.sessionSummary":"本次練習摘要","worksheets.firstTry":"首次即答對","worksheets.revisionSuggestions":"複習建議","worksheets.revisionExcellent":"優秀 — 繼續用閃卡複習。","worksheets.revisionGood":"良好 — 重溫錯題所屬節。","worksheets.revisionFair":"一般 — 回顧總結針對弱項。","worksheets.revisionLow":"需努力 — 先温習總結再試。","worksheets.weakSections":"建議複習節次","flashcards.title":"閃卡","flashcards.intro":"使用間隔重複習—難記的卡片在下一輪會更頻繁出現。反射、折射、全內反射、電磁波、凸透鏡與凹透鏡課題使用圖片閃卡。","flashcards.progress":"第 {current} 張，共 {total} 張","flashcards.deck":"卡組","flashcards.question":"問題","flashcards.answer":"答案","flashcards.flip":"翻面","flashcards.next":"下一張","flashcards.prev":"上一張","flashcards.all":"全部課題","flashcards.deck.refractionTir":"折射與全內反射","flashcards.mode.sequence":"順序","flashcards.mode.random":"隨機","flashcards.again":"再來","flashcards.gotIt":"懂了","flashcards.round":"第 {round} 輪 · {total} 張卡","flashcards.flipFirst":"請先點擊卡片、按空白鍵或翻面查看答案。","flashcards.hint.rated":"← 再來 · 懂了 →（或按 1 / 2）","flashcards.summary.title":"第 {round} 輪完成","flashcards.summary.stats":"共 {total} 張 · 再來 {again} · 懂了 {gotIt} · 下一張 {neutral}","flashcards.summary.keep":"{count} 張需繼續練習","flashcards.summary.confident":"{count} 張已掌握","flashcards.summary.nextRound":"下一輪","flashcards.summary.restart":"重新開始","flashcards.summary.complete":"練習完成","flashcards.summary.completeStats":"很好！你已完成所有排程的卡片。","summary.title":"課題總結","summary.intro":"HKDSE 總結表（PDF 或圖片）。可於下方預覽，或新分頁開啟。","summary.viewImage":"開啟完整圖片","summary.download":"開啟 / 下載 PDF","summary.missing":"找不到總結 PDF。","footer.conventions":"透鏡光線圖採用與各實驗室說明一致的薄透鏡符號規定。","summary.item.reflection":"反射","summary.item.refraction":"折射與司乃耳定律","summary.item.tir":"全內反射","summary.item.convex":"凸透鏡","summary.item.concave":"凹透鏡","summary.item.em":"電磁波","topic.thermometer":"溫度計","topic.heatInternalEnergy":"熱與內能","topic.changeOfState":"物態變化","topic.heatTransfer":"熱傳入","topic.thermometerLab":"溫度計與校準實驗室","topic.viewNotes":"查閱筆記","notes.card.thermometer":"Ch.1.1 溫度計","notes.card.heatInternalEnergy":"Ch.1.2 熱與內能","notes.card.changeOfState":"Ch.1.3 物態變化","notes.card.heatTransfer":"Ch.1.4 熱傳入","summary.item.thermometer":"溫度計","summary.item.heatInternalEnergy":"熱與內能","summary.item.changeOfState":"物態變化","summary.item.heatTransfer":"熱傳入","flashcards.deck.thermometry":"溫度計（各類）","flashcards.deck.heatInternalEnergy":"熱與內能","flashcards.deck.changeOfState":"物態變化","flashcards.deck.heatTransfer":"熱傳入","tools.thermometerLab.title":"溫度計與校準實驗室","tools.specificHeat.title":"比熱容量實驗室","tools.thermalMixing.title":"熱混合實驗室","tools.changeOfState.title":"物態變化實驗室","tools.heatTransfer.title":"熱的轉移實驗室","tools.thermometerLab.subtitle":"液體玻璃、鈐電阻及熱敏電阻溫度計的互動學習伴侶。","tools.thermometerLab.liquid.title":"液體玻璃溫度計","tools.thermometerLab.liquid.subtitle":"探索玻璃泡容積、毛細管內外徑和液體種類對靉敏度及反應時間的影響。","tools.thermometerLab.resistance.title":"鈐電阻溫度計","tools.thermometerLab.resistance.subtitle":"研究鈐電阻如何隨溫度呈線性變化，並解決溫度校準問題。","tools.thermometerLab.thermistor.title":"NTC 熱敏電阻溫度計","tools.thermometerLab.thermistor.subtitle":"學習負溫度係數（NTC）熱敏電阻的非線性電阻-溫度關係，並進行實時 Beta 計算。","tools.thermometerLab.labels.show":"顯示結構標註","tools.thermometerLab.labels.hide":"隱藏結構標註","tools.thermometerLab.labels.thinWall":"薄玻璃壁 (快速傳熱)","tools.thermometerLab.labels.largeBulb":"大玻璃泡 (容納更多液體，提高靉敏度)","tools.thermometerLab.labels.narrowBore":"細毛細管 (液柱升得更高，提高靉敏度)","tools.thermometerLab.labels.meniscus":"彎月面 (讀數位置)","tools.thermometerLab.labels.platinumCoil":"鈐絲線圈 (電阻隨溫度線性增加)","tools.thermometerLab.labels.metalSheath":"金屬保護套 (保護並快速導熱)","tools.thermometerLab.labels.semiconductorBead":"半導體小珠 (電阻隨溫度指數級減少)","tools.thermometerLab.labels.leads":"連接導線","tools.thermometerLab.faulty.dualScale":"雙刻度對比示意圖","tools.thermometerLab.faulty.trueScale":"標準溫標 (°C)","tools.thermometerLab.faulty.faultyScale":"偏差溫標 (°C)","tools.thermometerLab.paramSettings":"參數設定","tools.thermometerLab.faultySolver":"故障溫度計求解器","tools.thermometerLab.resistanceSolver":"電阻求溫度求解器","worksheets.paperTitleHeat":"S3 熱學 — 多項選擇題工作紙"},ft="s3phy.lang",ht={en:$e,"zh-Hant":Tt};let Ie="en";function zt(){try{const t=localStorage.getItem(ft);if(t==="zh-Hant"||t==="en")return t}catch{}return"en"}function Rt(){Ie=zt()}function pt(t){if(ht[t]){Ie=t;try{localStorage.setItem(ft,t)}catch{}document.documentElement.lang=t==="zh-Hant"?"zh-Hant":"en",window.dispatchEvent(new CustomEvent("s3phy:lang"))}}function oe(){return Ie}function l(t){const n=ht[Ie]||$e;return Object.prototype.hasOwnProperty.call(n,t)?n[t]:Object.prototype.hasOwnProperty.call($e,t)?$e[t]:t}const Lt=.78;function We(){const t=document.documentElement,n=window.innerWidth,o=Math.max(window.innerHeight,1),i=n/o;let s=1;if(n<=1360?s=.88:n<=1500&&(s=.94),n>1700&&i>1.7){const a=Math.min(.07,(i-1.7)*.09),r=Math.min(.05,(n-1700)/1800*.05);s-=a+r}o<=700&&(s=Math.min(s,.82)),s=Math.max(Lt,Math.min(1,s)),t.style.setProperty("--hub-scale",s.toFixed(3))}function Mt(){return We(),window.addEventListener("resize",We),()=>window.removeEventListener("resize",We)}const _t=[{id:"optics",titleKey:"strand.optics.title",descKey:"strand.optics.desc"},{id:"heat",titleKey:"strand.heat.title",descKey:"strand.heat.desc"}];function Ht(t){function n(){t.innerHTML=`
       <header class="site-header site-header--strand-picker">
         <div class="site-header__brand">
           <div class="brand-logo-wrap" aria-hidden="true">
@@ -819,6 +819,9 @@ ${Z}</body></html>`}function V(w){const R=I(w),Z=new Blob(["\uFEFF",R],{type:"ap
 .tl-wrap .tl-tab-content.active {
   display: flex;
 }
+.tl-wrap .tl-controls-steps {
+  order: -1;
+}
 .tl-wrap .tl-beaker-overlay {
   background-color: rgba(20, 20, 23, 0.95);
   border: 1px solid var(--tl-border);
@@ -831,13 +834,24 @@ ${Z}</body></html>`}function V(w){const R=I(w),Z=new Blob(["\uFEFF",R],{type:"ap
   align-items: center;
 }
 .tl-wrap .tl-temp-badge {
-  font-size: 1.1rem;
+  font-size: 1.35rem;
   font-weight: 800;
   color: var(--tl-cyan);
   text-shadow: 0 0 10px var(--tl-glow-cyan);
 }
+.tl-wrap .tl-live-value {
+  font-size: 1.05rem;
+  font-weight: 700;
+  color: var(--tl-cyan);
+}
+.tl-wrap .tl-lr-value {
+  font-size: 1.1rem;
+}
+.tl-wrap .tl-bath-bar-top {
+  font-size: 0.95rem;
+}
 .tl-wrap .tl-cg { display: flex; flex-direction: column; gap: 6px; }
-.tl-wrap .tl-lr { display: flex; justify-content: space-between; align-items: center; font-size: 0.8rem; font-weight: 600; }
+.tl-wrap .tl-lr { display: flex; justify-content: space-between; align-items: center; font-size: 0.95rem; font-weight: 600; }
 .tl-wrap .tl-section-label {
   font-size: 0.75rem;
   font-weight: 800;
@@ -858,7 +872,7 @@ ${Z}</body></html>`}function V(w){const R=I(w),Z=new Blob(["\uFEFF",R],{type:"ap
   padding: 3px 10px;
   border-radius: 6px;
   font-family: ui-monospace, monospace;
-  font-size: 0.82rem;
+  font-size: 1rem;
   border: 1px solid rgba(255, 255, 255, 0.05);
 }
 .tl-wrap input[type="range"] { -webkit-appearance: none; width: 100%; background: transparent; margin: 6px 0; }
@@ -1197,12 +1211,12 @@ ${Z}</body></html>`}function V(w){const R=I(w),Z=new Blob(["\uFEFF",R],{type:"ap
           <div class="tl-bath-bar-top" style="display:flex;align-items:center;justify-content:space-between;gap:12px">
             <div class="tl-beaker-overlay" style="padding:4px 8px;margin:0;font-size:0.75rem;background:transparent;border:none">
               <span>Liquid: <b id="tl-bath-state">Water</b></span>
-              <span><b class="tl-temp-badge" id="tl-bath-temp-display" style="font-size:0.9rem">25.0°C</b></span>
+              <span><b class="tl-temp-badge" id="tl-bath-temp-display">25.0°C</b></span>
             </div>
             <div class="tl-bath-slider-wrap" style="flex:1;display:flex;flex-direction:column;gap:2px">
-              <div class="tl-lr" style="font-size:0.72rem">
+              <div class="tl-lr">
                 <span>T<sub>bath</sub></span>
-                <span class="tl-badge" id="tl-val-bath-temp" style="color:var(--tl-cyan);font-size:0.75rem">25.0 °C</span>
+                <span class="tl-badge tl-lr-value" id="tl-val-bath-temp" style="color:var(--tl-cyan)">25.0 °C</span>
               </div>
               <input type="range" id="tl-bath-temp-slider" min="0" max="200" step="0.5" value="25.0" style="margin:0">
             </div>
@@ -1221,284 +1235,268 @@ ${Z}</body></html>`}function V(w){const R=I(w),Z=new Blob(["\uFEFF",R],{type:"ap
 
         <!-- TAB 1: LIQUID-IN-GLASS -->
         <div class="tl-tab-content active" id="tl-tab-liquid">
-          <div class="tl-cg">
-            <span class="tl-section-label">Thermometric liquid</span>
-            <div class="tl-seg" role="group" aria-label="Thermometric liquid">
-              <button type="button" class="tl-seg-btn active-mercury" id="tl-card-mercury" title="Mercury — boils at 356.7°C; suitable for high temperatures">
-                <span class="tl-dot mercury"></span> Hg
-              </button>
-              <button type="button" class="tl-seg-btn" id="tl-card-alcohol" title="Alcohol — boils at 78.4°C; vaporizes at high temperatures">
-                <span class="tl-dot alcohol"></span> Alcohol
-              </button>
-            </div>
-          </div>
-
-          <div class="tl-warning-banner" id="tl-alcohol-boiling-warning">
-            <strong>CRITICAL PHYSICS ALERT!</strong> Alcohol boils at 78.4°C. Dipping it into this temperature vaporizes the liquid, creating extreme pressure and breaking the thermometer. This is why alcohol <b>cannot</b> be used to measure hot oil (150°C)!
-          </div>
-
-          <div class="tl-param-grid">
-            <div class="tl-cg">
-              <div class="tl-lr">
-                <span>Bulb Volume (V<sub>b</sub>)</span>
-                <span class="tl-badge" id="tl-val-bulb-vol">200 mm³</span>
+          <!-- Live calibration formula (always visible) -->
+          <div class="tl-controls-steps">
+            <div class="tl-info-label" style="margin-top:0;font-size:0.8rem;color:var(--tl-cyan)">Live calibration formula (Dual-Directional Realtime Calculations)</div>
+            <div class="tl-worked-solution" style="margin-bottom:10px; display:flex; flex-direction:column; gap:12px">
+              <div style="border-bottom:1px solid rgba(255,255,255,0.05); padding-bottom:10px">
+                <div class="tl-info-label" style="font-size:0.75rem;color:var(--tl-cyan);margin-bottom:4px">Direction A: Length to Temperature (L<sub>T</sub> &rarr; T)</div>
+                <div id="tl-svg-formula-liquid" class="tl-math-formula" style="height:45px; margin:4px 0"></div>
+                <p style="margin:2px 0; font-size:0.85rem">Substitute current reading <b class="tl-live-value" id="tl-live-liquid-lt">5.50 cm</b>:</p>
+                <div id="tl-svg-formula-liquid-sub" class="tl-math-formula" style="height:100px; margin:4px 0"></div>
               </div>
-              <input type="range" id="tl-slider-bulb-vol" min="10" max="1000" step="10" value="200">
-            </div>
-            <div class="tl-cg">
-              <div class="tl-lr">
-                <span>Wall Thickness (w)</span>
-                <span class="tl-badge" id="tl-val-wall-thickness">0.5 mm</span>
-              </div>
-              <input type="range" id="tl-slider-wall-thick" min="0.05" max="3.0" step="0.05" value="0.5">
-            </div>
-            <div class="tl-cg">
-              <div class="tl-lr">
-                <span>Capillary Bore Diameter (d)</span>
-                <span class="tl-badge" id="tl-val-capillary-bore">0.3 mm</span>
-              </div>
-              <input type="range" id="tl-slider-capillary-bore" min="0.05" max="2.0" step="0.05" value="0.3">
-            </div>
-            <div class="tl-cg">
-              <div class="tl-lr">
-                <span>Ice Point Column Length (L<sub>0</sub>)</span>
-                <span class="tl-badge" id="tl-val-liquid-l0">3.0 cm</span>
-              </div>
-              <input type="range" id="tl-slider-liquid-l0" min="0.5" max="15.0" step="0.1" value="3.0">
-            </div>
-            <div class="tl-cg">
-              <div class="tl-lr">
-                <span>Steam Point Column Length (L<sub>100</sub>)</span>
-                <span class="tl-badge" id="tl-val-liquid-l100">13.0 cm</span>
-              </div>
-              <input type="range" id="tl-slider-liquid-l100" min="5.0" max="30.0" step="0.1" value="13.0">
-            </div>
-          </div>
-
-          <div class="tl-info-card tl-info-card--compact">
-            τ = <b id="tl-val-response-time">0.65 s</b> · larger V<sub>b</sub> → slower equilibration
-          </div>
-
-          <!-- Live calibration formula -->
-          <div class="tl-info-label" style="margin-top:10px;font-size:0.8rem;color:var(--tl-cyan)">Live calibration formula (Dual-Directional Realtime Calculations)</div>
-          <div class="tl-worked-solution" style="margin-bottom:10px; display:flex; flex-direction:column; gap:12px">
-            <!-- Direction A: Length to Temperature -->
-            <div style="border-bottom:1px solid rgba(255,255,255,0.05); padding-bottom:10px">
-              <div class="tl-info-label" style="font-size:0.75rem;color:var(--tl-cyan);margin-bottom:4px">Direction A: Length to Temperature (L<sub>T</sub> &rarr; T)</div>
-              <div id="tl-svg-formula-liquid" class="tl-math-formula" style="height:45px; margin:4px 0">
-                <!-- Inline SVG for beautiful LaTeX-like formula rendering -->
-              </div>
-              <p style="margin:2px 0; font-size:0.75rem">Substitute current reading <b id="tl-live-liquid-lt">5.50 cm</b>:</p>
-              <div id="tl-svg-formula-liquid-sub" class="tl-math-formula" style="height:100px; margin:4px 0">
-                <!-- Substituted numbers formula -->
-              </div>
-            </div>
-
-            <!-- Direction B: Temperature to Length -->
-            <div>
-              <div class="tl-info-label" style="font-size:0.75rem;color:var(--tl-cyan);margin-bottom:4px">Direction B: Temperature to Length (T &rarr; L<sub>T</sub>)</div>
-              <p style="margin:2px 0; font-size:0.75rem">Substitute current bath temperature <b id="tl-live-liquid-t-sub">25.0°C</b>:</p>
-              <div id="tl-svg-formula-t-to-l" class="tl-math-formula" style="font-size:0.85rem;height:110px; margin:4px 0">
-                <!-- T to L Formula -->
+              <div>
+                <div class="tl-info-label" style="font-size:0.75rem;color:var(--tl-cyan);margin-bottom:4px">Direction B: Temperature to Length (T &rarr; L<sub>T</sub>)</div>
+                <p style="margin:2px 0; font-size:0.85rem">Substitute current bath temperature <b class="tl-live-value" id="tl-live-liquid-t-sub">25.0°C</b>:</p>
+                <div id="tl-svg-formula-t-to-l" class="tl-math-formula" style="font-size:0.85rem;height:110px; margin:4px 0"></div>
               </div>
             </div>
           </div>
 
-          <!-- Faulty thermometer solver -->
-          <div class="tl-info-label" style="margin-top:10px;font-size:0.8rem;color:var(--tl-cyan)">Faulty thermometer solver</div>
-          <div style="display:flex;flex-direction:column;gap:8px">
-            <p style="font-size:0.7rem;color:var(--tl-muted);margin:0">Set faulty readings at ice (0°C) and steam (100°C), then solve for T or C.</p>
-            <div class="tl-info-card" style="margin-bottom:4px">
-              <div class="tl-info-label">Faulty scale calibration</div>
-              <p style="margin:0;font-size:0.68rem">T / 100 = (C − C<sub>f</sub>) / (C<sub>u</sub> − C<sub>f</sub>)</p>
+          <details class="tl-details">
+            <summary>${t("tools.thermometerLab.paramSettings")}</summary>
+            <div class="tl-details-body">
+              <div class="tl-cg">
+                <span class="tl-section-label">Thermometric liquid</span>
+                <div class="tl-seg" role="group" aria-label="Thermometric liquid">
+                  <button type="button" class="tl-seg-btn active-mercury" id="tl-card-mercury" title="Mercury — boils at 356.7°C; suitable for high temperatures">
+                    <span class="tl-dot mercury"></span> Hg
+                  </button>
+                  <button type="button" class="tl-seg-btn" id="tl-card-alcohol" title="Alcohol — boils at 78.4°C; vaporizes at high temperatures">
+                    <span class="tl-dot alcohol"></span> Alcohol
+                  </button>
+                </div>
+              </div>
+              <div class="tl-warning-banner" id="tl-alcohol-boiling-warning">
+                <strong>CRITICAL PHYSICS ALERT!</strong> Alcohol boils at 78.4°C. Dipping it into this temperature vaporizes the liquid, creating extreme pressure and breaking the thermometer. This is why alcohol <b>cannot</b> be used to measure hot oil (150°C)!
+              </div>
+              <div class="tl-param-grid">
+                <div class="tl-cg">
+                  <div class="tl-lr">
+                    <span>Bulb Volume (V<sub>b</sub>)</span>
+                    <span class="tl-badge" id="tl-val-bulb-vol">200 mm³</span>
+                  </div>
+                  <input type="range" id="tl-slider-bulb-vol" min="10" max="1000" step="10" value="200">
+                </div>
+                <div class="tl-cg">
+                  <div class="tl-lr">
+                    <span>Wall Thickness (w)</span>
+                    <span class="tl-badge" id="tl-val-wall-thickness">0.5 mm</span>
+                  </div>
+                  <input type="range" id="tl-slider-wall-thick" min="0.05" max="3.0" step="0.05" value="0.5">
+                </div>
+                <div class="tl-cg">
+                  <div class="tl-lr">
+                    <span>Capillary Bore Diameter (d)</span>
+                    <span class="tl-badge" id="tl-val-capillary-bore">0.3 mm</span>
+                  </div>
+                  <input type="range" id="tl-slider-capillary-bore" min="0.05" max="2.0" step="0.05" value="0.3">
+                </div>
+                <div class="tl-cg">
+                  <div class="tl-lr">
+                    <span>Ice Point Column Length (L<sub>0</sub>)</span>
+                    <span class="tl-badge" id="tl-val-liquid-l0">3.0 cm</span>
+                  </div>
+                  <input type="range" id="tl-slider-liquid-l0" min="0.5" max="15.0" step="0.1" value="3.0">
+                </div>
+                <div class="tl-cg">
+                  <div class="tl-lr">
+                    <span>Steam Point Column Length (L<sub>100</sub>)</span>
+                    <span class="tl-badge" id="tl-val-liquid-l100">13.0 cm</span>
+                  </div>
+                  <input type="range" id="tl-slider-liquid-l100" min="5.0" max="30.0" step="0.1" value="13.0">
+                </div>
+              </div>
+              <div class="tl-info-card tl-info-card--compact">
+                τ = <b id="tl-val-response-time">0.65 s</b> · larger V<sub>b</sub> → slower equilibration
+              </div>
             </div>
-            
-            <!-- Dual-Scale Diagram Container -->
-            <div class="tl-info-label" style="font-size:0.75rem;color:var(--tl-muted);margin-top:4px;">${t("tools.thermometerLab.faulty.dualScale")}</div>
-            <div id="tl-faulty-svg-container" style="width:100%; height:190px; margin:4px 0; background:rgba(0,0,0,0.25); border-radius:10px; border:1px solid var(--tl-border); display:flex; justify-content:center; align-items:center; padding:8px;"></div>
+          </details>
 
-            <div class="tl-faulty-cal">
-              <div class="tl-calc-inputs">
-                <span>Ice reading C<sub>f</sub> (true 0°C)</span>
-                <div class="tl-input-with-unit">
-                  <input type="number" id="tl-input-faulty-cf" value="-1.5" step="0.1" class="tl-calc-input" aria-label="Ice point faulty reading">
-                  <span class="tl-unit">°C</span>
+          <details class="tl-details">
+            <summary>${t("tools.thermometerLab.faultySolver")}</summary>
+            <div class="tl-details-body">
+              <p style="font-size:0.75rem;color:var(--tl-muted);margin:0">Set faulty readings at ice (0°C) and steam (100°C), then solve for T or C.</p>
+              <div class="tl-info-card" style="margin-bottom:4px">
+                <div class="tl-info-label">Faulty scale calibration</div>
+                <p style="margin:0;font-size:0.75rem">T / 100 = (C − C<sub>f</sub>) / (C<sub>u</sub> − C<sub>f</sub>)</p>
+              </div>
+              <div class="tl-info-label" style="font-size:0.75rem;color:var(--tl-muted);margin-top:4px;">${t("tools.thermometerLab.faulty.dualScale")}</div>
+              <div id="tl-faulty-svg-container" style="width:100%; height:190px; margin:4px 0; background:rgba(0,0,0,0.25); border-radius:10px; border:1px solid var(--tl-border); display:flex; justify-content:center; align-items:center; padding:8px;"></div>
+              <div class="tl-faulty-cal">
+                <div class="tl-calc-inputs">
+                  <span>Ice reading C<sub>f</sub> (true 0°C)</span>
+                  <div class="tl-input-with-unit">
+                    <input type="number" id="tl-input-faulty-cf" value="-1.5" step="0.1" class="tl-calc-input" aria-label="Ice point faulty reading">
+                    <span class="tl-unit">°C</span>
+                  </div>
+                </div>
+                <div class="tl-calc-inputs">
+                  <span>Steam reading C<sub>u</sub> (true 100°C)</span>
+                  <div class="tl-input-with-unit">
+                    <input type="number" id="tl-input-faulty-cu" value="105" step="0.1" class="tl-calc-input" aria-label="Steam point faulty reading">
+                    <span class="tl-unit">°C</span>
+                  </div>
                 </div>
               </div>
-              <div class="tl-calc-inputs">
-                <span>Steam reading C<sub>u</sub> (true 100°C)</span>
-                <div class="tl-input-with-unit">
-                  <input type="number" id="tl-input-faulty-cu" value="105" step="0.1" class="tl-calc-input" aria-label="Steam point faulty reading">
-                  <span class="tl-unit">°C</span>
+              <div class="tl-faulty-interval">
+                <span>Proportional interval (C<sub>u</sub> − C<sub>f</sub>)</span>
+                <b id="tl-val-faulty-interval">106.5 °C</b>
+              </div>
+              <div class="tl-solver-tabs">
+                <button class="tl-solver-tab-btn active" id="tl-btn-solve-q10a">Find True Temp (T)</button>
+                <button class="tl-solver-tab-btn" id="tl-btn-solve-q10b">Find Faulty Reading (C)</button>
+              </div>
+              <div id="tl-pane-q10a" class="tl-solver-pane active">
+                <div class="tl-calc-inputs">
+                  <span>Faulty reading C</span>
+                  <div class="tl-input-with-unit">
+                    <input type="number" id="tl-input-q10a-cm" value="25.0" step="0.5" class="tl-calc-input">
+                    <span class="tl-unit">°C</span>
+                  </div>
+                </div>
+                <p class="tl-solver-error" id="tl-faulty-error-a" hidden></p>
+                <div class="tl-worked-solution" style="background:rgba(0,0,0,0.15)">
+                  <div id="tl-svg-formula-faulty-a" class="tl-math-formula" style="font-size:0.85rem"></div>
+                </div>
+              </div>
+              <div id="tl-pane-q10b" class="tl-solver-pane">
+                <div class="tl-calc-inputs">
+                  <span>True temperature T</span>
+                  <div class="tl-input-with-unit">
+                    <input type="number" id="tl-input-q10b-t" value="70.0" step="1.0" class="tl-calc-input">
+                    <span class="tl-unit">°C</span>
+                  </div>
+                </div>
+                <p class="tl-solver-error" id="tl-faulty-error-b" hidden></p>
+                <div class="tl-worked-solution" style="background:rgba(0,0,0,0.15)">
+                  <div id="tl-svg-formula-faulty-b" class="tl-math-formula" style="font-size:0.85rem"></div>
                 </div>
               </div>
             </div>
-            <div class="tl-faulty-interval">
-              <span>Proportional interval (C<sub>u</sub> − C<sub>f</sub>)</span>
-              <b id="tl-val-faulty-interval">106.5 °C</b>
-            </div>
-            <div class="tl-solver-tabs">
-              <button class="tl-solver-tab-btn active" id="tl-btn-solve-q10a">Find True Temp (T)</button>
-              <button class="tl-solver-tab-btn" id="tl-btn-solve-q10b">Find Faulty Reading (C)</button>
-            </div>
-            <div id="tl-pane-q10a" class="tl-solver-pane active">
-              <div class="tl-calc-inputs">
-                <span>Faulty reading C</span>
-                <div class="tl-input-with-unit">
-                  <input type="number" id="tl-input-q10a-cm" value="25.0" step="0.5" class="tl-calc-input">
-                  <span class="tl-unit">°C</span>
-                </div>
-              </div>
-              <p class="tl-solver-error" id="tl-faulty-error-a" hidden></p>
-              <div class="tl-worked-solution" style="background:rgba(0,0,0,0.15)">
-                <div id="tl-svg-formula-faulty-a" class="tl-math-formula" style="font-size:0.85rem">
-                  <!-- Formula A -->
-                </div>
-              </div>
-            </div>
-            <div id="tl-pane-q10b" class="tl-solver-pane">
-              <div class="tl-calc-inputs">
-                <span>True temperature T</span>
-                <div class="tl-input-with-unit">
-                  <input type="number" id="tl-input-q10b-t" value="70.0" step="1.0" class="tl-calc-input">
-                  <span class="tl-unit">°C</span>
-                </div>
-              </div>
-              <p class="tl-solver-error" id="tl-faulty-error-b" hidden></p>
-              <div class="tl-worked-solution" style="background:rgba(0,0,0,0.15)">
-                <div id="tl-svg-formula-faulty-b" class="tl-math-formula" style="font-size:0.85rem">
-                  <!-- Formula B -->
-                </div>
-              </div>
-            </div>
-          </div>
+          </details>
         </div>
 
         <!-- TAB 2: PLATINUM RESISTANCE -->
         <div class="tl-tab-content" id="tl-tab-resistance">
-          <div class="tl-probe-specs">
-            <div class="tl-spec-tile">
-              <span class="tl-tile-label">Ice Point Resistance (R<sub>0</sub>)</span>
-              <span class="tl-tile-val" id="tl-spec-resistance-r0">5.0 Ω</span>
-            </div>
-            <div class="tl-spec-tile">
-              <span class="tl-tile-label">Steam Point Resistance (R<sub>100</sub>)</span>
-              <span class="tl-tile-val" id="tl-spec-resistance-r100">6.2 Ω</span>
-            </div>
-          </div>
-
-          <div class="tl-param-grid">
-            <div class="tl-cg">
-              <div class="tl-lr">
-                <span>Ice Point Resistance (R<sub>0</sub>)</span>
-                <span class="tl-badge" id="tl-val-resistance-r0">5.0 Ω</span>
+          <div class="tl-controls-steps">
+            <div class="tl-info-label" style="margin-top:0;font-size:0.8rem;color:var(--tl-cyan)">Live calibration formula (Dual-Directional Realtime Calculations)</div>
+            <div class="tl-worked-solution" style="margin-bottom:10px; display:flex; flex-direction:column; gap:12px">
+              <div style="border-bottom:1px solid rgba(255,255,255,0.05); padding-bottom:10px">
+                <div class="tl-info-label" style="font-size:0.75rem;color:var(--tl-cyan);margin-bottom:4px">Direction A: Resistance to Temperature (R<sub>T</sub> &rarr; T)</div>
+                <div id="tl-svg-formula-resistance" class="tl-math-formula" style="height:45px; margin:4px 0"></div>
+                <p style="margin:2px 0; font-size:0.85rem">Substitute current resistance <b class="tl-live-value" id="tl-live-resistance-rt">5.30 Ω</b>:</p>
+                <div id="tl-svg-formula-resistance-sub" class="tl-math-formula" style="height:100px; margin:4px 0"></div>
               </div>
-              <input type="range" id="tl-slider-resistance-r0" min="0.5" max="20.0" step="0.1" value="5.0">
-            </div>
-            <div class="tl-cg">
-              <div class="tl-lr">
-                <span>Steam Point Resistance (R<sub>100</sub>)</span>
-                <span class="tl-badge" id="tl-val-resistance-r100">6.2 Ω</span>
-              </div>
-              <input type="range" id="tl-slider-resistance-r100" min="2.0" max="30.0" step="0.1" value="6.2">
-            </div>
-          </div>
-
-          <div class="tl-info-card" style="border-color:rgba(245,158,11,0.3)">
-            <div class="tl-info-label" style="color:#f59e0b">Fundamental Assumption</div>
-            <p>To calculate temperature using linear calibration, it is <b>fundamentally assumed that electrical resistance varies linearly with temperature</b>.</p>
-          </div>
-
-          <!-- Live calibration formula -->
-          <div class="tl-info-label" style="margin-top:10px;font-size:0.8rem;color:var(--tl-cyan)">Live calibration formula (Dual-Directional Realtime Calculations)</div>
-          <div class="tl-worked-solution" style="margin-bottom:10px; display:flex; flex-direction:column; gap:12px">
-            <!-- Direction A: Resistance to Temperature -->
-            <div style="border-bottom:1px solid rgba(255,255,255,0.05); padding-bottom:10px">
-              <div class="tl-info-label" style="font-size:0.75rem;color:var(--tl-cyan);margin-bottom:4px">Direction A: Resistance to Temperature (R<sub>T</sub> &rarr; T)</div>
-              <div id="tl-svg-formula-resistance" class="tl-math-formula" style="height:45px; margin:4px 0">
-                <!-- Resistance formula -->
-              </div>
-              <p style="margin:2px 0; font-size:0.75rem">Substitute current resistance <b id="tl-live-resistance-rt">5.30 Ω</b>:</p>
-              <div id="tl-svg-formula-resistance-sub" class="tl-math-formula" style="height:100px; margin:4px 0">
-                <!-- Resistance sub formula -->
-              </div>
-            </div>
-
-            <!-- Direction B: Temperature to Resistance -->
-            <div>
-              <div class="tl-info-label" style="font-size:0.75rem;color:var(--tl-cyan);margin-bottom:4px">Direction B: Temperature to Resistance (T &rarr; R<sub>T</sub>)</div>
-              <p style="margin:2px 0; font-size:0.75rem">Substitute current bath temperature <b id="tl-live-resistance-t-sub">25.0°C</b>:</p>
-              <div id="tl-svg-formula-t-to-r" class="tl-math-formula" style="font-size:0.85rem;height:110px; margin:4px 0">
-                <!-- T to R Formula -->
+              <div>
+                <div class="tl-info-label" style="font-size:0.75rem;color:var(--tl-cyan);margin-bottom:4px">Direction B: Temperature to Resistance (T &rarr; R<sub>T</sub>)</div>
+                <p style="margin:2px 0; font-size:0.85rem">Substitute current bath temperature <b class="tl-live-value" id="tl-live-resistance-t-sub">25.0°C</b>:</p>
+                <div id="tl-svg-formula-t-to-r" class="tl-math-formula" style="font-size:0.85rem;height:110px; margin:4px 0"></div>
               </div>
             </div>
           </div>
 
-          <!-- Resistance-to-temperature solver -->
-          <div class="tl-info-label" style="margin-top:10px;font-size:0.8rem;color:var(--tl-cyan)">Resistance-to-temperature solver</div>
-          <div style="display:flex;flex-direction:column;gap:8px">
-            <div class="tl-calc-inputs">
-              <span>Measured Resistance (R):</span>
-              <div class="tl-input-with-unit">
-                <input type="number" id="tl-input-q11-r" value="7.7" step="0.1" class="tl-calc-input">
-                <span class="tl-unit">Ω</span>
+          <details class="tl-details">
+            <summary>${t("tools.thermometerLab.paramSettings")}</summary>
+            <div class="tl-details-body">
+              <div class="tl-probe-specs">
+                <div class="tl-spec-tile">
+                  <span class="tl-tile-label">Ice Point Resistance (R<sub>0</sub>)</span>
+                  <span class="tl-tile-val" id="tl-spec-resistance-r0">5.0 Ω</span>
+                </div>
+                <div class="tl-spec-tile">
+                  <span class="tl-tile-label">Steam Point Resistance (R<sub>100</sub>)</span>
+                  <span class="tl-tile-val" id="tl-spec-resistance-r100">6.2 Ω</span>
+                </div>
+              </div>
+              <div class="tl-param-grid">
+                <div class="tl-cg">
+                  <div class="tl-lr">
+                    <span>Ice Point Resistance (R<sub>0</sub>)</span>
+                    <span class="tl-badge" id="tl-val-resistance-r0">5.0 Ω</span>
+                  </div>
+                  <input type="range" id="tl-slider-resistance-r0" min="0.5" max="20.0" step="0.1" value="5.0">
+                </div>
+                <div class="tl-cg">
+                  <div class="tl-lr">
+                    <span>Steam Point Resistance (R<sub>100</sub>)</span>
+                    <span class="tl-badge" id="tl-val-resistance-r100">6.2 Ω</span>
+                  </div>
+                  <input type="range" id="tl-slider-resistance-r100" min="2.0" max="30.0" step="0.1" value="6.2">
+                </div>
+              </div>
+              <div class="tl-info-card" style="border-color:rgba(245,158,11,0.3)">
+                <div class="tl-info-label" style="color:#f59e0b">Fundamental Assumption</div>
+                <p>To calculate temperature using linear calibration, it is <b>fundamentally assumed that electrical resistance varies linearly with temperature</b>.</p>
               </div>
             </div>
-            <div class="tl-worked-solution" style="background:rgba(0,0,0,0.15)">
-              <div id="tl-svg-formula-resistance-solver" class="tl-math-formula" style="font-size:0.85rem">
-                <!-- Solver formula -->
+          </details>
+
+          <details class="tl-details">
+            <summary>${t("tools.thermometerLab.resistanceSolver")}</summary>
+            <div class="tl-details-body">
+              <div class="tl-calc-inputs">
+                <span>Measured Resistance (R):</span>
+                <div class="tl-input-with-unit">
+                  <input type="number" id="tl-input-q11-r" value="7.7" step="0.1" class="tl-calc-input">
+                  <span class="tl-unit">Ω</span>
+                </div>
+              </div>
+              <div class="tl-worked-solution" style="background:rgba(0,0,0,0.15)">
+                <div id="tl-svg-formula-resistance-solver" class="tl-math-formula" style="font-size:0.85rem"></div>
               </div>
             </div>
-          </div>
+          </details>
         </div>
 
         <!-- TAB 3: THERMISTOR -->
         <div class="tl-tab-content" id="tl-tab-thermistor">
-          <div class="tl-probe-specs">
-            <div class="tl-spec-tile">
-              <span class="tl-tile-label">Resistance at 25°C (R<sub>25</sub>)</span>
-              <span class="tl-tile-val" id="tl-spec-thermistor-r25">10.0 kΩ</span>
-            </div>
-            <div class="tl-spec-tile">
-              <span class="tl-tile-label">Beta Parameter (β)</span>
-              <span class="tl-tile-val" id="tl-spec-thermistor-beta">3500 K</span>
+          <div class="tl-controls-steps">
+            <div class="tl-info-label" style="margin-top:0;font-size:0.8rem;color:var(--tl-green)">Live NTC beta calculation</div>
+            <div class="tl-worked-solution" style="background-color:rgba(16,185,129,0.05);border-left-color:var(--tl-green)">
+              <div id="tl-svg-formula-thermistor" class="tl-math-formula" style="font-size:0.85rem"></div>
+              <p style="font-size:0.85rem">Substitute current resistance <b class="tl-live-value" id="tl-live-thermistor-rt">10.00 kΩ</b>:</p>
+              <div id="tl-svg-formula-thermistor-sub" class="tl-math-formula" style="font-size:0.85rem"></div>
             </div>
           </div>
 
-          <div class="tl-param-grid">
-            <div class="tl-cg">
-              <div class="tl-lr">
-                <span>Resistance at 25°C (R<sub>25</sub>)</span>
-                <span class="tl-badge" id="tl-val-thermistor-r25">10.0 kΩ</span>
+          <details class="tl-details">
+            <summary>${t("tools.thermometerLab.paramSettings")}</summary>
+            <div class="tl-details-body">
+              <div class="tl-probe-specs">
+                <div class="tl-spec-tile">
+                  <span class="tl-tile-label">Resistance at 25°C (R<sub>25</sub>)</span>
+                  <span class="tl-tile-val" id="tl-spec-thermistor-r25">10.0 kΩ</span>
+                </div>
+                <div class="tl-spec-tile">
+                  <span class="tl-tile-label">Beta Parameter (β)</span>
+                  <span class="tl-tile-val" id="tl-spec-thermistor-beta">3500 K</span>
+                </div>
               </div>
-              <input type="range" id="tl-slider-thermistor-r25" min="0.5" max="50.0" step="0.1" value="10.0">
-            </div>
-            <div class="tl-cg">
-              <div class="tl-lr">
-                <span>Beta Parameter (β)</span>
-                <span class="tl-badge" id="tl-val-thermistor-beta">3500 K</span>
+              <div class="tl-param-grid">
+                <div class="tl-cg">
+                  <div class="tl-lr">
+                    <span>Resistance at 25°C (R<sub>25</sub>)</span>
+                    <span class="tl-badge" id="tl-val-thermistor-r25">10.0 kΩ</span>
+                  </div>
+                  <input type="range" id="tl-slider-thermistor-r25" min="0.5" max="50.0" step="0.1" value="10.0">
+                </div>
+                <div class="tl-cg">
+                  <div class="tl-lr">
+                    <span>Beta Parameter (β)</span>
+                    <span class="tl-badge" id="tl-val-thermistor-beta">3500 K</span>
+                  </div>
+                  <input type="range" id="tl-slider-thermistor-beta" min="1000" max="8000" step="50" value="3500">
+                </div>
               </div>
-              <input type="range" id="tl-slider-thermistor-beta" min="1000" max="8000" step="50" value="3500">
             </div>
-          </div>
-
-          <!-- Live NTC beta calculation -->
-          <div class="tl-info-label" style="margin-top:10px;font-size:0.8rem;color:var(--tl-green)">Live NTC beta calculation</div>
-          <div class="tl-worked-solution" style="background-color:rgba(16,185,129,0.05);border-left-color:var(--tl-green)">
-            <div id="tl-svg-formula-thermistor" class="tl-math-formula" style="font-size:0.85rem">
-              <!-- Thermistor formula -->
-            </div>
-            <p>Substitute current resistance <b id="tl-live-thermistor-rt">10.00 kΩ</b>:</p>
-            <div id="tl-svg-formula-thermistor-sub" class="tl-math-formula" style="font-size:0.85rem">
-              <!-- Thermistor sub formula -->
-            </div>
-          </div>
+          </details>
         </div>
 
         </div>
       </div>
     </div>
-  `;const r={liquidType:"mercury",thermometerType:o,bulbVolume:200,wallThickness:.5,capillaryBore:.3,liquidL0:3,liquidL100:13,resistanceR0:5,resistanceR100:6.2,thermistorR25:10,thermistorBeta:3500,bathTemp:25,thermometerTemp:25,bubbles:[],iceCubes:[],heatWaves:[],steamParticles:[],currentLength:5.5,currentResistance:5.3,currentThermistorR:10,lastTimestamp:0,showLabels:!0},u=460,j=340,A=80,L=800,H=560;function M(){const e={left:110,top:48,right:30,bottom:65};return{gx:e.left,gy:e.top,gw:L-e.left-e.right,gh:H-e.top-e.bottom,tickFont:`bold ${Math.round(L*.024)}px Arial`,axisFont:`bold ${Math.round(L*.026)}px Arial`,dotR:8,yLabelX:e.left-75,xLabelY:H-e.bottom+32}}function K(){let c=100;const m=Math.max(r.bathTemp,r.thermometerTemp,100);m>120&&(c=150),m>145&&(c=200);const b=c<=100?20:25;return{minT:0,maxT:c,tickStep:b}}function x(e,c,m,b,p){return b+(e-c)/(m-c)*p}function _(e,c,m,b,p){return b+p-(e-c)/(m-c)*p}function F(e,c,m,b,p,C){const{gx:v,gy:y,gw:q,gh:T,tickFont:z,axisFont:O,yLabelX:Y,xLabelY:S}=c;e.strokeStyle="#1e1e24",e.lineWidth=1;for(const B of C){const N=_(B.value,B.min,B.max,y,T);e.beginPath(),e.moveTo(v,N),e.lineTo(v+q,N),e.stroke()}for(let B=m;B<=b+.01;B+=p){const N=x(B,m,b,v,q);e.beginPath(),e.moveTo(N,y),e.lineTo(N,y+T),e.stroke()}e.strokeStyle="#4b5563",e.lineWidth=2.5,e.beginPath(),e.moveTo(v,y),e.lineTo(v,y+T),e.lineTo(v+q,y+T),e.stroke(),e.fillStyle="#e4e4e7",e.font=z,e.textAlign="right",e.textBaseline="middle";for(const B of C){const N=_(B.value,B.min,B.max,y,T);e.fillText(B.label,v-15,N)}e.textAlign="center",e.textBaseline="top";for(let B=m;B<=b+.01;B+=p){const N=x(B,m,b,v,q);e.fillText(`${Math.round(B)}`,N,y+T+10)}return{gx:v,gy:y,gw:q,gh:T,axisFont:O,yLabelX:Y,xLabelY:S}}function g(e,c){const m=c-e,b=m<=8?1:m<=14?2:5,p=[],C=Math.ceil(e/b)*b;for(let v=C;v<=c+.001;v+=b)p.push({value:v,label:v%1===0?`${v.toFixed(0)}`:`${v.toFixed(1)}`,min:e,max:c});return p}function E(){const{maxT:e}=K(),c=$(0),m=$(e),b=m-c,p=Math.max(1,b*.1),C=Math.max(0,Math.round((c-p)*10)/10),v=Math.round((m+p)*10)/10;return{minL:C,maxL:v}}function $(e){return r.liquidL0+(r.liquidL100-r.liquidL0)/100*e}function U(){const{maxT:e}=K(),c=d(0),m=d(e),b=m-c,p=Math.max(.2,b*.1),C=Math.max(0,c-p),v=m+p,y=b<=2?.5:b<=4?1:2,q=[],T=Math.ceil(C/y)*y;for(let z=T;z<=v+.001;z+=y)q.push({value:z,label:z.toFixed(1),min:C,max:v});return{minR:C,maxR:v,ticks:q}}function d(e){return r.resistanceR0+(r.resistanceR100-r.resistanceR0)/100*e}function f(e){const{maxT:c}=e;let m=r.thermistorR25;for(let v=0;v<=c;v+=5){const y=v+273.15,q=r.thermistorR25*Math.exp(r.thermistorBeta*(1/y-1/298.15));m=Math.max(m,q)}m=Math.ceil(m*1.08*10)/10;const b=0,p=m<=12?2:4,C=[];for(let v=0;v<=m+.001;v+=p)C.push({value:v,label:v.toFixed(0),min:b,max:m});return{minR:b,maxR:m,ticks:C}}const h=a.querySelector("#tl-thermometerCanvas"),k=h.getContext("2d"),G=a.querySelector("#tl-graphCanvas"),J=G.getContext("2d"),Q=window.devicePixelRatio||1;h.width=u*Q,h.height=j*Q,k.scale(Q,Q),G.width=L*Q,G.height=H*Q,J.scale(Q,Q);function P(){r.iceCubes=[];for(let e=0;e<5;e++)r.iceCubes.push({x:60+Math.random()*120,y:200+Math.random()*15,size:12+Math.random()*8,angle:Math.random()*Math.PI,speedX:(Math.random()-.5)*.15,speedY:(Math.random()-.5)*.15});r.bubbles=[];for(let e=0;e<20;e++)r.bubbles.push({x:60+Math.random()*120,y:190+Math.random()*70,r:1+Math.random()*3.5,speedY:.8+Math.random()*1.5,phase:Math.random()*Math.PI*2,wobbleSpeed:.08+Math.random()*.08});r.heatWaves=[];for(let e=0;e<8;e++)r.heatWaves.push({x:65+Math.random()*110,y:190+Math.random()*60,length:15+Math.random()*15,speedY:.5+Math.random()*.6,opacity:.15+Math.random()*.25});r.steamParticles=[];for(let e=0;e<12;e++)r.steamParticles.push({x:60+Math.random()*120,y:175+Math.random()*10,r:2+Math.random()*4,vx:(Math.random()-.5)*.3,vy:-.4-Math.random()*.6,alpha:.2+Math.random()*.4})}const I=200,V=11;function ee(){const e=Math.pow(r.bulbVolume/I,.3333333333333333);return V*e}function ne(){if(r.thermometerType==="resistance"||r.thermometerType==="thermistor")return .35;const e=r.liquidType==="mercury"?1:8,c=.2+r.wallThickness*1.5,m=.4+r.bulbVolume*.003,b=1.35-r.capillaryBore*.45;return Math.max(.1,c*m*b*e*.15)}function te(e){r.bathTemp<=8&&r.iceCubes.forEach(c=>{c.x+=c.speedX,c.y+=c.speedY,(c.x<65||c.x>175)&&(c.speedX*=-1),(c.y<195||c.y>210)&&(c.speedY*=-1)}),r.bathTemp>35&&r.heatWaves.forEach(c=>{c.y-=c.speedY*(1+r.bathTemp/100),c.y<185&&(c.y=265,c.x=65+Math.random()*110)}),r.bathTemp>=80&&r.bubbles.forEach(c=>{c.y-=c.speedY*(1+(r.bathTemp-80)/40),c.phase+=c.wobbleSpeed,c.x+=Math.sin(c.phase)*.3,c.y<185&&(c.y=260+Math.random()*10,c.x=60+Math.random()*120)}),r.bathTemp>=95&&r.steamParticles.forEach(c=>{c.x+=c.vx,c.y+=c.vy,c.alpha-=.005,(c.alpha<=0||c.y<130)&&(c.x=60+Math.random()*120,c.y=175+Math.random()*5,c.alpha=.2+Math.random()*.4)})}function ae(e){let v=59,y=130,q=246;if(r.bathTemp<25){const S=r.bathTemp/25;v=Math.round(180-S*121),y=Math.round(210-S*80),q=Math.round(250-S*4)}else{const S=Math.min(1,(r.bathTemp-25)/125);v=Math.round(59+S*180),y=Math.round(130-S*100),q=Math.round(246-S*190)}if(r.bathTemp>40){const S=Math.min(1,(r.bathTemp-40)/100),B=Date.now()*.02;e.fillStyle=`rgba(239, 68, 68, ${S*.25})`,e.beginPath(),e.roundRect(45,284,150,10,4),e.fill(),e.fillStyle="rgba(249, 115, 22, 0.85)",e.beginPath(),e.moveTo(55+130/2-25,284);for(let N=-25;N<=25;N+=6){const re=S*(12+Math.sin(N*.4+B)*5);e.lineTo(55+130/2+N,284-re)}e.lineTo(55+130/2+25,284),e.closePath(),e.fill()}e.strokeStyle="#4b5563",e.lineWidth=2,e.fillStyle="#121214",e.beginPath(),e.roundRect(55,180,130,100,[0,0,10,10]),e.fill();const T=e.createLinearGradient(55,190,55,280);T.addColorStop(0,`rgba(${v}, ${y}, ${q}, 0.25)`),T.addColorStop(1,`rgba(${v}, ${y}, ${q}, 0.55)`),e.fillStyle=T,e.beginPath(),e.moveTo(55,190);const z=r.bathTemp>=80?2:.5,O=r.bathTemp>=80?.09:.03,Y=Date.now()*O;for(let S=55;S<=185;S+=5){const B=190+Math.sin(S*.15+Y)*z;e.lineTo(S,B)}e.lineTo(185,280),e.lineTo(55,280),e.closePath(),e.fill(),r.bathTemp>35&&(e.strokeStyle=`rgba(239, 68, 68, ${Math.min(.5,(r.bathTemp-35)/120)})`,e.lineWidth=1.2,r.heatWaves.forEach(S=>{e.beginPath(),e.moveTo(S.x,S.y),e.quadraticCurveTo(S.x+Math.sin(S.y*.06)*5,S.y-S.length/2,S.x,S.y-S.length),e.stroke()})),r.bathTemp<=8&&(e.fillStyle="rgba(224, 242, 254, 0.55)",e.strokeStyle="rgba(186, 230, 253, 0.8)",e.lineWidth=1,r.iceCubes.forEach(S=>{e.save(),e.translate(S.x,S.y),e.rotate(S.angle),e.beginPath(),e.roundRect(-S.size/2,-S.size/2,S.size,S.size,3),e.fill(),e.stroke(),e.restore()})),r.bathTemp>=80&&(e.fillStyle="rgba(255, 255, 255, 0.4)",e.strokeStyle="rgba(255, 255, 255, 0.65)",e.lineWidth=.6,r.bubbles.forEach(S=>{e.beginPath(),e.arc(S.x,S.y,S.r,0,Math.PI*2),e.fill(),e.stroke()})),r.bathTemp>=95&&r.steamParticles.forEach(S=>{e.fillStyle=`rgba(255, 255, 255, ${S.alpha})`,e.beginPath(),e.arc(S.x,S.y,S.r,0,Math.PI*2),e.fill()}),e.strokeStyle="#9ca3af",e.lineWidth=3.5,e.beginPath(),e.moveTo(54,180),e.lineTo(54,272),e.arcTo(54,281,65,281,8),e.lineTo(175,281),e.arcTo(186,281,186,272,8),e.lineTo(186,180),e.stroke(),e.strokeStyle="rgba(255, 255, 255, 0.4)",e.lineWidth=1.5,e.beginPath(),e.moveTo(59,190),e.lineTo(59,270),e.stroke()}function w(e,c,m,b,p,C,v="left"){if(!r.showLabels)return;e.strokeStyle="rgba(6, 182, 212, 0.7)",e.lineWidth=1,e.setLineDash([3,3]),e.beginPath(),e.moveTo(c,m),e.lineTo(b,p),e.stroke(),e.setLineDash([]),e.fillStyle="#06b6d4",e.beginPath(),e.arc(c,m,3,0,Math.PI*2),e.fill(),e.font="bold 9px system-ui, sans-serif";const q=e.measureText(C).width+10,T=16,z=v==="left"?b:b-q,O=p-T/2;e.fillStyle="rgba(21, 21, 24, 0.9)",e.strokeStyle="#06b6d4",e.lineWidth=1,e.beginPath(),e.roundRect(z,O,q,T,4),e.fill(),e.stroke(),e.fillStyle="#f4f4f5",e.textAlign="center",e.textBaseline="middle",e.fillText(C,z+q/2,O+T/2+.5)}function R(e){const b=ee(),p=250+Math.max(0,b-V)*.35,C=p-b-1,v=10+r.wallThickness*8,y=120-v/2,q=120+v/2,T=e.createLinearGradient(y,20,q,20);T.addColorStop(0,"rgba(209, 213, 219, 0.85)"),T.addColorStop(.2,"rgba(255, 255, 255, 0.95)"),T.addColorStop(.5,"rgba(243, 244, 246, 0.15)"),T.addColorStop(.8,"rgba(255, 255, 255, 0.95)"),T.addColorStop(1,"rgba(156, 163, 175, 0.9)"),e.fillStyle=T,e.strokeStyle="rgba(156, 163, 175, 0.8)",e.lineWidth=1,e.beginPath(),e.moveTo(y,C),e.lineTo(y,25),e.arcTo(y,20,y+5,20,5),e.arcTo(q,20,q,25,5),e.lineTo(q,C),e.closePath(),e.fill(),e.stroke();const z=e.createRadialGradient(120-b*.2,p-b*.2,b*.1,120,p,b);z.addColorStop(0,"rgba(255, 255, 255, 0.8)"),z.addColorStop(1,"rgba(156, 163, 175, 0.35)"),e.fillStyle=z,e.strokeStyle="#6b7280",e.lineWidth=.8+r.wallThickness*.6,e.beginPath(),e.arc(120,p,b+.5+r.wallThickness*.5,0,Math.PI*2),e.fill(),e.stroke();const O=Math.min(v*.72,.8+r.capillaryBore*4.5);e.fillStyle="#0a0a0c",e.fillRect(120-O/2,28,O,C-20-8);const Y=r.liquidType==="mercury",S=Y?"#a1a1aa":"#ef4444",B=Y?"#f4f4f5":"#fee2e2",N=210,re=220,be=(N-40)/re,fe=N-Math.min(re,r.thermometerTemp)*be;e.fillStyle=S,e.fillRect(120-O/2,fe,O,C-fe),e.beginPath(),e.ellipse(120,fe,O/2,1.5,0,0,Math.PI*2),e.fill(),e.fillStyle=B,e.fillRect(120-O/6,fe,O/3,C-fe);const se=b*.9,ie=e.createRadialGradient(120-se*.2,p-se*.2,se*.1,120,p,se);Y?(ie.addColorStop(0,"#f4f4f5"),ie.addColorStop(.3,"#d4d4d8"),ie.addColorStop(.8,"#71717a"),ie.addColorStop(1,"#3f3f46")):(ie.addColorStop(0,"#fee2e2"),ie.addColorStop(.2,"#fca5a5"),ie.addColorStop(.7,"#ef4444"),ie.addColorStop(1,"#991b1b")),e.fillStyle=ie,e.beginPath(),e.arc(120,p,se,0,Math.PI*2),e.fill(),e.strokeStyle="rgba(161, 161, 170, 0.6)",e.lineWidth=.5,e.font="6.5px Arial",e.fillStyle="#a1a1aa",e.textAlign="right",e.textBaseline="middle";for(let ce=0;ce<=200;ce+=50){const pe=N-ce*be;e.beginPath(),e.moveTo(y,pe),e.lineTo(y+4,pe),e.stroke(),e.fillText(`${ce}°C`,y-22,pe+2.5)}r.showLabels&&(w(e,y+1,80,10,50,t("tools.thermometerLab.labels.thinWall"),"left"),w(e,120,fe,230,fe-15,t("tools.thermometerLab.labels.meniscus"),"left"),w(e,120-O/2,130,10,130,t("tools.thermometerLab.labels.narrowBore"),"left"),w(e,120,p,230,p+15,t("tools.thermometerLab.labels.largeBulb"),"left"))}function Z(e){const v=e.createLinearGradient(115,20,125,20);v.addColorStop(0,"#71717a"),v.addColorStop(.3,"#f4f4f5"),v.addColorStop(.7,"#d4d4d8"),v.addColorStop(1,"#3f3f46"),e.fillStyle=v,e.strokeStyle="#4b5563",e.lineWidth=1,e.beginPath(),e.roundRect(115,20,10,225,[0,0,4,4]),e.fill(),e.stroke(),e.fillStyle="rgba(21, 21, 24, 0.8)",e.fillRect(117,200,6,40),e.strokeStyle="#e2e8f0",e.lineWidth=1.2,e.beginPath();let y=205;e.moveTo(118,y);for(let Y=0;Y<8;Y++)y+=4,e.lineTo(122,y),y+=4,e.lineTo(118,y);e.stroke(),e.lineWidth=1.5,e.strokeStyle="#ef4444",e.beginPath(),e.moveTo(118,20),e.bezierCurveTo(110,5,200,30,245,60),e.stroke(),e.strokeStyle="#111827",e.beginPath(),e.moveTo(122,20),e.bezierCurveTo(130,8,210,45,245,75),e.stroke();const q=245,T=40,z=135,O=90;e.fillStyle="#18181b",e.strokeStyle="#6366f1",e.lineWidth=2.5,e.beginPath(),e.roundRect(q,T,z,O,10),e.fill(),e.stroke(),e.fillStyle="#022c22",e.beginPath(),e.roundRect(q+10,T+12,z-20,34,4),e.fill(),e.font='bold 14px "Courier New"',e.fillStyle="#10b981",e.textAlign="right",e.fillText(r.currentResistance.toFixed(2)+" Ω",q+z-16,T+34),e.font="6px Arial",e.fillStyle="#a7f3d0",e.textAlign="left",e.fillText("PLATINUM RTD METER",q+14,T+21),r.showLabels&&(w(e,116,100,10,70,t("tools.thermometerLab.labels.metalSheath"),"left"),w(e,120,225,230,205,t("tools.thermometerLab.labels.platinumCoil"),"left"))}function W(e){e.strokeStyle="#111827",e.lineWidth=1.2,e.beginPath(),e.moveTo(118,20),e.lineTo(118,245),e.stroke(),e.beginPath(),e.moveTo(122,20),e.lineTo(122,245),e.stroke();const p=20,C=225,v=12,y=120-v/2,q=e.createLinearGradient(y,p,y+v,p);q.addColorStop(0,"rgba(229, 231, 235, 0.4)"),q.addColorStop(.3,"rgba(255, 255, 255, 0.8)"),q.addColorStop(.7,"rgba(243, 244, 246, 0.5)"),q.addColorStop(1,"rgba(209, 213, 219, 0.6)"),e.fillStyle=q,e.strokeStyle="rgba(156, 163, 175, 0.6)",e.lineWidth=.8,e.beginPath(),e.roundRect(y,p,v,C-p,[0,0,3,3]),e.fill(),e.stroke();const T=7,z=e.createRadialGradient(120-T*.2,245-T*.2,T*.1,120,245,T);z.addColorStop(0,"#6b7280"),z.addColorStop(.7,"#1f2937"),z.addColorStop(1,"#09090b"),e.fillStyle=z,e.strokeStyle="#030712",e.lineWidth=1.2,e.beginPath(),e.arc(120,245,T,0,Math.PI*2),e.fill(),e.stroke(),e.lineWidth=1.5,e.strokeStyle="#ef4444",e.beginPath(),e.moveTo(118,20),e.bezierCurveTo(110,5,200,30,245,60),e.stroke(),e.strokeStyle="#111827",e.beginPath(),e.moveTo(122,20),e.bezierCurveTo(130,8,210,45,245,75),e.stroke();const O=245,Y=40,S=135,B=90;e.fillStyle="#18181b",e.strokeStyle="#10b981",e.lineWidth=2.5,e.beginPath(),e.roundRect(O,Y,S,B,10),e.fill(),e.stroke(),e.fillStyle="#022c22",e.beginPath(),e.roundRect(O+10,Y+12,S-20,34,4),e.fill(),e.font='bold 14px "Courier New"',e.fillStyle="#34d399",e.textAlign="right",e.fillText(r.currentThermistorR.toFixed(2)+" kΩ",O+S-16,Y+34),e.font="6px Arial",e.fillStyle="#a7f3d0",e.textAlign="left",e.fillText("NTC THERMISTOR METER",O+14,Y+21),r.showLabels&&(w(e,118,120,10,90,t("tools.thermometerLab.labels.leads"),"left"),w(e,120,245,230,225,t("tools.thermometerLab.labels.semiconductorBead"),"left"))}function X(e,c,m,b,p,C,v,y,q){const{gx:T,gy:z,gw:O,gh:Y}=c;e.strokeStyle="rgba(255, 255, 255, 0.2)",e.lineWidth=1,e.setLineDash([4,4]),e.beginPath(),e.moveTo(m,b),e.lineTo(m,z+Y),e.stroke(),e.beginPath(),e.moveTo(m,b),e.lineTo(T,b),e.stroke(),e.setLineDash([]),e.font="bold 11px Arial",e.textAlign="center",e.textBaseline="top";const S=`${p.toFixed(1)}${v}`,B=e.measureText(S).width+10;e.fillStyle=q,e.beginPath(),e.roundRect(m-B/2,z+Y+2,B,15,3),e.fill(),e.fillStyle="#000",e.fillText(S,m,z+Y+4),e.textAlign="right",e.textBaseline="middle";const N=`${C.toFixed(2)} ${y}`,re=e.measureText(N).width+10;e.fillStyle=q,e.beginPath(),e.roundRect(T-re-2,b-7,re,15,3),e.fill(),e.fillStyle="#000",e.fillText(N,T-7,b)}function D(e){const c=M(),{minL:m,maxL:b}=E(),{minT:p,maxT:C,tickStep:v}=K(),y=g(m,b),q=F(e,c,p,C,v,y),{gx:T,gy:z,gw:O,gh:Y,axisFont:S,yLabelX:B,xLabelY:N,dotR:re}={...c,...q};e.save(),e.translate(B,z+Y/2),e.rotate(-Math.PI/2),e.font=S,e.fillStyle="#e4e4e7",e.fillText("Length of liquid column / cm",0,0),e.restore(),e.font=S,e.fillStyle="#e4e4e7",e.textAlign="center",e.fillText("temperature / °C",T+O/2,N);const we=C,be=x(0,p,C,T,O),fe=_($(0),m,b,z,Y),se=x(we,p,C,T,O),ie=_($(we),m,b,z,Y);e.strokeStyle="#ef4444",e.lineWidth=3,e.beginPath(),e.moveTo(be,fe),e.lineTo(se,ie),e.stroke();const ce=r.thermometerTemp,pe=r.currentLength;if(ce>=p&&ce<=C){const ve=x(ce,p,C,T,O),Te=_(pe,m,b,z,Y);X(e,c,ve,Te,ce,pe,"°C","cm","#ef4444"),e.shadowColor="#ef4444",e.shadowBlur=10,e.fillStyle="#ef4444",e.beginPath(),e.arc(ve,Te,re,0,Math.PI*2),e.fill(),e.shadowBlur=0}}function de(e){const c=M(),{minR:m,maxR:b,ticks:p}=U(),C=K(),v=F(e,c,C.minT,C.maxT,C.tickStep,p),{gx:y,gy:q,gw:T,gh:z,axisFont:O,yLabelX:Y,xLabelY:S,dotR:B}={...c,...v};e.save(),e.translate(Y,q+z/2),e.rotate(-Math.PI/2),e.font=O,e.fillStyle="#e4e4e7",e.fillText("Resistance of platinum / Ω",0,0),e.restore(),e.font=O,e.fillStyle="#e4e4e7",e.textAlign="center",e.fillText("temperature / °C",y+T/2,S);const{minT:N,maxT:re}=C,we=re,be=x(0,N,re,y,T),fe=_(d(0),m,b,q,z),se=x(we,N,re,y,T),ie=_(d(we),m,b,q,z);e.strokeStyle="#6366f1",e.lineWidth=3,e.beginPath(),e.moveTo(be,fe),e.lineTo(se,ie),e.stroke();const ce=r.thermometerTemp,pe=r.currentResistance;if(ce>=N&&ce<=re){const ve=x(ce,N,re,y,T),Te=_(pe,m,b,q,z);X(e,c,ve,Te,ce,pe,"°C","Ω","#6366f1"),e.shadowColor="#6366f1",e.shadowBlur=10,e.fillStyle="#6366f1",e.beginPath(),e.arc(ve,Te,B,0,Math.PI*2),e.fill(),e.shadowBlur=0}}function le(e){const c=M(),m=K(),{minR:b,maxR:p,ticks:C}=f(m),v=F(e,c,m.minT,m.maxT,m.tickStep,C),{gx:y,gy:q,gw:T,gh:z,axisFont:O,yLabelX:Y,xLabelY:S,dotR:B}={...c,...v},{minT:N,maxT:re}=m;e.save(),e.translate(Y,q+z/2),e.rotate(-Math.PI/2),e.font=O,e.fillStyle="#e4e4e7",e.fillText("Resistance of thermistor / kΩ",0,0),e.restore(),e.font=O,e.fillStyle="#e4e4e7",e.textAlign="center",e.fillText("temperature / °C",y+T/2,S),e.strokeStyle="#10b981",e.lineWidth=3,e.beginPath();let we=!1;for(let se=N;se<=re;se+=1){const ie=se+273.15,ce=r.thermistorR25*Math.exp(r.thermistorBeta*(1/ie-1/298.15)),pe=x(se,N,re,y,T),ve=_(Math.min(p,ce),b,p,q,z);ve>=q&&ve<=q+z&&(we?e.lineTo(pe,ve):(e.moveTo(pe,ve),we=!0))}e.stroke();const be=r.thermometerTemp,fe=r.currentThermistorR;if(be>=N&&be<=re){const se=x(be,N,re,y,T),ie=_(Math.min(p,fe),b,p,q,z);X(e,c,se,ie,be,fe,"°C","kΩ","#10b981"),e.shadowColor="#10b981",e.shadowBlur=10,e.fillStyle="#10b981",e.beginPath(),e.arc(se,ie,B,0,Math.PI*2),e.fill(),e.shadowBlur=0}}function he(){k.clearRect(0,0,u,j),J.clearRect(0,0,L,H),k.save(),k.translate(A,0),ae(k),r.thermometerType==="liquid"?R(k):r.thermometerType==="resistance"?Z(k):W(k),k.restore(),r.thermometerType==="liquid"?D(J):r.thermometerType==="resistance"?de(J):le(J)}function ge(){const e=a.querySelector("#tl-svg-formula-liquid");e&&(e.innerHTML=`
+  `;const r={liquidType:"mercury",thermometerType:o,bulbVolume:200,wallThickness:.5,capillaryBore:.3,liquidL0:3,liquidL100:13,resistanceR0:5,resistanceR100:6.2,thermistorR25:10,thermistorBeta:3500,bathTemp:25,thermometerTemp:25,bubbles:[],iceCubes:[],heatWaves:[],steamParticles:[],currentLength:5.5,currentResistance:5.3,currentThermistorR:10,lastTimestamp:0,showLabels:!0},u=460,j=340,A=80,L=800,H=560;function M(){const e={left:110,top:48,right:30,bottom:65};return{gx:e.left,gy:e.top,gw:L-e.left-e.right,gh:H-e.top-e.bottom,tickFont:`bold ${Math.round(L*.024)}px Arial`,axisFont:`bold ${Math.round(L*.026)}px Arial`,dotR:8,yLabelX:e.left-75,xLabelY:H-e.bottom+32}}function K(){let c=100;const m=Math.max(r.bathTemp,r.thermometerTemp,100);m>120&&(c=150),m>145&&(c=200);const b=c<=100?20:25;return{minT:0,maxT:c,tickStep:b}}function x(e,c,m,b,p){return b+(e-c)/(m-c)*p}function _(e,c,m,b,p){return b+p-(e-c)/(m-c)*p}function F(e,c,m,b,p,C){const{gx:v,gy:y,gw:q,gh:T,tickFont:z,axisFont:O,yLabelX:Y,xLabelY:S}=c;e.strokeStyle="#1e1e24",e.lineWidth=1;for(const B of C){const N=_(B.value,B.min,B.max,y,T);e.beginPath(),e.moveTo(v,N),e.lineTo(v+q,N),e.stroke()}for(let B=m;B<=b+.01;B+=p){const N=x(B,m,b,v,q);e.beginPath(),e.moveTo(N,y),e.lineTo(N,y+T),e.stroke()}e.strokeStyle="#4b5563",e.lineWidth=2.5,e.beginPath(),e.moveTo(v,y),e.lineTo(v,y+T),e.lineTo(v+q,y+T),e.stroke(),e.fillStyle="#e4e4e7",e.font=z,e.textAlign="right",e.textBaseline="middle";for(const B of C){const N=_(B.value,B.min,B.max,y,T);e.fillText(B.label,v-15,N)}e.textAlign="center",e.textBaseline="top";for(let B=m;B<=b+.01;B+=p){const N=x(B,m,b,v,q);e.fillText(`${Math.round(B)}`,N,y+T+10)}return{gx:v,gy:y,gw:q,gh:T,axisFont:O,yLabelX:Y,xLabelY:S}}function g(e,c){const m=c-e,b=m<=8?1:m<=14?2:5,p=[],C=Math.ceil(e/b)*b;for(let v=C;v<=c+.001;v+=b)p.push({value:v,label:v%1===0?`${v.toFixed(0)}`:`${v.toFixed(1)}`,min:e,max:c});return p}function E(){const{maxT:e}=K(),c=$(0),m=$(e),b=m-c,p=Math.max(1,b*.1),C=Math.max(0,Math.round((c-p)*10)/10),v=Math.round((m+p)*10)/10;return{minL:C,maxL:v}}function $(e){return r.liquidL0+(r.liquidL100-r.liquidL0)/100*e}function U(){const{maxT:e}=K(),c=d(0),m=d(e),b=m-c,p=Math.max(.2,b*.1),C=Math.max(0,c-p),v=m+p,y=b<=2?.5:b<=4?1:2,q=[],T=Math.ceil(C/y)*y;for(let z=T;z<=v+.001;z+=y)q.push({value:z,label:z.toFixed(1),min:C,max:v});return{minR:C,maxR:v,ticks:q}}function d(e){return r.resistanceR0+(r.resistanceR100-r.resistanceR0)/100*e}function f(e){const{maxT:c}=e;let m=r.thermistorR25;for(let v=0;v<=c;v+=5){const y=v+273.15,q=r.thermistorR25*Math.exp(r.thermistorBeta*(1/y-1/298.15));m=Math.max(m,q)}m=Math.ceil(m*1.08*10)/10;const b=0,p=m<=12?2:4,C=[];for(let v=0;v<=m+.001;v+=p)C.push({value:v,label:v.toFixed(0),min:b,max:m});return{minR:b,maxR:m,ticks:C}}const h=a.querySelector("#tl-thermometerCanvas"),k=h.getContext("2d"),G=a.querySelector("#tl-graphCanvas"),J=G.getContext("2d"),Q=window.devicePixelRatio||1;h.width=u*Q,h.height=j*Q,k.scale(Q,Q),G.width=L*Q,G.height=H*Q,J.scale(Q,Q);function P(){r.iceCubes=[];for(let e=0;e<5;e++)r.iceCubes.push({x:60+Math.random()*120,y:200+Math.random()*15,size:12+Math.random()*8,angle:Math.random()*Math.PI,speedX:(Math.random()-.5)*.15,speedY:(Math.random()-.5)*.15});r.bubbles=[];for(let e=0;e<20;e++)r.bubbles.push({x:60+Math.random()*120,y:190+Math.random()*70,r:1+Math.random()*3.5,speedY:.8+Math.random()*1.5,phase:Math.random()*Math.PI*2,wobbleSpeed:.08+Math.random()*.08});r.heatWaves=[];for(let e=0;e<8;e++)r.heatWaves.push({x:65+Math.random()*110,y:190+Math.random()*60,length:15+Math.random()*15,speedY:.5+Math.random()*.6,opacity:.15+Math.random()*.25});r.steamParticles=[];for(let e=0;e<12;e++)r.steamParticles.push({x:60+Math.random()*120,y:175+Math.random()*10,r:2+Math.random()*4,vx:(Math.random()-.5)*.3,vy:-.4-Math.random()*.6,alpha:.2+Math.random()*.4})}const I=200,V=11;function ee(){const e=Math.pow(r.bulbVolume/I,.3333333333333333);return V*e}function ne(){if(r.thermometerType==="resistance"||r.thermometerType==="thermistor")return .35;const e=r.liquidType==="mercury"?1:8,c=.2+r.wallThickness*1.5,m=.4+r.bulbVolume*.003,b=1.35-r.capillaryBore*.45;return Math.max(.1,c*m*b*e*.15)}function te(e){r.bathTemp<=8&&r.iceCubes.forEach(c=>{c.x+=c.speedX,c.y+=c.speedY,(c.x<65||c.x>175)&&(c.speedX*=-1),(c.y<195||c.y>210)&&(c.speedY*=-1)}),r.bathTemp>35&&r.heatWaves.forEach(c=>{c.y-=c.speedY*(1+r.bathTemp/100),c.y<185&&(c.y=265,c.x=65+Math.random()*110)}),r.bathTemp>=80&&r.bubbles.forEach(c=>{c.y-=c.speedY*(1+(r.bathTemp-80)/40),c.phase+=c.wobbleSpeed,c.x+=Math.sin(c.phase)*.3,c.y<185&&(c.y=260+Math.random()*10,c.x=60+Math.random()*120)}),r.bathTemp>=95&&r.steamParticles.forEach(c=>{c.x+=c.vx,c.y+=c.vy,c.alpha-=.005,(c.alpha<=0||c.y<130)&&(c.x=60+Math.random()*120,c.y=175+Math.random()*5,c.alpha=.2+Math.random()*.4)})}function ae(e){let v=59,y=130,q=246;if(r.bathTemp<25){const S=r.bathTemp/25;v=Math.round(180-S*121),y=Math.round(210-S*80),q=Math.round(250-S*4)}else{const S=Math.min(1,(r.bathTemp-25)/125);v=Math.round(59+S*180),y=Math.round(130-S*100),q=Math.round(246-S*190)}if(r.bathTemp>40){const S=Math.min(1,(r.bathTemp-40)/100),B=Date.now()*.02;e.fillStyle=`rgba(239, 68, 68, ${S*.25})`,e.beginPath(),e.roundRect(45,284,150,10,4),e.fill(),e.fillStyle="rgba(249, 115, 22, 0.85)",e.beginPath(),e.moveTo(55+130/2-25,284);for(let N=-25;N<=25;N+=6){const re=S*(12+Math.sin(N*.4+B)*5);e.lineTo(55+130/2+N,284-re)}e.lineTo(55+130/2+25,284),e.closePath(),e.fill()}e.strokeStyle="#4b5563",e.lineWidth=2,e.fillStyle="#121214",e.beginPath(),e.roundRect(55,180,130,100,[0,0,10,10]),e.fill();const T=e.createLinearGradient(55,190,55,280);T.addColorStop(0,`rgba(${v}, ${y}, ${q}, 0.25)`),T.addColorStop(1,`rgba(${v}, ${y}, ${q}, 0.55)`),e.fillStyle=T,e.beginPath(),e.moveTo(55,190);const z=r.bathTemp>=80?2:.5,O=r.bathTemp>=80?.09:.03,Y=Date.now()*O;for(let S=55;S<=185;S+=5){const B=190+Math.sin(S*.15+Y)*z;e.lineTo(S,B)}e.lineTo(185,280),e.lineTo(55,280),e.closePath(),e.fill(),r.bathTemp>35&&(e.strokeStyle=`rgba(239, 68, 68, ${Math.min(.5,(r.bathTemp-35)/120)})`,e.lineWidth=1.2,r.heatWaves.forEach(S=>{e.beginPath(),e.moveTo(S.x,S.y),e.quadraticCurveTo(S.x+Math.sin(S.y*.06)*5,S.y-S.length/2,S.x,S.y-S.length),e.stroke()})),r.bathTemp<=8&&(e.fillStyle="rgba(224, 242, 254, 0.55)",e.strokeStyle="rgba(186, 230, 253, 0.8)",e.lineWidth=1,r.iceCubes.forEach(S=>{e.save(),e.translate(S.x,S.y),e.rotate(S.angle),e.beginPath(),e.roundRect(-S.size/2,-S.size/2,S.size,S.size,3),e.fill(),e.stroke(),e.restore()})),r.bathTemp>=80&&(e.fillStyle="rgba(255, 255, 255, 0.4)",e.strokeStyle="rgba(255, 255, 255, 0.65)",e.lineWidth=.6,r.bubbles.forEach(S=>{e.beginPath(),e.arc(S.x,S.y,S.r,0,Math.PI*2),e.fill(),e.stroke()})),r.bathTemp>=95&&r.steamParticles.forEach(S=>{e.fillStyle=`rgba(255, 255, 255, ${S.alpha})`,e.beginPath(),e.arc(S.x,S.y,S.r,0,Math.PI*2),e.fill()}),e.strokeStyle="#9ca3af",e.lineWidth=3.5,e.beginPath(),e.moveTo(54,180),e.lineTo(54,272),e.arcTo(54,281,65,281,8),e.lineTo(175,281),e.arcTo(186,281,186,272,8),e.lineTo(186,180),e.stroke(),e.strokeStyle="rgba(255, 255, 255, 0.4)",e.lineWidth=1.5,e.beginPath(),e.moveTo(59,190),e.lineTo(59,270),e.stroke()}function w(e,c,m,b,p,C,v="left"){if(!r.showLabels)return;e.strokeStyle="rgba(6, 182, 212, 0.7)",e.lineWidth=1,e.setLineDash([3,3]),e.beginPath(),e.moveTo(c,m),e.lineTo(b,p),e.stroke(),e.setLineDash([]),e.fillStyle="#06b6d4",e.beginPath(),e.arc(c,m,3,0,Math.PI*2),e.fill(),e.font="bold 9px system-ui, sans-serif";const q=e.measureText(C).width+10,T=16,z=v==="left"?b:b-q,O=p-T/2;e.fillStyle="rgba(21, 21, 24, 0.9)",e.strokeStyle="#06b6d4",e.lineWidth=1,e.beginPath(),e.roundRect(z,O,q,T,4),e.fill(),e.stroke(),e.fillStyle="#f4f4f5",e.textAlign="center",e.textBaseline="middle",e.fillText(C,z+q/2,O+T/2+.5)}function R(e){const b=ee(),p=250+Math.max(0,b-V)*.35,C=p-b-1,v=10+r.wallThickness*8,y=120-v/2,q=120+v/2,T=e.createLinearGradient(y,20,q,20);T.addColorStop(0,"rgba(209, 213, 219, 0.85)"),T.addColorStop(.2,"rgba(255, 255, 255, 0.95)"),T.addColorStop(.5,"rgba(243, 244, 246, 0.15)"),T.addColorStop(.8,"rgba(255, 255, 255, 0.95)"),T.addColorStop(1,"rgba(156, 163, 175, 0.9)"),e.fillStyle=T,e.strokeStyle="rgba(156, 163, 175, 0.8)",e.lineWidth=1,e.beginPath(),e.moveTo(y,C),e.lineTo(y,25),e.arcTo(y,20,y+5,20,5),e.arcTo(q,20,q,25,5),e.lineTo(q,C),e.closePath(),e.fill(),e.stroke();const z=e.createRadialGradient(120-b*.2,p-b*.2,b*.1,120,p,b);z.addColorStop(0,"rgba(255, 255, 255, 0.8)"),z.addColorStop(1,"rgba(156, 163, 175, 0.35)"),e.fillStyle=z,e.strokeStyle="#6b7280",e.lineWidth=.8+r.wallThickness*.6,e.beginPath(),e.arc(120,p,b+.5+r.wallThickness*.5,0,Math.PI*2),e.fill(),e.stroke();const O=Math.min(v*.72,.8+r.capillaryBore*4.5);e.fillStyle="#0a0a0c",e.fillRect(120-O/2,28,O,C-20-8);const Y=r.liquidType==="mercury",S=Y?"#a1a1aa":"#ef4444",B=Y?"#f4f4f5":"#fee2e2",N=210,re=220,be=(N-40)/re,fe=N-Math.min(re,r.thermometerTemp)*be;e.fillStyle=S,e.fillRect(120-O/2,fe,O,C-fe),e.beginPath(),e.ellipse(120,fe,O/2,1.5,0,0,Math.PI*2),e.fill(),e.fillStyle=B,e.fillRect(120-O/6,fe,O/3,C-fe);const se=b*.9,ie=e.createRadialGradient(120-se*.2,p-se*.2,se*.1,120,p,se);Y?(ie.addColorStop(0,"#f4f4f5"),ie.addColorStop(.3,"#d4d4d8"),ie.addColorStop(.8,"#71717a"),ie.addColorStop(1,"#3f3f46")):(ie.addColorStop(0,"#fee2e2"),ie.addColorStop(.2,"#fca5a5"),ie.addColorStop(.7,"#ef4444"),ie.addColorStop(1,"#991b1b")),e.fillStyle=ie,e.beginPath(),e.arc(120,p,se,0,Math.PI*2),e.fill(),e.strokeStyle="rgba(161, 161, 170, 0.6)",e.lineWidth=.5,e.font="6.5px Arial",e.fillStyle="#a1a1aa",e.textAlign="right",e.textBaseline="middle";for(let ce=0;ce<=200;ce+=50){const pe=N-ce*be;e.beginPath(),e.moveTo(y,pe),e.lineTo(y+4,pe),e.stroke(),e.fillText(`${ce}°C`,y-22,pe+2.5)}r.showLabels&&(w(e,y+1,80,10,50,t("tools.thermometerLab.labels.thinWall"),"left"),w(e,120,fe,230,fe-15,t("tools.thermometerLab.labels.meniscus"),"left"),w(e,120-O/2,130,10,130,t("tools.thermometerLab.labels.narrowBore"),"left"),w(e,120,p,230,p+15,t("tools.thermometerLab.labels.largeBulb"),"left"))}function Z(e){const v=e.createLinearGradient(115,20,125,20);v.addColorStop(0,"#71717a"),v.addColorStop(.3,"#f4f4f5"),v.addColorStop(.7,"#d4d4d8"),v.addColorStop(1,"#3f3f46"),e.fillStyle=v,e.strokeStyle="#4b5563",e.lineWidth=1,e.beginPath(),e.roundRect(115,20,10,225,[0,0,4,4]),e.fill(),e.stroke(),e.fillStyle="rgba(21, 21, 24, 0.8)",e.fillRect(117,200,6,40),e.strokeStyle="#e2e8f0",e.lineWidth=1.2,e.beginPath();let y=205;e.moveTo(118,y);for(let Y=0;Y<8;Y++)y+=4,e.lineTo(122,y),y+=4,e.lineTo(118,y);e.stroke(),e.lineWidth=1.5,e.strokeStyle="#ef4444",e.beginPath(),e.moveTo(118,20),e.bezierCurveTo(110,5,200,30,245,60),e.stroke(),e.strokeStyle="#111827",e.beginPath(),e.moveTo(122,20),e.bezierCurveTo(130,8,210,45,245,75),e.stroke();const q=245,T=40,z=135,O=90;e.fillStyle="#18181b",e.strokeStyle="#6366f1",e.lineWidth=2.5,e.beginPath(),e.roundRect(q,T,z,O,10),e.fill(),e.stroke(),e.fillStyle="#022c22",e.beginPath(),e.roundRect(q+10,T+12,z-20,34,4),e.fill(),e.font='bold 17px "Courier New"',e.fillStyle="#10b981",e.textAlign="right",e.fillText(r.currentResistance.toFixed(2)+" Ω",q+z-16,T+34),e.font="6px Arial",e.fillStyle="#a7f3d0",e.textAlign="left",e.fillText("PLATINUM RTD METER",q+14,T+21),r.showLabels&&(w(e,116,100,10,70,t("tools.thermometerLab.labels.metalSheath"),"left"),w(e,120,225,230,205,t("tools.thermometerLab.labels.platinumCoil"),"left"))}function W(e){e.strokeStyle="#111827",e.lineWidth=1.2,e.beginPath(),e.moveTo(118,20),e.lineTo(118,245),e.stroke(),e.beginPath(),e.moveTo(122,20),e.lineTo(122,245),e.stroke();const p=20,C=225,v=12,y=120-v/2,q=e.createLinearGradient(y,p,y+v,p);q.addColorStop(0,"rgba(229, 231, 235, 0.4)"),q.addColorStop(.3,"rgba(255, 255, 255, 0.8)"),q.addColorStop(.7,"rgba(243, 244, 246, 0.5)"),q.addColorStop(1,"rgba(209, 213, 219, 0.6)"),e.fillStyle=q,e.strokeStyle="rgba(156, 163, 175, 0.6)",e.lineWidth=.8,e.beginPath(),e.roundRect(y,p,v,C-p,[0,0,3,3]),e.fill(),e.stroke();const T=7,z=e.createRadialGradient(120-T*.2,245-T*.2,T*.1,120,245,T);z.addColorStop(0,"#6b7280"),z.addColorStop(.7,"#1f2937"),z.addColorStop(1,"#09090b"),e.fillStyle=z,e.strokeStyle="#030712",e.lineWidth=1.2,e.beginPath(),e.arc(120,245,T,0,Math.PI*2),e.fill(),e.stroke(),e.lineWidth=1.5,e.strokeStyle="#ef4444",e.beginPath(),e.moveTo(118,20),e.bezierCurveTo(110,5,200,30,245,60),e.stroke(),e.strokeStyle="#111827",e.beginPath(),e.moveTo(122,20),e.bezierCurveTo(130,8,210,45,245,75),e.stroke();const O=245,Y=40,S=135,B=90;e.fillStyle="#18181b",e.strokeStyle="#10b981",e.lineWidth=2.5,e.beginPath(),e.roundRect(O,Y,S,B,10),e.fill(),e.stroke(),e.fillStyle="#022c22",e.beginPath(),e.roundRect(O+10,Y+12,S-20,34,4),e.fill(),e.font='bold 17px "Courier New"',e.fillStyle="#34d399",e.textAlign="right",e.fillText(r.currentThermistorR.toFixed(2)+" kΩ",O+S-16,Y+34),e.font="6px Arial",e.fillStyle="#a7f3d0",e.textAlign="left",e.fillText("NTC THERMISTOR METER",O+14,Y+21),r.showLabels&&(w(e,118,120,10,90,t("tools.thermometerLab.labels.leads"),"left"),w(e,120,245,230,225,t("tools.thermometerLab.labels.semiconductorBead"),"left"))}function X(e,c,m,b,p,C,v,y,q){const{gx:T,gy:z,gw:O,gh:Y}=c;e.strokeStyle="rgba(255, 255, 255, 0.2)",e.lineWidth=1,e.setLineDash([4,4]),e.beginPath(),e.moveTo(m,b),e.lineTo(m,z+Y),e.stroke(),e.beginPath(),e.moveTo(m,b),e.lineTo(T,b),e.stroke(),e.setLineDash([]),e.font="bold 11px Arial",e.textAlign="center",e.textBaseline="top";const S=`${p.toFixed(1)}${v}`,B=e.measureText(S).width+10;e.fillStyle=q,e.beginPath(),e.roundRect(m-B/2,z+Y+2,B,15,3),e.fill(),e.fillStyle="#000",e.fillText(S,m,z+Y+4),e.textAlign="right",e.textBaseline="middle";const N=`${C.toFixed(2)} ${y}`,re=e.measureText(N).width+10;e.fillStyle=q,e.beginPath(),e.roundRect(T-re-2,b-7,re,15,3),e.fill(),e.fillStyle="#000",e.fillText(N,T-7,b)}function D(e){const c=M(),{minL:m,maxL:b}=E(),{minT:p,maxT:C,tickStep:v}=K(),y=g(m,b),q=F(e,c,p,C,v,y),{gx:T,gy:z,gw:O,gh:Y,axisFont:S,yLabelX:B,xLabelY:N,dotR:re}={...c,...q};e.save(),e.translate(B,z+Y/2),e.rotate(-Math.PI/2),e.font=S,e.fillStyle="#e4e4e7",e.fillText("Length of liquid column / cm",0,0),e.restore(),e.font=S,e.fillStyle="#e4e4e7",e.textAlign="center",e.fillText("temperature / °C",T+O/2,N);const we=C,be=x(0,p,C,T,O),fe=_($(0),m,b,z,Y),se=x(we,p,C,T,O),ie=_($(we),m,b,z,Y);e.strokeStyle="#ef4444",e.lineWidth=3,e.beginPath(),e.moveTo(be,fe),e.lineTo(se,ie),e.stroke();const ce=r.thermometerTemp,pe=r.currentLength;if(ce>=p&&ce<=C){const ve=x(ce,p,C,T,O),Te=_(pe,m,b,z,Y);X(e,c,ve,Te,ce,pe,"°C","cm","#ef4444"),e.shadowColor="#ef4444",e.shadowBlur=10,e.fillStyle="#ef4444",e.beginPath(),e.arc(ve,Te,re,0,Math.PI*2),e.fill(),e.shadowBlur=0}}function de(e){const c=M(),{minR:m,maxR:b,ticks:p}=U(),C=K(),v=F(e,c,C.minT,C.maxT,C.tickStep,p),{gx:y,gy:q,gw:T,gh:z,axisFont:O,yLabelX:Y,xLabelY:S,dotR:B}={...c,...v};e.save(),e.translate(Y,q+z/2),e.rotate(-Math.PI/2),e.font=O,e.fillStyle="#e4e4e7",e.fillText("Resistance of platinum / Ω",0,0),e.restore(),e.font=O,e.fillStyle="#e4e4e7",e.textAlign="center",e.fillText("temperature / °C",y+T/2,S);const{minT:N,maxT:re}=C,we=re,be=x(0,N,re,y,T),fe=_(d(0),m,b,q,z),se=x(we,N,re,y,T),ie=_(d(we),m,b,q,z);e.strokeStyle="#6366f1",e.lineWidth=3,e.beginPath(),e.moveTo(be,fe),e.lineTo(se,ie),e.stroke();const ce=r.thermometerTemp,pe=r.currentResistance;if(ce>=N&&ce<=re){const ve=x(ce,N,re,y,T),Te=_(pe,m,b,q,z);X(e,c,ve,Te,ce,pe,"°C","Ω","#6366f1"),e.shadowColor="#6366f1",e.shadowBlur=10,e.fillStyle="#6366f1",e.beginPath(),e.arc(ve,Te,B,0,Math.PI*2),e.fill(),e.shadowBlur=0}}function le(e){const c=M(),m=K(),{minR:b,maxR:p,ticks:C}=f(m),v=F(e,c,m.minT,m.maxT,m.tickStep,C),{gx:y,gy:q,gw:T,gh:z,axisFont:O,yLabelX:Y,xLabelY:S,dotR:B}={...c,...v},{minT:N,maxT:re}=m;e.save(),e.translate(Y,q+z/2),e.rotate(-Math.PI/2),e.font=O,e.fillStyle="#e4e4e7",e.fillText("Resistance of thermistor / kΩ",0,0),e.restore(),e.font=O,e.fillStyle="#e4e4e7",e.textAlign="center",e.fillText("temperature / °C",y+T/2,S),e.strokeStyle="#10b981",e.lineWidth=3,e.beginPath();let we=!1;for(let se=N;se<=re;se+=1){const ie=se+273.15,ce=r.thermistorR25*Math.exp(r.thermistorBeta*(1/ie-1/298.15)),pe=x(se,N,re,y,T),ve=_(Math.min(p,ce),b,p,q,z);ve>=q&&ve<=q+z&&(we?e.lineTo(pe,ve):(e.moveTo(pe,ve),we=!0))}e.stroke();const be=r.thermometerTemp,fe=r.currentThermistorR;if(be>=N&&be<=re){const se=x(be,N,re,y,T),ie=_(Math.min(p,fe),b,p,q,z);X(e,c,se,ie,be,fe,"°C","kΩ","#10b981"),e.shadowColor="#10b981",e.shadowBlur=10,e.fillStyle="#10b981",e.beginPath(),e.arc(se,ie,B,0,Math.PI*2),e.fill(),e.shadowBlur=0}}function he(){k.clearRect(0,0,u,j),J.clearRect(0,0,L,H),k.save(),k.translate(A,0),ae(k),r.thermometerType==="liquid"?R(k):r.thermometerType==="resistance"?Z(k):W(k),k.restore(),r.thermometerType==="liquid"?D(J):r.thermometerType==="resistance"?de(J):le(J)}function ge(){const e=a.querySelector("#tl-svg-formula-liquid");e&&(e.innerHTML=`
         <svg height="55" width="280" style="background:transparent; overflow:visible;">
           <text x="10" y="31" fill="#fff" font-family="Cambria, Georgia, serif" font-size="15">Slope Equation:</text>
           <line x1="120" y1="26" x2="210" y2="26" stroke="#fff" stroke-width="1.5" />

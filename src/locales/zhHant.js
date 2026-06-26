@@ -218,5 +218,8 @@ export const zhHant = {
   'tools.thermometerLab.faulty.dualScale': '\u96d9\u523b\u5ea6\u5c0d\u6bd4\u793a\u610f\u5716',
   'tools.thermometerLab.faulty.trueScale': '\u6a19\u6e96\u6eab\u6a19 (\u00b0C)',
   'tools.thermometerLab.faulty.faultyScale': '\u504f\u5dee\u6eab\u6a19 (\u00b0C)',
+  'tools.thermometerLab.paramSettings': '\u53c3\u6578\u8a2d\u5b9a',
+  'tools.thermometerLab.faultySolver': '\u6545\u969c\u6eab\u5ea6\u8a08\u6c42\u89e3\u5668',
+  'tools.thermometerLab.resistanceSolver': '\u96fb\u963b\u6c42\u6eab\u5ea6\u6c42\u89e3\u5668',
   'worksheets.paperTitleHeat': 'S3 \u71b1\u5b78 \u2014 \u591a\u9805\u9078\u64c7\u984c\u5de5\u4f5c\u7d19',
 };

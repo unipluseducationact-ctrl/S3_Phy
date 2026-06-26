@@ -218,5 +218,8 @@ export const en = {
   'tools.thermometerLab.faulty.dualScale': 'Dual-Scale Comparison Diagram',
   'tools.thermometerLab.faulty.trueScale': 'True Scale (°C)',
   'tools.thermometerLab.faulty.faultyScale': 'Faulty Scale (°C)',
+  'tools.thermometerLab.paramSettings': 'Parameter settings',
+  'tools.thermometerLab.faultySolver': 'Faulty thermometer solver',
+  'tools.thermometerLab.resistanceSolver': 'Resistance-to-temperature solver',
   'worksheets.paperTitleHeat': 'S3 Heat — Multiple choice worksheet',
 };
