@@ -629,11 +629,18 @@ a {
 }
 
 .tool-specific-heat,
-.tool-thermal-mixing,
-.tool-change-of-state {
+.tool-thermal-mixing {
   width: 100%;
   height: clamp(560px, calc(100dvh - 140px), 1400px);
   min-height: clamp(560px, calc(100dvh - 140px), 1400px);
+  display: flex;
+  flex-direction: column;
+}
+
+.tool-change-of-state {
+  width: 100%;
+  height: clamp(720px, calc(100dvh - 100px), 1500px);
+  min-height: clamp(720px, calc(100dvh - 100px), 1500px);
   display: flex;
   flex-direction: column;
 }
@@ -1476,10 +1483,14 @@ canvas.lab-canvas {
   }
 
   .tool-specific-heat,
-  .tool-thermal-mixing,
-  .tool-change-of-state {
+  .tool-thermal-mixing {
     height: clamp(480px, calc(100dvh - 120px), 1200px);
     min-height: clamp(480px, calc(100dvh - 120px), 1200px);
+  }
+
+  .tool-change-of-state {
+    height: clamp(640px, calc(100dvh - 100px), 1300px);
+    min-height: clamp(640px, calc(100dvh - 100px), 1300px);
   }
 
   .tool-heat-transfer {
