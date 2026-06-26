@@ -1,6 +1,7 @@
 /* thermometerLab.js - Ported high-fidelity Thermometer Simulation Lab */
 
 const STYLE_ID = 's3phy-thermometer-lab-css';
+const THERM_FLOAT_BREAKPOINT = 900;
 
 const CSS = `
 .tl-wrap {
@@ -131,6 +132,62 @@ const CSS = `
   gap: 14px;
   min-height: 0;
 }
+.tl-wrap .tl-controls-float-bar {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  flex-shrink: 0;
+}
+.tl-wrap .tl-controls-drag-handle {
+  display: none;
+  cursor: grab;
+  touch-action: none;
+  color: var(--tl-muted);
+  padding: 4px 6px;
+  border-radius: 6px;
+  background: none;
+  border: 1px solid transparent;
+  font-size: 0.85rem;
+  line-height: 1;
+  flex-shrink: 0;
+}
+.tl-wrap .tl-controls-drag-handle.is-dragging { cursor: grabbing; }
+.tl-wrap .tl-controls-drag-handle:hover { color: var(--tl-text); border-color: var(--tl-border); }
+.tl-wrap .tl-controls-float .tl-controls-drag-handle { display: inline-flex; align-items: center; }
+.tl-wrap .tl-controls-toggle {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  flex: 1;
+  min-width: 0;
+  background: none;
+  border: none;
+  color: var(--tl-cyan);
+  font-size: 0.8rem;
+  font-weight: 700;
+  cursor: pointer;
+  padding: 4px 0;
+  text-align: left;
+}
+.tl-wrap .tl-controls-toggle:hover { opacity: 0.85; }
+.tl-wrap .tl-controls-body {
+  transition: max-height 0.25s ease, opacity 0.2s ease;
+  min-height: 0;
+}
+.tl-wrap .tl-controls.controls-collapsed .tl-controls-body {
+  max-height: 0;
+  opacity: 0;
+  overflow: hidden;
+  pointer-events: none;
+}
+.tl-wrap .tl-controls:not(.controls-collapsed) .tl-controls-body {
+  max-height: min(70vh, 520px);
+  opacity: 1;
+  overflow-y: auto;
+}
+.tl-wrap .tl-controls.lab-controls-float {
+  box-shadow: 0 12px 28px rgba(0, 0, 0, 0.45);
+}
 .tl-wrap .tl-controls-scroll {
   flex: 1;
   min-height: 0;
@@ -195,9 +252,10 @@ const CSS = `
   .tl-wrap .tl-dash {
     display: grid;
     grid-template-columns: minmax(0, 460px) 1fr;
-    grid-template-rows: auto auto auto;
+    grid-template-rows: auto;
     gap: 20px;
     align-items: stretch;
+    position: relative;
   }
   .tl-wrap .tl-viz-phys {
     grid-column: 1;
@@ -206,7 +264,7 @@ const CSS = `
     display: flex;
     justify-content: center;
     align-items: center;
-    border: 2px solid #3b82f6; /* Highlight physical view */
+    border: 2px solid #3b82f6;
     box-shadow: 0 0 20px rgba(59, 130, 246, 0.2);
   }
   .tl-wrap .tl-viz-graph {
@@ -216,31 +274,15 @@ const CSS = `
     display: flex;
     justify-content: center;
     align-items: center;
-    border: 2px solid #10b981; /* Highlight graph view */
+    border: 2px solid #10b981;
     box-shadow: 0 0 20px rgba(16, 185, 129, 0.2);
   }
-  .tl-wrap .tl-controls {
-    grid-column: 1 / -1;
-    grid-row: 2;
-    max-height: none;
-    min-height: 0;
-    overflow: visible;
-    border: 1px solid #3f3f46;
-    background: #0f0f12;
-  }
-  .tl-wrap .tl-controls-scroll {
-    flex: none;
-    overflow-y: visible;
-    max-height: none;
-  }
-  .tl-wrap .tl-bath-bar {
-    grid-column: 1 / -1;
-    grid-row: 3;
-    flex-direction: row;
-    flex-wrap: wrap;
-    align-items: center;
-    gap: 12px 16px;
-    margin-top: 0;
+  .tl-wrap .tl-controls.lab-controls-float {
+    position: absolute;
+    z-index: 40;
+    width: min(360px, calc(100% - 24px));
+    padding: 12px;
+    gap: 10px;
   }
   .tl-wrap .tl-canvas-phys,
   .tl-wrap .tl-canvas-graph {
@@ -686,6 +728,142 @@ function ensureStyles() {
   document.head.appendChild(el);
 }
 
+function initFloatingControlsPanel(options) {
+  const FLOAT_BREAKPOINT = 1024;
+  const DEFAULT_POS = { x: 12, y: 12 };
+  const LAYOUT_DEBOUNCE_MS = 200;
+  const {
+    container,
+    panel,
+    toggleBtn,
+    dragHandle,
+    storageKey,
+    onLayoutChange,
+    breakpoint = FLOAT_BREAKPOINT,
+    collapsedClass = 'controls-collapsed',
+    floatingClass = 'controls-floating',
+  } = options;
+
+  if (!container || !panel || !toggleBtn) return null;
+
+  let collapsed = sessionStorage.getItem(storageKey) !== 'false';
+  let pos = (() => {
+    try {
+      const raw = localStorage.getItem(storageKey + ':pos');
+      if (!raw) return { ...DEFAULT_POS };
+      const parsed = JSON.parse(raw);
+      if (typeof parsed.x === 'number' && typeof parsed.y === 'number') return parsed;
+    } catch (e) { void e; }
+    return { ...DEFAULT_POS };
+  })();
+  let dragState = null;
+  let layoutTimer = null;
+
+  const isFloatingEnabled = () => window.innerWidth >= breakpoint;
+
+  const clampPosition = (x, y) => {
+    const cRect = container.getBoundingClientRect();
+    const pRect = panel.getBoundingClientRect();
+    const maxX = Math.max(0, cRect.width - pRect.width);
+    const maxY = Math.max(0, cRect.height - pRect.height);
+    return { x: Math.min(Math.max(0, x), maxX), y: Math.min(Math.max(0, y), maxY) };
+  };
+
+  const applyPosition = () => {
+    panel.style.left = pos.x + 'px';
+    panel.style.top = pos.y + 'px';
+    panel.style.right = 'auto';
+    panel.style.bottom = 'auto';
+  };
+
+  const scheduleLayoutChange = () => {
+    if (typeof onLayoutChange !== 'function') return;
+    clearTimeout(layoutTimer);
+    layoutTimer = setTimeout(onLayoutChange, LAYOUT_DEBOUNCE_MS);
+  };
+
+  const updateToggleUi = () => {
+    toggleBtn.setAttribute('aria-expanded', collapsed ? 'false' : 'true');
+    if (options.getToggleTitle) toggleBtn.title = options.getToggleTitle(collapsed);
+    const icon = toggleBtn.querySelector('[data-float-chevron]');
+    if (icon) icon.textContent = collapsed ? 'v' : '^';
+  };
+
+  const setCollapsed = (next) => {
+    collapsed = next;
+    panel.classList.toggle(collapsedClass, collapsed);
+    sessionStorage.setItem(storageKey, collapsed ? 'true' : 'false');
+    updateToggleUi();
+    scheduleLayoutChange();
+  };
+
+  const enableFloating = () => {
+    container.classList.add(floatingClass);
+    panel.classList.add('lab-controls-float');
+    pos = clampPosition(pos.x, pos.y);
+    applyPosition();
+    if (dragHandle) dragHandle.style.display = '';
+  };
+
+  const disableFloating = () => {
+    container.classList.remove(floatingClass);
+    panel.classList.remove('lab-controls-float');
+    panel.style.left = '';
+    panel.style.top = '';
+    panel.style.right = '';
+    panel.style.bottom = '';
+    if (dragHandle) dragHandle.style.display = 'none';
+  };
+
+  const refreshMode = () => {
+    if (isFloatingEnabled()) {
+      enableFloating();
+      pos = clampPosition(pos.x, pos.y);
+      applyPosition();
+    } else {
+      disableFloating();
+    }
+    scheduleLayoutChange();
+  };
+
+  panel.classList.toggle(collapsedClass, collapsed);
+  updateToggleUi();
+  refreshMode();
+
+  toggleBtn.addEventListener('click', (e) => {
+    e.stopPropagation();
+    setCollapsed(!collapsed);
+  });
+
+  if (dragHandle) {
+    dragHandle.addEventListener('pointerdown', (e) => {
+      if (!isFloatingEnabled()) return;
+      e.preventDefault();
+      dragState = { pointerId: e.pointerId, startX: e.clientX, startY: e.clientY, originX: pos.x, originY: pos.y };
+      dragHandle.setPointerCapture(e.pointerId);
+      dragHandle.classList.add('is-dragging');
+    });
+    dragHandle.addEventListener('pointermove', (e) => {
+      if (!dragState || dragState.pointerId !== e.pointerId) return;
+      pos = clampPosition(dragState.originX + e.clientX - dragState.startX, dragState.originY + e.clientY - dragState.startY);
+      applyPosition();
+    });
+    const endDrag = (e) => {
+      if (!dragState || dragState.pointerId !== e.pointerId) return;
+      dragHandle.releasePointerCapture(e.pointerId);
+      dragHandle.classList.remove('is-dragging');
+      try { localStorage.setItem(storageKey + ':pos', JSON.stringify(pos)); } catch (err) { void err; }
+      dragState = null;
+      scheduleLayoutChange();
+    };
+    dragHandle.addEventListener('pointerup', endDrag);
+    dragHandle.addEventListener('pointercancel', endDrag);
+  }
+
+  window.addEventListener('resize', refreshMode);
+  return { setCollapsed, refreshMode, isCollapsed: () => collapsed };
+}
+
 export function createThermometerLab(t, options = {}) {
   ensureStyles();
 
@@ -748,8 +926,16 @@ export function createThermometerLab(t, options = {}) {
         </div>
       </div>
 
-      <!-- BOTTOM ROW: CONTROLS & SOLVERS -->
-      <div class="tl-controls">
+      <!-- FLOATING CONTROLS & SOLVERS -->
+      <div class="tl-controls controls-collapsed">
+        <div class="tl-controls-float-bar">
+          <button type="button" class="tl-controls-drag-handle" id="tl-controls-drag" aria-label="${t('tools.floatingControls.dragHint')}" title="${t('tools.floatingControls.dragHint')}">⋮⋮</button>
+          <button type="button" class="tl-controls-toggle" id="tl-controls-toggle" aria-expanded="false">
+            <span data-float-chevron>▾</span>
+            <span>${t('tools.thermometerLab.paramSettings')}</span>
+          </button>
+        </div>
+        <div class="tl-controls-body">
 
         <!-- TAB 1: LIQUID-IN-GLASS -->
         <div class="tl-tab-content active" id="tl-tab-liquid">
@@ -2689,6 +2875,25 @@ export function createThermometerLab(t, options = {}) {
   initParticles();
   setupEventListeners();
   updateCalculations();
+
+  const dash = wrap.querySelector('.tl-dash');
+  const controlsPanel = wrap.querySelector('.tl-controls');
+  const toggleBtn = wrap.querySelector('#tl-controls-toggle');
+  const dragHandle = wrap.querySelector('#tl-controls-drag');
+  if (dash && controlsPanel && toggleBtn) {
+    initFloatingControlsPanel({
+      container: dash,
+      panel: controlsPanel,
+      toggleBtn,
+      dragHandle,
+      storageKey: `s3phy-thermo-${defaultType}`,
+      breakpoint: THERM_FLOAT_BREAKPOINT,
+      getToggleTitle: (collapsed) => collapsed
+        ? t('tools.floatingControls.showParams')
+        : t('tools.floatingControls.hideParams'),
+      onLayoutChange: () => drawVisuals(),
+    });
+  }
 
   // Start loop
   animationFrameId = requestAnimationFrame(simulationLoop);
