@@ -39,8 +39,8 @@
       .lab-section .lab-controls { grid-column: span 4 / span 4; }
       .lab-section .lab-viz { grid-column: span 4 / span 4; }
       .lab-section .lab-steps { grid-column: span 4 / span 4; }
-      .lab-section.controls-collapsed .lab-controls { grid-column: span 2 / span 2; }
-      .lab-section.controls-collapsed .lab-viz { grid-column: span 6 / span 6; }
+      .lab-section.controls-collapsed .lab-controls { grid-column: span 3 / span 3; }
+      .lab-section.controls-collapsed .lab-viz { grid-column: span 5 / span 5; }
       .lab-section.controls-collapsed .lab-steps { grid-column: span 4 / span 4; }
     }
     .lab-section.controls-collapsed .lab-controls-body,
@@ -53,6 +53,14 @@
     .lab-viz { display: flex; flex-direction: column; min-height: 0; }
     .lab-viz-canvas { aspect-ratio: 4 / 3; }
     .lab-section.controls-collapsed .lab-viz-canvas { aspect-ratio: auto; flex: 1; min-height: 360px; }
+    /* Dual-panel viz (animation + chart): keep fixed canvas ratio, no flex-grow overlap */
+    .lab-viz-dual { overflow-y: auto; min-height: 0; }
+    @media (min-width: 1024px) {
+      .lab-viz-dual { max-height: calc(100dvh - 44px); }
+    }
+    .lab-viz-dual .lab-viz-panel { flex: none; flex-shrink: 0; }
+    .lab-viz-dual .lab-viz-canvas { aspect-ratio: 4 / 3; flex: none; min-height: 0; }
+    .lab-section.controls-collapsed .lab-viz-dual .lab-viz-canvas { aspect-ratio: 3 / 2; flex: none; min-height: unset; }
     .lab-controls-toggle { display: flex; align-items: center; gap: 0.5rem; width: 100%; text-align: left; background: none; border: none; cursor: pointer; padding: 0; }
     .lab-controls-toggle:hover { opacity: 0.85; }
     .lab-controls-toggle-icon { transition: transform 0.2s ease; flex-shrink: 0; }
@@ -161,9 +169,9 @@
       </div>
 
       <!-- Center: Visual Lab & Heating Curve Graph -->
-      <div class="lab-viz lg:col-span-4 flex flex-col gap-4">
+      <div class="lab-viz lab-viz-dual lg:col-span-4 flex flex-col gap-4">
         <!-- Visual View -->
-        <div class="bg-white p-3.5 rounded-2xl shadow-sm border border-slate-200 flex flex-col gap-3 flex-1 min-h-0">
+        <div class="lab-viz-panel bg-white p-3.5 rounded-2xl shadow-sm border border-slate-200 flex flex-col gap-3">
           <h3 class="text-lg font-bold text-slate-900 flex items-center gap-2">
             <i data-lucide="eye" class="w-5 h-5 text-indigo-600"></i>
             <span data-i18n="visualLab">Interactive Lab View</span>
@@ -187,7 +195,7 @@
         </div>
 
         <!-- Chart -->
-        <div class="bg-white p-3.5 rounded-2xl shadow-sm border border-slate-200 flex flex-col gap-2 flex-grow">
+        <div class="lab-viz-panel bg-white p-3.5 rounded-2xl shadow-sm border border-slate-200 flex flex-col gap-2">
           <h3 class="text-base font-bold text-slate-900 flex items-center gap-2">
             <i data-lucide="trending-up" class="w-5 h-5 text-blue-600"></i>
             <span data-i18n="heatingCurve">Heating Curve (T vs. Time)</span>
