@@ -1,13 +1,26 @@
-# TIR set 2 flashcard image sync
+# TIR set 3 bilingual flashcard image sync
 
-- **Card 1** (What is TIR): front TIR Flashcard Front 01 - What is TIR.png -> 1400x2100, back TIR Flashcard Back 01 - What is TIR.png -> 1400x2100
-- **Card 2** (Two Conditions): front TIR Flashcard Front 02 - Two Conditions.png -> 1400x2100, back TIR Flashcard Back 02 - Two Conditions (rays sketched).png -> 1400x2100
-- **Card 3** (Critical Angle): front TIR Flashcard Front 03 - Critical Angle.png -> 1400x2100, back TIR Flashcard Back 03 - Critical Angle.png -> 1400x2100
-- **Card 4** (Three Scenarios): front TIR Flashcard Front 04 - Three Scenarios.png -> 1400x2100, back TIR Flashcard Back 04 - Three Scenarios (rays sketched).png -> 1400x2100
-- **Card 5** (Fish Eye View): front TIR Flashcard Front 05 - Fish Eye View.png -> 1400x2100, back TIR Flashcard Back 05 - Fish Eye View (ray sketched).png -> 1400x2100
-- **Card 6** (Mirage): front TIR Flashcard Front 06 - Mirage.png -> 1400x2100, back TIR Flashcard Back 06 - Mirage (rays sketched).png -> 1400x2100
-- **Card 7** (Reflecting Prisms): front TIR Flashcard Front 07 - Reflecting Prisms.png -> 1400x2100, back TIR Flashcard Back 07 - Reflecting Prisms (rays sketched).png -> 1400x2100
-- **Card 8** (Optical Fibres): front TIR Flashcard Front 08 - Optical Fibres.png -> 1400x2100, back TIR Flashcard Back 08 - Optical Fibres (rays sketched).png -> 1400x2100
-- **Card 9** (Advantages): front TIR Flashcard Front 09 - Advantages.png -> 1400x2100, back TIR Flashcard Back 09 - Advantages.png -> 1400x2100
+## Skipped / unmapped files
+
+- English/EN-TIR-Summary-Poster-v11.png
+
+- **Card 1** (What is TIR, en): front EN-TIR-01-WhatIsTIR-Front-v2.png -> 1400x1400, back EN-TIR-01-WhatIsTIR-Back-v2.png -> 1400x1400
+- **Card 1** (What is TIR, zhHant): front ZH-TIR-01-WhatIsTIR-Front-v2.png -> 1400x1400, back ZH-TIR-01-WhatIsTIR-Back-v2.png -> 1400x1400
+- **Card 2** (Two Conditions, en): front EN-TIR-02-TwoConditions-Front-v2.png -> 1400x1400, back EN-TIR-02-TwoConditions-Back-v2.png -> 1400x1400
+- **Card 2** (Two Conditions, zhHant): front ZH-TIR-02-TwoConditions-Front-v2.png -> 1400x1400, back ZH-TIR-02-TwoConditions-Back-v2.png -> 1400x1400
+- **Card 3** (Critical Angle, en): front EN-TIR-03-CriticalAngle-Front-v2.png -> 1400x1400, back EN-TIR-03-CriticalAngle-Back-v2.png -> 1400x1400
+- **Card 3** (Critical Angle, zhHant): front ZH-TIR-03-CriticalAngle-Front-v2.png -> 1400x1400, back ZH-TIR-03-CriticalAngle-Back-v2.png -> 1400x1400
+- **Card 4** (Three Scenarios, en): front EN-TIR-04-ThreeScenarios-Front-v2.png -> 1400x1400, back EN-TIR-04-ThreeScenarios-Back-v2.png -> 1400x1400
+- **Card 4** (Three Scenarios, zhHant): front ZH-TIR-04-ThreeScenarios-Front-v2.png -> 1400x1400, back ZH-TIR-04-ThreeScenarios-Back-v2.png -> 1400x1400
+- **Card 5** (Fish Eye View, en): front EN-TIR-05-FishEyeView-Front-v2.png -> 1400x1400, back EN-TIR-05-FishEyeView-Back-v2.png -> 1400x1400
+- **Card 5** (Fish Eye View, zhHant): front ZH-TIR-05-FishEyeView-Front-v2.png -> 1400x1400, back ZH-TIR-05-FishEyeView-Back-v2.png -> 1400x1400
+- **Card 6** (Mirage, en): front EN-TIR-06-Mirage-Front-v2.png -> 1400x1400, back EN-TIR-06-Mirage-Back-v2.png -> 1400x1400
+- **Card 6** (Mirage, zhHant): front ZH-TIR-06-Mirage-Front-v2.png -> 1400x1400, back ZH-TIR-06-Mirage-Back-v2.png -> 1400x1400
+- **Card 7** (Reflecting Prisms, en): front EN-TIR-07-ReflectingPrisms-Front-v2.png -> 1400x1400, back EN-TIR-07-ReflectingPrisms-Back-v2.png -> 1400x1400
+- **Card 7** (Reflecting Prisms, zhHant): front ZH-TIR-07-ReflectingPrisms-Front-v2.png -> 1400x1400, back ZH-TIR-07-ReflectingPrisms-Back-v2.png -> 1400x1400
+- **Card 8** (Optical Fibres, en): front EN-TIR-08-OpticalFibres-Front-v2.png -> 1400x1400, back EN-TIR-08-OpticalFibres-Back-v2.png -> 1400x1400
+- **Card 8** (Optical Fibres, zhHant): front ZH-TIR-08-OpticalFibres-Front-v2.png -> 1400x1400, back ZH-TIR-08-OpticalFibres-Back-v2.png -> 1400x1400
+- **Card 9** (Key Advantages, en): front EN-TIR-09-KeyAdvantages-Front-v2.png -> 1400x1400, back EN-TIR-09-KeyAdvantages-Back-v3.png -> 1400x1400
+- **Card 9** (Key Advantages, zhHant): front ZH-TIR-09-KeyAdvantages-Front-v2.png -> 1400x1400, back ZH-TIR-09-KeyAdvantages-Back-v4.png -> 1400x1400
 
 **Total cards:** 9
