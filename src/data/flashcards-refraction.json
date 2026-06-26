@@ -3,96 +3,168 @@
     "id": 1,
     "topic": "refraction",
     "title": "What is Refraction",
-    "front": "./flashcards/refraction/01-front.webp",
     "alt": "Flashcard 1 - What is Refraction",
-    "back": "./flashcards/refraction/01-back.webp"
+    "en": {
+      "front": "./flashcards/refraction/01-en-front.webp",
+      "back": "./flashcards/refraction/01-en-back.webp"
+    },
+    "zhHant": {
+      "front": "./flashcards/refraction/01-zh-front.webp",
+      "back": "./flashcards/refraction/01-zh-back.webp"
+    }
   },
   {
     "id": 2,
     "topic": "refraction",
-    "title": "Denser vs Less Dense",
-    "front": "./flashcards/refraction/02-front.webp",
-    "alt": "Flashcard 2 - Denser vs Less Dense",
-    "back": "./flashcards/refraction/02-back.webp"
+    "title": "Laws of Refraction",
+    "alt": "Flashcard 2 - Laws of Refraction",
+    "en": {
+      "front": "./flashcards/refraction/02-en-front.webp",
+      "back": "./flashcards/refraction/02-en-back.webp"
+    },
+    "zhHant": {
+      "front": "./flashcards/refraction/02-zh-front.webp",
+      "back": "./flashcards/refraction/02-zh-back.webp"
+    }
   },
   {
     "id": 3,
     "topic": "refraction",
-    "title": "Less Dense to Denser",
-    "front": "./flashcards/refraction/03-front.webp",
-    "alt": "Flashcard 3 - Less Dense to Denser",
-    "back": "./flashcards/refraction/03-back.webp"
+    "title": "Snell's Law",
+    "alt": "Flashcard 3 - Snell's Law",
+    "en": {
+      "front": "./flashcards/refraction/03-en-front.webp",
+      "back": "./flashcards/refraction/03-en-back.webp"
+    },
+    "zhHant": {
+      "front": "./flashcards/refraction/03-zh-front.webp",
+      "back": "./flashcards/refraction/03-zh-back.webp"
+    }
   },
   {
     "id": 4,
     "topic": "refraction",
-    "title": "Denser to Less Dense",
-    "front": "./flashcards/refraction/04-front.webp",
-    "alt": "Flashcard 4 - Denser to Less Dense",
-    "back": "./flashcards/refraction/04-back.webp"
+    "title": "Refractive Index",
+    "alt": "Flashcard 4 - Refractive Index",
+    "en": {
+      "front": "./flashcards/refraction/04-en-front.webp",
+      "back": "./flashcards/refraction/04-en-back.webp"
+    },
+    "zhHant": {
+      "front": "./flashcards/refraction/04-zh-front.webp",
+      "back": "./flashcards/refraction/04-zh-back.webp"
+    }
   },
   {
     "id": 5,
     "topic": "refraction",
-    "title": "Laws of Refraction",
-    "front": "./flashcards/refraction/05-front.webp",
-    "alt": "Flashcard 5 - Laws of Refraction",
-    "back": "./flashcards/refraction/05-back.webp"
+    "title": "Normal Incidence",
+    "alt": "Flashcard 5 - Normal Incidence",
+    "en": {
+      "front": "./flashcards/refraction/05-en-front.webp",
+      "back": "./flashcards/refraction/05-en-back.webp"
+    },
+    "zhHant": {
+      "front": "./flashcards/refraction/05-zh-front.webp",
+      "back": "./flashcards/refraction/05-zh-back.webp"
+    }
   },
   {
     "id": 6,
     "topic": "refraction",
-    "title": "Snell's Law",
-    "front": "./flashcards/refraction/06-front.webp",
-    "alt": "Flashcard 6 - Snell's Law",
-    "back": "./flashcards/refraction/06-back.webp"
+    "title": "Denser vs Less Dense",
+    "alt": "Flashcard 6 - Denser vs Less Dense",
+    "en": {
+      "front": "./flashcards/refraction/06-en-front.webp",
+      "back": "./flashcards/refraction/06-en-back.webp"
+    },
+    "zhHant": {
+      "front": "./flashcards/refraction/06-zh-front.webp",
+      "back": "./flashcards/refraction/06-zh-back.webp"
+    }
   },
   {
     "id": 7,
     "topic": "refraction",
-    "title": "Refractive Index",
-    "front": "./flashcards/refraction/07-front.webp",
-    "alt": "Flashcard 7 - Refractive Index",
-    "back": "./flashcards/refraction/07-back.webp"
+    "title": "Less Dense to Denser",
+    "alt": "Flashcard 7 - Less Dense to Denser",
+    "en": {
+      "front": "./flashcards/refraction/07-en-front.webp",
+      "back": "./flashcards/refraction/07-en-back.webp"
+    },
+    "zhHant": {
+      "front": "./flashcards/refraction/07-zh-front.webp",
+      "back": "./flashcards/refraction/07-zh-back.webp"
+    }
   },
   {
     "id": 8,
     "topic": "refraction",
-    "title": "Normal Incidence",
-    "front": "./flashcards/refraction/08-front.webp",
-    "alt": "Flashcard 8 - Normal Incidence",
-    "back": "./flashcards/refraction/08-back.webp"
+    "title": "Denser to Less Dense",
+    "alt": "Flashcard 8 - Denser to Less Dense",
+    "en": {
+      "front": "./flashcards/refraction/08-en-front.webp",
+      "back": "./flashcards/refraction/08-en-back.webp"
+    },
+    "zhHant": {
+      "front": "./flashcards/refraction/08-zh-front.webp",
+      "back": "./flashcards/refraction/08-zh-back.webp"
+    }
   },
   {
     "id": 9,
     "topic": "refraction",
     "title": "Apparent Depth",
-    "front": "./flashcards/refraction/09-front.webp",
     "alt": "Flashcard 9 - Apparent Depth",
-    "back": "./flashcards/refraction/09-back.webp"
+    "en": {
+      "front": "./flashcards/refraction/09-en-front.webp",
+      "back": "./flashcards/refraction/09-en-back.webp"
+    },
+    "zhHant": {
+      "front": "./flashcards/refraction/09-zh-front.webp",
+      "back": "./flashcards/refraction/09-zh-back.webp"
+    }
   },
   {
     "id": 10,
     "topic": "refraction",
-    "title": "Experiment Graph",
-    "front": "./flashcards/refraction/10-front.webp",
-    "alt": "Flashcard 10 - Experiment Graph",
-    "back": "./flashcards/refraction/10-back.webp"
+    "title": "Dispersion",
+    "alt": "Flashcard 10 - Dispersion",
+    "en": {
+      "front": "./flashcards/refraction/10-en-front.webp",
+      "back": "./flashcards/refraction/10-en-back.webp"
+    },
+    "zhHant": {
+      "front": "./flashcards/refraction/10-zh-front.webp",
+      "back": "./flashcards/refraction/10-zh-back.webp"
+    }
   },
   {
     "id": 11,
     "topic": "refraction",
-    "title": "Dispersion",
-    "front": "./flashcards/refraction/11-front.webp",
-    "alt": "Flashcard 11 - Dispersion",
-    "back": "./flashcards/refraction/11-back.webp"
+    "title": "Red vs Violet",
+    "alt": "Flashcard 11 - Red vs Violet",
+    "en": {
+      "front": "./flashcards/refraction/11-en-front.webp",
+      "back": "./flashcards/refraction/11-en-back.webp"
+    },
+    "zhHant": {
+      "front": "./flashcards/refraction/11-zh-front.webp",
+      "back": "./flashcards/refraction/11-zh-back.webp"
+    }
   },
   {
     "id": 12,
     "topic": "refraction",
-    "title": "Red vs Violet",
-    "front": "./flashcards/refraction/12-front.webp",
-    "alt": "Flashcard 12 - Red vs Violet",
-    "back": "./flashcards/refraction/12-back.webp"
+    "title": "Experiment Graph",
+    "alt": "Flashcard 12 - Experiment Graph",
+    "en": {
+      "front": "./flashcards/refraction/12-en-front.webp",
+      "back": "./flashcards/refraction/12-en-back.webp"
+    },
+    "zhHant": {
+      "front": "./flashcards/refraction/12-zh-front.webp",
+      "back": "./flashcards/refraction/12-zh-back.webp"
+    }
   }
 ]
