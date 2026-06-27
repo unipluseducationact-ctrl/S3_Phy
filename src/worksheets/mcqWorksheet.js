@@ -31,6 +31,16 @@ function escapeHtml(s) {
     .replace(/"/g, '&quot;');
 }
 
+function formatStem(text) {
+  return escapeHtml(text).replace(/\n/g, '<br>');
+}
+
+function resolveAsset(path) {
+  if (!path) return '';
+  const clean = path.startsWith('./') ? path.slice(2) : path;
+  return `${import.meta.env.BASE_URL}${clean}`;
+}
+
 export function renderWorksheets(t, options = {}) {
   const topics = options.topics ?? [
     ['rotatingMirror', 'topic.rotatingMirror'],
@@ -261,9 +271,14 @@ export function hydrateWorksheets(root, questions, t, langKey, options = {}) {
         : 'ws-q-block--incorrect'
       : '';
 
+    const fig = pack.image
+      ? `<figure class="ws-q-fig"><img src="${escapeHtml(resolveAsset(pack.image))}" alt="" loading="lazy" /></figure>`
+      : '';
+
     return `<article class="ws-q-block ${rowClass}" data-ws-block="${i}">
       <div class="ws-q-meta">Q${qNum} · ${sectionTag.toUpperCase()} · MCQ</div>
-      <p class="ws-q-stem">${escapeHtml(pack.q)}</p>
+      <div class="ws-q-stem">${formatStem(pack.q)}</div>
+      ${fig}
       <div class="ws-options">${optionsHtml}</div>
       <button type="button" class="ws-check-btn" data-ws-check="${i}"${checkDisabled}>${escapeHtml(t('worksheets.checkAnswer'))}</button>
       ${feedback}
@@ -362,10 +377,13 @@ export function hydrateWorksheets(root, questions, t, langKey, options = {}) {
         const choices = pack.choices
           .map((c, j) => `<li>${LETTERS[j]}. ${escapeHtml(c)}</li>`)
           .join('');
+        const fig = pack.image
+          ? `<figure class="ws-q-fig"><img src="${escapeHtml(resolveAsset(pack.image))}" alt="" /></figure>`
+          : '';
         const ans = withAnswers
           ? `<p><strong>${escapeHtml(t('worksheets.answer'))}:</strong> ${LETTERS[pack.a]}<br/><em>${escapeHtml(pack.exp)}</em></p>`
           : '';
-        return `<div class="ws-print-q"><strong>Q${i + 1}.</strong> ${escapeHtml(pack.q)}<ol>${choices}</ol>${ans}</div>`;
+        return `<div class="ws-print-q"><strong>Q${i + 1}.</strong> ${formatStem(pack.q)}${fig}<ol>${choices}</ol>${ans}</div>`;
       })
       .join('');
     return `<h2>${escapeHtml(paperTitle)}</h2>${rows}`;
@@ -377,10 +395,13 @@ export function hydrateWorksheets(root, questions, t, langKey, options = {}) {
       .map((q, i) => {
         const pack = q[lk()] || q.en;
         const choices = pack.choices.map((c, j) => `${LETTERS[j]}. ${c}`).join('<br/>');
+        const img = pack.image
+          ? `<p><img src="${resolveAsset(pack.image)}" style="max-width:100%;max-height:280px" /></p>`
+          : '';
         const ans = withAnswers
           ? `<p><b>${t('worksheets.answer')}:</b> ${LETTERS[pack.a]}<br/><i>${pack.exp}</i></p>`
           : '';
-        return `<div style="page-break-inside:avoid;margin-bottom:16px"><b>Q${i + 1}.</b> ${pack.q}<br/>${choices}${ans}</div>`;
+        return `<div style="page-break-inside:avoid;margin-bottom:16px"><b>Q${i + 1}.</b> ${pack.q.replace(/\n/g, '<br/>')}${img}<br/>${choices}${ans}</div>`;
       })
       .join('');
     return `<html xmlns:o="urn:schemas-microsoft-com:office:office" xmlns:w="urn:schemas-microsoft-com:office:word">

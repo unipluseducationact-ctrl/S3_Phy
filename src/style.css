@@ -1203,6 +1203,22 @@ canvas.lab-canvas {
   line-height: 1.35;
 }
 
+.ws-q-fig {
+  margin: 0 0 16px;
+}
+
+.ws-q-fig img {
+  display: block;
+  max-width: 100%;
+  max-height: min(360px, 50vh);
+  margin: 0 auto;
+  object-fit: contain;
+  border-radius: 12px;
+  border: 1px solid rgba(193, 198, 213, 0.45);
+  background: #fff;
+  box-shadow: var(--shadow);
+}
+
 .ws-options {
   display: grid;
   grid-template-columns: 1fr;
