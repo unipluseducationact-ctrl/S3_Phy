@@ -975,6 +975,21 @@ input[type="number"]::-webkit-outer-spin-button {
     min-width: 0;
 }
 
+.data-card-header-label {
+    display: flex;
+    flex-direction: column;
+    line-height: 1.2;
+}
+
+.data-card-header-label .zh {
+    font-weight: bold;
+}
+
+.data-card-header-label .en {
+    font-size: 0.85em;
+    opacity: 0.9;
+}
+
 .data-card-header-actions {
     display: flex;
     align-items: center;
