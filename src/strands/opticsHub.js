@@ -12,7 +12,7 @@ import { mountFlashcardStudy } from '../flashcards/flashcardStudy.js';
 import { buildOpticsDeck } from '../flashcards/flashcardDeck.js';
 
 const TOOL_ORDER = ['rotatingMirror', 'refractionTir', 'lens', 'rgbMixer', 'em'];
-const SUMMARY_ASSET_VERSION = '20260627-reflection-v11';
+const SUMMARY_ASSET_VERSION = '20260627-em-v2';
 
 const TOOL_FACTORIES = {
   rotatingMirror: (tr) => createRotatingMirrorLab(tr),

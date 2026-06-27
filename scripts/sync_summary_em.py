@@ -11,8 +11,8 @@ from PIL import Image
 ROOT = Path(__file__).resolve().parents[1]
 SRC_DIR = Path(r"C:\Users\UniplusUser02\Desktop\PHYS\S3\Optics\Summary\EM waves")
 POSTERS = {
-    "em-en.webp": SRC_DIR / "EM Waves Summary Poster (English).png",
-    "em-zhHant.webp": SRC_DIR / "電磁波 總結海報（繁體中文）.png",
+    "em-en.webp": SRC_DIR / "EM Waves Summary Poster (English) - v2.png",
+    "em-zhHant.webp": SRC_DIR / "電磁波 總結海報（繁體中文）- v2.png",
 }
 OUT_DIR = ROOT / "public" / "summary"
 MAX_WIDTH = 1400
