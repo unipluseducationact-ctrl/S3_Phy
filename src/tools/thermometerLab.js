@@ -572,6 +572,33 @@ const CSS = `
 .tl-wrap .tl-worked-solution p {
   margin: 6px 0;
 }
+.tl-wrap .tl-worked-solution.tl-dual-direction {
+  display: flex;
+  flex-direction: row;
+  gap: 16px;
+  align-items: stretch;
+  margin-bottom: 10px;
+}
+.tl-wrap .tl-direction-col {
+  flex: 1 1 0;
+  min-width: 0;
+}
+.tl-wrap .tl-dual-direction > .tl-direction-col:first-child {
+  border-right: 1px solid rgba(255, 255, 255, 0.05);
+  padding-right: 16px;
+}
+@media (max-width: 699px) {
+  .tl-wrap .tl-worked-solution.tl-dual-direction {
+    flex-direction: column;
+    gap: 12px;
+  }
+  .tl-wrap .tl-dual-direction > .tl-direction-col:first-child {
+    border-right: none;
+    border-bottom: 1px solid rgba(255, 255, 255, 0.05);
+    padding-right: 0;
+    padding-bottom: 10px;
+  }
+}
 .tl-wrap .tl-math-formula {
   display: flex;
   align-items: center;
@@ -946,14 +973,14 @@ export function createThermometerLab(t, options = {}) {
         <div class="tl-live-tab active" id="tl-live-liquid">
           <div class="tl-controls-steps">
             <div class="tl-info-label" style="margin-top:0;font-size:0.8rem;color:var(--tl-cyan)">Live calibration formula (Dual-Directional Realtime Calculations)</div>
-            <div class="tl-worked-solution" style="margin-bottom:10px; display:flex; flex-direction:column; gap:12px">
-              <div style="border-bottom:1px solid rgba(255,255,255,0.05); padding-bottom:10px">
+            <div class="tl-worked-solution tl-dual-direction">
+              <div class="tl-direction-col">
                 <div class="tl-info-label" style="font-size:0.75rem;color:var(--tl-cyan);margin-bottom:4px">Direction A: Length to Temperature (L<sub>T</sub> &rarr; T)</div>
                 <div id="tl-svg-formula-liquid" class="tl-math-formula" style="height:45px; margin:4px 0"></div>
                 <p style="margin:2px 0; font-size:0.85rem">Substitute current reading <b class="tl-live-value" id="tl-live-liquid-lt">5.50 cm</b>:</p>
                 <div id="tl-svg-formula-liquid-sub" class="tl-math-formula" style="height:100px; margin:4px 0"></div>
               </div>
-              <div>
+              <div class="tl-direction-col">
                 <div class="tl-info-label" style="font-size:0.75rem;color:var(--tl-cyan);margin-bottom:4px">Direction B: Temperature to Length (T &rarr; L<sub>T</sub>)</div>
                 <p style="margin:2px 0; font-size:0.85rem">Substitute current bath temperature <b class="tl-live-value" id="tl-live-liquid-t-sub">25.0°C</b>:</p>
                 <div id="tl-svg-formula-t-to-l" class="tl-math-formula" style="font-size:0.85rem;height:110px; margin:4px 0"></div>
@@ -964,14 +991,14 @@ export function createThermometerLab(t, options = {}) {
         <div class="tl-live-tab" id="tl-live-resistance">
           <div class="tl-controls-steps">
             <div class="tl-info-label" style="margin-top:0;font-size:0.8rem;color:var(--tl-cyan)">Live calibration formula (Dual-Directional Realtime Calculations)</div>
-            <div class="tl-worked-solution" style="margin-bottom:10px; display:flex; flex-direction:column; gap:12px">
-              <div style="border-bottom:1px solid rgba(255,255,255,0.05); padding-bottom:10px">
+            <div class="tl-worked-solution tl-dual-direction">
+              <div class="tl-direction-col">
                 <div class="tl-info-label" style="font-size:0.75rem;color:var(--tl-cyan);margin-bottom:4px">Direction A: Resistance to Temperature (R<sub>T</sub> &rarr; T)</div>
                 <div id="tl-svg-formula-resistance" class="tl-math-formula" style="height:45px; margin:4px 0"></div>
                 <p style="margin:2px 0; font-size:0.85rem">Substitute current resistance <b class="tl-live-value" id="tl-live-resistance-rt">5.30 Ω</b>:</p>
                 <div id="tl-svg-formula-resistance-sub" class="tl-math-formula" style="height:100px; margin:4px 0"></div>
               </div>
-              <div>
+              <div class="tl-direction-col">
                 <div class="tl-info-label" style="font-size:0.75rem;color:var(--tl-cyan);margin-bottom:4px">Direction B: Temperature to Resistance (T &rarr; R<sub>T</sub>)</div>
                 <p style="margin:2px 0; font-size:0.85rem">Substitute current bath temperature <b class="tl-live-value" id="tl-live-resistance-t-sub">25.0°C</b>:</p>
                 <div id="tl-svg-formula-t-to-r" class="tl-math-formula" style="font-size:0.85rem;height:110px; margin:4px 0"></div>
