@@ -337,8 +337,11 @@ export function mountHeatHub(root) {
       }
 
       if (r.id === 'heatInternalEnergy') {
-        const ok = await assetExists('summary', 'heat-internal-energy.webp');
-        const url = `${import.meta.env.BASE_URL}summary/heat-internal-energy.webp`;
+        const file = lk === 'zhHant'
+          ? 'heat-internal-energy-zhHant.webp'
+          : 'heat-internal-energy-en.webp';
+        const ok = await assetExists('summary', file);
+        const url = `${import.meta.env.BASE_URL}summary/${file}`;
         if (ok) {
           body.innerHTML = `
           <img class="summary-thumb" src="${url}" alt="${t('summary.item.heatInternalEnergy')}" loading="lazy" />
