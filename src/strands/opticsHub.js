@@ -12,7 +12,7 @@ import { mountFlashcardStudy } from '../flashcards/flashcardStudy.js';
 import { buildOpticsDeck } from '../flashcards/flashcardDeck.js';
 
 const TOOL_ORDER = ['rotatingMirror', 'refractionTir', 'lens', 'rgbMixer', 'em'];
-const SUMMARY_ASSET_VERSION = '20260627-reflection';
+const SUMMARY_ASSET_VERSION = '20260627-em';
 
 const TOOL_FACTORIES = {
   rotatingMirror: (tr) => createRotatingMirrorLab(tr),
@@ -257,7 +257,7 @@ export function mountOpticsHub(root) {
       { key: 'tir', type: 'image', fileEn: 'tir-en.webp', fileZh: 'tir-zhHant.webp' },
       { key: 'convex', type: 'image', fileEn: 'convex-en.webp', fileZh: 'convex-zhHant.webp' },
       { key: 'concave', type: 'image', fileEn: 'concave-en.webp', fileZh: 'concave-zhHant.webp' },
-      { key: 'em', type: 'image', file: 'em.webp' },
+      { key: 'em', type: 'image', fileEn: 'em-en.webp', fileZh: 'em-zhHant.webp' },
     ];
     return `
       <section class="panel">
@@ -296,7 +296,7 @@ export function mountOpticsHub(root) {
       { key: 'tir', type: 'image', fileEn: 'tir-en.webp', fileZh: 'tir-zhHant.webp' },
       { key: 'convex', type: 'image', fileEn: 'convex-en.webp', fileZh: 'convex-zhHant.webp' },
       { key: 'concave', type: 'image', fileEn: 'concave-en.webp', fileZh: 'concave-zhHant.webp' },
-      { key: 'em', type: 'image', file: 'em.webp' },
+      { key: 'em', type: 'image', fileEn: 'em-en.webp', fileZh: 'em-zhHant.webp' },
     ];
     const lk = langKey();
     for (const r of rows) {
