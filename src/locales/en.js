@@ -48,6 +48,8 @@ export const en = {
   'notes.missing': 'PDF not uploaded yet.',
   'tools.title': 'Interactive labs',
   'tools.pick': 'Select a lab',
+  'tools.hideLabList': 'Hide lab list',
+  'tools.showLabList': 'Show lab list',
   'tools.rotatingMirror.title': 'Rotating plane mirror',
   'tools.rotatingMirror.subtitle': 'Ray shift when the mirror turns (?θ_ray = 2θ_mirror).',
   'tools.rotatingMirror.toggle.origNormal': 'Orig. normal',

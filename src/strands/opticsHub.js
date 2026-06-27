@@ -6,6 +6,7 @@ import { createLensLab } from '../tools/lensLab.js';
 import { createEmLab } from '../tools/emLab.js';
 import { createRgbColorMixerLab } from '../tools/rgbColorMixerLab.js';
 import { mountHubShell } from '../hubShell.js';
+import { renderToolsShell, hydrateToolsShell } from '../tools/toolsShell.js';
 import { renderWorksheets, hydrateWorksheets } from '../worksheets/mcqWorksheet.js';
 import { mountFlashcardStudy } from '../flashcards/flashcardStudy.js';
 import { buildOpticsDeck } from '../flashcards/flashcardDeck.js';
@@ -75,7 +76,14 @@ export function mountOpticsHub(root) {
 
     if (section === 'topics') el.main.innerHTML = renderTopics();
     else if (section === 'notes') el.main.innerHTML = renderNotesShell();
-    else if (section === 'tools') el.main.innerHTML = renderToolsShell();
+    else if (section === 'tools') {
+      el.main.innerHTML = renderToolsShell({
+        toolOrder: TOOL_ORDER,
+        toolId,
+        getLabel: toolLabel,
+        t,
+      });
+    }
     else if (section === 'worksheets') el.main.innerHTML = renderWorksheets(t);
     else if (section === 'flashcards') {
       destroyFlashcards = mountFlashcardStudy(el.main, {
@@ -88,7 +96,23 @@ export function mountOpticsHub(root) {
     } else if (section === 'summary') el.main.innerHTML = renderSummary();
 
     if (section === 'notes') void hydrateNotes();
-    if (section === 'tools') hydrateTools();
+    if (section === 'tools') {
+      hydrateToolsShell(root, {
+        getLabel: toolLabel,
+        t,
+        getActiveToolId: () => toolId,
+        onSelectTool: (id) => {
+          toolId = id;
+        },
+        mountTool: (stage) => {
+          stage.innerHTML = '';
+          const factory = TOOL_FACTORIES[toolId];
+          if (!factory) return;
+          const node = toolId === 'lens' ? factory(t, lensDefaultKind) : factory(t);
+          stage.appendChild(node);
+        },
+      });
+    }
     if (section === 'worksheets') hydrateWorksheets(root, questions, t, langKey);
     if (section === 'summary') void hydrateSummary();
   }
@@ -213,42 +237,6 @@ export function mountOpticsHub(root) {
           <p><a class="btn" href="${import.meta.env.BASE_URL}notes/README.txt" target="_blank" rel="noopener">README</a></p>`;
       }
     }
-  }
-
-  function renderToolsShell() {
-    return `
-      <section class="panel panel--tools">
-        <h2>${t('tools.title')}</h2>
-        <p class="lead">${t('tools.pick')}</p>
-        <div class="tools-layout">
-          <div class="tool-list" data-tool-list>
-            ${TOOL_ORDER.map((id) => `<button type="button" data-tool="${id}" class="${toolId === id ? 'active' : ''}">${toolLabel(id)}</button>`).join('')}
-          </div>
-          <div class="tool-stage" data-tool-stage></div>
-        </div>
-      </section>`;
-  }
-
-  function hydrateTools() {
-    const list = root.querySelector('[data-tool-list]');
-    const stage = root.querySelector('[data-tool-stage]');
-    if (!list || !stage) return;
-    list.querySelectorAll('button').forEach((btn) => {
-      btn.addEventListener('click', () => {
-        toolId = btn.getAttribute('data-tool');
-        list.querySelectorAll('button').forEach((b) => b.classList.toggle('active', b.getAttribute('data-tool') === toolId));
-        mountTool(stage);
-      });
-    });
-    mountTool(stage);
-  }
-
-  function mountTool(stage) {
-    stage.innerHTML = '';
-    const factory = TOOL_FACTORIES[toolId];
-    if (!factory) return;
-    const node = toolId === 'lens' ? factory(t, lensDefaultKind) : factory(t);
-    stage.appendChild(node);
   }
 
   function renderSummary() {
