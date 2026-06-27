@@ -88,16 +88,6 @@ export function renderWorksheets(t, options = {}) {
           </div>
 
           <div class="ws-main-grid">
-            <aside class="ws-hint-panel no-print" aria-label="${t('worksheets.hint')}">
-              <div class="ws-hint-card">
-                <div class="ws-hint-head">
-                  <span class="ws-hint-icon" aria-hidden="true">💡</span>
-                  <h3>${t('worksheets.hint')}</h3>
-                </div>
-                <p class="ws-hint-text" data-ws-hint-text>${t('worksheets.hintEmpty')}</p>
-              </div>
-            </aside>
-
             <section class="ws-practice-panel">
               <div class="ws-practice-header no-print">
                 <div>
@@ -105,9 +95,6 @@ export function renderWorksheets(t, options = {}) {
                   <p class="ws-practice-hint">${t('worksheets.practiceHint')}</p>
                 </div>
                 <button type="button" class="ws-summary-btn" data-ws-summary-btn>${t('worksheets.sessionSummary')}</button>
-              </div>
-              <div class="ws-hint-mobile no-print">
-                <p data-ws-hint-mobile>${t('worksheets.hintEmpty')}</p>
               </div>
               <div class="ws-summary-panel no-print" data-ws-summary hidden></div>
               <div class="ws-quiz-area ws-quiz-empty" data-ws-body>
@@ -137,8 +124,6 @@ export function hydrateWorksheets(root, questions, t, langKey, options = {}) {
   const body = root.querySelector('[data-ws-body]');
   const progressText = root.querySelector('[data-ws-progress-text]');
   const progressBar = root.querySelector('[data-ws-progress-bar]');
-  const hintText = root.querySelector('[data-ws-hint-text]');
-  const hintMobile = root.querySelector('[data-ws-hint-mobile]');
   const summaryEl = root.querySelector('[data-ws-summary]');
   const summaryBtn = root.querySelector('[data-ws-summary-btn]');
   const toggleSettings = root.querySelector('[data-ws-toggle-settings]');
@@ -169,12 +154,6 @@ export function hydrateWorksheets(root, questions, t, langKey, options = {}) {
     const node = root.querySelector(`[data-ws-topic="${id}"]`);
     const label = node?.closest('.ws-check-card')?.querySelector('span');
     return label?.textContent?.trim() || id;
-  }
-
-  function setHint(text) {
-    const msg = text || t('worksheets.hintEmpty');
-    if (hintText) hintText.textContent = msg;
-    if (hintMobile) hintMobile.textContent = msg;
   }
 
   function updateBankSummary() {
@@ -282,7 +261,7 @@ export function hydrateWorksheets(root, questions, t, langKey, options = {}) {
         : 'ws-q-block--incorrect'
       : '';
 
-    return `<article class="ws-q-block ${rowClass}" data-ws-block="${i}" data-ws-hint="${escapeHtml(pack.hint || pack.exp)}">
+    return `<article class="ws-q-block ${rowClass}" data-ws-block="${i}">
       <div class="ws-q-meta">Q${qNum} · ${sectionTag.toUpperCase()} · MCQ</div>
       <p class="ws-q-stem">${escapeHtml(pack.q)}</p>
       <div class="ws-options">${optionsHtml}</div>
@@ -295,18 +274,11 @@ export function hydrateWorksheets(root, questions, t, langKey, options = {}) {
     if (!state.items.length) {
       body.className = 'ws-quiz-area ws-quiz-empty';
       body.innerHTML = `<p>${escapeHtml(t('worksheets.empty'))}</p>`;
-      setHint(null);
       return;
     }
 
     body.className = 'ws-quiz-area';
     body.innerHTML = state.items.map((q, i) => paintQuestionBlock(q, i)).join('');
-
-    const firstOpen = state.items.findIndex((_, i) => !state.resolved[i]);
-    if (firstOpen >= 0) {
-      const pack = state.items[firstOpen][lk()] || state.items[firstOpen].en;
-      setHint(pack.hint || pack.exp);
-    }
 
     body.querySelectorAll('[data-ws-option]').forEach((btn) => {
       btn.addEventListener('click', () => {
@@ -318,11 +290,6 @@ export function hydrateWorksheets(root, questions, t, langKey, options = {}) {
           b.classList.toggle('ws-option-btn--selected', Number(b.getAttribute('data-ws-option')) === choice);
         });
       });
-    });
-
-    body.querySelectorAll('.ws-q-block').forEach((block) => {
-      block.addEventListener('mouseenter', () => setHint(block.getAttribute('data-ws-hint')));
-      block.addEventListener('focusin', () => setHint(block.getAttribute('data-ws-hint')));
     });
 
     body.querySelectorAll('[data-ws-check]').forEach((btn) => {
