@@ -12,6 +12,7 @@ import { mountFlashcardStudy } from '../flashcards/flashcardStudy.js';
 import { buildOpticsDeck } from '../flashcards/flashcardDeck.js';
 
 const TOOL_ORDER = ['rotatingMirror', 'refractionTir', 'lens', 'rgbMixer', 'em'];
+const SUMMARY_ASSET_VERSION = '20260627-reflection';
 
 const TOOL_FACTORIES = {
   rotatingMirror: (tr) => createRotatingMirrorLab(tr),
@@ -306,7 +307,8 @@ export function mountOpticsHub(root) {
       if (r.type === 'image') {
         const file = r.fileEn && r.fileZh ? (lk === 'zhHant' ? r.fileZh : r.fileEn) : r.file;
         const ok = await assetExists('summary', file);
-        const url = `${import.meta.env.BASE_URL}summary/${file}`;
+        const baseUrl = `${import.meta.env.BASE_URL}summary/${file}`;
+        const url = `${baseUrl}?v=${SUMMARY_ASSET_VERSION}`;
         if (ok) {
           body.innerHTML = `
           <img class="summary-thumb" src="${url}" alt="${t(`summary.item.${r.key}`)}" loading="lazy" />
