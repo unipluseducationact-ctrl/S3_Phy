@@ -23,14 +23,6 @@ function filterPool(questions, picked, topicFilter) {
   });
 }
 
-function todayStr() {
-  return new Date().toLocaleDateString(undefined, {
-    year: 'numeric',
-    month: 'long',
-    day: 'numeric',
-  });
-}
-
 function escapeHtml(s) {
   return String(s)
     .replace(/&/g, '&amp;')
@@ -48,224 +40,298 @@ export function renderWorksheets(t, options = {}) {
     ['concave', 'topic.concave'],
     ['em', 'topic.em'],
   ];
-  const paperTitleKey = options.paperTitleKey ?? 'worksheets.paperTitle';
+
   return `
     <section class="panel panel--worksheets">
-      <h2>${t('worksheets.title')}</h2>
-      <p class="lead">${t('worksheets.intro')}</p>
-      <div class="ws-controls no-print">
-        <div class="controls">
-          <div class="control">
-            <label>${t('worksheets.count')}</label>
-            <select data-ws-count>
-              <option>5</option><option>10</option><option>15</option>
-            </select>
+      <div class="ws-layout" id="ws-layout">
+        <aside class="ws-settings-panel no-print" id="ws-settings-panel">
+          <h2 class="ws-settings-title">${t('worksheets.settingsTitle')}</h2>
+          <div class="ws-bank-summary" id="ws-bank-summary" aria-live="polite"></div>
+          <label class="ws-field-label">${t('worksheets.topics')}</label>
+          <div class="ws-topic-checks" data-ws-topics>
+            ${topics
+              .map(
+                ([id, key]) =>
+                  `<label class="ws-check-card">
+                    <input type="checkbox" data-ws-topic="${id}" checked />
+                    <span>${t(key)}</span>
+                  </label>`,
+              )
+              .join('')}
           </div>
-        </div>
-        <p class="lead" style="margin-top:10px">${t('worksheets.topics')}</p>
-        <div class="grid cols-2" data-ws-topics>
-          ${topics
-            .map(
-              ([id, key]) => `<label class="card ws-topic-card">
-            <input type="checkbox" data-ws-topic="${id}" checked />
-            <span>${t(key)}</span>
-          </label>`,
-            )
-            .join('')}
-        </div>
-        <p class="ws-action-row">
-          <button class="btn primary" type="button" data-ws-gen>${t('worksheets.generate')}</button>
-        </p>
-      </div>
-      <div class="ws-preview-area" data-ws-preview-area hidden>
-        <div class="preview-tabs no-print" data-ws-tabs>
-          <button type="button" class="preview-tab active" data-ws-tab="practice">${t('worksheets.tabPractice')}</button>
-          <button type="button" class="preview-tab" data-ws-tab="answer">${t('worksheets.tabAnswer')}</button>
-        </div>
-        <div class="worksheet-paper practice-mode" data-ws-paper>
-          <div class="worksheet-header">
-            <div class="header-top">
-              <h3>${t(paperTitleKey)}</h3>
-              <div class="ws-date-row no-print" data-ws-date-row>
-                <span data-ws-date-label></span>
-                <button type="button" class="btn btn-sm" data-ws-date-today>${t('worksheets.today')}</button>
+          <label class="ws-field-label" for="ws-count-input">${t('worksheets.countLabel')}</label>
+          <input class="ws-input" id="ws-count-input" data-ws-count type="number" min="1" max="50" value="10" />
+          <button class="ws-generate-btn" type="button" data-ws-gen>${t('worksheets.generate')}</button>
+          <h3 class="ws-export-title">${t('worksheets.exportTitle')}</h3>
+          <p class="ws-export-hint">${t('worksheets.exportHint')}</p>
+          <div class="ws-export-stack">
+            <button type="button" class="ws-export-btn" data-ws-word-p>${t('worksheets.exportWordQuestions')}</button>
+            <button type="button" class="ws-export-btn" data-ws-word-a>${t('worksheets.exportWordAnswers')}</button>
+            <button type="button" class="ws-export-btn" data-ws-print-p>${t('worksheets.printPractice')}</button>
+            <button type="button" class="ws-export-btn" data-ws-print-a>${t('worksheets.printAnswers')}</button>
+          </div>
+        </aside>
+
+        <div class="ws-practice-col">
+          <div class="ws-progress-row no-print">
+            <div class="ws-progress-block">
+              <p class="ws-strand-label" data-ws-strand-label></p>
+              <p class="ws-progress-text" data-ws-progress-text>${t('worksheets.progressNone')}</p>
+              <div class="ws-progress-track">
+                <div class="ws-progress-bar" data-ws-progress-bar style="width:0%"></div>
               </div>
             </div>
-            <p class="ws-date-print" data-ws-date-print hidden></p>
+            <button type="button" class="ws-settings-toggle" data-ws-toggle-settings aria-controls="ws-settings-panel" aria-expanded="true">
+              <span class="ws-settings-toggle-icon" data-ws-toggle-icon>‹</span>
+              <span data-ws-toggle-label>${t('worksheets.hideSettings')}</span>
+            </button>
           </div>
-          <div class="worksheet-body" data-ws-body></div>
-        </div>
-        <div class="practice-actions no-print" data-ws-practice-actions>
-          <div class="score-display" data-ws-score hidden>
-            <span class="score-label">${t('worksheets.score')}</span>
-            <span class="score-value" data-ws-score-val>0/0</span>
+
+          <div class="ws-main-grid">
+            <aside class="ws-hint-panel no-print" aria-label="${t('worksheets.hint')}">
+              <div class="ws-hint-card">
+                <div class="ws-hint-head">
+                  <span class="ws-hint-icon" aria-hidden="true">💡</span>
+                  <h3>${t('worksheets.hint')}</h3>
+                </div>
+                <p class="ws-hint-text" data-ws-hint-text>${t('worksheets.hintEmpty')}</p>
+              </div>
+            </aside>
+
+            <section class="ws-practice-panel">
+              <div class="ws-practice-header no-print">
+                <div>
+                  <h2 class="ws-practice-title">${t('worksheets.practiceTitle')}</h2>
+                  <p class="ws-practice-hint">${t('worksheets.practiceHint')}</p>
+                </div>
+                <button type="button" class="ws-summary-btn" data-ws-summary-btn>${t('worksheets.sessionSummary')}</button>
+              </div>
+              <div class="ws-hint-mobile no-print">
+                <p data-ws-hint-mobile>${t('worksheets.hintEmpty')}</p>
+              </div>
+              <div class="ws-summary-panel no-print" data-ws-summary hidden></div>
+              <div class="ws-quiz-area ws-quiz-empty" data-ws-body>
+                <p>${t('worksheets.empty')}</p>
+              </div>
+            </section>
           </div>
-        </div>
-        <div class="ws-session-summary no-print" data-ws-summary hidden></div>
-        <div class="export-buttons no-print" data-ws-export>
-          <button type="button" class="export-btn" data-ws-word-p>${t('worksheets.exportWord')}</button>
-          <button type="button" class="export-btn" data-ws-word-a>${t('worksheets.exportWordAnswers')}</button>
-          <button type="button" class="export-btn" data-ws-print-p>${t('worksheets.printPractice')}</button>
-          <button type="button" class="export-btn" data-ws-print-a>${t('worksheets.printAnswers')}</button>
         </div>
       </div>
-      <div class="worksheet-output" data-ws-out><p class="lead">${t('worksheets.empty')}</p></div>
+      <div class="ws-print-sheet" data-ws-print-sheet hidden aria-hidden="true"></div>
     </section>`;
 }
 
 export function hydrateWorksheets(root, questions, t, langKey, options = {}) {
   const state = {
     items: [],
-    tab: 'practice',
-    dateStr: '',
     userAnswers: {},
     wrongAttempts: {},
     resolved: {},
+    pending: {},
   };
 
+  const layout = root.querySelector('#ws-layout');
+  const settingsPanel = root.querySelector('#ws-settings-panel');
+  const bankSummary = root.querySelector('#ws-bank-summary');
   const gen = root.querySelector('[data-ws-gen]');
-  const previewArea = root.querySelector('[data-ws-preview-area]');
-  const emptyOut = root.querySelector('[data-ws-out]');
   const body = root.querySelector('[data-ws-body]');
-  const paper = root.querySelector('[data-ws-paper]');
-  const tabs = root.querySelector('[data-ws-tabs]');
-  const practiceActions = root.querySelector('[data-ws-practice-actions]');
-  const scoreEl = root.querySelector('[data-ws-score]');
-  const scoreVal = root.querySelector('[data-ws-score-val]');
+  const progressText = root.querySelector('[data-ws-progress-text]');
+  const progressBar = root.querySelector('[data-ws-progress-bar]');
+  const hintText = root.querySelector('[data-ws-hint-text]');
+  const hintMobile = root.querySelector('[data-ws-hint-mobile]');
   const summaryEl = root.querySelector('[data-ws-summary]');
-  const dateRow = root.querySelector('[data-ws-date-row]');
-  const datePrint = root.querySelector('[data-ws-date-print]');
-  const dateToday = root.querySelector('[data-ws-date-today]');
-  const dateLabel = root.querySelector('[data-ws-date-label]');
+  const summaryBtn = root.querySelector('[data-ws-summary-btn]');
+  const toggleSettings = root.querySelector('[data-ws-toggle-settings]');
+  const toggleLabel = root.querySelector('[data-ws-toggle-label]');
+  const toggleIcon = root.querySelector('[data-ws-toggle-icon]');
+  const strandLabel = root.querySelector('[data-ws-strand-label]');
+  const printSheetEl = root.querySelector('[data-ws-print-sheet]');
 
   if (!gen || !body) return;
 
+  if (strandLabel && options.paperTitleKey) {
+    strandLabel.textContent = t(options.paperTitleKey).toUpperCase();
+  } else if (strandLabel) {
+    strandLabel.textContent = t('worksheets.paperTitle').toUpperCase();
+  }
+
   function lk() {
     return langKey();
+  }
+
+  function pickedTopics() {
+    return [...root.querySelectorAll('[data-ws-topic]')]
+      .filter((c) => c.checked)
+      .map((c) => c.getAttribute('data-ws-topic'));
+  }
+
+  function topicLabel(id) {
+    const node = root.querySelector(`[data-ws-topic="${id}"]`);
+    const label = node?.closest('.ws-check-card')?.querySelector('span');
+    return label?.textContent?.trim() || id;
+  }
+
+  function setHint(text) {
+    const msg = text || t('worksheets.hintEmpty');
+    if (hintText) hintText.textContent = msg;
+    if (hintMobile) hintMobile.textContent = msg;
+  }
+
+  function updateBankSummary() {
+    if (!bankSummary) return;
+    const picked = pickedTopics();
+    if (!picked.length) {
+      bankSummary.innerHTML = `<p class="ws-bank-title">${escapeHtml(t('worksheets.bankTitle'))}</p>
+        <p class="ws-bank-muted">${escapeHtml(t('worksheets.bankNone'))}</p>`;
+      return;
+    }
+    const pool = filterPool(questions, picked, options.topicFilter);
+    const rows = picked
+      .map((id) => {
+        const count = pool.filter((q) => {
+          if (options.topicFilter) return options.topicFilter(q, [id]);
+          if (id === 'rotatingMirror') return q.topic === 'reflection';
+          if (id === 'refraction') return q.topic === 'refraction';
+          return q.topic === id;
+        }).length;
+        return `<li><span>${escapeHtml(topicLabel(id))}</span><strong>${count}</strong></li>`;
+      })
+      .join('');
+    bankSummary.innerHTML = `
+      <p class="ws-bank-title">${escapeHtml(t('worksheets.bankTitle'))}</p>
+      <p class="ws-bank-muted">${escapeHtml(t('worksheets.bankAvailable'))}</p>
+      <p class="ws-bank-count">${pool.length}</p>
+      <p class="ws-bank-muted ws-bank-by-topic">${escapeHtml(t('worksheets.bankByTopic'))}</p>
+      <ul class="ws-bank-list">${rows}</ul>`;
+  }
+
+  function updateProgress() {
+    if (!state.items.length) {
+      if (progressText) progressText.textContent = t('worksheets.progressNone');
+      if (progressBar) progressBar.style.width = '0%';
+      return;
+    }
+    const done = state.items.filter((_, i) => state.resolved[i]).length;
+    if (progressText) {
+      progressText.textContent = `${t('worksheets.progressPrefix')} ${done} / ${state.items.length}`;
+    }
+    if (progressBar) {
+      progressBar.style.width = `${(done / state.items.length) * 100}%`;
+    }
   }
 
   function resetSession() {
     state.userAnswers = {};
     state.wrongAttempts = {};
     state.resolved = {};
-    scoreEl.hidden = true;
-    summaryEl.hidden = true;
+    state.pending = {};
+    if (summaryEl) {
+      summaryEl.hidden = true;
+      summaryEl.innerHTML = '';
+    }
   }
 
   function allResolved() {
     return state.items.length > 0 && state.items.every((_, i) => state.resolved[i]);
   }
 
-  function updateScore() {
-    let correct = 0;
-    state.items.forEach((q, i) => {
-      if (!state.resolved[i]) return;
-      const pack = q[lk()] || q.en;
-      if (state.userAnswers[i] === pack.a) correct += 1;
-    });
-    const answered = Object.keys(state.resolved).length;
-    if (answered > 0) {
-      scoreVal.textContent = `${correct}/${state.items.length}`;
-      scoreEl.hidden = false;
-    }
-  }
-
-  function setTab(tab) {
-    state.tab = tab;
-    tabs?.querySelectorAll('[data-ws-tab]').forEach((btn) => {
-      btn.classList.toggle('active', btn.getAttribute('data-ws-tab') === tab);
-    });
-    if (practiceActions) practiceActions.hidden = tab !== 'practice';
-    if (dateRow) dateRow.hidden = tab !== 'practice';
-    if (datePrint) {
-      datePrint.hidden = !state.dateStr;
-      datePrint.textContent = state.dateStr ? `${t('worksheets.date')}: ${state.dateStr}` : '';
-    }
-    paper?.classList.toggle('practice-mode', tab === 'practice');
-    paint();
-  }
-
-  function paintQuestionRow(q, i, mode) {
+  function paintQuestionBlock(q, i) {
     const pack = q[lk()] || q.en;
-    const letters = LETTERS;
     const qNum = i + 1;
-    const sectionTag = q.section ? `<span class="q-section">${escapeHtml(q.section)}</span>` : '';
+    const st = {
+      selected: state.pending[i] ?? state.userAnswers[i],
+      wrong: state.wrongAttempts[i] || 0,
+      solved: state.resolved[i],
+    };
+    const sectionTag = q.section ? escapeHtml(q.section) : escapeHtml(q.topic || '');
 
-    if (mode === 'answer') {
-      const choices = pack.choices
-        .map(
-          (c, j) =>
-            `<li class="${j === pack.a ? 'choice-correct' : ''}"><strong>${letters[j]}.</strong> ${escapeHtml(c)}</li>`,
-        )
-        .join('');
-      return `<div class="question-row question-row--answer">
-        <h4>Q${qNum} ${sectionTag}</h4>
-        <p>${escapeHtml(pack.q)}</p>
-        <ol class="choice-list">${choices}</ol>
-        <p class="q-exp"><strong>${t('worksheets.answer')}:</strong> ${letters[pack.a]}</p>
-        <p class="q-exp"><em>${escapeHtml(pack.exp)}</em></p>
-      </div>`;
-    }
-
-    // practice mode
-    const selected = state.userAnswers[i];
-    const wrongCount = state.wrongAttempts[i] || 0;
-    const locked = state.resolved[i];
-    const isCorrect = locked && selected === pack.a;
-    const isFailed = locked && selected !== pack.a;
-
-    let feedback = '';
-    if (wrongCount === 1 && !locked) {
-      feedback = `<p class="q-hint"><strong>${t('worksheets.hint')}:</strong> ${escapeHtml(pack.hint || pack.exp)}</p>`;
-    } else if (isFailed) {
-      feedback = `<p class="q-exp"><strong>${t('worksheets.answer')}:</strong> ${letters[pack.a]}</p>
-        <p class="q-exp q-summary"><em>${escapeHtml(pack.exp)}</em></p>`;
-    }
-
-    const rowClass = isCorrect ? 'correct' : isFailed ? 'incorrect' : '';
-
-    const choices = pack.choices
+    const optionsHtml = pack.choices
       .map((c, j) => {
-        const checked = selected === j ? ' checked' : '';
-        const disabled = locked ? ' disabled' : '';
-        return `<li>
-          <label class="choice-radio">
-            <input type="radio" name="ws-q-${i}" value="${j}" data-ws-q="${i}" data-ws-choice="${j}"${checked}${disabled} />
-            <span class="choice-circle choice-circle--print"></span>
-            <strong>${letters[j]}.</strong> ${escapeHtml(c)}
-          </label>
-        </li>`;
+        const letter = LETTERS[j];
+        const isSelected = st.selected === j;
+        const isCorrect = st.solved && j === pack.a;
+        const classes = ['ws-option-btn'];
+        if (isSelected && !st.solved) classes.push('ws-option-btn--selected');
+        if (isCorrect) classes.push('ws-option-btn--correct');
+        const disabled = st.solved ? ' disabled' : '';
+        return `<button type="button" class="${classes.join(' ')}" data-ws-option="${j}" data-ws-q="${i}"${disabled}>
+          <span class="ws-option-badge">${letter}</span>
+          <span class="ws-option-text">${escapeHtml(c)}</span>
+        </button>`;
       })
       .join('');
 
-    const icon = isCorrect
-      ? '<span class="result-icon">✓</span>'
-      : isFailed
-        ? '<span class="result-icon">✗</span>'
-        : '';
+    let feedback = '';
+    if (st.wrong === 1 && !st.solved) {
+      feedback = `<div class="ws-feedback ws-feedback--hint" role="status">
+        <strong>${escapeHtml(t('worksheets.hint'))}:</strong> ${escapeHtml(pack.hint || pack.exp)}
+      </div>`;
+    } else if (st.solved && st.selected !== pack.a) {
+      feedback = `<div class="ws-feedback ws-feedback--model" role="status">
+        <strong>${escapeHtml(t('worksheets.modelAnswer'))}:</strong> ${escapeHtml(LETTERS[pack.a])}
+        <span class="ws-feedback-exp">${escapeHtml(pack.exp)}</span>
+      </div>`;
+    } else if (st.solved && st.selected === pack.a) {
+      feedback = `<div class="ws-feedback ws-feedback--correct" role="status">${escapeHtml(t('worksheets.correct'))}</div>`;
+    }
 
-    return `<div class="question-row ${rowClass}" data-ws-row="${i}">
-      <div class="q-header"><h4>Q${qNum} ${sectionTag}</h4>${icon}</div>
-      <p>${escapeHtml(pack.q)}</p>
-      <ol class="choice-list choice-list--radio">${choices}</ol>
+    const checkDisabled = st.solved ? ' disabled' : '';
+    const rowClass = st.solved
+      ? st.selected === pack.a
+        ? 'ws-q-block--correct'
+        : 'ws-q-block--incorrect'
+      : '';
+
+    return `<article class="ws-q-block ${rowClass}" data-ws-block="${i}" data-ws-hint="${escapeHtml(pack.hint || pack.exp)}">
+      <div class="ws-q-meta">Q${qNum} · ${sectionTag.toUpperCase()} · MCQ</div>
+      <p class="ws-q-stem">${escapeHtml(pack.q)}</p>
+      <div class="ws-options">${optionsHtml}</div>
+      <button type="button" class="ws-check-btn" data-ws-check="${i}"${checkDisabled}>${escapeHtml(t('worksheets.checkAnswer'))}</button>
       ${feedback}
-    </div>`;
+    </article>`;
   }
 
   function paint() {
-    if (!state.items.length) return;
-    body.innerHTML = state.items.map((q, i) => paintQuestionRow(q, i, state.tab)).join('');
-    bindPracticeInputs();
-  }
+    if (!state.items.length) {
+      body.className = 'ws-quiz-area ws-quiz-empty';
+      body.innerHTML = `<p>${escapeHtml(t('worksheets.empty'))}</p>`;
+      setHint(null);
+      return;
+    }
 
-  function bindPracticeInputs() {
-    if (state.tab !== 'practice') return;
-    body.querySelectorAll('[data-ws-choice]').forEach((input) => {
-      input.addEventListener('change', () => {
-        const qi = Number(input.getAttribute('data-ws-q'));
+    body.className = 'ws-quiz-area';
+    body.innerHTML = state.items.map((q, i) => paintQuestionBlock(q, i)).join('');
+
+    const firstOpen = state.items.findIndex((_, i) => !state.resolved[i]);
+    if (firstOpen >= 0) {
+      const pack = state.items[firstOpen][lk()] || state.items[firstOpen].en;
+      setHint(pack.hint || pack.exp);
+    }
+
+    body.querySelectorAll('[data-ws-option]').forEach((btn) => {
+      btn.addEventListener('click', () => {
+        const qi = Number(btn.getAttribute('data-ws-q'));
         if (state.resolved[qi]) return;
+        const choice = Number(btn.getAttribute('data-ws-option'));
+        state.pending[qi] = choice;
+        body.querySelectorAll(`[data-ws-q="${qi}"][data-ws-option]`).forEach((b) => {
+          b.classList.toggle('ws-option-btn--selected', Number(b.getAttribute('data-ws-option')) === choice);
+        });
+      });
+    });
 
-        const choice = Number(input.getAttribute('data-ws-choice'));
+    body.querySelectorAll('.ws-q-block').forEach((block) => {
+      block.addEventListener('mouseenter', () => setHint(block.getAttribute('data-ws-hint')));
+      block.addEventListener('focusin', () => setHint(block.getAttribute('data-ws-hint')));
+    });
+
+    body.querySelectorAll('[data-ws-check]').forEach((btn) => {
+      btn.addEventListener('click', () => {
+        const qi = Number(btn.getAttribute('data-ws-check'));
+        if (state.resolved[qi]) return;
+        const choice = state.pending[qi];
+        if (choice === undefined) return;
+
         const pack = state.items[qi][lk()] || state.items[qi].en;
         state.userAnswers[qi] = choice;
 
@@ -273,12 +339,10 @@ export function hydrateWorksheets(root, questions, t, langKey, options = {}) {
           state.resolved[qi] = true;
         } else {
           state.wrongAttempts[qi] = (state.wrongAttempts[qi] || 0) + 1;
-          if (state.wrongAttempts[qi] >= 2) {
-            state.resolved[qi] = true;
-          }
+          if (state.wrongAttempts[qi] >= 2) state.resolved[qi] = true;
         }
 
-        updateScore();
+        updateProgress();
         if (allResolved()) buildSessionSummary();
         paint();
       });
@@ -315,19 +379,36 @@ export function hydrateWorksheets(root, questions, t, langKey, options = {}) {
       .join('');
 
     summaryEl.innerHTML = `
-      <h4>${t('worksheets.sessionSummary')}</h4>
-      <p>${t('worksheets.score')}: <strong>${correct}/${total}</strong> (${pct}%)</p>
-      <p>${t('worksheets.firstTry')}: <strong>${firstTry}/${total}</strong></p>
-      <p>${t('worksheets.revisionSuggestions')}: ${band}</p>
-      ${weakList ? `<p>${t('worksheets.weakSections')}:</p><ul>${weakList}</ul>` : ''}`;
+      <h4>${escapeHtml(t('worksheets.sessionSummary'))}</h4>
+      <p>${escapeHtml(t('worksheets.score'))}: <strong>${correct}/${total}</strong> (${pct}%)</p>
+      <p>${escapeHtml(t('worksheets.firstTry'))}: <strong>${firstTry}/${total}</strong></p>
+      <p>${escapeHtml(t('worksheets.revisionSuggestions'))}: ${escapeHtml(band)}</p>
+      ${weakList ? `<p>${escapeHtml(t('worksheets.weakSections'))}:</p><ul>${weakList}</ul>` : ''}`;
     summaryEl.hidden = false;
   }
 
-  function buildWordHtml(withAnswers) {
-    const lkVal = lk();
+  function buildPrintHtml(withAnswers) {
+    const paperTitle = options.paperTitleKey ? t(options.paperTitleKey) : t('worksheets.paperTitle');
     const rows = state.items
       .map((q, i) => {
-        const pack = q[lkVal] || q.en;
+        const pack = q[lk()] || q.en;
+        const choices = pack.choices
+          .map((c, j) => `<li>${LETTERS[j]}. ${escapeHtml(c)}</li>`)
+          .join('');
+        const ans = withAnswers
+          ? `<p><strong>${escapeHtml(t('worksheets.answer'))}:</strong> ${LETTERS[pack.a]}<br/><em>${escapeHtml(pack.exp)}</em></p>`
+          : '';
+        return `<div class="ws-print-q"><strong>Q${i + 1}.</strong> ${escapeHtml(pack.q)}<ol>${choices}</ol>${ans}</div>`;
+      })
+      .join('');
+    return `<h2>${escapeHtml(paperTitle)}</h2>${rows}`;
+  }
+
+  function buildWordHtml(withAnswers) {
+    const paperTitle = options.paperTitleKey ? t(options.paperTitleKey) : t('worksheets.paperTitle');
+    const rows = state.items
+      .map((q, i) => {
+        const pack = q[lk()] || q.en;
         const choices = pack.choices.map((c, j) => `${LETTERS[j]}. ${c}`).join('<br/>');
         const ans = withAnswers
           ? `<p><b>${t('worksheets.answer')}:</b> ${LETTERS[pack.a]}<br/><i>${pack.exp}</i></p>`
@@ -336,13 +417,12 @@ export function hydrateWorksheets(root, questions, t, langKey, options = {}) {
       })
       .join('');
     return `<html xmlns:o="urn:schemas-microsoft-com:office:office" xmlns:w="urn:schemas-microsoft-com:office:word">
-<head><meta charset="utf-8"><title>${t('worksheets.paperTitle')}</title></head>
-<body><h2>${t('worksheets.paperTitle')}</h2>
-${state.dateStr && !withAnswers ? `<p>${t('worksheets.date')}: ${state.dateStr}</p>` : ''}
-${rows}</body></html>`;
+<head><meta charset="utf-8"><title>${paperTitle}</title></head>
+<body><h2>${paperTitle}</h2>${rows}</body></html>`;
   }
 
   function downloadWord(withAnswers) {
+    if (!state.items.length) return;
     const html = buildWordHtml(withAnswers);
     const blob = new Blob(['\ufeff', html], { type: 'application/msword' });
     const a = document.createElement('a');
@@ -352,61 +432,56 @@ ${rows}</body></html>`;
     URL.revokeObjectURL(a.href);
   }
 
+  function printWorksheet(withAnswers) {
+    if (!state.items.length || !printSheetEl) return;
+    printSheetEl.hidden = false;
+    printSheetEl.innerHTML = buildPrintHtml(withAnswers);
+    const cleanup = () => {
+      printSheetEl.hidden = true;
+      printSheetEl.innerHTML = '';
+      document.body.classList.remove('ws-printing');
+    };
+    document.body.classList.add('ws-printing');
+    window.addEventListener('afterprint', cleanup, { once: true });
+    window.print();
+  }
+
   gen.addEventListener('click', () => {
-    const count = Number(root.querySelector('[data-ws-count]').value);
-    const picked = [...root.querySelectorAll('[data-ws-topic]')]
-      .filter((c) => c.checked)
-      .map((c) => c.getAttribute('data-ws-topic'));
+    const count = Math.min(50, Math.max(1, Number(root.querySelector('[data-ws-count]').value) || 10));
+    const picked = pickedTopics();
+    if (!picked.length) return;
     const pool = filterPool(questions, picked, options.topicFilter);
     const deck = shuffle(pool).slice(0, Math.min(count, pool.length || 1));
     state.items = deck.length ? deck : shuffle(questions).slice(0, Math.min(count, questions.length));
     resetSession();
-    state.tab = 'practice';
-    state.dateStr = '';
-    previewArea.hidden = false;
-    emptyOut.hidden = true;
-    tabs?.querySelectorAll('[data-ws-tab]').forEach((btn) => {
-      btn.classList.toggle('active', btn.getAttribute('data-ws-tab') === 'practice');
-    });
-    if (practiceActions) practiceActions.hidden = false;
-    if (dateRow) dateRow.hidden = false;
-    if (datePrint) datePrint.hidden = true;
-    dateLabel.textContent = '';
-    paper?.classList.add('practice-mode');
+    updateProgress();
     paint();
   });
 
-  tabs?.addEventListener('click', (ev) => {
-    const btn = ev.target.closest('[data-ws-tab]');
-    if (!btn || !state.items.length) return;
-    setTab(btn.getAttribute('data-ws-tab'));
+  root.querySelector('[data-ws-topics]')?.addEventListener('change', updateBankSummary);
+
+  toggleSettings?.addEventListener('click', () => {
+    const collapsed = layout?.classList.toggle('ws-layout--collapsed');
+    if (toggleLabel) {
+      toggleLabel.textContent = collapsed ? t('worksheets.showSettings') : t('worksheets.hideSettings');
+    }
+    if (toggleIcon) toggleIcon.textContent = collapsed ? '›' : '‹';
+    toggleSettings.setAttribute('aria-expanded', collapsed ? 'false' : 'true');
   });
 
-  dateToday?.addEventListener('click', () => {
-    if (state.dateStr) {
-      state.dateStr = '';
-      dateLabel.textContent = '';
-    } else {
-      state.dateStr = todayStr();
-      dateLabel.textContent = `${t('worksheets.date')}: ${state.dateStr}`;
+  summaryBtn?.addEventListener('click', () => {
+    if (!state.items.length) return;
+    if (!summaryEl.hidden && summaryEl.innerHTML) {
+      summaryEl.hidden = true;
+      return;
     }
-    if (datePrint) {
-      datePrint.hidden = !state.dateStr;
-      datePrint.textContent = state.dateStr ? `${t('worksheets.date')}: ${state.dateStr}` : '';
-    }
+    buildSessionSummary();
   });
 
   root.querySelector('[data-ws-word-p]')?.addEventListener('click', () => downloadWord(false));
   root.querySelector('[data-ws-word-a]')?.addEventListener('click', () => downloadWord(true));
-  root.querySelector('[data-ws-print-p]')?.addEventListener('click', () => {
-    setTab('practice');
-    paper?.classList.add('ws-print-blank');
-    const cleanup = () => paper?.classList.remove('ws-print-blank');
-    window.addEventListener('afterprint', cleanup, { once: true });
-    window.print();
-  });
-  root.querySelector('[data-ws-print-a]')?.addEventListener('click', () => {
-    setTab('answer');
-    window.print();
-  });
+  root.querySelector('[data-ws-print-p]')?.addEventListener('click', () => printWorksheet(false));
+  root.querySelector('[data-ws-print-a]')?.addEventListener('click', () => printWorksheet(true));
+
+  updateBankSummary();
 }
