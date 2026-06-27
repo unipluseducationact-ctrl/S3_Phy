@@ -487,18 +487,6 @@ label input {
         max-height: min(60vh, calc(100% - 32px));
     }
     
-    .control-panel.collapsed {
-        width: 40px;
-    }
-    
-    .toggle-panel {
-        right: 0;
-        top: 50%;
-        bottom: auto;
-        transform: translateY(-50%);
-        border-radius: 4px 0 0 4px;
-    }
-    
     .main-view {
         grid-row: 1;
         grid-column: 1;
@@ -604,7 +592,7 @@ input[type="number"]::-webkit-outer-spin-button {
     background-color: var(--card-bg);
     border-radius: 10px;
     box-shadow: var(--shadow-md);
-    transition: width var(--transition-speed), height var(--transition-speed);
+    transition: max-height var(--transition-speed);
     overflow: hidden;
     z-index: 60;
     display: flex;
@@ -612,7 +600,6 @@ input[type="number"]::-webkit-outer-spin-button {
 }
 
 .control-panel.collapsed {
-    width: 40px;
     max-height: none;
 }
 
@@ -620,7 +607,7 @@ input[type="number"]::-webkit-outer-spin-button {
     flex-shrink: 0;
     display: flex;
     align-items: center;
-    justify-content: center;
+    justify-content: flex-start;
     gap: 6px;
     padding: 6px 10px;
     background-color: var(--primary-color);
@@ -629,6 +616,10 @@ input[type="number"]::-webkit-outer-spin-button {
     cursor: move;
     user-select: none;
     border-radius: 10px 10px 0 0;
+}
+
+.control-panel.collapsed .control-panel-drag-handle {
+    border-radius: 10px;
 }
 
 .control-panel-drag-handle .zh {
@@ -641,12 +632,8 @@ input[type="number"]::-webkit-outer-spin-button {
     opacity: 0.85;
 }
 
-.control-panel-drag-handle i {
+.control-panel-drag-handle i.fa-grip-lines {
     font-size: 12px;
-}
-
-.control-panel.collapsed .control-panel-drag-handle {
-    display: none;
 }
 
 .panel-content {
@@ -655,6 +642,18 @@ input[type="number"]::-webkit-outer-spin-button {
     min-height: 0;
     overflow-y: auto;
     padding: 12px;
+    max-height: min(60vh, 520px);
+    opacity: 1;
+    transition: max-height 0.25s ease, opacity 0.2s ease, padding 0.25s ease;
+}
+
+.control-panel.collapsed .panel-content {
+    max-height: 0;
+    opacity: 0;
+    overflow: hidden;
+    pointer-events: none;
+    padding-top: 0;
+    padding-bottom: 0;
 }
 
 /* Scoped Traditional Chinese typography in control panel */
@@ -700,26 +699,27 @@ input[type="number"]::-webkit-outer-spin-button {
 }
 
 .toggle-panel {
-    position: absolute;
-    right: 0;
-    top: 50%;
-    transform: translateY(-50%);
-    background-color: var(--primary-color);
+    margin-left: auto;
+    flex-shrink: 0;
+    background: none;
     color: white;
     border: none;
-    border-radius: 4px 0 0 4px;
+    border-radius: 4px;
     width: 24px;
-    height: 60px;
+    height: 24px;
     display: flex;
     align-items: center;
     justify-content: center;
     cursor: pointer;
-    z-index: 10;
-    transition: all var(--transition-speed);
+    transition: background-color var(--transition-speed);
 }
 
-.control-panel.collapsed .toggle-panel i {
-    transform: rotate(180deg);
+.toggle-panel:hover {
+    background-color: rgba(255, 255, 255, 0.2);
+}
+
+.toggle-panel i {
+    font-size: 12px;
 }
 
 .control-section {
@@ -944,8 +944,24 @@ input[type="number"]::-webkit-outer-spin-button {
     justify-content: space-between;
     align-items: center;
     font-size: 14px;
+    gap: 8px;
 }
 
+.data-card-header-title {
+    display: flex;
+    align-items: center;
+    gap: 6px;
+    min-width: 0;
+}
+
+.data-card-header-actions {
+    display: flex;
+    align-items: center;
+    gap: 4px;
+    flex-shrink: 0;
+}
+
+.collapse-card,
 .expand-card {
     background: none;
     border: none;
@@ -954,14 +970,48 @@ input[type="number"]::-webkit-outer-spin-button {
     padding: 2px;
     border-radius: 3px;
     transition: all var(--transition-speed);
+    width: 22px;
+    height: 22px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
 }
 
+.collapse-card:hover,
 .expand-card:hover {
     background-color: rgba(255,255,255,0.2);
 }
 
 .data-card-content {
     padding: 10px;
+    max-height: 600px;
+    opacity: 1;
+    overflow: hidden;
+    transition: max-height 0.25s ease, opacity 0.2s ease, padding 0.25s ease;
+}
+
+.data-card .image-type-indicator,
+.data-card .uv-graph-container {
+    max-height: 400px;
+    opacity: 1;
+    overflow: hidden;
+    transition: max-height 0.25s ease, opacity 0.2s ease, padding 0.25s ease;
+}
+
+.data-card.collapsed .data-card-content,
+.data-card.collapsed .image-type-indicator,
+.data-card.collapsed .uv-graph-container {
+    max-height: 0;
+    opacity: 0;
+    pointer-events: none;
+    padding-top: 0;
+    padding-bottom: 0;
+    margin: 0;
+    border: none;
+}
+
+.data-card.collapsed.expanded {
+    width: 200px;
 }
 
 .measurement-item {
@@ -1012,7 +1062,7 @@ input[type="number"]::-webkit-outer-spin-button {
     border: 1px solid var(--border-color);
 }
 .control-panel-transition {
-    transition: width 0.3s ease;
+    transition: max-height 0.3s ease;
 }
 
 .data-card-transition {
@@ -1297,11 +1347,8 @@ html.s3phy-embed .control-panel {
     max-height: min(68vh, calc(100% - 24px));
 }
 
-html.s3phy-embed .control-panel.collapsed {
-    width: 32px;
-}
-
 html.s3phy-embed .panel-content {
+    max-height: min(68vh, 480px);
     padding: 8px 10px;
 }
 
@@ -1373,7 +1420,13 @@ html.s3phy-embed .ray-indicator {
 
 html.s3phy-embed .toggle-panel {
     width: 20px;
-    height: 48px;
+    height: 20px;
+}
+
+html.s3phy-embed .collapse-card,
+html.s3phy-embed .expand-card {
+    width: 18px;
+    height: 18px;
 }
 
 /* Floating measurements card */
@@ -1383,6 +1436,10 @@ html.s3phy-embed .data-card {
 
 html.s3phy-embed .data-card.expanded {
     width: 252px;
+}
+
+html.s3phy-embed .data-card.collapsed.expanded {
+    width: 168px;
 }
 
 html.s3phy-embed .data-card-header {

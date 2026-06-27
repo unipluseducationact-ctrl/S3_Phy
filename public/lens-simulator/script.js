@@ -2779,54 +2779,98 @@ function updateLensPosition(value) {
 }
 
 // 添加UI交互处理函数
+const CONTROL_PANEL_COLLAPSED_KEY = 'lens-control-panel-collapsed';
+const MEASUREMENTS_COLLAPSED_KEY = 'lens-measurements-collapsed';
+
+function setControlPanelCollapsed(controlPanel, togglePanelBtn, collapsed) {
+    controlPanel.classList.toggle('collapsed', collapsed);
+    togglePanelBtn.setAttribute('aria-expanded', collapsed ? 'false' : 'true');
+    const icon = togglePanelBtn.querySelector('i');
+    icon.classList.toggle('fa-chevron-up', !collapsed);
+    icon.classList.toggle('fa-chevron-down', collapsed);
+    sessionStorage.setItem(CONTROL_PANEL_COLLAPSED_KEY, collapsed ? 'true' : 'false');
+}
+
+function setMeasurementsCollapsed(dataCard, collapseCardBtn, expandCardBtn, collapsed) {
+    dataCard.classList.toggle('collapsed', collapsed);
+    collapseCardBtn.setAttribute('aria-expanded', collapsed ? 'false' : 'true');
+    const icon = collapseCardBtn.querySelector('i');
+    icon.classList.toggle('fa-chevron-up', !collapsed);
+    icon.classList.toggle('fa-chevron-down', collapsed);
+    sessionStorage.setItem(MEASUREMENTS_COLLAPSED_KEY, collapsed ? 'true' : 'false');
+
+    if (collapsed) {
+        dataCard.classList.remove('expanded');
+        const expandIcon = expandCardBtn.querySelector('i');
+        expandIcon.classList.remove('fa-compress-alt');
+        expandIcon.classList.add('fa-expand-alt');
+        document.querySelector('.uv-graph-container').style.display = 'none';
+        drawUVGraph();
+    }
+}
+
 function setupUIInteractions() {
-    // 侧边折叠面板控制
+    // 向上折叠控制面板
     const togglePanelBtn = document.querySelector('.toggle-panel');
     const controlPanel = document.querySelector('.control-panel');
-    
+
+    setControlPanelCollapsed(
+        controlPanel,
+        togglePanelBtn,
+        sessionStorage.getItem(CONTROL_PANEL_COLLAPSED_KEY) === 'true'
+    );
+
     togglePanelBtn.addEventListener('click', (e) => {
         e.stopPropagation();
-        controlPanel.classList.toggle('collapsed');
-        // 更新按钮图标方向
-        const icon = togglePanelBtn.querySelector('i');
-        if (controlPanel.classList.contains('collapsed')) {
-            icon.classList.remove('fa-chevron-left');
-            icon.classList.add('fa-chevron-right');
-        } else {
-            icon.classList.remove('fa-chevron-right');
-            icon.classList.add('fa-chevron-left');
-        }
-        // 调整后重新绘制
-        setTimeout(resizeCanvas, 300); // 等待过渡效果完成
+        const collapsed = !controlPanel.classList.contains('collapsed');
+        setControlPanelCollapsed(controlPanel, togglePanelBtn, collapsed);
+        setTimeout(resizeCanvas, 300);
     });
     
     // 数据卡片展开/折叠控制
     const expandCardBtn = document.querySelector('.expand-card');
+    const collapseCardBtn = document.querySelector('.collapse-card');
     const dataCard = document.querySelector('.data-card');
+
+    setMeasurementsCollapsed(
+        dataCard,
+        collapseCardBtn,
+        expandCardBtn,
+        sessionStorage.getItem(MEASUREMENTS_COLLAPSED_KEY) === 'true'
+    );
+
+    collapseCardBtn.addEventListener('click', (e) => {
+        e.stopPropagation();
+        const collapsed = !dataCard.classList.contains('collapsed');
+        setMeasurementsCollapsed(dataCard, collapseCardBtn, expandCardBtn, collapsed);
+        setTimeout(resizeCanvas, 300);
+    });
     
-    expandCardBtn.addEventListener('click', () => {
+    expandCardBtn.addEventListener('click', (e) => {
+        e.stopPropagation();
+        if (dataCard.classList.contains('collapsed')) return;
+
         dataCard.classList.toggle('expanded');
-        // 更新按钮图标
         const icon = expandCardBtn.querySelector('i');
         if (dataCard.classList.contains('expanded')) {
             icon.classList.remove('fa-expand-alt');
             icon.classList.add('fa-compress-alt');
-            // 如果图表应该显示，更新图表
             if (state.lensType === 'convex') {
                 document.querySelector('.uv-graph-container').style.display = 'block';
-                setTimeout(drawUVGraph, 300); // 等待动画完成后绘制
+                setTimeout(drawUVGraph, 300);
             }
         } else {
             icon.classList.remove('fa-compress-alt');
             icon.classList.add('fa-expand-alt');
             document.querySelector('.uv-graph-container').style.display = 'none';
         }
-        // 立即调用以控制容器显示
         drawUVGraph();
     });
     
     // 使测量数据面板可拖动
-    makeDraggable(document.getElementById('image-type-indicator'));
+    makeDraggable(document.getElementById('image-type-indicator'), {
+        excludeDragStart: 'button, .collapse-card, .expand-card'
+    });
 
     // 使控制面板可拖动
     const controlPanelEl = document.getElementById('ray-rules-container');
