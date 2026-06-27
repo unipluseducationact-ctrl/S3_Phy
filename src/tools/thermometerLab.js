@@ -252,7 +252,7 @@ const CSS = `
   .tl-wrap .tl-dash {
     display: grid;
     grid-template-columns: minmax(0, 460px) 1fr;
-    grid-template-rows: auto;
+    grid-template-rows: auto auto;
     gap: 20px;
     align-items: stretch;
     position: relative;
@@ -276,6 +276,11 @@ const CSS = `
     align-items: center;
     border: 2px solid #10b981;
     box-shadow: 0 0 20px rgba(16, 185, 129, 0.2);
+  }
+  .tl-wrap .tl-live-calculations {
+    grid-row: 2;
+    grid-column: 1 / -1;
+    min-width: 0;
   }
   .tl-wrap .tl-controls.lab-controls-float {
     position: absolute;
@@ -350,8 +355,18 @@ const CSS = `
 .tl-wrap .tl-tab-content.active {
   display: flex;
 }
-.tl-wrap .tl-controls-steps {
-  order: -1;
+.tl-wrap .tl-live-calculations {
+  background: var(--tl-panel);
+  border: 1px solid var(--tl-border);
+  border-radius: 16px;
+  padding: 16px;
+  min-width: 0;
+}
+.tl-wrap .tl-live-tab {
+  display: none;
+}
+.tl-wrap .tl-live-tab.active {
+  display: block;
 }
 .tl-wrap .tl-beaker-overlay {
   background-color: rgba(20, 20, 23, 0.95);
@@ -926,20 +941,9 @@ export function createThermometerLab(t, options = {}) {
         </div>
       </div>
 
-      <!-- FLOATING CONTROLS & SOLVERS -->
-      <div class="tl-controls controls-collapsed">
-        <div class="tl-controls-float-bar">
-          <button type="button" class="tl-controls-drag-handle" id="tl-controls-drag" aria-label="${t('tools.floatingControls.dragHint')}" title="${t('tools.floatingControls.dragHint')}">⋮⋮</button>
-          <button type="button" class="tl-controls-toggle" id="tl-controls-toggle" aria-expanded="false">
-            <span data-float-chevron>▾</span>
-            <span>${t('tools.thermometerLab.paramSettings')}</span>
-          </button>
-        </div>
-        <div class="tl-controls-body">
-
-        <!-- TAB 1: LIQUID-IN-GLASS -->
-        <div class="tl-tab-content active" id="tl-tab-liquid">
-          <!-- Live calibration formula (always visible) -->
+      <!-- DOCKED LIVE CALCULATIONS -->
+      <div class="tl-live-calculations">
+        <div class="tl-live-tab active" id="tl-live-liquid">
           <div class="tl-controls-steps">
             <div class="tl-info-label" style="margin-top:0;font-size:0.8rem;color:var(--tl-cyan)">Live calibration formula (Dual-Directional Realtime Calculations)</div>
             <div class="tl-worked-solution" style="margin-bottom:10px; display:flex; flex-direction:column; gap:12px">
@@ -956,7 +960,50 @@ export function createThermometerLab(t, options = {}) {
               </div>
             </div>
           </div>
+        </div>
+        <div class="tl-live-tab" id="tl-live-resistance">
+          <div class="tl-controls-steps">
+            <div class="tl-info-label" style="margin-top:0;font-size:0.8rem;color:var(--tl-cyan)">Live calibration formula (Dual-Directional Realtime Calculations)</div>
+            <div class="tl-worked-solution" style="margin-bottom:10px; display:flex; flex-direction:column; gap:12px">
+              <div style="border-bottom:1px solid rgba(255,255,255,0.05); padding-bottom:10px">
+                <div class="tl-info-label" style="font-size:0.75rem;color:var(--tl-cyan);margin-bottom:4px">Direction A: Resistance to Temperature (R<sub>T</sub> &rarr; T)</div>
+                <div id="tl-svg-formula-resistance" class="tl-math-formula" style="height:45px; margin:4px 0"></div>
+                <p style="margin:2px 0; font-size:0.85rem">Substitute current resistance <b class="tl-live-value" id="tl-live-resistance-rt">5.30 Ω</b>:</p>
+                <div id="tl-svg-formula-resistance-sub" class="tl-math-formula" style="height:100px; margin:4px 0"></div>
+              </div>
+              <div>
+                <div class="tl-info-label" style="font-size:0.75rem;color:var(--tl-cyan);margin-bottom:4px">Direction B: Temperature to Resistance (T &rarr; R<sub>T</sub>)</div>
+                <p style="margin:2px 0; font-size:0.85rem">Substitute current bath temperature <b class="tl-live-value" id="tl-live-resistance-t-sub">25.0°C</b>:</p>
+                <div id="tl-svg-formula-t-to-r" class="tl-math-formula" style="font-size:0.85rem;height:110px; margin:4px 0"></div>
+              </div>
+            </div>
+          </div>
+        </div>
+        <div class="tl-live-tab" id="tl-live-thermistor">
+          <div class="tl-controls-steps">
+            <div class="tl-info-label" style="margin-top:0;font-size:0.8rem;color:var(--tl-green)">Live NTC beta calculation</div>
+            <div class="tl-worked-solution" style="background-color:rgba(16,185,129,0.05);border-left-color:var(--tl-green)">
+              <div id="tl-svg-formula-thermistor" class="tl-math-formula" style="font-size:0.85rem"></div>
+              <p style="font-size:0.85rem">Substitute current resistance <b class="tl-live-value" id="tl-live-thermistor-rt">10.00 kΩ</b>:</p>
+              <div id="tl-svg-formula-thermistor-sub" class="tl-math-formula" style="font-size:0.85rem"></div>
+            </div>
+          </div>
+        </div>
+      </div>
 
+      <!-- FLOATING CONTROLS & SOLVERS -->
+      <div class="tl-controls controls-collapsed">
+        <div class="tl-controls-float-bar">
+          <button type="button" class="tl-controls-drag-handle" id="tl-controls-drag" aria-label="${t('tools.floatingControls.dragHint')}" title="${t('tools.floatingControls.dragHint')}">⋮⋮</button>
+          <button type="button" class="tl-controls-toggle" id="tl-controls-toggle" aria-expanded="false">
+            <span data-float-chevron>▾</span>
+            <span>${t('tools.thermometerLab.paramSettings')}</span>
+          </button>
+        </div>
+        <div class="tl-controls-body">
+
+        <!-- TAB 1: LIQUID-IN-GLASS -->
+        <div class="tl-tab-content active" id="tl-tab-liquid">
           <details class="tl-details">
             <summary>${t('tools.thermometerLab.paramSettings')}</summary>
             <div class="tl-details-body">
@@ -1083,23 +1130,6 @@ export function createThermometerLab(t, options = {}) {
 
         <!-- TAB 2: PLATINUM RESISTANCE -->
         <div class="tl-tab-content" id="tl-tab-resistance">
-          <div class="tl-controls-steps">
-            <div class="tl-info-label" style="margin-top:0;font-size:0.8rem;color:var(--tl-cyan)">Live calibration formula (Dual-Directional Realtime Calculations)</div>
-            <div class="tl-worked-solution" style="margin-bottom:10px; display:flex; flex-direction:column; gap:12px">
-              <div style="border-bottom:1px solid rgba(255,255,255,0.05); padding-bottom:10px">
-                <div class="tl-info-label" style="font-size:0.75rem;color:var(--tl-cyan);margin-bottom:4px">Direction A: Resistance to Temperature (R<sub>T</sub> &rarr; T)</div>
-                <div id="tl-svg-formula-resistance" class="tl-math-formula" style="height:45px; margin:4px 0"></div>
-                <p style="margin:2px 0; font-size:0.85rem">Substitute current resistance <b class="tl-live-value" id="tl-live-resistance-rt">5.30 Ω</b>:</p>
-                <div id="tl-svg-formula-resistance-sub" class="tl-math-formula" style="height:100px; margin:4px 0"></div>
-              </div>
-              <div>
-                <div class="tl-info-label" style="font-size:0.75rem;color:var(--tl-cyan);margin-bottom:4px">Direction B: Temperature to Resistance (T &rarr; R<sub>T</sub>)</div>
-                <p style="margin:2px 0; font-size:0.85rem">Substitute current bath temperature <b class="tl-live-value" id="tl-live-resistance-t-sub">25.0°C</b>:</p>
-                <div id="tl-svg-formula-t-to-r" class="tl-math-formula" style="font-size:0.85rem;height:110px; margin:4px 0"></div>
-              </div>
-            </div>
-          </div>
-
           <details class="tl-details">
             <summary>${t('tools.thermometerLab.paramSettings')}</summary>
             <div class="tl-details-body">
@@ -1155,15 +1185,6 @@ export function createThermometerLab(t, options = {}) {
 
         <!-- TAB 3: THERMISTOR -->
         <div class="tl-tab-content" id="tl-tab-thermistor">
-          <div class="tl-controls-steps">
-            <div class="tl-info-label" style="margin-top:0;font-size:0.8rem;color:var(--tl-green)">Live NTC beta calculation</div>
-            <div class="tl-worked-solution" style="background-color:rgba(16,185,129,0.05);border-left-color:var(--tl-green)">
-              <div id="tl-svg-formula-thermistor" class="tl-math-formula" style="font-size:0.85rem"></div>
-              <p style="font-size:0.85rem">Substitute current resistance <b class="tl-live-value" id="tl-live-thermistor-rt">10.00 kΩ</b>:</p>
-              <div id="tl-svg-formula-thermistor-sub" class="tl-math-formula" style="font-size:0.85rem"></div>
-            </div>
-          </div>
-
           <details class="tl-details">
             <summary>${t('tools.thermometerLab.paramSettings')}</summary>
             <div class="tl-details-body">
@@ -2708,18 +2729,24 @@ export function createThermometerLab(t, options = {}) {
     });
   }
 
+  function setActiveTab(tabId) {
+    wrap.querySelectorAll('.tl-tab-btn').forEach(btn => {
+      btn.classList.toggle('active', btn.getAttribute('data-tl-tab') === tabId);
+    });
+    wrap.querySelectorAll('.tl-tab-content').forEach(content => {
+      content.classList.toggle('active', content.id === 'tl-tab-' + tabId);
+    });
+    wrap.querySelectorAll('.tl-live-tab').forEach(panel => {
+      panel.classList.toggle('active', panel.id === 'tl-live-' + tabId);
+    });
+    state.thermometerType = tabId;
+  }
+
   // Event Listeners
   function setupEventListeners() {
     wrap.querySelectorAll('.tl-tab-btn').forEach(btn => {
       btn.addEventListener('click', () => {
-        wrap.querySelectorAll('.tl-tab-btn').forEach(b => b.classList.remove('active'));
-        wrap.querySelectorAll('.tl-tab-content').forEach(c => c.classList.remove('active'));
-
-        btn.classList.add('active');
-        const tabId = btn.getAttribute('data-tl-tab');
-        wrap.querySelector('#tl-tab-' + tabId).classList.add('active');
-
-        state.thermometerType = tabId;
+        setActiveTab(btn.getAttribute('data-tl-tab'));
         updateCalculations();
       });
     });
@@ -2854,23 +2881,7 @@ export function createThermometerLab(t, options = {}) {
     }
   }
 
-  wrap.querySelectorAll('.tl-tab-btn').forEach(btn => {
-    const tabId = btn.getAttribute('data-tl-tab');
-    if (tabId === defaultType) {
-      btn.classList.add('active');
-    } else {
-      btn.classList.remove('active');
-    }
-  });
-
-  wrap.querySelectorAll('.tl-tab-content').forEach(content => {
-    const tabId = content.id.replace('tl-tab-', '');
-    if (tabId === defaultType) {
-      content.classList.add('active');
-    } else {
-      content.classList.remove('active');
-    }
-  });
+  setActiveTab(defaultType);
 
   initParticles();
   setupEventListeners();
