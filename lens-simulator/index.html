@@ -164,8 +164,10 @@
                 <div class="control-panel-drag-handle" title="拖動面板 Drag panel">
                     <i class="fas fa-grip-lines"></i>
                     <span class="zh">拖動</span><span class="en">Drag</span>
+                    <button type="button" class="toggle-panel" aria-expanded="true" title="折叠/展开控制面板 Collapse/expand panel">
+                        <i class="fas fa-chevron-up"></i>
+                    </button>
                 </div>
-                <button class="toggle-panel" title="折叠/展开控制面板"><i class="fas fa-chevron-left"></i></button>
                 
                 <div class="panel-content">
                     <!-- 透鏡类型切换 -->
@@ -279,8 +281,15 @@
             <!-- 浮动数据卡片 -->
             <div class="data-card" id="image-type-indicator">
                 <div class="data-card-header">
-                    <i class="fas fa-chart-line"></i> <span class="zh">測量數據</span><span class="en">Measurements</span>
-                    <button class="expand-card"><i class="fas fa-expand-alt"></i></button>
+                    <span class="data-card-header-title">
+                        <i class="fas fa-chart-line"></i> <span class="zh">測量數據</span><span class="en">Measurements</span>
+                    </span>
+                    <div class="data-card-header-actions">
+                        <button type="button" class="collapse-card" aria-expanded="true" title="折叠/展开测量面板 Collapse/expand measurements">
+                            <i class="fas fa-chevron-up"></i>
+                        </button>
+                        <button type="button" class="expand-card" title="展开图表 Expand chart"><i class="fas fa-expand-alt"></i></button>
+                    </div>
                 </div>
                 <div class="data-card-content">
                     <div class="measurement-item">
