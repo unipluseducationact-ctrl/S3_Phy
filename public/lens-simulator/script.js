@@ -2791,6 +2791,32 @@ function setControlPanelCollapsed(controlPanel, togglePanelBtn, collapsed) {
     sessionStorage.setItem(CONTROL_PANEL_COLLAPSED_KEY, collapsed ? 'true' : 'false');
 }
 
+function syncMeasurementsGraphVisibility(dataCard, expandCardBtn) {
+    const graphContainer = document.querySelector('.uv-graph-container');
+    if (!graphContainer || !dataCard) return;
+
+    const expanded = dataCard.classList.contains('expanded');
+    const collapsed = dataCard.classList.contains('collapsed');
+    const expandIcon = expandCardBtn?.querySelector('i');
+
+    if (expandIcon) {
+        expandIcon.classList.toggle('fa-compress-alt', expanded);
+        expandIcon.classList.toggle('fa-expand-alt', !expanded);
+    }
+
+    if (state.lensType === 'concave' || collapsed || !expanded) {
+        graphContainer.style.display = 'none';
+    } else {
+        graphContainer.style.display = '';
+        drawUVGraph();
+    }
+}
+
+function setMeasurementsGraphExpanded(dataCard, expandCardBtn, expanded) {
+    dataCard.classList.toggle('expanded', expanded);
+    syncMeasurementsGraphVisibility(dataCard, expandCardBtn);
+}
+
 function setMeasurementsCollapsed(dataCard, collapseCardBtn, expandCardBtn, collapsed) {
     dataCard.classList.toggle('collapsed', collapsed);
     collapseCardBtn.setAttribute('aria-expanded', collapsed ? 'false' : 'true');
@@ -2801,12 +2827,9 @@ function setMeasurementsCollapsed(dataCard, collapseCardBtn, expandCardBtn, coll
 
     if (collapsed) {
         dataCard.classList.remove('expanded');
-        const expandIcon = expandCardBtn.querySelector('i');
-        expandIcon.classList.remove('fa-compress-alt');
-        expandIcon.classList.add('fa-expand-alt');
-        document.querySelector('.uv-graph-container').style.display = 'none';
-        drawUVGraph();
     }
+
+    syncMeasurementsGraphVisibility(dataCard, expandCardBtn);
 }
 
 function setupUIInteractions() {
@@ -2839,6 +2862,10 @@ function setupUIInteractions() {
         sessionStorage.getItem(MEASUREMENTS_COLLAPSED_KEY) === 'true'
     );
 
+    if (!dataCard.classList.contains('collapsed')) {
+        setMeasurementsGraphExpanded(dataCard, expandCardBtn, true);
+    }
+
     collapseCardBtn.addEventListener('click', (e) => {
         e.stopPropagation();
         const collapsed = !dataCard.classList.contains('collapsed');
@@ -2850,21 +2877,8 @@ function setupUIInteractions() {
         e.stopPropagation();
         if (dataCard.classList.contains('collapsed')) return;
 
-        dataCard.classList.toggle('expanded');
-        const icon = expandCardBtn.querySelector('i');
-        if (dataCard.classList.contains('expanded')) {
-            icon.classList.remove('fa-expand-alt');
-            icon.classList.add('fa-compress-alt');
-            if (state.lensType === 'convex') {
-                document.querySelector('.uv-graph-container').style.display = 'block';
-                setTimeout(drawUVGraph, 300);
-            }
-        } else {
-            icon.classList.remove('fa-compress-alt');
-            icon.classList.add('fa-expand-alt');
-            document.querySelector('.uv-graph-container').style.display = 'none';
-        }
-        drawUVGraph();
+        setMeasurementsGraphExpanded(dataCard, expandCardBtn, !dataCard.classList.contains('expanded'));
+        setTimeout(drawUVGraph, 300);
     });
     
     // 使测量数据面板可拖动
@@ -2899,8 +2913,7 @@ function setupUIInteractions() {
             state.focalLength = -Math.abs(state.focalLength);
             
             // 隐藏uv图表
-            const graphContainer = document.querySelector('.uv-graph-container');
-            if (graphContainer) graphContainer.style.display = 'none';
+            syncMeasurementsGraphVisibility(document.querySelector('.data-card'), document.querySelector('.expand-card'));
         } else {
             lensTypeToggle.classList.remove('concave');
             lensTypeText.innerHTML = '⛶ 凸透鏡'; // 更新为凸透镜符号和文本
@@ -2908,13 +2921,7 @@ function setupUIInteractions() {
             // 凸透镜始终使用正焦距
             state.focalLength = Math.abs(state.focalLength);
             
-            // 如果卡片是展开的，显示uv图表
-            const graphContainer = document.querySelector('.uv-graph-container');
-            const dataCard = document.querySelector('.data-card');
-            if (graphContainer && dataCard && dataCard.classList.contains('expanded')) {
-                graphContainer.style.display = 'block';
-                setTimeout(drawUVGraph, 50);
-            }
+            syncMeasurementsGraphVisibility(document.querySelector('.data-card'), document.querySelector('.expand-card'));
         }
         
         // 更新焦距显示
@@ -3678,12 +3685,12 @@ function applyDefaultLensFromEmbed() {
         lensTypeToggle.classList.add('concave');
         lensTypeText.innerHTML = '⫽ 凹透鏡';
         state.focalLength = -Math.abs(state.focalLength);
-        const graphContainer = document.querySelector('.uv-graph-container');
-        if (graphContainer) graphContainer.style.display = 'none';
+        syncMeasurementsGraphVisibility(document.querySelector('.data-card'), document.querySelector('.expand-card'));
     } else {
         lensTypeToggle.classList.remove('concave');
         lensTypeText.innerHTML = '⛶ 凸透鏡';
         state.focalLength = Math.abs(state.focalLength);
+        syncMeasurementsGraphVisibility(document.querySelector('.data-card'), document.querySelector('.expand-card'));
     }
     const absF = Math.abs(state.focalLength);
     if (focalLengthValue) {
