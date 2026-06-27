@@ -340,7 +340,7 @@ QUESTIONS = [
         "section": "Condition for TIR",
         "en": {
             "q": "Total internal reflection can occur when light travels from ____ to ____.",
-            "choices": ["rare to dense", "dense to rare", "air to air", "vacuum to vacuum"],
+            "choices": ["less dense to more dense", "more dense to less dense", "air to air", "vacuum to vacuum"],
             "a": 1,
             "exp": "TIR needs light incident in the optically denser medium.",
         },
@@ -435,7 +435,7 @@ QUESTIONS = [
         "topic": "tir",
         "section": "No TIR rare to dense",
         "en": {
-            "q": "When light travels from a rarer to a denser medium, total internal reflection ____.",
+            "q": "When light travels from a less dense to a more dense medium, total internal reflection ____.",
             "choices": ["always occurs", "never occurs", "occurs at 45° only", "replaces refraction"],
             "a": 1,
             "exp": "TIR requires dense-to-rare incidence.",
@@ -612,7 +612,7 @@ QUESTIONS = [
         "topic": "convex",
         "section": "u < f",
         "en": {
-            "q": "When the object is inside the focal length of a convex lens (u < f), the image is ____.",
+            "q": "When the object distance is shorter than the focal length of a convex lens (u < f), the image is ____.",
             "choices": ["real and inverted", "virtual, upright and enlarged", "at 2f", "absent"],
             "a": 1,
             "exp": "u < f: virtual magnifying-glass image.",
@@ -709,7 +709,7 @@ QUESTIONS = [
         "topic": "concave",
         "section": "Parallel ray",
         "en": {
-            "q": "After a concave lens, a ray parallel to the axis appears to come from ____.",
+            "q": "After passing through a concave lens, a ray parallel to the axis appears to come from ____.",
             "choices": ["2F on the object side", "the focal point F on the same side as the object", "infinity behind", "the centre of Earth"],
             "a": 1,
             "exp": "Parallel in, diverges as if from F.",
@@ -805,10 +805,10 @@ QUESTIONS = [
         "topic": "concave",
         "section": "Power",
         "en": {
-            "q": "A lens with a more negative focal length has ____ diverging power.",
+            "q": "A lens with a shorter focal length has ____ diverging power.",
             "choices": ["less", "greater", "no", "infinite converging"],
             "a": 1,
-            "exp": "Smaller (more negative) f means stronger divergence.",
+            "exp": "A shorter focal length means stronger divergence.",
         },
         "zhHant": {
             "q": "焦距越負（絕對值越大）的凹透鏡，發散能力____。",
