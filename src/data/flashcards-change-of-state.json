@@ -3,96 +3,168 @@
     "id": 1,
     "topic": "changeOfState",
     "title": "What is Latent Heat?",
-    "front": "./flashcards/change-of-state/01-front.webp",
     "alt": "Flashcard 1 - What is Latent Heat?",
-    "back": "./flashcards/change-of-state/01-back.webp"
+    "en": {
+      "front": "./flashcards/change-of-state/01-en-front.webp",
+      "back": "./flashcards/change-of-state/01-en-back.webp"
+    },
+    "zhHant": {
+      "front": "./flashcards/change-of-state/01-zh-front.webp",
+      "back": "./flashcards/change-of-state/01-zh-back.webp"
+    }
   },
   {
     "id": 2,
     "topic": "changeOfState",
     "title": "Fusion & Freezing",
-    "front": "./flashcards/change-of-state/02-front.webp",
     "alt": "Flashcard 2 - Fusion & Freezing",
-    "back": "./flashcards/change-of-state/02-back.webp"
+    "en": {
+      "front": "./flashcards/change-of-state/02-en-front.webp",
+      "back": "./flashcards/change-of-state/02-en-back.webp"
+    },
+    "zhHant": {
+      "front": "./flashcards/change-of-state/02-zh-front.webp",
+      "back": "./flashcards/change-of-state/02-zh-back.webp"
+    }
   },
   {
     "id": 3,
     "topic": "changeOfState",
     "title": "Vaporization & Condensation",
-    "front": "./flashcards/change-of-state/03-front.webp",
     "alt": "Flashcard 3 - Vaporization & Condensation",
-    "back": "./flashcards/change-of-state/03-back.webp"
+    "en": {
+      "front": "./flashcards/change-of-state/03-en-front.webp",
+      "back": "./flashcards/change-of-state/03-en-back.webp"
+    },
+    "zhHant": {
+      "front": "./flashcards/change-of-state/03-zh-front.webp",
+      "back": "./flashcards/change-of-state/03-zh-back.webp"
+    }
   },
   {
     "id": 4,
     "topic": "changeOfState",
     "title": "Internal Energy",
-    "front": "./flashcards/change-of-state/04-front.webp",
     "alt": "Flashcard 4 - Internal Energy",
-    "back": "./flashcards/change-of-state/04-back.webp"
+    "en": {
+      "front": "./flashcards/change-of-state/04-en-front.webp",
+      "back": "./flashcards/change-of-state/04-en-back.webp"
+    },
+    "zhHant": {
+      "front": "./flashcards/change-of-state/04-zh-front.webp",
+      "back": "./flashcards/change-of-state/04-zh-back.webp"
+    }
   },
   {
     "id": 5,
     "topic": "changeOfState",
     "title": "Heating Curve",
-    "front": "./flashcards/change-of-state/05-front.webp",
     "alt": "Flashcard 5 - Heating Curve",
-    "back": "./flashcards/change-of-state/05-back.webp"
+    "en": {
+      "front": "./flashcards/change-of-state/05-en-front.webp",
+      "back": "./flashcards/change-of-state/05-en-back.webp"
+    },
+    "zhHant": {
+      "front": "./flashcards/change-of-state/05-zh-front.webp",
+      "back": "./flashcards/change-of-state/05-zh-back.webp"
+    }
   },
   {
     "id": 6,
     "topic": "changeOfState",
     "title": "Cooling Curve",
-    "front": "./flashcards/change-of-state/06-front.webp",
     "alt": "Flashcard 6 - Cooling Curve",
-    "back": "./flashcards/change-of-state/06-back.webp"
+    "en": {
+      "front": "./flashcards/change-of-state/06-en-front.webp",
+      "back": "./flashcards/change-of-state/06-en-back.webp"
+    },
+    "zhHant": {
+      "front": "./flashcards/change-of-state/06-zh-front.webp",
+      "back": "./flashcards/change-of-state/06-zh-back.webp"
+    }
   },
   {
     "id": 7,
     "topic": "changeOfState",
     "title": "Evaporation vs Boiling",
-    "front": "./flashcards/change-of-state/07-front.webp",
     "alt": "Flashcard 7 - Evaporation vs Boiling",
-    "back": "./flashcards/change-of-state/07-back.webp"
+    "en": {
+      "front": "./flashcards/change-of-state/07-en-front.webp",
+      "back": "./flashcards/change-of-state/07-en-back.webp"
+    },
+    "zhHant": {
+      "front": "./flashcards/change-of-state/07-zh-front.webp",
+      "back": "./flashcards/change-of-state/07-zh-back.webp"
+    }
   },
   {
     "id": 8,
     "topic": "changeOfState",
     "title": "Evaporation Factors",
-    "front": "./flashcards/change-of-state/08-front.webp",
     "alt": "Flashcard 8 - Evaporation Factors",
-    "back": "./flashcards/change-of-state/08-back.webp"
+    "en": {
+      "front": "./flashcards/change-of-state/08-en-front.webp",
+      "back": "./flashcards/change-of-state/08-en-back.webp"
+    },
+    "zhHant": {
+      "front": "./flashcards/change-of-state/08-zh-front.webp",
+      "back": "./flashcards/change-of-state/08-zh-back.webp"
+    }
   },
   {
     "id": 9,
     "topic": "changeOfState",
     "title": "Energy Formula E=ml",
-    "front": "./flashcards/change-of-state/09-front.webp",
     "alt": "Flashcard 9 - Energy Formula E=ml",
-    "back": "./flashcards/change-of-state/09-back.webp"
+    "en": {
+      "front": "./flashcards/change-of-state/09-en-front.webp",
+      "back": "./flashcards/change-of-state/09-en-back.webp"
+    },
+    "zhHant": {
+      "front": "./flashcards/change-of-state/09-zh-front.webp",
+      "back": "./flashcards/change-of-state/09-zh-back.webp"
+    }
   },
   {
     "id": 10,
     "topic": "changeOfState",
     "title": "Specific Latent Heat Values",
-    "front": "./flashcards/change-of-state/10-front.webp",
     "alt": "Flashcard 10 - Specific Latent Heat Values",
-    "back": "./flashcards/change-of-state/10-back.webp"
+    "en": {
+      "front": "./flashcards/change-of-state/10-en-front.webp",
+      "back": "./flashcards/change-of-state/10-en-back.webp"
+    },
+    "zhHant": {
+      "front": "./flashcards/change-of-state/10-zh-front.webp",
+      "back": "./flashcards/change-of-state/10-zh-back.webp"
+    }
   },
   {
     "id": 11,
     "topic": "changeOfState",
     "title": "Experiment: Latent Heat of Fusion",
-    "front": "./flashcards/change-of-state/11-front.webp",
     "alt": "Flashcard 11 - Experiment: Latent Heat of Fusion",
-    "back": "./flashcards/change-of-state/11-back.webp"
+    "en": {
+      "front": "./flashcards/change-of-state/11-en-front.webp",
+      "back": "./flashcards/change-of-state/11-en-back.webp"
+    },
+    "zhHant": {
+      "front": "./flashcards/change-of-state/11-zh-front.webp",
+      "back": "./flashcards/change-of-state/11-zh-back.webp"
+    }
   },
   {
     "id": 12,
     "topic": "changeOfState",
     "title": "Experiment: Latent Heat of Vaporization",
-    "front": "./flashcards/change-of-state/12-front.webp",
     "alt": "Flashcard 12 - Experiment: Latent Heat of Vaporization",
-    "back": "./flashcards/change-of-state/12-back.webp"
+    "en": {
+      "front": "./flashcards/change-of-state/12-en-front.webp",
+      "back": "./flashcards/change-of-state/12-en-back.webp"
+    },
+    "zhHant": {
+      "front": "./flashcards/change-of-state/12-zh-front.webp",
+      "back": "./flashcards/change-of-state/12-zh-back.webp"
+    }
   }
 ]

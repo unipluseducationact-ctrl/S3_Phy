@@ -3,104 +3,182 @@
     "id": 1,
     "topic": "heatTransfer",
     "title": "What is Conduction?",
-    "front": "./flashcards/heat-transfer/01-front.webp",
     "alt": "Flashcard 1 - What is Conduction?",
-    "back": "./flashcards/heat-transfer/01-back.webp"
+    "en": {
+      "front": "./flashcards/heat-transfer/01-en-front.webp",
+      "back": "./flashcards/heat-transfer/01-en-back.webp"
+    },
+    "zhHant": {
+      "front": "./flashcards/heat-transfer/01-zh-front.webp",
+      "back": "./flashcards/heat-transfer/01-zh-back.webp"
+    }
   },
   {
     "id": 2,
     "topic": "heatTransfer",
     "title": "What is Convection?",
-    "front": "./flashcards/heat-transfer/02-front.webp",
     "alt": "Flashcard 2 - What is Convection?",
-    "back": "./flashcards/heat-transfer/02-back.webp"
+    "en": {
+      "front": "./flashcards/heat-transfer/02-en-front.webp",
+      "back": "./flashcards/heat-transfer/02-en-back.webp"
+    },
+    "zhHant": {
+      "front": "./flashcards/heat-transfer/02-zh-front.webp",
+      "back": "./flashcards/heat-transfer/02-zh-back.webp"
+    }
   },
   {
     "id": 3,
     "topic": "heatTransfer",
     "title": "What is Radiation?",
-    "front": "./flashcards/heat-transfer/03-front.webp",
     "alt": "Flashcard 3 - What is Radiation?",
-    "back": "./flashcards/heat-transfer/03-back.webp"
+    "en": {
+      "front": "./flashcards/heat-transfer/03-en-front.webp",
+      "back": "./flashcards/heat-transfer/03-en-back.webp"
+    },
+    "zhHant": {
+      "front": "./flashcards/heat-transfer/03-zh-front.webp",
+      "back": "./flashcards/heat-transfer/03-zh-back.webp"
+    }
   },
   {
     "id": 4,
     "topic": "heatTransfer",
     "title": "Conduction Mechanism",
-    "front": "./flashcards/heat-transfer/04-front.webp",
     "alt": "Flashcard 4 - Conduction Mechanism",
-    "back": "./flashcards/heat-transfer/04-back.webp"
+    "en": {
+      "front": "./flashcards/heat-transfer/04-en-front.webp",
+      "back": "./flashcards/heat-transfer/04-en-back.webp"
+    },
+    "zhHant": {
+      "front": "./flashcards/heat-transfer/04-zh-front.webp",
+      "back": "./flashcards/heat-transfer/04-zh-back.webp"
+    }
   },
   {
     "id": 5,
     "topic": "heatTransfer",
     "title": "Convection Mechanism",
-    "front": "./flashcards/heat-transfer/05-front.webp",
     "alt": "Flashcard 5 - Convection Mechanism",
-    "back": "./flashcards/heat-transfer/05-back.webp"
+    "en": {
+      "front": "./flashcards/heat-transfer/05-en-front.webp",
+      "back": "./flashcards/heat-transfer/05-en-back.webp"
+    },
+    "zhHant": {
+      "front": "./flashcards/heat-transfer/05-zh-front.webp",
+      "back": "./flashcards/heat-transfer/05-zh-back.webp"
+    }
   },
   {
     "id": 6,
     "topic": "heatTransfer",
     "title": "Conductors & Insulators",
-    "front": "./flashcards/heat-transfer/06-front.webp",
     "alt": "Flashcard 6 - Conductors & Insulators",
-    "back": "./flashcards/heat-transfer/06-back.webp"
+    "en": {
+      "front": "./flashcards/heat-transfer/06-en-front.webp",
+      "back": "./flashcards/heat-transfer/06-en-back.webp"
+    },
+    "zhHant": {
+      "front": "./flashcards/heat-transfer/06-zh-front.webp",
+      "back": "./flashcards/heat-transfer/06-zh-back.webp"
+    }
   },
   {
     "id": 7,
     "topic": "heatTransfer",
     "title": "Convection in Daily Life",
-    "front": "./flashcards/heat-transfer/07-front.webp",
     "alt": "Flashcard 7 - Convection in Daily Life",
-    "back": "./flashcards/heat-transfer/07-back.webp"
+    "en": {
+      "front": "./flashcards/heat-transfer/07-en-front.webp",
+      "back": "./flashcards/heat-transfer/07-en-back.webp"
+    },
+    "zhHant": {
+      "front": "./flashcards/heat-transfer/07-zh-front.webp",
+      "back": "./flashcards/heat-transfer/07-zh-back.webp"
+    }
   },
   {
     "id": 8,
     "topic": "heatTransfer",
     "title": "Sea Breeze & Land Breeze",
-    "front": "./flashcards/heat-transfer/08-front.webp",
     "alt": "Flashcard 8 - Sea Breeze & Land Breeze",
-    "back": "./flashcards/heat-transfer/08-back.webp"
+    "en": {
+      "front": "./flashcards/heat-transfer/08-en-front.webp",
+      "back": "./flashcards/heat-transfer/08-en-back.webp"
+    },
+    "zhHant": {
+      "front": "./flashcards/heat-transfer/08-zh-front.webp",
+      "back": "./flashcards/heat-transfer/08-zh-back.webp"
+    }
   },
   {
     "id": 9,
     "topic": "heatTransfer",
     "title": "Surface Properties & Radiation",
-    "front": "./flashcards/heat-transfer/09-front.webp",
     "alt": "Flashcard 9 - Surface Properties & Radiation",
-    "back": "./flashcards/heat-transfer/09-back.webp"
+    "en": {
+      "front": "./flashcards/heat-transfer/09-en-front.webp",
+      "back": "./flashcards/heat-transfer/09-en-back.webp"
+    },
+    "zhHant": {
+      "front": "./flashcards/heat-transfer/09-zh-front.webp",
+      "back": "./flashcards/heat-transfer/09-zh-back.webp"
+    }
   },
   {
     "id": 10,
     "topic": "heatTransfer",
     "title": "Vacuum Flask",
-    "front": "./flashcards/heat-transfer/10-front.webp",
     "alt": "Flashcard 10 - Vacuum Flask",
-    "back": "./flashcards/heat-transfer/10-back.webp"
+    "en": {
+      "front": "./flashcards/heat-transfer/10-en-front.webp",
+      "back": "./flashcards/heat-transfer/10-en-back.webp"
+    },
+    "zhHant": {
+      "front": "./flashcards/heat-transfer/10-zh-front.webp",
+      "back": "./flashcards/heat-transfer/10-zh-back.webp"
+    }
   },
   {
     "id": 11,
     "topic": "heatTransfer",
     "title": "Greenhouse Effect",
-    "front": "./flashcards/heat-transfer/11-front.webp",
     "alt": "Flashcard 11 - Greenhouse Effect",
-    "back": "./flashcards/heat-transfer/11-back.webp"
+    "en": {
+      "front": "./flashcards/heat-transfer/11-en-front.webp",
+      "back": "./flashcards/heat-transfer/11-en-back.webp"
+    },
+    "zhHant": {
+      "front": "./flashcards/heat-transfer/11-zh-front.webp",
+      "back": "./flashcards/heat-transfer/11-zh-back.webp"
+    }
   },
   {
     "id": 12,
     "topic": "heatTransfer",
     "title": "Three Methods Comparison",
-    "front": "./flashcards/heat-transfer/12-front.webp",
     "alt": "Flashcard 12 - Three Methods Comparison",
-    "back": "./flashcards/heat-transfer/12-back.webp"
+    "en": {
+      "front": "./flashcards/heat-transfer/12-en-front.webp",
+      "back": "./flashcards/heat-transfer/12-en-back.webp"
+    },
+    "zhHant": {
+      "front": "./flashcards/heat-transfer/12-zh-front.webp",
+      "back": "./flashcards/heat-transfer/12-zh-back.webp"
+    }
   },
   {
     "id": 13,
     "topic": "heatTransfer",
     "title": "Key Facts & Common Errors",
-    "front": "./flashcards/heat-transfer/13-front.webp",
     "alt": "Flashcard 13 - Key Facts & Common Errors",
-    "back": "./flashcards/heat-transfer/13-back.webp"
+    "en": {
+      "front": "./flashcards/heat-transfer/13-en-front.webp",
+      "back": "./flashcards/heat-transfer/13-en-back.webp"
+    },
+    "zhHant": {
+      "front": "./flashcards/heat-transfer/13-zh-front.webp",
+      "back": "./flashcards/heat-transfer/13-zh-back.webp"
+    }
   }
 ]

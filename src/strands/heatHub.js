@@ -304,6 +304,13 @@ export function mountHeatHub(root) {
       </section>`;
   }
 
+  const SUMMARY_POSTER_BASE = {
+    thermometer: 'thermometer',
+    heatInternalEnergy: 'heat-internal-energy',
+    changeOfState: 'change-of-state',
+    heatTransfer: 'heat-transfer',
+  };
+
   async function hydrateSummary() {
     const lk = langKey();
     for (const r of HEAT_TOPICS) {
@@ -311,54 +318,16 @@ export function mountHeatHub(root) {
       if (!card) continue;
       const body = card.querySelector('[data-summary-body]');
 
-      if (r.id === 'thermometer') {
-        const ok = await assetExists('summary', 'thermometer.webp');
-        const url = `${import.meta.env.BASE_URL}summary/thermometer.webp`;
-        if (ok) {
-          body.innerHTML = `
-          <img class="summary-thumb" src="${url}" alt="${t('summary.item.thermometer')}" loading="lazy" />
-          <p style="margin-top:8px"><a href="${url}" target="_blank" rel="noopener">${t('summary.viewImage')}</a></p>`;
-        } else {
-          body.innerHTML = `<p class="lead">${t('summary.missing')}</p>`;
-        }
-        continue;
-      }
-
-      if (r.id === 'heatInternalEnergy') {
+      const posterBase = SUMMARY_POSTER_BASE[r.id];
+      if (posterBase) {
         const file = lk === 'zhHant'
-          ? 'heat-internal-energy-zhHant.webp'
-          : 'heat-internal-energy-en.webp';
+          ? `${posterBase}-zhHant.webp`
+          : `${posterBase}-en.webp`;
         const ok = await assetExists('summary', file);
         const url = `${import.meta.env.BASE_URL}summary/${file}`;
         if (ok) {
           body.innerHTML = `
-          <img class="summary-thumb" src="${url}" alt="${t('summary.item.heatInternalEnergy')}" loading="lazy" />
-          <p style="margin-top:8px"><a href="${url}" target="_blank" rel="noopener">${t('summary.viewImage')}</a></p>`;
-        } else {
-          body.innerHTML = `<p class="lead">${t('summary.missing')}</p>`;
-        }
-        continue;
-      }
-
-      if (r.id === 'changeOfState') {
-        const ok = await assetExists('summary', 'change-of-state.webp');
-        const url = `${import.meta.env.BASE_URL}summary/change-of-state.webp`;
-        if (ok) {
-          body.innerHTML = `
-          <img class="summary-thumb" src="${url}" alt="${t('summary.item.changeOfState')}" loading="lazy" />
-          <p style="margin-top:8px"><a href="${url}" target="_blank" rel="noopener">${t('summary.viewImage')}</a></p>`;
-        } else {
-          body.innerHTML = `<p class="lead">${t('summary.missing')}</p>`;
-        }
-        continue;
-      }
-
-      if (r.id === 'heatTransfer') {
-        const ok = await assetExists('summary', 'heat-transfer.webp');
-        const url = `${import.meta.env.BASE_URL}summary/heat-transfer.webp`;
-        if (ok) {
-          body.innerHTML = `
-          <img class="summary-thumb" src="${url}" alt="${t('summary.item.heatTransfer')}" loading="lazy" />
+          <img class="summary-thumb" src="${url}" alt="${t(`summary.item.${r.id}`)}" loading="lazy" />
           <p style="margin-top:8px"><a href="${url}" target="_blank" rel="noopener">${t('summary.viewImage')}</a></p>`;
         } else {
           body.innerHTML = `<p class="lead">${t('summary.missing')}</p>`;
