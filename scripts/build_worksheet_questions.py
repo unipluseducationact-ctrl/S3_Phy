@@ -320,9 +320,9 @@ QUESTIONS = [
     },
     {
         "topic": "refraction",
-        "section": "Angle increases in rarer medium",
+        "section": "Angle increases in less dense medium",
         "en": {
-            "q": "When light enters a rarer medium from a denser one, the angle in the rarer medium is ____ the angle of incidence in the denser medium.",
+            "q": "When light enters a less dense medium from a more dense one, the angle in the less dense medium is ____ the angle of incidence in the more dense medium.",
             "choices": ["smaller than", "equal to", "larger than", "always zero"],
             "a": 2,
             "exp": "From Snell's law, sin r > sin i when n2 < n1.",
@@ -618,7 +618,7 @@ QUESTIONS = [
             "exp": "u < f: virtual magnifying-glass image.",
         },
         "zhHant": {
-            "q": "物在凸透鏡焦距內（u < f）時，像為____。",
+            "q": "物距短於凸透鏡焦距（u < f）時，像為____。",
             "choices": ["實像倒立", "虛像正立放大", "在 2f", "不存在"],
             "a": 1,
             "exp": "u < f：虛像、正立、放大（放大鏡）。",
@@ -626,18 +626,34 @@ QUESTIONS = [
     },
     {
         "topic": "convex",
-        "section": "Sign of f",
+        "section": "Sign of 1/v real",
         "en": {
-            "q": "In the usual thin-lens sign convention, the focal length of a convex lens is ____.",
+            "q": "In the lens formula 1/u + 1/v = 1/f, for a convex lens when the image is real, what is the sign of 1/v?",
             "choices": ["negative", "positive", "zero", "imaginary"],
             "a": 1,
-            "exp": "Convex converging lenses have f > 0.",
+            "exp": "Real images have v > 0, so 1/v is positive.",
         },
         "zhHant": {
-            "q": "薄透鏡符號規定中，凸透鏡的焦距為____。",
+            "q": "透鏡公式 1/u + 1/v = 1/f 中，凸透鏡成實像時，1/v 的符號為____。",
             "choices": ["負", "正", "零", "虛數"],
             "a": 1,
-            "exp": "凸透鏡 f > 0。",
+            "exp": "實像 v > 0，故 1/v 為正。",
+        },
+    },
+    {
+        "topic": "convex",
+        "section": "Sign of 1/v virtual",
+        "en": {
+            "q": "In the lens formula 1/u + 1/v = 1/f, for a convex lens when the image is virtual, what is the sign of 1/v?",
+            "choices": ["negative", "positive", "zero", "imaginary"],
+            "a": 0,
+            "exp": "Virtual images have v < 0, so 1/v is negative.",
+        },
+        "zhHant": {
+            "q": "透鏡公式 1/u + 1/v = 1/f 中，凸透鏡成虛像時，1/v 的符號為____。",
+            "choices": ["負", "正", "零", "虛數"],
+            "a": 0,
+            "exp": "虛像 v < 0，故 1/v 為負。",
         },
     },
     {
@@ -691,18 +707,18 @@ QUESTIONS = [
     },
     {
         "topic": "concave",
-        "section": "Sign of f",
+        "section": "Sign of 1/v",
         "en": {
-            "q": "The focal length of a concave lens in the usual convention is ____.",
-            "choices": ["positive", "negative", "infinite", "equal to u"],
+            "q": "In the lens formula 1/u + 1/v = 1/f, for a concave lens, what is the sign of 1/v?",
+            "choices": ["positive", "negative", "zero", "imaginary"],
             "a": 1,
-            "exp": "Concave diverging lenses have f < 0.",
+            "exp": "Concave lenses form virtual images with v < 0, so 1/v is negative.",
         },
         "zhHant": {
-            "q": "凹透鏡的焦距在慣用符號下為____。",
-            "choices": ["正", "負", "無窮", "等於 u"],
+            "q": "透鏡公式 1/u + 1/v = 1/f 中，凹透鏡成像時，1/v 的符號為____。",
+            "choices": ["正", "負", "零", "虛數"],
             "a": 1,
-            "exp": "凹透鏡 f < 0。",
+            "exp": "凹透鏡成虛像，v < 0，故 1/v 為負。",
         },
     },
     {
