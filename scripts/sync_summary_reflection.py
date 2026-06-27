@@ -11,8 +11,8 @@ from PIL import Image
 ROOT = Path(__file__).resolve().parents[1]
 SRC_DIR = Path(r"C:\Users\UniplusUser02\Desktop\PHYS\S3\Optics\Summary\Reflection")
 POSTERS = {
-    "reflection-en.webp": SRC_DIR / "EN-Reflection-Summary-Poster-v10.png",
-    "reflection-zhHant.webp": SRC_DIR / "ZH-Reflection-Summary-Poster-v10.png",
+    "reflection-en.webp": SRC_DIR / "EN-Reflection-Summary-Poster-v11.png",
+    "reflection-zhHant.webp": SRC_DIR / "ZH-Reflection-Summary-Poster-v11.png",
 }
 OUT_DIR = ROOT / "public" / "summary"
 MAX_WIDTH = 1400
