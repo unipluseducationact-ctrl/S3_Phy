@@ -172,10 +172,16 @@ const CSS = `
   gap: 8px;
   flex-shrink: 0;
 }
-.tl-wrap .tl-controls-drag-handle {
-  display: none;
+.tl-wrap .tl-controls.lab-controls-float .tl-controls-float-bar {
   cursor: grab;
   touch-action: none;
+  user-select: none;
+}
+.tl-wrap .tl-controls.lab-controls-float .tl-controls-float-bar.is-dragging {
+  cursor: grabbing;
+}
+.tl-wrap .tl-controls-drag-handle {
+  display: none;
   color: var(--tl-muted);
   padding: 4px 6px;
   border-radius: 6px;
@@ -184,10 +190,10 @@ const CSS = `
   font-size: 0.85rem;
   line-height: 1;
   flex-shrink: 0;
+  pointer-events: none;
 }
-.tl-wrap .tl-controls-drag-handle.is-dragging { cursor: grabbing; }
 .tl-wrap .tl-controls-drag-handle:hover { color: var(--tl-text); border-color: var(--tl-border); }
-.tl-wrap .tl-controls-float .tl-controls-drag-handle { display: inline-flex; align-items: center; }
+.tl-wrap .tl-controls.lab-controls-float .tl-controls-drag-handle { display: inline-flex; align-items: center; }
 .tl-wrap .tl-controls-toggle {
   display: flex;
   align-items: center;
@@ -807,12 +813,15 @@ function initFloatingControlsPanel(options) {
     panel,
     toggleBtn,
     dragHandle,
+    dragSurface,
     storageKey,
     onLayoutChange,
     breakpoint = FLOAT_BREAKPOINT,
     collapsedClass = 'controls-collapsed',
     floatingClass = 'controls-floating',
   } = options;
+
+  const dragTarget = dragSurface || dragHandle;
 
   if (!container || !panel || !toggleBtn) return null;
 
@@ -859,12 +868,20 @@ function initFloatingControlsPanel(options) {
     if (icon) icon.textContent = collapsed ? 'v' : '^';
   };
 
+  const reclampPosition = () => {
+    if (!isFloatingEnabled()) return;
+    pos = clampPosition(pos.x, pos.y);
+    applyPosition();
+  };
+
   const setCollapsed = (next) => {
     collapsed = next;
     panel.classList.toggle(collapsedClass, collapsed);
     sessionStorage.setItem(storageKey, collapsed ? 'true' : 'false');
     updateToggleUi();
     scheduleLayoutChange();
+    requestAnimationFrame(reclampPosition);
+    setTimeout(reclampPosition, 260);
   };
 
   const enableFloating = () => {
@@ -905,29 +922,30 @@ function initFloatingControlsPanel(options) {
     setCollapsed(!collapsed);
   });
 
-  if (dragHandle) {
-    dragHandle.addEventListener('pointerdown', (e) => {
+  if (dragTarget) {
+    dragTarget.addEventListener('pointerdown', (e) => {
       if (!isFloatingEnabled()) return;
+      if (toggleBtn.contains(e.target)) return;
       e.preventDefault();
       dragState = { pointerId: e.pointerId, startX: e.clientX, startY: e.clientY, originX: pos.x, originY: pos.y };
-      dragHandle.setPointerCapture(e.pointerId);
-      dragHandle.classList.add('is-dragging');
+      dragTarget.setPointerCapture(e.pointerId);
+      dragTarget.classList.add('is-dragging');
     });
-    dragHandle.addEventListener('pointermove', (e) => {
+    dragTarget.addEventListener('pointermove', (e) => {
       if (!dragState || dragState.pointerId !== e.pointerId) return;
       pos = clampPosition(dragState.originX + e.clientX - dragState.startX, dragState.originY + e.clientY - dragState.startY);
       applyPosition();
     });
     const endDrag = (e) => {
       if (!dragState || dragState.pointerId !== e.pointerId) return;
-      dragHandle.releasePointerCapture(e.pointerId);
-      dragHandle.classList.remove('is-dragging');
+      dragTarget.releasePointerCapture(e.pointerId);
+      dragTarget.classList.remove('is-dragging');
       try { localStorage.setItem(storageKey + ':pos', JSON.stringify(pos)); } catch (err) { void err; }
       dragState = null;
       scheduleLayoutChange();
     };
-    dragHandle.addEventListener('pointerup', endDrag);
-    dragHandle.addEventListener('pointercancel', endDrag);
+    dragTarget.addEventListener('pointerup', endDrag);
+    dragTarget.addEventListener('pointercancel', endDrag);
   }
 
   window.addEventListener('resize', refreshMode);
@@ -2944,12 +2962,14 @@ export function createThermometerLab(t, options = {}) {
   const controlsPanel = wrap.querySelector('.tl-controls');
   const toggleBtn = wrap.querySelector('#tl-controls-toggle');
   const dragHandle = wrap.querySelector('#tl-controls-drag');
+  const floatBar = wrap.querySelector('.tl-controls-float-bar');
   if (dash && controlsPanel && toggleBtn) {
     initFloatingControlsPanel({
       container: dash,
       panel: controlsPanel,
       toggleBtn,
       dragHandle,
+      dragSurface: floatBar,
       storageKey: `s3phy-thermo-${defaultType}`,
       breakpoint: THERM_FLOAT_BREAKPOINT,
       getToggleTitle: (collapsed) => collapsed
