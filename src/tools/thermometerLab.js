@@ -121,6 +121,40 @@ const CSS = `
   font-size: 0.78rem;
   margin-bottom: 4px;
 }
+.tl-wrap .tl-bath-bar--under-graph {
+  margin-top: 0;
+  padding: 8px 12px;
+  background: rgba(255, 255, 255, 0.02);
+  border-radius: 12px;
+}
+.tl-wrap .tl-bath-bar--under-graph .tl-bath-bar-top {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 12px;
+}
+.tl-wrap .tl-bath-bar--under-graph .tl-beaker-overlay {
+  padding: 4px 8px;
+  margin: 0;
+  font-size: 0.75rem;
+  background: transparent;
+  border: none;
+}
+.tl-wrap .tl-bath-bar--under-graph .tl-temp-badge {
+  font-size: 1rem;
+}
+.tl-wrap .tl-bath-bar--under-graph .tl-bath-slider-wrap {
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+}
+.tl-wrap .tl-bath-bar--under-graph input[type="range"] {
+  margin: 0;
+}
+.tl-wrap .tl-bath-bar--under-graph .tl-val-bath-temp {
+  color: var(--tl-cyan);
+}
 .tl-wrap .tl-controls {
   min-width: min(100%, 280px);
   background: var(--tl-panel);
@@ -234,19 +268,6 @@ const CSS = `
   .tl-wrap .tl-btn-group {
     grid-template-columns: repeat(4, 1fr);
   }
-  .tl-wrap .tl-bath-bar {
-    flex-direction: row;
-    flex-wrap: wrap;
-    align-items: center;
-    gap: 12px 16px;
-  }
-  .tl-wrap .tl-bath-bar-top {
-    flex: 1 1 auto;
-  }
-  .tl-wrap .tl-btn-group {
-    flex: 1 1 300px;
-    max-width: none;
-  }
 }
 @media (min-width: 900px) {
   .tl-wrap .tl-dash {
@@ -293,11 +314,6 @@ const CSS = `
   .tl-wrap .tl-canvas-graph {
     max-width: 100%;
     width: 100%;
-  }
-  .tl-wrap .tl-btn-group {
-    grid-template-columns: repeat(4, 1fr);
-    flex: 1 1 auto;
-    max-width: none;
   }
   .tl-wrap .tl-bath-slider-wrap {
     flex: 1 1 260px;
@@ -437,8 +453,20 @@ const CSS = `
 }
 .tl-wrap .tl-btn-group {
   display: grid;
-  grid-template-columns: repeat(2, 1fr);
-  gap: 8px;
+  grid-template-columns: repeat(4, 1fr);
+  gap: 6px;
+  align-items: stretch;
+  width: 100%;
+  margin-top: 6px;
+}
+.tl-wrap .tl-preset-btn {
+  padding: 6px 4px;
+  font-size: 0.7rem;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  min-height: 2rem;
+  white-space: nowrap;
 }
 .tl-wrap .tl-btn {
   background-color: #1f1f23;
@@ -945,25 +973,25 @@ export function createThermometerLab(t, options = {}) {
         <canvas class="tl-canvas-graph" id="tl-graphCanvas" width="800" height="560"></canvas>
         
         <!-- Interactive Temperature Slider aligned directly under the Graph -->
-        <div class="tl-bath-bar" style="margin-top:0;padding:8px 12px;background:rgba(255,255,255,0.02);border:1px solid var(--tl-border);border-radius:12px">
-          <div class="tl-bath-bar-top" style="display:flex;align-items:center;justify-content:space-between;gap:12px">
-            <div class="tl-beaker-overlay" style="padding:4px 8px;margin:0;font-size:0.75rem;background:transparent;border:none">
+        <div class="tl-bath-bar tl-bath-bar--under-graph">
+          <div class="tl-bath-bar-top">
+            <div class="tl-beaker-overlay">
               <span>Liquid: <b id="tl-bath-state">Water</b></span>
               <span><b class="tl-temp-badge" id="tl-bath-temp-display">25.0°C</b></span>
             </div>
-            <div class="tl-bath-slider-wrap" style="flex:1;display:flex;flex-direction:column;gap:2px">
+            <div class="tl-bath-slider-wrap">
               <div class="tl-lr">
                 <span>T<sub>bath</sub></span>
-                <span class="tl-badge tl-lr-value" id="tl-val-bath-temp" style="color:var(--tl-cyan)">25.0 °C</span>
+                <span class="tl-badge tl-lr-value tl-val-bath-temp" id="tl-val-bath-temp">25.0 °C</span>
               </div>
-              <input type="range" id="tl-bath-temp-slider" min="0" max="200" step="0.5" value="25.0" style="margin:0">
+              <input type="range" id="tl-bath-temp-slider" min="0" max="200" step="0.5" value="25.0">
             </div>
           </div>
-          <div class="tl-btn-group" style="display:grid;grid-template-columns:repeat(4,1fr);gap:6px;margin-top:6px">
-            <button class="tl-btn" id="tl-btn-preset-ice" style="padding:4px;font-size:0.7rem">Ice 0°C</button>
-            <button class="tl-btn" id="tl-btn-preset-room" style="padding:4px;font-size:0.7rem">Room 25°C</button>
-            <button class="tl-btn" id="tl-btn-preset-steam" style="padding:4px;font-size:0.7rem">Steam 100°C</button>
-            <button class="tl-btn" id="tl-btn-preset-oil" style="padding:4px;font-size:0.7rem">Oil 150°C</button>
+          <div class="tl-btn-group">
+            <button class="tl-btn tl-preset-btn" id="tl-btn-preset-ice">Ice 0°C</button>
+            <button class="tl-btn tl-preset-btn" id="tl-btn-preset-room">Room 25°C</button>
+            <button class="tl-btn tl-preset-btn" id="tl-btn-preset-steam">Steam 100°C</button>
+            <button class="tl-btn tl-preset-btn" id="tl-btn-preset-oil">Oil 150°C</button>
           </div>
         </div>
       </div>
@@ -1313,7 +1341,7 @@ export function createThermometerLab(t, options = {}) {
     return gy + gh - ((v - minV) / (maxV - minV)) * gh;
   }
 
-  function drawGraphAxes(ctx, layout, minT, maxT, tStep, yTicks) {
+  function drawGraphAxes(ctx, layout, minT, maxT, tStep, yTicks, activeTemp = null) {
     const { gx, gy, gw, gh, tickFont, axisFont, yLabelX, xLabelY } = layout;
 
     // Grid lines background
@@ -1356,6 +1384,7 @@ export function createThermometerLab(t, options = {}) {
     ctx.textAlign = 'center';
     ctx.textBaseline = 'top';
     for (let tVal = minT; tVal <= maxT + 0.01; tVal += tStep) {
+      if (activeTemp != null && Math.abs(tVal - activeTemp) < 0.25) continue;
       const xGrid = mapGraphX(tVal, minT, maxT, gx, gw);
       ctx.fillText(`${Math.round(tVal)}`, xGrid, gy + gh + 10);
     }
@@ -2072,7 +2101,7 @@ export function createThermometerLab(t, options = {}) {
   }
 
   function drawGraphCrosshair(ctx, layout, px, py, xVal, yVal, xUnit, yUnit, color) {
-    const { gx, gy, gw, gh } = layout;
+    const { gx, gy, gw, gh, tickFont } = layout;
     
     ctx.strokeStyle = 'rgba(255, 255, 255, 0.2)';
     ctx.lineWidth = 1.0;
@@ -2091,18 +2120,20 @@ export function createThermometerLab(t, options = {}) {
     ctx.stroke();
     ctx.setLineDash([]);
 
-    // Glowing labels on axes
-    ctx.font = 'bold 11px Arial';
+    // Glowing labels on axes (x-axis aligned with tick labels at gy + gh + 10)
+    const xTickY = gy + gh + 10;
+    ctx.font = tickFont;
     ctx.textAlign = 'center';
     ctx.textBaseline = 'top';
     const xText = `${xVal.toFixed(1)}${xUnit}`;
     const xTextW = ctx.measureText(xText).width + 10;
+    const xPillH = 18;
     ctx.fillStyle = color;
     ctx.beginPath();
-    ctx.roundRect(px - xTextW/2, gy + gh + 2, xTextW, 15, 3);
+    ctx.roundRect(px - xTextW / 2, xTickY - 2, xTextW, xPillH, 3);
     ctx.fill();
     ctx.fillStyle = '#000';
-    ctx.fillText(xText, px, gy + gh + 4);
+    ctx.fillText(xText, px, xTickY);
 
     ctx.textAlign = 'right';
     ctx.textBaseline = 'middle';
@@ -2121,7 +2152,7 @@ export function createThermometerLab(t, options = {}) {
     const { minL, maxL } = getLiquidLengthBounds();
     const { minT, maxT, tickStep } = getTempAxisScale();
     const yTicks = buildLengthTicks(minL, maxL);
-    const axis = drawGraphAxes(ctx, layout, minT, maxT, tickStep, yTicks);
+    const axis = drawGraphAxes(ctx, layout, minT, maxT, tickStep, yTicks, state.thermometerTemp);
     const { gx, gy, gw, gh, axisFont, yLabelX, xLabelY, dotR } = { ...layout, ...axis };
 
     ctx.save();
@@ -2175,7 +2206,7 @@ export function createThermometerLab(t, options = {}) {
     const layout = getGraphLayout();
     const { minR, maxR, ticks } = getResistanceBounds();
     const tempScale = getTempAxisScale();
-    const axis = drawGraphAxes(ctx, layout, tempScale.minT, tempScale.maxT, tempScale.tickStep, ticks);
+    const axis = drawGraphAxes(ctx, layout, tempScale.minT, tempScale.maxT, tempScale.tickStep, ticks, state.thermometerTemp);
     const { gx, gy, gw, gh, axisFont, yLabelX, xLabelY, dotR } = { ...layout, ...axis };
 
     ctx.save();
@@ -2230,7 +2261,7 @@ export function createThermometerLab(t, options = {}) {
     const layout = getGraphLayout();
     const tempScale = getTempAxisScale();
     const { minR, maxR, ticks } = getThermistorBounds(tempScale);
-    const axis = drawGraphAxes(ctx, layout, tempScale.minT, tempScale.maxT, tempScale.tickStep, ticks);
+    const axis = drawGraphAxes(ctx, layout, tempScale.minT, tempScale.maxT, tempScale.tickStep, ticks, state.thermometerTemp);
     const { gx, gy, gw, gh, axisFont, yLabelX, xLabelY, dotR } = { ...layout, ...axis };
     const { minT, maxT } = tempScale;
 
