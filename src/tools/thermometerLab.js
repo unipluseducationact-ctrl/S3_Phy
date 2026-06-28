@@ -1302,13 +1302,7 @@ export function createThermometerLab(t, options = {}) {
   }
 
   function getTempAxisScale() {
-    const minT = 0;
-    let maxT = 100;
-    const peak = Math.max(state.bathTemp, state.thermometerTemp, 100);
-    if (peak > 120) maxT = 150;
-    if (peak > 145) maxT = 200;
-    const tickStep = maxT <= 100 ? 20 : 25;
-    return { minT, maxT, tickStep };
+    return { minT: 0, maxT: 200, tickStep: 25 };
   }
 
   function mapGraphX(t, minT, maxT, gx, gw) {
