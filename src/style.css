@@ -1304,10 +1304,10 @@ canvas.lab-canvas {
   width: 100%;
   min-height: 88px;
   padding: 12px 14px;
-  border: 1px solid var(--ws-border, #3f3f46);
+  border: 1px solid var(--ws-outline);
   border-radius: 12px;
-  background: var(--ws-surface, #18181b);
-  color: inherit;
+  background: var(--ws-surface-low);
+  color: var(--text);
   font: inherit;
   line-height: 1.5;
   resize: vertical;
