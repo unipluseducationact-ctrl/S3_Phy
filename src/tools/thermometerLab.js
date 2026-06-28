@@ -1036,7 +1036,7 @@ export function createThermometerLab(t, options = {}) {
         </div>
         <div class="tl-live-tab" id="tl-live-thermistor">
           <div class="tl-controls-steps">
-            <div class="tl-info-label" style="margin-top:0;font-size:0.8rem;color:var(--tl-green)">Live NTC beta calculation</div>
+            <div class="tl-info-label" style="margin-top:0;font-size:0.8rem;color:var(--tl-green)">${t('tools.thermometerLab.thermistor.liveBetaLabel')}</div>
             <div class="tl-worked-solution" style="background-color:rgba(16,185,129,0.05);border-left-color:var(--tl-green)">
               <div id="tl-svg-formula-thermistor" class="tl-math-formula" style="font-size:0.85rem"></div>
               <p style="font-size:0.85rem">Substitute current resistance <b class="tl-live-value" id="tl-live-thermistor-rt">10.00 kΩ</b>:</p>
@@ -2088,10 +2088,11 @@ export function createThermometerLab(t, options = {}) {
     ctx.textAlign = 'right';
     ctx.fillText(state.currentThermistorR.toFixed(2) + ' kΩ', ox + ow - 16, oy + 34);
 
-    ctx.font = '6px Arial';
+    ctx.font = '5px Arial';
     ctx.fillStyle = '#a7f3d0';
     ctx.textAlign = 'left';
-    ctx.fillText('NTC THERMISTOR METER', ox + 14, oy + 21);
+    ctx.fillText(t('tools.thermometerLab.thermistor.meterLabelLine1'), ox + 14, oy + 52);
+    ctx.fillText(t('tools.thermometerLab.thermistor.meterLabelLine2'), ox + 14, oy + 59);
 
     // Structure Labels
     if (state.showLabels) {
