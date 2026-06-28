@@ -51,6 +51,16 @@ const THERMOMETRY_SUBTOPICS = [
 
 const HEAT_WORKSHEET_TOPICS = [
   ['thermometer', 'topic.thermometer'],
+  ['heatInternalEnergy', 'topic.heatInternalEnergy'],
+  ['changeOfState', 'topic.changeOfState'],
+  ['heatTransfer', 'topic.heatTransfer'],
+];
+
+const HEAT_QUESTION_TOPICS = [
+  ...THERMOMETRY_SUBTOPICS,
+  'heatInternalEnergy',
+  'changeOfState',
+  'heatTransfer',
 ];
 
 const TOOL_ORDER = [
@@ -170,14 +180,23 @@ export function mountHeatHub(root) {
     }
     if (section === 'worksheets') {
       const heatQuestions = questions.filter((q) =>
-        THERMOMETRY_SUBTOPICS.includes(q.topic),
+        HEAT_QUESTION_TOPICS.includes(q.topic),
       );
       hydrateWorksheets(root, heatQuestions, t, langKey, {
         topicFilter: (q, picked) => {
-          if (picked.includes('thermometer')) {
-            return THERMOMETRY_SUBTOPICS.includes(q.topic);
+          if (picked.includes('thermometer') && THERMOMETRY_SUBTOPICS.includes(q.topic)) {
+            return true;
           }
-          return picked.includes(q.topic);
+          if (picked.includes('heatInternalEnergy') && q.topic === 'heatInternalEnergy') {
+            return true;
+          }
+          if (picked.includes('changeOfState') && q.topic === 'changeOfState') {
+            return true;
+          }
+          if (picked.includes('heatTransfer') && q.topic === 'heatTransfer') {
+            return true;
+          }
+          return false;
         },
       });
     }

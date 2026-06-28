@@ -248,5 +248,9 @@ export const zhHant = {
   'tools.floatingControls.hideParams': '\u96b1\u85cf\u53c3\u6578',
   'tools.thermometerLab.faultySolver': '\u6545\u969c\u6eab\u5ea6\u8a08\u6c42\u89e3\u5668',
   'tools.thermometerLab.resistanceSolver': '\u96fb\u963b\u6c42\u6eab\u5ea6\u6c42\u89e3\u5668',
-  'worksheets.paperTitleHeat': 'S3 \u71b1\u5b78 \u2014 \u591a\u9805\u9078\u64c7\u984c\u5de5\u4f5c\u7d19',
+  'worksheets.paperTitleHeat': 'S3 \u71b1\u5b78 \u2014 \u7df4\u7fd2\u5de5\u4f5c\u7d19\uff08\u9078\u64c7\u984c + \u77ed\u7b54\uff09',
+  'worksheets.typeShort': '\u77ed\u7b54\u984c',
+  'worksheets.typeMcq': '\u591a\u9805\u9078\u64c7\u984c',
+  'worksheets.yourAnswer': '\u4f60\u7684\u7b54\u6848',
+  'worksheets.typeAnswerPlaceholder': '\u5728\u6b64\u8f38\u5165\u7b54\u6848\u2026',
 };

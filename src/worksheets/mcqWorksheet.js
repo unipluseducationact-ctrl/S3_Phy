@@ -41,6 +41,74 @@ function resolveAsset(path) {
   return `${import.meta.env.BASE_URL}${clean}`;
 }
 
+function isShortQuestion(q) {
+  return q.kind === 'short';
+}
+
+function normalizeShortAnswer(text) {
+  return String(text)
+    .trim()
+    .toLowerCase()
+    .replace(/\s+/g, ' ')
+    .replace(/[×x]/g, 'x')
+    .replace(/−/g, '-')
+    .replace(/°/g, ' deg')
+    .replace(/,/g, '');
+}
+
+function extractNumbers(text) {
+  const matches = String(text).match(/-?\d+(?:\.\d+)?(?:\s*[x×]\s*10\s*\^?\s*-?\d+)?/gi);
+  if (!matches) return [];
+  return matches.map((m) => {
+    const sci = m.match(/^(-?\d+(?:\.\d+)?)\s*[x×]\s*10\s*\^?\s*(-?\d+)$/i);
+    if (sci) return Number(sci[1]) * 10 ** Number(sci[2]);
+    return Number(m);
+  }).filter((n) => !Number.isNaN(n));
+}
+
+function matchesShortAnswer(pack, userText) {
+  const normalized = normalizeShortAnswer(userText);
+  if (!normalized) return false;
+
+  const candidates = [pack.answer, ...(pack.accept || [])].filter(Boolean);
+  if (candidates.some((c) => normalizeShortAnswer(c) === normalized)) {
+    return true;
+  }
+
+  if (pack.numeric?.value != null) {
+    const userNums = extractNumbers(normalized);
+    const target = Number(pack.numeric.value);
+    const tol = Number(pack.numeric.tolerance ?? 0.02);
+    if (userNums.some((n) => Math.abs(n - target) <= Math.max(Math.abs(target) * tol, tol))) {
+      return true;
+    }
+  }
+
+  const userNums = extractNumbers(normalized);
+  if (userNums.length && candidates.length) {
+    for (const candidate of candidates) {
+      const candNums = extractNumbers(candidate);
+      if (!candNums.length) continue;
+      const target = candNums[candNums.length - 1];
+      const tol = Math.max(Math.abs(target) * 0.02, 0.5);
+      if (userNums.some((n) => Math.abs(n - target) <= tol)) return true;
+    }
+  }
+
+  return false;
+}
+
+function modelShortAnswer(pack) {
+  return pack.answer || pack.exp || '';
+}
+
+function isAnswerCorrect(q, pack, ans) {
+  if (isShortQuestion(q)) {
+    return typeof ans === 'string' && matchesShortAnswer(pack, ans);
+  }
+  return ans === pack.a;
+}
+
 export function renderWorksheets(t, options = {}) {
   const topics = options.topics ?? [
     ['rotatingMirror', 'topic.rotatingMirror'],
@@ -225,6 +293,11 @@ export function hydrateWorksheets(root, questions, t, langKey, options = {}) {
   }
 
   function paintQuestionBlock(q, i) {
+    if (isShortQuestion(q)) return paintShortQuestionBlock(q, i);
+    return paintMcqQuestionBlock(q, i);
+  }
+
+  function paintMcqQuestionBlock(q, i) {
     const pack = q[lk()] || q.en;
     const qNum = i + 1;
     const st = {
@@ -285,6 +358,55 @@ export function hydrateWorksheets(root, questions, t, langKey, options = {}) {
     </article>`;
   }
 
+  function paintShortQuestionBlock(q, i) {
+    const pack = q[lk()] || q.en;
+    const qNum = i + 1;
+    const userText = state.pending[i] ?? state.userAnswers[i] ?? '';
+    const st = {
+      wrong: state.wrongAttempts[i] || 0,
+      solved: state.resolved[i],
+      correct: state.resolved[i] && isAnswerCorrect(q, pack, state.userAnswers[i]),
+    };
+    const sectionTag = q.section ? escapeHtml(q.section) : escapeHtml(q.topic || '');
+
+    let feedback = '';
+    if (st.wrong === 1 && !st.solved) {
+      feedback = `<div class="ws-feedback ws-feedback--hint" role="status">
+        <strong>${escapeHtml(t('worksheets.hint'))}:</strong> ${escapeHtml(pack.hint || pack.exp)}
+      </div>`;
+    } else if (st.solved && !st.correct) {
+      feedback = `<div class="ws-feedback ws-feedback--model" role="status">
+        <strong>${escapeHtml(t('worksheets.modelAnswer'))}:</strong> ${escapeHtml(modelShortAnswer(pack))}
+        <span class="ws-feedback-exp">${escapeHtml(pack.exp || '')}</span>
+      </div>`;
+    } else if (st.solved && st.correct) {
+      feedback = `<div class="ws-feedback ws-feedback--correct" role="status">${escapeHtml(t('worksheets.correct'))}</div>`;
+    }
+
+    const checkDisabled = st.solved ? ' disabled' : '';
+    const rowClass = st.solved
+      ? st.correct
+        ? 'ws-q-block--correct'
+        : 'ws-q-block--incorrect'
+      : '';
+
+    const fig = pack.image
+      ? `<figure class="ws-q-fig"><img src="${escapeHtml(resolveAsset(pack.image))}" alt="" loading="lazy" /></figure>`
+      : '';
+
+    const inputDisabled = st.solved ? ' disabled' : '';
+
+    return `<article class="ws-q-block ${rowClass}" data-ws-block="${i}">
+      <div class="ws-q-meta">Q${qNum} · ${sectionTag.toUpperCase()} · ${escapeHtml(t('worksheets.typeShort'))}</div>
+      <div class="ws-q-stem">${formatStem(pack.q)}</div>
+      ${fig}
+      <label class="ws-short-label" for="ws-short-${i}">${escapeHtml(t('worksheets.yourAnswer'))}</label>
+      <textarea class="ws-short-input" id="ws-short-${i}" data-ws-short="${i}" rows="3" placeholder="${escapeHtml(t('worksheets.typeAnswerPlaceholder'))}"${inputDisabled}>${escapeHtml(userText)}</textarea>
+      <button type="button" class="ws-check-btn" data-ws-check="${i}"${checkDisabled}>${escapeHtml(t('worksheets.checkAnswer'))}</button>
+      ${feedback}
+    </article>`;
+  }
+
   function paint() {
     if (!state.items.length) {
       body.className = 'ws-quiz-area ws-quiz-empty';
@@ -307,21 +429,43 @@ export function hydrateWorksheets(root, questions, t, langKey, options = {}) {
       });
     });
 
+    body.querySelectorAll('[data-ws-short]').forEach((field) => {
+      field.addEventListener('input', () => {
+        const qi = Number(field.getAttribute('data-ws-short'));
+        if (state.resolved[qi]) return;
+        state.pending[qi] = field.value;
+      });
+    });
+
     body.querySelectorAll('[data-ws-check]').forEach((btn) => {
       btn.addEventListener('click', () => {
         const qi = Number(btn.getAttribute('data-ws-check'));
         if (state.resolved[qi]) return;
-        const choice = state.pending[qi];
-        if (choice === undefined) return;
 
-        const pack = state.items[qi][lk()] || state.items[qi].en;
-        state.userAnswers[qi] = choice;
+        const q = state.items[qi];
+        const pack = q[lk()] || q.en;
 
-        if (choice === pack.a) {
-          state.resolved[qi] = true;
+        if (isShortQuestion(q)) {
+          const field = body.querySelector(`[data-ws-short="${qi}"]`);
+          const text = (field?.value ?? state.pending[qi] ?? '').trim();
+          if (!text) return;
+          state.userAnswers[qi] = text;
+          if (matchesShortAnswer(pack, text)) {
+            state.resolved[qi] = true;
+          } else {
+            state.wrongAttempts[qi] = (state.wrongAttempts[qi] || 0) + 1;
+            if (state.wrongAttempts[qi] >= 2) state.resolved[qi] = true;
+          }
         } else {
-          state.wrongAttempts[qi] = (state.wrongAttempts[qi] || 0) + 1;
-          if (state.wrongAttempts[qi] >= 2) state.resolved[qi] = true;
+          const choice = state.pending[qi];
+          if (choice === undefined) return;
+          state.userAnswers[qi] = choice;
+          if (choice === pack.a) {
+            state.resolved[qi] = true;
+          } else {
+            state.wrongAttempts[qi] = (state.wrongAttempts[qi] || 0) + 1;
+            if (state.wrongAttempts[qi] >= 2) state.resolved[qi] = true;
+          }
         }
 
         updateProgress();
@@ -340,7 +484,7 @@ export function hydrateWorksheets(root, questions, t, langKey, options = {}) {
     state.items.forEach((q, i) => {
       const pack = q[lk()] || q.en;
       const ans = state.userAnswers[i];
-      if (ans === pack.a) {
+      if (isAnswerCorrect(q, pack, ans)) {
         correct += 1;
         if ((state.wrongAttempts[i] || 0) === 0) firstTry += 1;
       } else if (state.resolved[i]) {
@@ -374,12 +518,18 @@ export function hydrateWorksheets(root, questions, t, langKey, options = {}) {
     const rows = state.items
       .map((q, i) => {
         const pack = q[lk()] || q.en;
-        const choices = pack.choices
-          .map((c, j) => `<li>${LETTERS[j]}. ${escapeHtml(c)}</li>`)
-          .join('');
         const fig = pack.image
           ? `<figure class="ws-q-fig"><img src="${escapeHtml(resolveAsset(pack.image))}" alt="" /></figure>`
           : '';
+        if (isShortQuestion(q)) {
+          const ans = withAnswers
+            ? `<p><strong>${escapeHtml(t('worksheets.answer'))}:</strong> ${escapeHtml(modelShortAnswer(pack))}<br/><em>${escapeHtml(pack.exp || '')}</em></p>`
+            : `<p class="ws-print-blank">${escapeHtml(t('worksheets.yourAnswer'))}: ________________________________</p>`;
+          return `<div class="ws-print-q"><strong>Q${i + 1}.</strong> ${formatStem(pack.q)}${fig}${ans}</div>`;
+        }
+        const choices = pack.choices
+          .map((c, j) => `<li>${LETTERS[j]}. ${escapeHtml(c)}</li>`)
+          .join('');
         const ans = withAnswers
           ? `<p><strong>${escapeHtml(t('worksheets.answer'))}:</strong> ${LETTERS[pack.a]}<br/><em>${escapeHtml(pack.exp)}</em></p>`
           : '';
@@ -394,10 +544,16 @@ export function hydrateWorksheets(root, questions, t, langKey, options = {}) {
     const rows = state.items
       .map((q, i) => {
         const pack = q[lk()] || q.en;
-        const choices = pack.choices.map((c, j) => `${LETTERS[j]}. ${c}`).join('<br/>');
         const img = pack.image
           ? `<p><img src="${resolveAsset(pack.image)}" style="max-width:100%;max-height:280px" /></p>`
           : '';
+        if (isShortQuestion(q)) {
+          const ans = withAnswers
+            ? `<p><b>${t('worksheets.answer')}:</b> ${modelShortAnswer(pack)}<br/><i>${pack.exp || ''}</i></p>`
+            : `<p><i>${t('worksheets.yourAnswer')}:</i> ________________________________</p>`;
+          return `<div style="page-break-inside:avoid;margin-bottom:16px"><b>Q${i + 1}.</b> ${pack.q.replace(/\n/g, '<br/>')}${img}${ans}</div>`;
+        }
+        const choices = pack.choices.map((c, j) => `${LETTERS[j]}. ${c}`).join('<br/>');
         const ans = withAnswers
           ? `<p><b>${t('worksheets.answer')}:</b> ${LETTERS[pack.a]}<br/><i>${pack.exp}</i></p>`
           : '';

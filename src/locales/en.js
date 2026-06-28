@@ -248,5 +248,9 @@ export const en = {
   'tools.floatingControls.hideParams': 'Hide parameters',
   'tools.thermometerLab.faultySolver': 'Faulty thermometer solver',
   'tools.thermometerLab.resistanceSolver': 'Resistance-to-temperature solver',
-  'worksheets.paperTitleHeat': 'S3 Heat — Multiple choice worksheet',
+  'worksheets.paperTitleHeat': 'S3 Heat — Worksheet (MC + short answer)',
+  'worksheets.typeShort': 'Short answer',
+  'worksheets.typeMcq': 'MCQ',
+  'worksheets.yourAnswer': 'Your answer',
+  'worksheets.typeAnswerPlaceholder': 'Type your answer here…',
 };
