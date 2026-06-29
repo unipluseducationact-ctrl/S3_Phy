@@ -1,0 +1,3478 @@
+/* Plane Mirror Lab bundle - Chrome file:// compatible */
+'use strict';
+
+/* --- geometry.js --- */
+/** @file Shared 2D geometry for plane mirror simulations (world units: metres). */
+const Vec2 = {
+  add(a, b) { return { x: a.x + b.x, y: a.y + b.y }; },
+  sub(a, b) { return { x: a.x - b.x, y: a.y - b.y }; },
+  scale(v, s) { return { x: v.x * s, y: v.y * s }; },
+  dot(a, b) { return a.x * b.x + a.y * b.y; },
+  len(v) { return Math.hypot(v.x, v.y); },
+  norm(v) { const l = Math.hypot(v.x, v.y) || 1; return { x: v.x / l, y: v.y / l }; },
+  dist(a, b) { return Math.hypot(a.x - b.x, a.y - b.y); },
+  lerp(a, b, t) { return { x: a.x + (b.x - a.x) * t, y: a.y + (b.y - a.y) * t }; },
+  rot(v, rad) {
+    const c = Math.cos(rad), s = Math.sin(rad);
+    return { x: v.x * c - v.y * s, y: v.x * s + v.y * c };
+  },
+};
+
+function reflectPoint(p, mirrorA, mirrorB) {
+  const ab = Vec2.sub(mirrorB, mirrorA);
+  const ap = Vec2.sub(p, mirrorA);
+  const t = Vec2.dot(ap, ab) / (Vec2.dot(ab, ab) || 1);
+  const foot = Vec2.add(mirrorA, Vec2.scale(ab, t));
+  return Vec2.add(foot, Vec2.sub(foot, p));
+}
+
+function lineIntersection(p1, p2, p3, p4) {
+  const d = (p1.x - p2.x) * (p3.y - p4.y) - (p1.y - p2.y) * (p3.x - p4.x);
+  if (Math.abs(d) < 1e-10) return null;
+  const t = ((p1.x - p3.x) * (p3.y - p4.y) - (p1.y - p3.y) * (p3.x - p4.x)) / d;
+  const u = -((p1.x - p2.x) * (p1.y - p3.y) - (p1.y - p2.y) * (p1.x - p3.x)) / d;
+  if (t < 0 || t > 1 || u < 0 || u > 1) return null;
+  return { x: p1.x + t * (p2.x - p1.x), y: p1.y + t * (p2.y - p1.y), t, u };
+}
+
+function segmentIntersection(p1, p2, p3, p4) {
+  return lineIntersection(p1, p2, p3, p4);
+}
+
+function lineIntersectInfinite(p1, p2, p3, p4) {
+  const d = (p1.x - p2.x) * (p3.y - p4.y) - (p1.y - p2.y) * (p3.x - p4.x);
+  if (Math.abs(d) < 1e-10) return null;
+  const t = ((p1.x - p3.x) * (p3.y - p4.y) - (p1.y - p3.y) * (p3.x - p4.x)) / d;
+  return { x: p1.x + t * (p2.x - p1.x), y: p1.y + t * (p2.y - p1.y), t };
+}
+
+function pointOnSegment(p, a, b, eps = 1e-6) {
+  const ab = Vec2.sub(b, a);
+  const ap = Vec2.sub(p, a);
+  const t = Vec2.dot(ap, ab) / (Vec2.dot(ab, ab) || 1);
+  return t >= -eps && t <= 1 + eps;
+}
+
+/** Mirror segment vertical at x, from y0 to y1. */
+function verticalMirrorSegment(x, y0, y1) {
+  return { a: { x, y: Math.min(y0, y1) }, b: { x, y: Math.max(y0, y1) } };
+}
+
+/** Horizontal mirror segment at y, from x0 to x1. */
+function horizontalMirrorSegment(y, x0, x1) {
+  return { a: { x: Math.min(x0, x1), y }, b: { x: Math.max(x0, x1), y } };
+}
+
+function virtualSightOnVerticalMirror(imagePt, eye, mirrorX, yMin, yMax) {
+  const hit = lineIntersectInfinite(imagePt, eye, { x: mirrorX, y: yMin }, { x: mirrorX, y: yMax });
+  if (!hit) return null;
+  if (hit.y < yMin - 1e-6 || hit.y > yMax + 1e-6) return null;
+  return { x: mirrorX, y: hit.y };
+}
+
+function sightRayVertical(objectPt, eye, mirrorX, yMin, yMax) {
+  const image = reflectPoint(objectPt, { x: mirrorX, y: yMin }, { x: mirrorX, y: yMax });
+  const reflectPt = virtualSightOnVerticalMirror(image, eye, mirrorX, yMin, yMax);
+  if (!reflectPt) return { ok: false, image, reflectPt: null };
+  return { ok: true, image, reflectPt, objectPt, eye };
+}
+
+/** y on mirror for eye to see floor object: y/(hEye-y) = dObj/dEye */
+function mirrorHeightForFloorObject(dObj, dEye, hEye, hObj = 0) {
+  if (hObj === 0) return (dObj * hEye) / (dObj + dEye);
+  const num = dObj * (hEye - hObj) + hObj * dEye;
+  const den = dObj + dEye;
+  return num / den;
+}
+
+/** Ceiling light: mirror height from ground. dLight=dist light to wall, dEye=eye to wall, hLight, hEye */
+function mirrorHeightForCeilingLight(dLight, dEye, hLight, hEye) {
+  const dh = hLight - hEye;
+  const hBelowEye = (dEye * dh) / (dLight + dEye);
+  return hEye + hBelowEye;
+}
+
+/** Max visible height on back wall through mirror top at mirrorTopY */
+function maxHeightOnBackWall(dEyeToMirror, dMirrorToWall, hEye, mirrorTopY) {
+  const dy = mirrorTopY - hEye;
+  const totalBase = 2 * dEyeToMirror + dMirrorToWall;
+  return hEye + dy * totalBase / dEyeToMirror;
+}
+
+function minMirrorForBody(H, hEye) {
+  const q = hEye / 2;
+  const p = H / 2;
+  const top = (H + hEye) / 2;
+  return { length: p, bottom: q, top, minP: p, minQ: q };
+}
+
+function canSeeFullBody(H, hEye, p, q) {
+  const req = minMirrorForBody(H, hEye);
+  return { ok: p >= req.minP - 1e-6 && q >= req.minQ - 1e-6, required: req };
+}
+
+/** Ground mirror: horizontal span visible at height H from eye at hEye over mirror half-width w */
+function groundMirrorSpan(hEye, mirrorWidth, objectHeight) {
+  const totalH = hEye + objectHeight;
+  const x = (mirrorWidth * objectHeight) / hEye;
+  return x;
+}
+
+function groundMirrorSpeed(hEye, mirrorWidth, cloudHeight, timeSec) {
+  const x = groundMirrorSpan(hEye, mirrorWidth, cloudHeight);
+  return { distance: x, speed: timeSec > 0 ? x / timeSec : 0 };
+}
+
+function reflectAcrossLine(p, a, b) {
+  return reflectPoint(p, a, b);
+}
+
+/** Generate images in wedge between two mirrors meeting at origin, angle theta (rad). */
+function imagesInWedge(thetaRad, object, maxImages = 12) {
+  const half = thetaRad / 2;
+  const nFormula = Math.round(360 / rad2deg(thetaRad)) - 1;
+  const m1a = { x: 0, y: 0 };
+  const m1b = { x: Math.cos(half), y: Math.sin(half) };
+  const m2a = { x: 0, y: 0 };
+  const m2b = { x: Math.cos(-half), y: Math.sin(-half) };
+  const r1 = (p) => reflectPoint(p, m1a, m1b);
+  const r2 = (p) => reflectPoint(p, m2a, m2b);
+  const labels = ['X', 'Z', 'Y', 'W', 'V', 'U', 'T', 'S', 'R', 'Q'];
+  const images = [];
+
+  const xPt = r1(object);
+  const zPt = r2(object);
+  images.push({ pt: { ...xPt }, label: 'X', mirror: 'M1', parent: 'O' });
+  if (nFormula < 2) return { images, count: images.length, formula: nFormula };
+
+  images.push({ pt: { ...zPt }, label: 'Z', mirror: 'M2', parent: 'O' });
+
+  let lastX = xPt;
+  let lastZ = zPt;
+  for (let i = 2; i < nFormula && images.length < maxImages; i++) {
+    if (i % 2 === 0) {
+      const pt = r1(lastZ);
+      images.push({ pt: { ...pt }, label: labels[i] || String(i + 1), mirror: 'M1', parent: images[i - 1].label });
+      lastZ = pt;
+    } else {
+      const pt = r2(lastX);
+      images.push({ pt: { ...pt }, label: labels[i] || String(i + 1), mirror: 'M2', parent: images[i - 1].label });
+      lastX = pt;
+    }
+  }
+
+  return { images, count: images.length, formula: nFormula };
+}
+
+function deg2rad(d) { return d * Math.PI / 180; }
+function rad2deg(r) { return r * 180 / Math.PI; }
+
+function clamp(v, lo, hi) { return Math.max(lo, Math.min(hi, v)); }
+
+function formatLength(m, lang = 'zh') {
+  if (m >= 1) return `${m.toFixed(2)} m`;
+  const cm = m * 100;
+  return lang === 'zh' ? `${cm.toFixed(1)} cm` : `${cm.toFixed(1)} cm`;
+}
+
+
+/* --- canvasView.js --- */
+/** @file Canvas drawing helpers — colours map 1:1 to styles.css legend & SVG icons. */
+
+/**
+ * Optical colour semantics (HKDSE ray diagrams):
+ * - mirror: plane mirror surface
+ * - rayReal: incident/reflected rays (solid)
+ * - rayVirtual: extensions behind mirror / virtual images (dashed)
+ * - mirrorNeed: minimum required mirror segment (exam highlight)
+ */
+const COLORS = {
+  bg: '#121214',
+  grid: '#2a2a30',
+  gridMajor: '#35353d',
+  mirror: '#22d3ee',
+  mirrorNeed: '#ffcc00',
+  mirrorFail: '#ff5252',
+  rayReal: '#00e676',
+  rayVirtual: '#a78bfa',
+  object: '#e4e4e7',
+  image: '#818cf8',
+  eye: '#f472b6',
+  wall: '#71717a',
+  ground: '#52525b',
+  label: '#e4e4e7',
+  visible: '#00e676',
+  hidden: '#52525b',
+  accent: '#2979ff',
+};
+
+function createWorldView(canvas, opts = {}) {
+  const margin = opts.margin ?? { left: 50, right: 30, top: 30, bottom: 50 };
+  const gridStep = opts.gridStep ?? 1;
+  return {
+    canvas,
+    margin,
+    gridStep,
+    worldBounds: opts.worldBounds ?? { xMin: -1, xMax: 5, yMin: 0, yMax: 3 },
+    pxPerM: opts.pxPerM ?? null,
+    showGrid: opts.showGrid !== false,
+    horizontalGridScale: opts.horizontalGridScale ?? 1,
+  };
+}
+
+function resizeCanvasToDisplay(canvas) {
+  const parent = canvas.parentElement;
+  const rect = parent
+    ? parent.getBoundingClientRect()
+    : { width: canvas.clientWidth || 600, height: canvas.clientHeight || 400 };
+  const w = Math.max(600, Math.floor(rect.width - 20));
+  const h = Math.max(400, Math.min(520, Math.floor(w * 0.62)));
+  const dpr = window.devicePixelRatio || 1;
+  canvas.style.width = `${w}px`;
+  canvas.style.height = `${h}px`;
+  canvas.width = Math.floor(w * dpr);
+  canvas.height = Math.floor(h * dpr);
+  const ctx = canvas.getContext('2d');
+  ctx.setTransform(dpr, 0, 0, dpr, 0, 0);
+  return { w, h, ctx };
+}
+
+function computeTransform(view, canvasW, canvasH) {
+  const { margin, worldBounds } = view;
+  const plotW = canvasW - margin.left - margin.right;
+  const plotH = canvasH - margin.top - margin.bottom;
+  const worldW = worldBounds.xMax - worldBounds.xMin;
+  const worldH = worldBounds.yMax - worldBounds.yMin;
+  const pxPerM = view.pxPerM ?? Math.min(plotW / worldW, plotH / worldH);
+  const usedW = worldW * pxPerM;
+  const usedH = worldH * pxPerM;
+  /* Centre world bounds in plot area when aspect ratios differ */
+  const padX = Math.max(0, (plotW - usedW) / 2);
+  const padY = Math.max(0, (plotH - usedH) / 2);
+  const ox = margin.left + padX - worldBounds.xMin * pxPerM;
+  const oy = canvasH - margin.bottom - padY + worldBounds.yMin * pxPerM;
+  return { pxPerM, ox, oy, plotW, plotH, padX, padY };
+}
+
+function toScreen(view, t, p) {
+  return { x: t.ox + p.x * t.pxPerM, y: t.oy - p.y * t.pxPerM };
+}
+
+function toWorld(view, t, sx, sy) {
+  return { x: (sx - t.ox) / t.pxPerM, y: (t.oy - sy) / t.pxPerM };
+}
+
+function clear(ctx, w, h) {
+  ctx.fillStyle = COLORS.bg;
+  ctx.fillRect(0, 0, w, h);
+}
+
+function drawGrid(ctx, view, t, w, h) {
+  if (!view.showGrid) return;
+  const step = view.gridStep;
+  const hStep = step * (view.horizontalGridScale ?? 1);
+  const { worldBounds } = view;
+  ctx.lineWidth = 1;
+  for (let x = Math.ceil(worldBounds.xMin / hStep) * hStep; x <= worldBounds.xMax; x += hStep) {
+    const major = Math.abs((x / hStep) % 2) < 0.01;
+    ctx.strokeStyle = major ? COLORS.gridMajor : COLORS.grid;
+    const p0 = toScreen(view, t, { x, y: worldBounds.yMin });
+    const p1 = toScreen(view, t, { x, y: worldBounds.yMax });
+    ctx.beginPath();
+    ctx.moveTo(p0.x, p0.y);
+    ctx.lineTo(p1.x, p1.y);
+    ctx.stroke();
+  }
+  for (let y = Math.ceil(worldBounds.yMin / step) * step; y <= worldBounds.yMax; y += step) {
+    const major = Math.abs((y / step) % 2) < 0.01;
+    ctx.strokeStyle = major ? COLORS.gridMajor : COLORS.grid;
+    const p0 = toScreen(view, t, { x: worldBounds.xMin, y });
+    const p1 = toScreen(view, t, { x: worldBounds.xMax, y });
+    ctx.beginPath();
+    ctx.moveTo(p0.x, p0.y);
+    ctx.lineTo(p1.x, p1.y);
+    ctx.stroke();
+  }
+}
+
+/**
+ * Polar wedge grid for angled mirrors — radial + arc lines rotate with φ, aligned to apex.
+ * Replaces axis-aligned Cartesian grid when mirrors are rotated.
+ */
+function drawPolarWedgeGrid(ctx, view, t, opts = {}) {
+  const apex = opts.apex ?? { x: 0, y: 0 };
+  const phi = opts.phi ?? 0;
+  const half = opts.halfAngle ?? Math.PI / 4;
+  const maxR = opts.maxR ?? 3.5;
+  const stepR = opts.stepR ?? 1;
+  const angMin = phi - half;
+  const angMax = phi + half;
+
+  for (let r = stepR; r <= maxR + 0.01; r += stepR) {
+    const major = Math.abs(Math.round(r / stepR) % 2) === 0;
+    ctx.strokeStyle = major ? COLORS.gridMajor : COLORS.grid;
+    ctx.lineWidth = 1;
+    ctx.beginPath();
+    const segs = Math.max(12, Math.ceil((angMax - angMin) / 0.15));
+    for (let i = 0; i <= segs; i++) {
+      const a = angMin + ((angMax - angMin) * i) / segs;
+      const s = toScreen(view, t, { x: apex.x + r * Math.cos(a), y: apex.y + r * Math.sin(a) });
+      if (i === 0) ctx.moveTo(s.x, s.y);
+      else ctx.lineTo(s.x, s.y);
+    }
+    ctx.stroke();
+  }
+
+  const nRadials = Math.max(4, Math.ceil((2 * half) / (Math.PI / 12)));
+  for (let i = 0; i <= nRadials; i++) {
+    const a = angMin + ((angMax - angMin) * i) / nRadials;
+    const onBisector = Math.abs(a - phi) < 0.04;
+    const onMirror = Math.abs(a - angMin) < 0.04 || Math.abs(a - angMax) < 0.04;
+    ctx.strokeStyle = onBisector
+      ? 'rgba(255,204,0,0.22)'
+      : onMirror
+        ? 'rgba(34,211,238,0.18)'
+        : COLORS.grid;
+    ctx.lineWidth = onBisector ? 1.5 : 1;
+    const s0 = toScreen(view, t, apex);
+    const s1 = toScreen(view, t, { x: apex.x + maxR * Math.cos(a), y: apex.y + maxR * Math.sin(a) });
+    ctx.beginPath();
+    ctx.moveTo(s0.x, s0.y);
+    ctx.lineTo(s1.x, s1.y);
+    ctx.stroke();
+  }
+}
+
+function drawGround(ctx, view, t, y = 0) {
+  const p0 = toScreen(view, t, { x: view.worldBounds.xMin, y });
+  const p1 = toScreen(view, t, { x: view.worldBounds.xMax, y });
+  ctx.strokeStyle = COLORS.ground;
+  ctx.lineWidth = 2;
+  ctx.beginPath();
+  ctx.moveTo(p0.x, p0.y);
+  ctx.lineTo(p1.x, p1.y);
+  ctx.stroke();
+}
+
+function drawVerticalMirror(ctx, view, t, x, y0, y1, color = COLORS.mirror, width = 4) {
+  const p0 = toScreen(view, t, { x, y: y0 });
+  const p1 = toScreen(view, t, { x, y: y1 });
+  ctx.strokeStyle = color;
+  ctx.lineWidth = width;
+  ctx.beginPath();
+  ctx.moveTo(p0.x, p0.y);
+  ctx.lineTo(p1.x, p1.y);
+  ctx.stroke();
+  const hash = 8;
+  for (let y = y0; y <= y1; y += 0.25) {
+    const ps = toScreen(view, t, { x, y });
+    ctx.beginPath();
+    ctx.moveTo(ps.x - hash, ps.y - hash * 0.5);
+    ctx.lineTo(ps.x, ps.y);
+    ctx.stroke();
+  }
+}
+
+function drawHorizontalMirror(ctx, view, t, y, x0, x1, color = COLORS.mirror) {
+  const p0 = toScreen(view, t, { x: x0, y });
+  const p1 = toScreen(view, t, { x: x1, y });
+  ctx.strokeStyle = color;
+  ctx.lineWidth = 4;
+  ctx.beginPath();
+  ctx.moveTo(p0.x, p0.y);
+  ctx.lineTo(p1.x, p1.y);
+  ctx.stroke();
+}
+
+function drawWall(ctx, view, t, x, y0, y1) {
+  drawVerticalMirror(ctx, view, t, x, y0, y1, COLORS.wall, 3);
+}
+
+function drawPoint(ctx, view, t, p, r = 5, color = COLORS.accent, label = '') {
+  const s = toScreen(view, t, p);
+  ctx.fillStyle = color;
+  ctx.beginPath();
+  ctx.arc(s.x, s.y, r, 0, Math.PI * 2);
+  ctx.fill();
+  if (label) drawLabel(ctx, s.x + 8, s.y - 8, label);
+}
+
+function drawLabel(ctx, x, y, text, color = COLORS.label, align = 'left') {
+  ctx.fillStyle = color;
+  ctx.font = '600 13px system-ui, sans-serif';
+  ctx.textAlign = align;
+  ctx.fillText(text, x, y);
+}
+
+function drawArrow(ctx, view, t, from, to, opts = {}) {
+  const {
+    color = COLORS.rayReal,
+    width = 2,
+    dashed = false,
+    progress = 1,
+    head = true,
+  } = opts;
+  const end = progress >= 1 ? to : Vec2.lerp(from, to, progress);
+  const s0 = toScreen(view, t, from);
+  const s1 = toScreen(view, t, end);
+  /* Soft glow helps students track ray direction during step animation */
+  if (!dashed && progress >= 0.5) {
+    ctx.save();
+    ctx.strokeStyle = color;
+    ctx.lineWidth = width + 4;
+    ctx.globalAlpha = 0.12;
+    ctx.beginPath();
+    ctx.moveTo(s0.x, s0.y);
+    ctx.lineTo(s1.x, s1.y);
+    ctx.stroke();
+    ctx.restore();
+  }
+  ctx.strokeStyle = color;
+  ctx.lineWidth = width;
+  if (dashed) ctx.setLineDash([6, 5]);
+  else ctx.setLineDash([]);
+  ctx.beginPath();
+  ctx.moveTo(s0.x, s0.y);
+  ctx.lineTo(s1.x, s1.y);
+  ctx.stroke();
+  ctx.setLineDash([]);
+  if (head && progress >= 0.95) {
+    const ang = Math.atan2(s1.y - s0.y, s1.x - s0.x);
+    const hl = 9;
+    ctx.fillStyle = color;
+    ctx.beginPath();
+    ctx.moveTo(s1.x, s1.y);
+    ctx.lineTo(s1.x - hl * Math.cos(ang - 0.35), s1.y - hl * Math.sin(ang - 0.35));
+    ctx.lineTo(s1.x - hl * Math.cos(ang + 0.35), s1.y - hl * Math.sin(ang + 0.35));
+    ctx.closePath();
+    ctx.fill();
+  }
+}
+
+function drawArrowBody(ctx, view, t, y0, y1, x, dashed = false) {
+  drawArrow(ctx, view, t, { x, y: y0 }, { x, y: y1 }, {
+    color: COLORS.object,
+    width: 3,
+    dashed,
+    head: true,
+  });
+}
+
+function drawPerson(ctx, view, t, x, h, hEye, labels = {}) {
+  drawGround(ctx, view, t);
+  drawArrowBody(ctx, view, t, 0, h, x);
+  const eye = { x, y: hEye };
+  drawPoint(ctx, view, t, eye, 6, COLORS.eye, labels.E || 'E');
+  drawPoint(ctx, view, t, { x, y: h }, 5, COLORS.object, labels.A || 'A');
+  drawPoint(ctx, view, t, { x, y: 0 }, 5, COLORS.object, labels.B || 'B');
+  return { top: { x, y: h }, eye, foot: { x, y: 0 } };
+}
+
+function drawLegend(ctx, x, y, items) {
+  let cy = y;
+  items.forEach((it) => {
+    ctx.strokeStyle = it.color;
+    ctx.lineWidth = it.width || 2;
+    if (it.dashed) ctx.setLineDash([5, 4]);
+    else ctx.setLineDash([]);
+    ctx.beginPath();
+    ctx.moveTo(x, cy + 6);
+    ctx.lineTo(x + 24, cy + 6);
+    ctx.stroke();
+    ctx.setLineDash([]);
+    ctx.fillStyle = COLORS.label;
+    ctx.font = '12px system-ui';
+    ctx.textAlign = 'left';
+    ctx.fillText(it.text, x + 30, cy + 10);
+    cy += 20;
+  });
+}
+
+/** Arbitrary-angle mirror segment with hatch on the reflective side. */
+function drawMirrorSegment(ctx, view, t, a, b, color = COLORS.mirror, width = 4, selected = false) {
+  const p0 = toScreen(view, t, a);
+  const p1 = toScreen(view, t, b);
+  ctx.strokeStyle = selected ? COLORS.mirrorNeed : color;
+  ctx.lineWidth = width;
+  ctx.beginPath();
+  ctx.moveTo(p0.x, p0.y);
+  ctx.lineTo(p1.x, p1.y);
+  ctx.stroke();
+
+  const ab = Vec2.sub(b, a);
+  const len = Vec2.len(ab) || 1;
+  const tangent = Vec2.scale(ab, 1 / len);
+  const n = { x: -tangent.y, y: tangent.x };
+  const hashLen = 0.12;
+  const steps = Math.max(3, Math.floor(len / 0.25));
+  for (let i = 0; i <= steps; i++) {
+    const u = i / steps;
+    const p = Vec2.lerp(a, b, u);
+    const ps = toScreen(view, t, p);
+    const off = Vec2.scale(n, hashLen * t.pxPerM);
+    ctx.beginPath();
+    ctx.moveTo(ps.x - off.x * 0.6, ps.y + off.y * 0.6);
+    ctx.lineTo(ps.x, ps.y);
+    ctx.stroke();
+  }
+  drawPoint(ctx, view, t, a, 5, selected ? COLORS.mirrorNeed : color, '');
+  drawPoint(ctx, view, t, b, 5, selected ? COLORS.mirrorNeed : color, '');
+}
+
+/** Object or image bar (solid or dashed). */
+function drawBar(ctx, view, t, a, b, opts = {}) {
+  const {
+    color = COLORS.object,
+    width = 4,
+    dashed = false,
+    labelA = '',
+    labelB = '',
+    selected = false,
+  } = opts;
+  drawArrow(ctx, view, t, a, b, {
+    color: selected ? COLORS.mirrorNeed : color,
+    width,
+    dashed,
+    head: true,
+  });
+  if (labelA) drawPoint(ctx, view, t, a, 5, color, labelA);
+  if (labelB) drawPoint(ctx, view, t, b, 5, color, labelB);
+}
+
+
+/* --- rayAnimator.js --- */
+/** @file Step-by-step ray diagram animation (HKDSE drawing order). */
+
+const STEPS_PER_RAY = 5;
+
+class RayAnimator {
+  constructor() {
+    this.stepIndex = 0;
+    this.playing = false;
+    this.raf = null;
+    this.playTimer = null;
+    this.stepDelayMs = 550;
+    this.onUpdate = null;
+    this.rayCount = 2;
+    /** Extra animation steps after all rays (e.g. similar-triangle construction). */
+    this.extraSteps = 0;
+  }
+
+  get totalSteps() {
+    return (this.rayCount || 1) * STEPS_PER_RAY + (this.extraSteps || 0);
+  }
+
+  get progress() {
+    return this.totalSteps > 0 ? this.stepIndex / this.totalSteps : 0;
+  }
+
+  reset() {
+    this.pause();
+    this.stepIndex = 0;
+    this.onUpdate?.();
+  }
+
+  showAll() {
+    this.pause();
+    this.stepIndex = this.totalSteps;
+    this.onUpdate?.();
+  }
+
+  play() {
+    if (this.playing) return;
+    if (this.stepIndex >= this.totalSteps) this.stepIndex = 0;
+    this.playing = true;
+    this.playTimer = setInterval(() => {
+      if (this.stepIndex < this.totalSteps) {
+        this.stepIndex += 1;
+        this.onUpdate?.();
+      } else {
+        this.pause();
+      }
+    }, this.stepDelayMs);
+  }
+
+  pause() {
+    this.playing = false;
+    if (this.playTimer) {
+      clearInterval(this.playTimer);
+      this.playTimer = null;
+    }
+    if (this.raf) {
+      cancelAnimationFrame(this.raf);
+      this.raf = null;
+    }
+  }
+
+  stepNext() {
+    this.pause();
+    if (this.stepIndex < this.totalSteps) {
+      this.stepIndex += 1;
+      this.onUpdate?.();
+    }
+  }
+
+  /**
+   * Draw one sight ray with discrete steps (1–5 per ray).
+   * stepIndex: global count of completed steps (0 = blank).
+   */
+  static drawSightRay(ctx, view, t, draw, ray, stepIndex, rayIndex, rayCount, fail = false) {
+    const rayStart = rayIndex * STEPS_PER_RAY;
+    const localSteps = Math.max(0, Math.min(STEPS_PER_RAY, stepIndex - rayStart));
+    if (localSteps <= 0) return;
+
+    const { objectPt, eye, image, reflectPt } = ray;
+    const realColor = fail ? '#ff5252' : undefined;
+
+    if (localSteps >= 1) {
+      draw.drawPoint?.(objectPt, fail ? '#ff5252' : undefined);
+    }
+
+    if (localSteps >= 2 && image) {
+      draw.drawImageLine?.(objectPt, image, 1);
+    }
+
+    if (localSteps >= 3 && image && reflectPt) {
+      draw.drawArrow(image, eye, { dashed: true, progress: 1, color: realColor || undefined });
+    }
+
+    if (localSteps >= 4 && reflectPt) {
+      draw.drawArrow(objectPt, reflectPt, { progress: 1, color: realColor || undefined });
+    }
+
+    if (localSteps >= 5 && reflectPt) {
+      draw.drawArrow(reflectPt, eye, { progress: 1, color: realColor || undefined });
+    }
+  }
+}
+
+
+/* --- i18n.js --- */
+/** @file Bilingual strings — one language visible at a time. */
+
+const STRINGS = {
+  zh: {
+    title: '平面鏡反射實驗室',
+    subtitle: 'HKDSE 光學互動模擬',
+    langBtn: 'English',
+    tabs: {
+      imageFormation: '像的形成',
+      minLength: '最小鏡長',
+      minHeight: '最小鏡高',
+      seeBack: '看後方物件',
+      groundMirror: '地面鏡',
+      fieldOfView: '視野與障礙',
+      angledMirrors: '夾角鏡',
+      raySketch: '練習作圖',
+    },
+    concept: {
+      imageFormation: '像的形成 · u = v',
+      minLength: '最小鏡長 · 相似三角形',
+      minHeight: '最小鏡高 · 光路幾何',
+      seeBack: '看後方物件 · 虛像延長',
+      angledMirrors: '夾角鏡 · n = 360°/θ − 1',
+      raySketch: '練習作圖 · 反射定律',
+    },
+    sub: {
+      feet: '看見自己的腳',
+      cockroach: '看見地上物件',
+      mc: 'MC 驗證',
+      ceiling: '天花燈',
+      spider: '後牆蜘蛛',
+      side: '側視圖',
+      top: '俯視圖',
+    },
+    anim: {
+      play: '逐步繪製光線',
+      pause: '暫停',
+      step: '下一步',
+      showAll: '顯示全部',
+      replay: '重播',
+    },
+    preset: '載入原題數值',
+    reset: '重設',
+    results: '計算結果',
+    legend: '圖例',
+    legendReal: '實際光線',
+    legendVirtual: '虛線／虛像',
+    legendNeed: '所需鏡段',
+    legendMirror: '平面鏡',
+    legendObject: '實物 O',
+    legendEye: '觀察者 E',
+    formulaLive: '即時公式',
+    vizHint: '拖曳元素或調整滑桿，公式會即時更新',
+    footerNote: '拖曳畫布元素 · 滑桿調參 · 公式同步更新',
+    controls: '參數',
+    description: '說明',
+    visible: '可見',
+    hidden: '不可見',
+    uEqualsV: '物距 u = 像距 v',
+    virtualImage: '虛像：正立、等大、左右倒轉',
+    minLength: '最小鏡長',
+    minBottom: '鏡底最低高度',
+    minTop: '鏡頂高度',
+    canSeeFull: '可以看見全身',
+    cannotSeeFull: '無法看見全身',
+    mirrorBottom: '鏡底高度 y',
+    mirrorLength: '鏡長 p',
+    cloudSpeed: '雲的像移動速度',
+    cloudDistance: '像橫移距離',
+    imageCount: '像的數目',
+    formula: '公式',
+    moveCloser: '走近鏡子 10 cm',
+    objectDistance: '物距 u',
+    objectHeight: '物高',
+    personHeight: '身高',
+    eyeHeight: '眼高',
+    distToMirror: '人鏡距離',
+    distObjToMirror: '物件距鏡',
+    ceilingHeight: '天花高度',
+    distLightToWall: '燈距牆',
+    mirrorTop: '鏡頂高度',
+    distToBackWall: '後牆距人',
+    mirrorWidth: '鏡闊',
+    cloudHeight: '雲高度',
+    time: '時間',
+    angle: '夾角 θ',
+    wedgeOrientation: '旋轉 φ',
+    showRays: '顯示光線',
+    showImages: '顯示虛像',
+    addObject: '新增物件',
+    removeObject: '移除物件',
+    placeObject: '點擊放置',
+    toolSelect: '選取',
+    toolMirror: '鏡面',
+    toolObject: '物件',
+    toolImage: '虛像',
+    toolObserver: '觀察者',
+    toolRealRay: '實線',
+    toolVirtualRay: '虛線',
+    deleteSelected: '刪除選取',
+    gridSnap: '網格對齊',
+    sketchTools: '作圖工具',
+    sketchGroupPlace: '放置元素',
+    sketchGroupNav: '選取與移動',
+    sketchGroupRays: '繪製光線',
+    sketchGroupActions: '操作',
+    sketchHintSelect: '點選線段或端點；拖曳移動；按刪除或 Delete 鍵移除',
+    sketchHintMirror: '在畫布上點擊兩點，畫出鏡面線段',
+    sketchHintObject: '點擊兩點，畫出物件棒（A、B）',
+    sketchHintImage: '點擊兩點，畫出虛像棒（A′、B′）',
+    sketchHintObserver: '點擊一下，放置觀察者 E',
+    sketchHintRealRay: '點擊兩點，畫一條實線（每段獨立繪製）',
+    sketchHintVirtualRay: '點擊兩點，畫一條虛線（每段獨立繪製）',
+    sketchSelected: '已選取',
+    sketchNothingSelected: '未選取任何元素',
+  },
+  en: {
+    title: 'Plane Mirror Reflection Lab',
+    subtitle: 'HKDSE Optics Interactive Simulation',
+    langBtn: '中文',
+    tabs: {
+      imageFormation: 'Image Formation',
+      minLength: 'Min. Length',
+      minHeight: 'Min. Height',
+      seeBack: 'See Back Object',
+      groundMirror: 'Ground Mirror',
+      fieldOfView: 'Field of View',
+      angledMirrors: 'Angled Mirrors',
+      raySketch: 'Ray Sketch',
+    },
+    concept: {
+      imageFormation: 'Image formation · u = v',
+      minLength: 'Min length · similar triangles',
+      minHeight: 'Min height · ray geometry',
+      seeBack: 'Behind mirror · virtual sight',
+      angledMirrors: 'Wedge mirrors · n = 360°/θ − 1',
+      raySketch: 'Ray sketch · reflection law',
+    },
+    sub: {
+      feet: 'See Own Feet',
+      cockroach: 'See Floor Object',
+      mc: 'MC Check',
+      ceiling: 'Ceiling Light',
+      spider: 'Spider on Wall',
+      side: 'Side View',
+      top: 'Top View',
+    },
+    anim: {
+      play: 'Animate Rays',
+      pause: 'Pause',
+      step: 'Next Step',
+      showAll: 'Show All',
+      replay: 'Replay',
+    },
+    preset: 'Load Worksheet Values',
+    reset: 'Reset',
+    results: 'Results',
+    legend: 'Legend',
+    legendReal: 'Real ray',
+    legendVirtual: 'Virtual / dashed',
+    legendNeed: 'Required mirror',
+    legendMirror: 'Plane mirror',
+    legendObject: 'Object O',
+    legendEye: 'Observer E',
+    formulaLive: 'Live formula',
+    vizHint: 'Drag elements or sliders — formula updates live',
+    footerNote: 'Drag canvas · adjust sliders · live formulas',
+    controls: 'Controls',
+    description: 'Description',
+    visible: 'Visible',
+    hidden: 'Hidden',
+    uEqualsV: 'Object distance u = image distance v',
+    virtualImage: 'Virtual image: upright, same size, laterally inverted',
+    minLength: 'Minimum mirror length',
+    minBottom: 'Minimum bottom height',
+    minTop: 'Mirror top height',
+    canSeeFull: 'Full body visible',
+    cannotSeeFull: 'Full body NOT visible',
+    mirrorBottom: 'Mirror bottom y',
+    mirrorLength: 'Mirror length p',
+    cloudSpeed: 'Image speed of cloud',
+    cloudDistance: 'Image travel distance',
+    imageCount: 'Number of images',
+    formula: 'Formula',
+    moveCloser: 'Move 10 cm closer',
+    objectDistance: 'Object distance u',
+    objectHeight: 'Object height',
+    personHeight: 'Person height',
+    eyeHeight: 'Eye height',
+    distToMirror: 'Distance to mirror',
+    distObjToMirror: 'Object distance to mirror',
+    ceilingHeight: 'Ceiling height',
+    distLightToWall: 'Light to wall',
+    mirrorTop: 'Mirror top',
+    distToBackWall: 'Back wall distance',
+    mirrorWidth: 'Mirror width',
+    cloudHeight: 'Cloud height',
+    time: 'Time',
+    angle: 'Angle θ',
+    wedgeOrientation: 'Rotation φ',
+    showRays: 'Show rays',
+    showImages: 'Show virtual images',
+    addObject: 'Add object',
+    removeObject: 'Remove object',
+    placeObject: 'Click to place',
+    toolSelect: 'Select',
+    toolMirror: 'Mirror',
+    toolObject: 'Object',
+    toolImage: 'Image',
+    toolObserver: 'Observer',
+    toolRealRay: 'Real ray',
+    toolVirtualRay: 'Virtual ray',
+    deleteSelected: 'Delete',
+    gridSnap: 'Grid snap',
+    sketchTools: 'Drawing tools',
+    sketchGroupPlace: 'Place elements',
+    sketchGroupNav: 'Select & move',
+    sketchGroupRays: 'Draw rays',
+    sketchGroupActions: 'Actions',
+    sketchHintSelect: 'Click a line or endpoint; drag to move; Delete key or button to remove',
+    sketchHintMirror: 'Click two points on the canvas to draw the mirror',
+    sketchHintObject: 'Click two points for the object bar (A, B)',
+    sketchHintImage: 'Click two points for the virtual image bar (A′, B′)',
+    sketchHintObserver: 'Click once to place observer E',
+    sketchHintRealRay: 'Click two points for one real ray segment',
+    sketchHintVirtualRay: 'Click two points for one virtual ray segment',
+    sketchSelected: 'Selected',
+    sketchNothingSelected: 'Nothing selected',
+  },
+};
+
+let currentLang = 'zh';
+
+function getLang() { return currentLang; }
+
+function setLang(lang) {
+  currentLang = lang === 'en' ? 'en' : 'zh';
+  document.documentElement.lang = currentLang === 'zh' ? 'zh-HK' : 'en';
+  return currentLang;
+}
+
+function t(key) {
+  const parts = key.split('.');
+  let node = STRINGS[currentLang];
+  for (const p of parts) {
+    node = node?.[p];
+  }
+  return node ?? key;
+}
+
+function applyI18n(root = document) {
+  root.querySelectorAll('[data-i18n]').forEach((el) => {
+    const key = el.getAttribute('data-i18n');
+    el.textContent = t(key);
+  });
+  const titleEl = root.querySelector('[data-i18n-title]');
+  if (titleEl) titleEl.textContent = t('title');
+  document.title = t('title');
+}
+
+function toggleLang() {
+  setLang(currentLang === 'zh' ? 'en' : 'zh');
+  applyI18n();
+  return currentLang;
+}
+
+
+/* --- imageFormation.js --- */
+
+
+
+
+const defaults = () => ({
+  u: 2.0,
+  H: 1.6,
+  hEye: 1.5,
+  moved: false,
+});
+
+function createImageFormationScenario() {
+  let params = defaults();
+  let view = null;
+  let animator = new RayAnimator();
+  animator.rayCount = 2;
+
+  function compute() {
+    const u = params.moved ? params.u - 0.1 : params.u;
+    const mirrorX = u;
+    const objX = 0;
+    const top = { x: objX, y: params.H };
+    const foot = { x: objX, y: 0 };
+    const eye = { x: objX, y: params.hEye };
+    const mirrorLine = { a: { x: mirrorX, y: 0 }, b: { x: mirrorX, y: 3 } };
+    const imgTop = reflectPoint(top, mirrorLine.a, mirrorLine.b);
+    const imgFoot = reflectPoint(foot, mirrorLine.a, mirrorLine.b);
+    const v = mirrorX - objX;
+    const rayTop = sightRayVertical(top, eye, mirrorX, 0, 3);
+    const rayFoot = sightRayVertical(foot, eye, mirrorX, 0, 3);
+    return { u, v, mirrorX, objX, top, foot, eye, imgTop, imgFoot, rayTop, rayFoot };
+  }
+
+  function getControls() {
+    return [
+      { id: 'u', labelKey: 'objectDistance', min: 0.3, max: 4, step: 0.1, value: params.u, unit: 'm' },
+      { id: 'H', labelKey: 'objectHeight', min: 1, max: 2, step: 0.05, value: params.H, unit: 'm' },
+      { id: 'hEye', labelKey: 'eyeHeight', min: 1, max: 1.9, step: 0.05, value: params.hEye, unit: 'm' },
+    ];
+  }
+
+  function preset() { params = defaults(); }
+  function updateParams(id, value) {
+    if (id === 'moved') params.moved = value;
+    else params[id] = value;
+  }
+
+  function getDescription() {
+    return getLang() === 'zh'
+      ? '平面鏡成虛像：物距等於像距。物體靠近鏡子時，像亦以相同距離靠近。'
+      : 'A plane mirror forms a virtual image with u = v. When the object moves toward the mirror, the image moves the same amount.';
+  }
+
+  function getStats(c) {
+    const lang = getLang();
+    return [
+      { label: 'u', value: formatLength(c.u, lang) },
+      { label: 'v', value: formatLength(c.v, lang) },
+      { label: t('uEqualsV'), value: '✓', ok: true },
+    ];
+  }
+
+  function getFormula(c) {
+    return getLang() === 'zh'
+      ? `u = ${c.u.toFixed(2)} m\nv = ${c.v.toFixed(2)} m\n物像距離 = ${(c.u + c.v).toFixed(2)} m`
+      : `u = ${c.u.toFixed(2)} m\nv = ${c.v.toFixed(2)} m\nObject–image gap = ${(c.u + c.v).toFixed(2)} m`;
+  }
+
+  function init(canvas) {
+    view = createWorldView(canvas, {
+      worldBounds: { xMin: -0.5, xMax: 6.5, yMin: 0, yMax: 3.2 },
+      gridStep: 1,
+    });
+    animator.onUpdate = () => draw(canvas);
+  }
+
+  function draw(canvas) {
+    const { w, h, ctx } = resizeCanvasToDisplay(canvas);
+    const c = compute();
+    view.worldBounds.xMax = Math.max(4, c.mirrorX + c.v + 1);
+    const txf = computeTransform(view, w, h);
+    clear(ctx, w, h);
+    drawGrid(ctx, view, txf, w, h);
+    drawGround(ctx, view, txf);
+    drawVerticalMirror(ctx, view, txf, c.mirrorX, 0, 3, COLORS.mirror, 3);
+    drawPerson(ctx, view, txf, c.objX, params.H, params.hEye);
+
+    const stepIndex = animator.stepIndex;
+    const imgX = c.mirrorX + c.v;
+
+    const makeHelpers = (rayIndex) => ({
+      drawArrow: (from, to, opts) => drawArrow(ctx, view, txf, from, to, opts),
+      drawImageLine: (_a, _b, pr) => {
+        if (rayIndex === 0 && pr > 0) {
+          drawArrowBody(ctx, view, txf, 0, params.H, imgX, true);
+          if (pr >= 0.5) {
+            const sx = txf.ox + (imgX + 0.12) * txf.pxPerM;
+            const sy = txf.oy - params.H * txf.pxPerM;
+            drawLabel(ctx, sx, sy, "A'B'", COLORS.image);
+          }
+        }
+      },
+      drawPoint: (p) => drawPoint(ctx, view, txf, p, 5, COLORS.object),
+    });
+
+    const rays = [
+      { objectPt: c.top, eye: c.eye, image: c.imgTop, reflectPt: c.rayTop.reflectPt },
+      { objectPt: c.foot, eye: c.eye, image: c.imgFoot, reflectPt: c.rayFoot.reflectPt },
+    ];
+    rays.forEach((ray, i) => {
+      if (ray.reflectPt) {
+        RayAnimator.drawSightRay(ctx, view, txf, makeHelpers(i), ray, stepIndex, i, 2);
+      }
+    });
+
+    drawLegend(ctx, 12, 12, [
+      { color: COLORS.rayReal, text: t('legendReal') },
+      { color: COLORS.rayVirtual, text: t('legendVirtual'), dashed: true },
+    ]);
+  }
+
+  return {
+    id: 'imageFormation',
+    init, draw, compute, getControls, updateParams, preset, getDescription, getStats, getFormula,
+    getAnimator: () => animator,
+    extraButtons: [{ id: 'moved', labelKey: 'moveCloser', toggle: true }],
+  };
+}
+
+
+/* --- minMirrorLength.js --- */
+
+
+
+
+function createMinMirrorLengthScenario() {
+  let params = { H: 1.6, hEye: 1.5, d: 2.0 };
+  let view = null;
+  let animator = new RayAnimator();
+  animator.rayCount = 2;
+
+  function compute() {
+    const mirrorX = params.d;
+    const objX = 0;
+    const top = { x: objX, y: params.H };
+    const foot = { x: objX, y: 0 };
+    const eye = { x: objX, y: params.hEye };
+    const req = minMirrorForBody(params.H, params.hEye);
+    const rayTop = sightRayVertical(top, eye, mirrorX, 0, 3);
+    const rayFoot = sightRayVertical(foot, eye, mirrorX, 0, 3);
+    const yTop = rayTop.reflectPt?.y ?? req.top;
+    const yBot = rayFoot.reflectPt?.y ?? req.bottom;
+    return { mirrorX, objX, top, foot, eye, req, yTop, yBot, rayTop, rayFoot };
+  }
+
+  function getControls() {
+    return [
+      { id: 'H', labelKey: 'personHeight', min: 1.2, max: 2, step: 0.05, value: params.H, unit: 'm' },
+      { id: 'hEye', labelKey: 'eyeHeight', min: 1, max: 1.9, step: 0.05, value: params.hEye, unit: 'm' },
+      { id: 'd', labelKey: 'distToMirror', min: 1, max: 4, step: 0.1, value: params.d, unit: 'm' },
+    ];
+  }
+
+  function preset() { params = { H: 1.6, hEye: 1.5, d: 2.0 }; }
+  function updateParams(id, v) { params[id] = v; }
+
+  function getDescription() {
+    return getLang() === 'zh'
+      ? '（Q21）要看見全身，鏡的最小長度為身高的一半；鏡底在眼高的一半。'
+      : '(Q21) Minimum mirror length = half body height; bottom edge at half eye height.';
+  }
+
+  function getStats(c) {
+    const lang = getLang();
+    return [
+      { label: t('minLength'), value: formatLength(c.req.length, lang) },
+      { label: t('minBottom'), value: formatLength(c.req.bottom, lang) },
+      { label: t('minTop'), value: formatLength(c.req.top, lang) },
+    ];
+  }
+
+  function getFormula(c) {
+    return getLang() === 'zh'
+      ? `p = H/2 = ${c.req.length.toFixed(2)} m\nq = h/2 = ${c.req.bottom.toFixed(2)} m\n鏡頂 = (H+h)/2 = ${c.req.top.toFixed(2)} m`
+      : `p = H/2 = ${c.req.length.toFixed(2)} m\nq = h/2 = ${c.req.bottom.toFixed(2)} m\nTop = (H+h)/2 = ${c.req.top.toFixed(2)} m`;
+  }
+
+  function init(canvas) {
+    view = createWorldView(canvas, {
+      worldBounds: { xMin: -0.5, xMax: 6.5, yMin: 0, yMax: 3.2 },
+      gridStep: 1,
+      horizontalGridScale: 0.5,
+    });
+    animator.onUpdate = () => draw(canvas);
+  }
+
+  function draw(canvas) {
+    const { w, h, ctx } = resizeCanvasToDisplay(canvas);
+    const c = compute();
+    const txf = computeTransform(view, w, h);
+    clear(ctx, w, h);
+    drawGrid(ctx, view, txf, w, h);
+    drawGround(ctx, view, txf);
+    drawPerson(ctx, view, txf, c.objX, params.H, params.hEye);
+    drawVerticalMirror(ctx, view, txf, c.mirrorX, 0, 3, '#3f3f46', 2);
+    drawVerticalMirror(ctx, view, txf, c.mirrorX, c.yBot, c.yTop, COLORS.mirrorNeed, 5);
+
+    const stepIndex = animator.stepIndex;
+    const imgX = c.mirrorX + params.d;
+    const rays = [
+      { objectPt: c.top, eye: c.eye, image: c.rayTop.image, reflectPt: c.rayTop.reflectPt },
+      { objectPt: c.foot, eye: c.eye, image: c.rayFoot.image, reflectPt: c.rayFoot.reflectPt },
+    ];
+    const makeHelpers = (rayIndex) => ({
+      drawArrow: (from, to, opts) => drawArrow(ctx, view, txf, from, to, opts),
+      drawImageLine: (_a, _b, pr) => {
+        if (rayIndex === 0 && pr > 0) drawArrowBody(ctx, view, txf, 0, params.H, imgX, true);
+      },
+      drawPoint: () => {},
+    });
+    rays.forEach((ray, i) => {
+      if (ray.reflectPt) RayAnimator.drawSightRay(ctx, view, txf, makeHelpers(i), ray, stepIndex, i, 2);
+    });
+  }
+
+  return {
+    id: 'minLength', init, draw, compute, getControls, updateParams, preset, getDescription, getStats, getFormula,
+    getAnimator: () => animator,
+  };
+}
+
+
+/* --- minMirrorHeight.js --- */
+
+
+
+
+function createMinMirrorHeightScenario() {
+  let sub = 'feet';
+  let params = {
+    feet: { hEye: 1.5, dEye: 0.8 },
+    cockroach: { hEye: 1.5, dEye: 0.8, dObj: 0.4 },
+    mc: { H: 1.8, hEye: 1.7, p: 0.9, q: 0.85 },
+  };
+  let view = null;
+  let animator = new RayAnimator();
+  animator.rayCount = 1;
+
+  function getSubTabs() {
+    return ['feet', 'cockroach', 'mc'];
+  }
+
+  function setSub(s) {
+    sub = s;
+    animator.rayCount = s === 'mc' ? 2 : 1;
+  }
+
+  function compute() {
+    if (sub === 'feet') {
+      const { hEye, dEye } = params.feet;
+      const mirrorX = dEye;
+      const y = mirrorHeightForFloorObject(dEye, dEye, hEye, 0);
+      const eye = { x: 0, y: hEye };
+      const foot = { x: 0, y: 0 };
+      const ray = sightRayVertical(foot, eye, mirrorX, 0, 3);
+      return { mirrorX, eye, foot, y, ray, mode: 'feet', hEye, dEye };
+    }
+    if (sub === 'cockroach') {
+      const { hEye, dEye, dObj } = params.cockroach;
+      const mirrorX = dEye;
+      const objX = dEye - dObj;
+      const y = mirrorHeightForFloorObject(dObj, dEye, hEye, 0);
+      const eye = { x: 0, y: hEye };
+      const obj = { x: objX, y: 0 };
+      const ray = sightRayVertical(obj, eye, mirrorX, 0, 3);
+      return { mirrorX, eye, obj, y, ray, mode: 'cockroach', hEye, dEye, dObj, objX };
+    }
+    const { H, hEye, p, q } = params.mc;
+    const mirrorX2 = 1.5;
+    const req = canSeeFullBody(H, hEye, p, q);
+    const top = { x: 0, y: H };
+    const foot = { x: 0, y: 0 };
+    const eye = { x: 0, y: hEye };
+    const yTop = q + p;
+    const rayTop = sightRayVertical(top, eye, mirrorX2, q, yTop);
+    const rayFoot = sightRayVertical(foot, eye, mirrorX2, q, yTop);
+    const hitTop = rayTop.ok && rayTop.reflectPt.y <= yTop + 1e-6 && rayTop.reflectPt.y >= q - 1e-6;
+    const hitFoot = rayFoot.ok && rayFoot.reflectPt.y >= q - 1e-6 && rayFoot.reflectPt.y <= yTop + 1e-6;
+    const ok = req.ok && hitTop && hitFoot;
+    return { mirrorX: mirrorX2, eye, top, foot, p, q, yTop, req: { ...req, ok }, rayTop, rayFoot, mode: 'mc', H, hEye, hitTop, hitFoot };
+  }
+
+  function getControls() {
+    if (sub === 'feet') {
+      const p = params.feet;
+      return [
+        { id: 'hEye', labelKey: 'eyeHeight', min: 1.2, max: 1.8, step: 0.05, value: p.hEye, unit: 'm' },
+        { id: 'dEye', labelKey: 'distToMirror', min: 0.4, max: 2, step: 0.05, value: p.dEye, unit: 'm' },
+      ];
+    }
+    if (sub === 'cockroach') {
+      const p = params.cockroach;
+      return [
+        { id: 'hEye', labelKey: 'eyeHeight', min: 1.2, max: 1.8, step: 0.05, value: p.hEye, unit: 'm' },
+        { id: 'dEye', labelKey: 'distToMirror', min: 0.4, max: 2, step: 0.05, value: p.dEye, unit: 'm' },
+        { id: 'dObj', labelKey: 'distObjToMirror', min: 0.1, max: 1.5, step: 0.05, value: p.dObj, unit: 'm' },
+      ];
+    }
+    const p = params.mc;
+    return [
+      { id: 'H', labelKey: 'personHeight', min: 1.5, max: 2, step: 0.05, value: p.H, unit: 'm' },
+      { id: 'hEye', labelKey: 'eyeHeight', min: 1.4, max: 1.9, step: 0.05, value: p.hEye, unit: 'm' },
+      { id: 'p', labelKey: 'mirrorLength', min: 0.5, max: 1.2, step: 0.01, value: p.p, unit: 'm' },
+      { id: 'q', labelKey: 'mirrorBottom', min: 0.5, max: 1.2, step: 0.01, value: p.q, unit: 'm' },
+    ];
+  }
+
+  function updateParams(id, v) {
+    params[sub][id] = v;
+  }
+
+  function preset() {
+    params = {
+      feet: { hEye: 1.5, dEye: 0.8 },
+      cockroach: { hEye: 1.5, dEye: 0.8, dObj: 0.4 },
+      mc: { H: 1.8, hEye: 1.7, p: 0.9, q: 0.85 },
+    };
+  }
+
+  function getDescription() {
+    if (sub === 'feet') return getLang() === 'zh' ? '（Q22a）全等三角形：x = y，鏡底 y = h/2 = 0.75 m' : '(Q22a) Congruent triangles: y = h/2 = 0.75 m';
+    if (sub === 'cockroach') return getLang() === 'zh' ? '（Q22b）相似三角形：y/(h−y) = 0.4/0.8 → y = 0.50 m' : '(Q22b) Similar triangles: y = 0.50 m';
+    return getLang() === 'zh' ? '（Q17）最小要求 p=90 cm, q=85 cm（選 B）' : '(Q17) Minimum p=90 cm, q=85 cm (answer B)';
+  }
+
+  function getStats(c) {
+    const lang = getLang();
+    if (c.mode === 'mc') {
+      return [
+        { label: t('mirrorLength'), value: formatLength(c.p, lang) },
+        { label: t('mirrorBottom'), value: formatLength(c.q, lang) },
+        { label: t(c.req.ok ? 'canSeeFull' : 'cannotSeeFull'), value: c.req.ok ? '✓' : '✗', ok: c.req.ok, fail: !c.req.ok },
+      ];
+    }
+    return [{ label: t('mirrorBottom'), value: formatLength(c.y, lang) }];
+  }
+
+  function getFormula(c) {
+    if (c.mode === 'feet') {
+      return getLang() === 'zh'
+        ? `2y = h → y = ${c.y.toFixed(2)} m`
+        : `2y = h_eye → y = ${c.y.toFixed(2)} m`;
+    }
+    if (c.mode === 'cockroach') {
+      return getLang() === 'zh'
+        ? `y/(h−y) = d_obj/d_eye\ny = ${c.y.toFixed(2)} m`
+        : `y/(h−y) = d_obj/d_eye\ny = ${c.y.toFixed(2)} m`;
+    }
+    const req = minMirrorForBody(c.H, c.hEye);
+    return getLang() === 'zh'
+      ? `需要 p ≥ ${(req.minP * 100).toFixed(0)} cm\n需要 q ≥ ${(req.minQ * 100).toFixed(0)} cm`
+      : `Need p ≥ ${(req.minP * 100).toFixed(0)} cm, q ≥ ${(req.minQ * 100).toFixed(0)} cm`;
+  }
+
+  function init(canvas) {
+    view = createWorldView(canvas, { worldBounds: { xMin: -0.5, xMax: 4, yMin: 0, yMax: 2.2 } });
+    animator.onUpdate = () => draw(canvas);
+  }
+
+  function draw(canvas) {
+    const { w, h, ctx } = resizeCanvasToDisplay(canvas);
+    const c = compute();
+    const txf = computeTransform(view, w, h);
+    clear(ctx, w, h);
+    drawGrid(ctx, view, txf, w, h);
+    drawGround(ctx, view, txf);
+
+    const stepIndex = animator.stepIndex;
+    const helpers = {
+      drawArrow: (from, to, opts) => drawArrow(ctx, view, txf, from, to, opts),
+      drawImageLine: () => {},
+      drawPoint: (p, col) => drawPoint(ctx, view, txf, p, 5, col || COLORS.object),
+    };
+
+    if (c.mode === 'feet') {
+      drawPerson(ctx, view, txf, 0, c.hEye, c.hEye);
+      drawVerticalMirror(ctx, view, txf, c.mirrorX, c.y, c.y + 1.5, COLORS.mirrorNeed, 5);
+      const rp = { x: c.mirrorX, y: c.y };
+      const s0 = { x: txf.ox + rp.x * txf.pxPerM, y: txf.oy - rp.y * txf.pxPerM };
+      const s1 = { x: txf.ox + (c.mirrorX + 0.4) * txf.pxPerM, y: s0.y };
+      ctx.strokeStyle = COLORS.mirrorNeed;
+      ctx.lineWidth = 2;
+      ctx.setLineDash([4, 4]);
+      ctx.beginPath();
+      ctx.moveTo(s0.x, s0.y);
+      ctx.lineTo(s1.x, s1.y);
+      ctx.stroke();
+      ctx.setLineDash([]);
+      const ray = { objectPt: c.foot, eye: c.eye, image: c.ray.image, reflectPt: rp };
+      RayAnimator.drawSightRay(ctx, view, txf, helpers, ray, stepIndex, 0, 1);
+    } else if (c.mode === 'cockroach') {
+      drawPerson(ctx, view, txf, 0, c.hEye, c.hEye);
+      drawPoint(ctx, view, txf, c.obj, 6, '#fbbf24', 'Bug');
+      drawVerticalMirror(ctx, view, txf, c.mirrorX, c.y, c.y + 1.5, COLORS.mirrorNeed, 5);
+      const rp = { x: c.mirrorX, y: c.y };
+      const ray = { objectPt: c.obj, eye: c.eye, image: c.ray.image, reflectPt: rp };
+      RayAnimator.drawSightRay(ctx, view, txf, helpers, ray, stepIndex, 0, 1);
+    } else {
+      animator.rayCount = 2;
+      drawPerson(ctx, view, txf, 0, c.H, c.hEye);
+      const failTop = !c.hitTop;
+      const failFoot = !c.hitFoot;
+      drawVerticalMirror(ctx, view, txf, c.mirrorX, c.q, c.yTop, c.req.ok ? COLORS.mirrorNeed : COLORS.mirrorFail, 5);
+      const rays = [
+        { objectPt: c.top, eye: c.eye, image: c.rayTop.image, reflectPt: c.rayTop.reflectPt || { x: c.mirrorX, y: c.yTop } },
+        { objectPt: c.foot, eye: c.eye, image: c.rayFoot.image, reflectPt: c.rayFoot.reflectPt || { x: c.mirrorX, y: c.q } },
+      ];
+      rays.forEach((ray, i) => RayAnimator.drawSightRay(ctx, view, txf, helpers, ray, stepIndex, i, 2, i === 0 ? !c.hitTop : !c.hitFoot));
+    }
+  }
+
+  return {
+    id: 'minHeight', init, draw, compute, getControls, updateParams, preset, getDescription, getStats, getFormula,
+    getAnimator: () => animator, getSubTabs, setSub,
+  };
+}
+
+
+/* --- seeBackObject.js --- */
+
+
+
+
+const CONSTRUCTION_STEPS = 2;
+
+function drawRightTriangle(ctx, view, txf, a, b, c, fill, stroke) {
+  const toS = (p) => ({ x: txf.ox + p.x * txf.pxPerM, y: txf.oy - p.y * txf.pxPerM });
+  const sa = toS(a); const sb = toS(b); const sc = toS(c);
+  ctx.beginPath();
+  ctx.moveTo(sa.x, sa.y);
+  ctx.lineTo(sb.x, sb.y);
+  ctx.lineTo(sc.x, sc.y);
+  ctx.closePath();
+  if (fill) { ctx.fillStyle = fill; ctx.fill(); }
+  if (stroke) { ctx.strokeStyle = stroke; ctx.lineWidth = 1.5; ctx.stroke(); }
+}
+
+function drawDimLabel(ctx, txf, from, to, text, offset = { x: 0, y: 0 }) {
+  const mx = (from.x + to.x) / 2;
+  const my = (from.y + to.y) / 2;
+  const sx = txf.ox + mx * txf.pxPerM + offset.x;
+  const sy = txf.oy - my * txf.pxPerM + offset.y;
+  drawLabel(ctx, sx, sy, text, '#fbbf24');
+}
+
+/** Small triangle at eye: d_eye (horizontal) and h (vertical below eye level). */
+function drawCeilingSmallTriangle(ctx, view, txf, c) {
+  const { eye, mirrorY, dEye } = c;
+  const hBelow = mirrorY - c.hEye;
+  const foot = { x: 0, y: c.hEye };
+  const reflect = { x: 0, y: mirrorY };
+
+  drawRightTriangle(ctx, view, txf, eye, foot, reflect, 'rgba(255,204,0,0.14)', 'rgba(255,204,0,0.85)');
+  const dash = { dashed: true, color: 'rgba(255,204,0,0.75)', width: 1 };
+  drawArrow(ctx, view, txf, eye, foot, dash);
+  drawArrow(ctx, view, txf, foot, reflect, dash);
+
+  const lang = getLang();
+  drawDimLabel(ctx, txf, eye, foot, lang === 'zh' ? `d眼=${dEye}` : `d=${dEye}`, { x: 0, y: 14 });
+  drawDimLabel(ctx, txf, foot, reflect, `h=${hBelow.toFixed(2)}`, { x: 12, y: 0 });
+}
+
+/** Large similar triangle from E to image L′: base d_eye+d_light, height Δh. */
+function drawCeilingLargeTriangle(ctx, view, txf, c) {
+  const { eye, image, dEye, dLight, hEye, hCeiling } = c;
+  const dh = hCeiling - hEye;
+  const underImage = { x: image.x, y: hEye };
+
+  drawRightTriangle(ctx, view, txf, eye, underImage, image, 'rgba(167,139,250,0.14)', 'rgba(167,139,250,0.7)');
+  const dash = { dashed: true, color: 'rgba(167,139,250,0.7)', width: 1 };
+  drawArrow(ctx, view, txf, eye, underImage, dash);
+  drawArrow(ctx, view, txf, underImage, image, dash);
+
+  const lang = getLang();
+  drawDimLabel(ctx, txf, eye, underImage, lang === 'zh' ? `d眼+d燈` : `dE+dL`, { x: 0, y: -12 });
+  drawDimLabel(ctx, txf, underImage, image, `Δh=${dh.toFixed(2)}`, { x: 14, y: 0 });
+}
+
+function drawSpiderSmallTriangle(ctx, view, txf, c) {
+  const { eye, mirrorTop, hEye, dEye } = c;
+  const dy = mirrorTop - hEye;
+  const foot = { x: 0, y: hEye };
+  const top = { x: 0, y: mirrorTop };
+
+  drawRightTriangle(ctx, view, txf, eye, foot, top, 'rgba(255,204,0,0.14)', 'rgba(255,204,0,0.85)');
+  const dash = { dashed: true, color: 'rgba(255,204,0,0.75)', width: 1 };
+  drawArrow(ctx, view, txf, eye, foot, dash);
+  drawArrow(ctx, view, txf, foot, top, dash);
+
+  const lang = getLang();
+  drawDimLabel(ctx, txf, eye, foot, lang === 'zh' ? `d眼=${dEye}` : `d=${dEye}`, { x: 0, y: 14 });
+  drawDimLabel(ctx, txf, foot, top, dy.toFixed(2), { x: 12, y: 0 });
+}
+
+function drawSpiderLargeTriangle(ctx, view, txf, c) {
+  const { eye, image, hEye, dEye, dWall, maxH } = c;
+  const totalBase = 2 * dEye + dWall;
+  const underImage = { x: image.x, y: hEye };
+
+  drawRightTriangle(ctx, view, txf, eye, underImage, image, 'rgba(167,139,250,0.14)', 'rgba(167,139,250,0.7)');
+  const dash = { dashed: true, color: 'rgba(167,139,250,0.7)', width: 1 };
+  drawArrow(ctx, view, txf, eye, underImage, dash);
+  drawArrow(ctx, view, txf, underImage, image, dash);
+
+  const lang = getLang();
+  drawDimLabel(ctx, txf, eye, underImage, lang === 'zh' ? `2d眼+牆距` : `2d+dW`, { x: 0, y: -12 });
+  drawDimLabel(ctx, txf, underImage, image, lang === 'zh' ? `h−眼高` : `h−eye`, { x: 14, y: 0 });
+}
+
+function createSeeBackObjectScenario() {
+  let sub = 'ceiling';
+  let params = {
+    ceiling: { hEye: 1.5, dEye: 1.5, dLight: 3, hCeiling: 2.5 },
+    spider: { hEye: 1.6, dEye: 1.0, mirrorTop: 1.8, dWall: 3.0 },
+  };
+  let view = null;
+  let canvasRef = null;
+  let animator = new RayAnimator();
+  animator.rayCount = 1;
+  animator.extraSteps = CONSTRUCTION_STEPS;
+
+  function getSubTabs() { return ['ceiling', 'spider']; }
+  function setSub(s) {
+    sub = s;
+    if (canvasRef?.isConnected) {
+      animator.reset();
+    } else {
+      animator.pause();
+      animator.stepIndex = 0;
+    }
+  }
+
+  function teardown() {
+    canvasRef = null;
+  }
+
+  function updateWorldBounds(c) {
+    if (c.mode === 'ceiling') {
+      view.worldBounds = {
+        xMin: -c.dLight - 1,
+        xMax: c.dLight + c.dEye + 0.5,
+        yMin: 0,
+        yMax: Math.max(c.hCeiling, c.mirrorY) + 0.5,
+      };
+    } else {
+      const backX = -(c.dEye + c.dWall);
+      view.worldBounds = {
+        xMin: backX - 0.5,
+        xMax: 2 * c.dEye + c.dWall + 0.5,
+        yMin: 0,
+        yMax: Math.max(c.maxH, c.mirrorTop) + 0.5,
+      };
+    }
+  }
+
+  function compute() {
+    if (sub === 'ceiling') {
+      const { hEye, dEye, dLight, hCeiling } = params.ceiling;
+      const mirrorX = 0;
+      const mirrorY = mirrorHeightForCeilingLight(dLight, dEye, hCeiling, hEye);
+      const eye = { x: -dEye, y: hEye };
+      const light = { x: -dLight, y: hCeiling };
+      const image = { x: dLight, y: hCeiling };
+      const reflectPt = virtualSightOnVerticalMirror(image, eye, mirrorX, 0, 3);
+      return { mirrorX, eye, light, image, mirrorY, reflectPt, hEye, dEye, dLight, hCeiling, mode: 'ceiling' };
+    }
+    const { hEye, dEye, mirrorTop, dWall } = params.spider;
+    const mirrorX = 0;
+    const maxH = maxHeightOnBackWall(dEye, dWall, hEye, mirrorTop);
+    const eye = { x: -dEye, y: hEye };
+    const backWallX = -(dEye + dWall);
+    const spider = { x: backWallX, y: maxH };
+    const image = { x: dEye + dWall, y: maxH };
+    const reflectPt = { x: mirrorX, y: mirrorTop };
+    return { mirrorX, eye, spider, image, mirrorTop, maxH, reflectPt, hEye, dEye, dWall, backWallX, mode: 'spider' };
+  }
+
+  function getControls() {
+    if (sub === 'ceiling') {
+      const p = params.ceiling;
+      return [
+        { id: 'hEye', labelKey: 'eyeHeight', min: 1, max: 2, step: 0.05, value: p.hEye, unit: 'm' },
+        { id: 'dEye', labelKey: 'distToMirror', min: 0.5, max: 3, step: 0.1, value: p.dEye, unit: 'm' },
+        { id: 'dLight', labelKey: 'distLightToWall', min: 1, max: 5, step: 0.1, value: p.dLight, unit: 'm' },
+        { id: 'hCeiling', labelKey: 'ceilingHeight', min: 2, max: 3.5, step: 0.05, value: p.hCeiling, unit: 'm' },
+      ];
+    }
+    const p = params.spider;
+    return [
+      { id: 'hEye', labelKey: 'eyeHeight', min: 1.2, max: 2, step: 0.05, value: p.hEye, unit: 'm' },
+      { id: 'dEye', labelKey: 'distToMirror', min: 0.5, max: 2, step: 0.1, value: p.dEye, unit: 'm' },
+      { id: 'mirrorTop', labelKey: 'mirrorTop', min: 1.4, max: 2.5, step: 0.05, value: p.mirrorTop, unit: 'm' },
+      { id: 'dWall', labelKey: 'distToBackWall', min: 1, max: 5, step: 0.1, value: p.dWall, unit: 'm' },
+    ];
+  }
+
+  function updateParams(id, v) { params[sub][id] = v; }
+  function preset() {
+    params = {
+      ceiling: { hEye: 1.5, dEye: 1.5, dLight: 3, hCeiling: 2.5 },
+      spider: { hEye: 1.6, dEye: 1.0, mirrorTop: 1.8, dWall: 3.0 },
+    };
+    animator.extraSteps = CONSTRUCTION_STEPS;
+  }
+
+  function getDescription() {
+    if (sub === 'ceiling') return getLang() === 'zh' ? '（Q23）鏡最小高度 ≈ 1.83 m' : '(Q23) Minimum mirror height ≈ 1.83 m';
+    return getLang() === 'zh' ? '（Q24）可見蜘蛛最大高度 h = 2.6 m' : '(Q24) Maximum visible height h = 2.6 m';
+  }
+
+  function getStats(c) {
+    const lang = getLang();
+    if (c.mode === 'ceiling') {
+      return [{ label: getLang() === 'zh' ? '鏡高度' : 'Mirror height', value: formatLength(c.mirrorY, lang) }];
+    }
+    return [{ label: getLang() === 'zh' ? '最大可見高度' : 'Max visible h', value: formatLength(c.maxH, lang) }];
+  }
+
+  function getFormula(c) {
+    if (c.mode === 'ceiling') {
+      return getLang() === 'zh'
+        ? 'h/d眼 = 1/(d眼+d燈)\nh = 0.33 m\n鏡高 = 1.5+0.33 = 1.83 m'
+        : 'h/dE = 1/(dE+dL) → mirror at 1.83 m';
+    }
+    return getLang() === 'zh'
+      ? '0.2/1 = (h−1.6)/5\nh = 2.6 m'
+      : '0.2/1 = (h−1.6)/5 → h = 2.6 m';
+  }
+
+  function init(canvas) {
+    canvasRef = canvas;
+    view = createWorldView(canvas, {
+      worldBounds: sub === 'ceiling' ? { xMin: -5, xMax: 5, yMin: 0, yMax: 3 } : { xMin: -6, xMax: 6, yMin: 0, yMax: 3.2 },
+    });
+    animator.onUpdate = () => {
+      if (canvasRef) draw(canvasRef);
+    };
+  }
+
+  function drawConstruction(ctx, view, txf, c, stepIndex) {
+    const rayDone = STEPS_PER_RAY;
+    const showSmall = stepIndex >= rayDone + 1;
+    const showLarge = stepIndex >= rayDone + 2;
+    if (!showSmall && !showLarge) return;
+
+    if (c.mode === 'ceiling') {
+      if (showSmall) drawCeilingSmallTriangle(ctx, view, txf, c);
+      if (showLarge) drawCeilingLargeTriangle(ctx, view, txf, c);
+    } else {
+      if (showSmall) drawSpiderSmallTriangle(ctx, view, txf, c);
+      if (showLarge) drawSpiderLargeTriangle(ctx, view, txf, c);
+    }
+  }
+
+  function draw(canvas) {
+    const { w, h, ctx } = resizeCanvasToDisplay(canvas);
+    const c = compute();
+    updateWorldBounds(c);
+    const txf = computeTransform(view, w, h);
+    clear(ctx, w, h);
+    drawGrid(ctx, view, txf, w, h);
+    drawGround(ctx, view, txf);
+
+    const stepIndex = animator.stepIndex;
+    const helpers = {
+      drawArrow: (from, to, opts) => drawArrow(ctx, view, txf, from, to, opts),
+      drawImageLine: (from, to) => drawArrow(ctx, view, txf, from, to, { dashed: true, color: COLORS.rayVirtual, width: 1 }),
+      drawPoint: (p, col) => drawPoint(ctx, view, txf, p, 5, col),
+    };
+
+    if (c.mode === 'ceiling') {
+      drawWall(ctx, view, txf, c.light.x, 0, c.hCeiling);
+      drawVerticalMirror(ctx, view, txf, c.mirrorX, 0, c.mirrorY, COLORS.mirrorNeed, 5);
+      drawPoint(ctx, view, txf, c.eye, 6, COLORS.eye, 'E');
+      drawPoint(ctx, view, txf, c.light, 7, '#fbbf24', 'L');
+      drawPoint(ctx, view, txf, c.image, 6, COLORS.image, "L'");
+      if (c.reflectPt) {
+        const ray = { objectPt: c.light, eye: c.eye, image: c.image, reflectPt: c.reflectPt };
+        RayAnimator.drawSightRay(ctx, view, txf, helpers, ray, stepIndex, 0, 1);
+      }
+      drawConstruction(ctx, view, txf, c, stepIndex);
+    } else {
+      drawVerticalMirror(ctx, view, txf, c.mirrorX, 0, c.mirrorTop + 0.3, COLORS.mirror, 3);
+      drawWall(ctx, view, txf, c.backWallX, 0, 3);
+      drawPoint(ctx, view, txf, c.eye, 6, COLORS.eye, 'E');
+      drawPoint(ctx, view, txf, c.spider, 7, '#ef4444', 'S');
+      drawPoint(ctx, view, txf, c.image, 6, COLORS.image, "S'");
+      const ray = { objectPt: c.spider, eye: c.eye, image: c.image, reflectPt: c.reflectPt };
+      RayAnimator.drawSightRay(ctx, view, txf, helpers, ray, stepIndex, 0, 1);
+      drawConstruction(ctx, view, txf, c, stepIndex);
+    }
+  }
+
+  return {
+    id: 'seeBack', init, draw, compute, getControls, updateParams, preset, teardown,
+    getDescription, getStats, getFormula,
+    getAnimator: () => animator, getSubTabs, setSub,
+  };
+}
+
+
+/* --- angledMirrors.js --- */
+
+
+
+const MIRROR_LEN = 3.5;
+const HIT_PX = 18;
+const LINE_HIT_PX = 14;
+
+function defaultObjectInWedge(index, thetaDeg, orientationDeg) {
+  const r = 1.1 + index * 0.2;
+  const phi = deg2rad(orientationDeg);
+  return { x: r * Math.cos(phi), y: r * Math.sin(phi) };
+}
+
+/** Keep object inside the wedge (2D polar clamp in local frame). */
+function constrainInWedge(pt, thetaDeg, phiRad, minR = 0.35, maxR = 2.8) {
+  const half = deg2rad(thetaDeg) / 2;
+  const margin = deg2rad(3);
+  const local = Vec2.rot(pt, -phiRad);
+  let r = Math.hypot(local.x, local.y);
+  let ang = Math.atan2(local.y, local.x);
+  ang = clamp(ang, -half + margin, half - margin);
+  r = clamp(r, minR, maxR);
+  const localClamped = { x: r * Math.cos(ang), y: r * Math.sin(ang) };
+  return Vec2.rot(localClamped, phiRad);
+}
+
+function isInsideWedge(pt, thetaDeg, phiRad, minR = 0.2) {
+  const half = deg2rad(thetaDeg) / 2;
+  const local = Vec2.rot(pt, -phiRad);
+  if (Math.hypot(local.x, local.y) < minR) return false;
+  const ang = Math.atan2(local.y, local.x);
+  return Math.abs(ang) < half - deg2rad(2);
+}
+
+function createAngledMirrorsScenario() {
+  let params = { theta: 45, orientation: 0, showRays: true, showImages: true };
+  let view = null;
+  let objects = [];
+  let nextObjId = 1;
+  let dragTarget = null;
+  let draggingObjectId = null;
+  let canvasRef = null;
+  let placeMode = false;
+
+  function makeObject(index) {
+    const pt = defaultObjectInWedge(index, params.theta, params.orientation);
+    const label = index === 0 ? 'O' : `O${index + 1}`;
+    return { id: nextObjId++, label, x: pt.x, y: pt.y };
+  }
+
+  function resetObjects() {
+    nextObjId = 1;
+    objects = [makeObject(0)];
+  }
+
+  function compute() {
+    const theta = deg2rad(params.theta);
+    const half = theta / 2;
+    const phi = deg2rad(params.orientation);
+    const apex = { x: 0, y: 0 };
+    const m1 = {
+      a: apex,
+      b: Vec2.rot({ x: MIRROR_LEN * Math.cos(half), y: MIRROR_LEN * Math.sin(half) }, phi),
+    };
+    const m2 = {
+      a: apex,
+      b: Vec2.rot({ x: MIRROR_LEN * Math.cos(-half), y: MIRROR_LEN * Math.sin(-half) }, phi),
+    };
+    const objectSets = objects.map((obj) => {
+      const localObj = Vec2.rot(obj, -phi);
+      const { images } = imagesInWedge(theta, localObj, 12);
+      const worldImages = images.map((im) => ({ ...im, pt: Vec2.rot(im.pt, phi) }));
+      return { object: obj, images: worldImages };
+    });
+    const nFormula = Math.round(360 / params.theta) - 1;
+    return { theta, half, phi, m1, m2, objectSets, nFormula };
+  }
+
+  function fitBounds(c) {
+    const pts = [{ x: 0, y: 0 }];
+    c.objectSets.forEach((set) => {
+      pts.push(set.object);
+      set.images.forEach((im) => pts.push(im.pt));
+    });
+    pts.push(c.m1.b, c.m2.b);
+    let xMin = 0; let xMax = 1; let yMin = 0; let yMax = 1;
+    pts.forEach((p) => {
+      xMin = Math.min(xMin, p.x);
+      xMax = Math.max(xMax, p.x);
+      yMin = Math.min(yMin, p.y);
+      yMax = Math.max(yMax, p.y);
+    });
+    view.worldBounds = {
+      xMin: xMin - 0.8,
+      xMax: xMax + 0.8,
+      yMin: yMin - 0.8,
+      yMax: yMax + 0.8,
+    };
+  }
+
+  function getControls() {
+    return [
+      { id: 'theta', labelKey: 'angle', min: 30, max: 120, step: 5, value: params.theta, unit: '°' },
+      { id: 'orientation', labelKey: 'wedgeOrientation', min: -180, max: 180, step: 5, value: params.orientation, unit: '°' },
+    ];
+  }
+
+  function preset() {
+    params = { theta: 45, orientation: 0, showRays: true, showImages: true };
+    placeMode = false;
+    resetObjects();
+  }
+
+  function updateParams(id, v) {
+    if (id === 'theta') {
+      params.theta = v;
+      const phi = deg2rad(params.orientation);
+      objects.forEach((obj) => {
+        const p = constrainInWedge(obj, params.theta, phi);
+        obj.x = p.x;
+        obj.y = p.y;
+      });
+      return;
+    }
+    if (id === 'orientation') {
+      params.orientation = v;
+      return;
+    }
+    params[id] = v;
+  }
+
+  function handleAction(id) {
+    if (id === 'addObject') {
+      objects.push(makeObject(objects.length));
+      canvasRef && draw(canvasRef);
+      return;
+    }
+    if (id === 'removeObject' && objects.length > 1) {
+      objects.pop();
+      canvasRef && draw(canvasRef);
+      return;
+    }
+    if (id === 'placeMode') {
+      placeMode = !placeMode;
+      if (canvasRef) canvasRef.style.cursor = placeMode ? 'crosshair' : 'default';
+    }
+  }
+
+  function getDescription() {
+    return getLang() === 'zh'
+      ? '拖曳頂點旋轉鏡組；拖曳鏡面線／鏡端調整 θ；物件可於楔角內自由移動。'
+      : 'Drag apex to rotate mirrors; drag mirror line/tip for θ; object moves freely in wedge.';
+  }
+
+  function getStats(c) {
+    return [
+      { label: t('imageCount'), value: String(c.nFormula) },
+      { label: t('formula'), value: `360/${params.theta}−1` },
+      { label: getLang() === 'zh' ? '物件數' : 'Objects', value: String(objects.length) },
+    ];
+  }
+
+  function getFormula(c) {
+    return `n = 360°/θ − 1 = ${c.nFormula}`;
+  }
+
+  function syncControl(id, value, unit = '°') {
+    const slider = document.getElementById(`ctrl-${id}`);
+    const badge = document.getElementById(`ctrl-${id}-val`);
+    if (slider) slider.value = String(value);
+    if (badge) badge.textContent = `${value}${unit}`;
+  }
+
+  function syncThetaControl() {
+    syncControl('theta', params.theta);
+  }
+
+  function syncOrientationControl() {
+    syncControl('orientation', params.orientation);
+  }
+
+  function getWorld(canvas, clientX, clientY) {
+    const rect = canvas.getBoundingClientRect();
+    const sx = clientX - rect.left;
+    const sy = clientY - rect.top;
+    const txf = computeTransform(view, rect.width, rect.height);
+    return {
+      x: (sx - txf.ox) / txf.pxPerM,
+      y: (txf.oy - sy) / txf.pxPerM,
+      sx, sy, txf, rect,
+    };
+  }
+
+  function toScreen(txf, p) {
+    return { x: txf.ox + p.x * txf.pxPerM, y: txf.oy - p.y * txf.pxPerM };
+  }
+
+  function distPx(ax, ay, bx, by) {
+    return Math.hypot(ax - bx, ay - by);
+  }
+
+  function distSegPx(px, py, ax, ay, bx, by) {
+    const abx = bx - ax;
+    const aby = by - ay;
+    const len2 = abx * abx + aby * aby;
+    if (len2 < 1) return Math.hypot(px - ax, py - ay);
+    let t = ((px - ax) * abx + (py - ay) * aby) / len2;
+    t = Math.max(0, Math.min(1, t));
+    const cx = ax + t * abx;
+    const cy = ay + t * aby;
+    return Math.hypot(px - cx, py - cy);
+  }
+
+  function setThetaFromMirror(dragId, world) {
+    const phi = deg2rad(params.orientation);
+    const local = Vec2.rot(world, -phi);
+    const ang = Math.atan2(local.y, local.x);
+    if (dragId === 'm1' || dragId === 'm1line') {
+      if (local.y < 0.01) return;
+      params.theta = clamp(Math.round(rad2deg(2 * ang) / 5) * 5, 30, 120);
+    } else if (dragId === 'm2' || dragId === 'm2line') {
+      if (local.y > -0.01) return;
+      params.theta = clamp(Math.round(rad2deg(-2 * ang) / 5) * 5, 30, 120);
+    }
+    const newPhi = deg2rad(params.orientation);
+    objects.forEach((obj) => {
+      const p = constrainInWedge(obj, params.theta, newPhi);
+      obj.x = p.x;
+      obj.y = p.y;
+    });
+    syncThetaControl();
+  }
+
+  function setOrientationFromPointer(world) {
+    params.orientation = Math.round(rad2deg(Math.atan2(world.y, world.x)) / 5) * 5;
+    syncOrientationControl();
+  }
+
+  function bindPointer(canvas) {
+    const pickTarget = (world) => {
+      const { sx, sy, txf } = world;
+      const c = compute();
+      const apex = toScreen(txf, c.m1.a);
+      const m1b = toScreen(txf, c.m1.b);
+      const m2b = toScreen(txf, c.m2.b);
+
+      let best = null;
+      let bestD = Infinity;
+
+      objects.forEach((o) => {
+        const s = toScreen(txf, o);
+        const d = distPx(sx, sy, s.x, s.y);
+        if (d < HIT_PX && d < bestD) { bestD = d; best = o.id; }
+      });
+
+      const dApex = distPx(sx, sy, apex.x, apex.y);
+      if (dApex < HIT_PX + 6 && dApex < bestD) { bestD = dApex; best = 'apex'; }
+
+      const tips = [
+        { id: 'm1', s: m1b },
+        { id: 'm2', s: m2b },
+      ];
+      tips.forEach(({ id, s }) => {
+        const d = distPx(sx, sy, s.x, s.y);
+        if (d < HIT_PX + 4 && d < bestD) { bestD = d; best = id; }
+      });
+
+      const lines = [
+        { id: 'm1line', a: apex, b: m1b },
+        { id: 'm2line', a: apex, b: m2b },
+      ];
+      lines.forEach(({ id, a, b }) => {
+        const d = distSegPx(sx, sy, a.x, a.y, b.x, b.y);
+        if (d < LINE_HIT_PX && d < bestD) { bestD = d; best = id; }
+      });
+
+      return best;
+    };
+
+    const onDown = (e) => {
+      e.preventDefault();
+      const world = getWorld(canvas, e.clientX, e.clientY);
+
+      if (!placeMode) {
+        const hit = pickTarget(world);
+        if (hit !== null) {
+          if (typeof hit === 'number') {
+            dragTarget = hit;
+            draggingObjectId = hit;
+          } else {
+            dragTarget = hit;
+            draggingObjectId = null;
+          }
+          canvas.setPointerCapture?.(e.pointerId);
+          canvas.style.cursor = 'grabbing';
+          return;
+        }
+      }
+
+      if (placeMode && isInsideWedge(world, params.theta, deg2rad(params.orientation))) {
+        const pt = constrainInWedge(world, params.theta, deg2rad(params.orientation));
+        objects.push({ id: nextObjId++, label: `O${objects.length + 1}`, x: pt.x, y: pt.y });
+        draw(canvas);
+      }
+    };
+
+    const onMove = (e) => {
+      const world = getWorld(canvas, e.clientX, e.clientY);
+
+      if (!dragTarget) {
+        if (!placeMode) {
+          const hover = pickTarget(world);
+          canvas.style.cursor = hover !== null ? 'grab' : 'default';
+        }
+        return;
+      }
+
+      e.preventDefault();
+
+      if (dragTarget === 'apex') {
+        setOrientationFromPointer(world);
+      } else if (dragTarget === 'm1' || dragTarget === 'm2' || dragTarget === 'm1line' || dragTarget === 'm2line') {
+        setThetaFromMirror(dragTarget, world);
+      } else if (typeof dragTarget === 'number') {
+        const obj = objects.find((o) => o.id === dragTarget);
+        if (obj) {
+          const p = constrainInWedge(world, params.theta, deg2rad(params.orientation));
+          obj.x = p.x;
+          obj.y = p.y;
+        }
+      }
+      draw(canvas);
+    };
+
+    const onUp = (e) => {
+      dragTarget = null;
+      draggingObjectId = null;
+      canvas.style.cursor = placeMode ? 'crosshair' : 'default';
+      if (canvas.releasePointerCapture) {
+        try { canvas.releasePointerCapture(e.pointerId); } catch (_) { /* ignore */ }
+      }
+    };
+
+    canvas.style.touchAction = 'none';
+    canvas.style.cursor = 'default';
+    canvas.addEventListener('pointerdown', onDown);
+    canvas.addEventListener('pointermove', onMove);
+    canvas.addEventListener('pointerup', onUp);
+    canvas.addEventListener('pointercancel', onUp);
+  }
+
+  function init(canvas) {
+    canvasRef = canvas;
+    if (!objects.length) resetObjects();
+    view = createWorldView(canvas, { worldBounds: { xMin: -1, xMax: 5, yMin: -0.5, yMax: 4.5 }, gridStep: 1 });
+    bindPointer(canvas);
+  }
+
+  function teardown() {
+    canvasRef = null;
+    dragTarget = null;
+    draggingObjectId = null;
+  }
+
+  function drawMirror(ctx, view, txf, a, b, label, draggable = false, active = false) {
+    ctx.strokeStyle = active ? COLORS.mirrorNeed : COLORS.mirror;
+    ctx.lineWidth = active ? 4 : 3;
+    const s0 = { x: txf.ox + a.x * txf.pxPerM, y: txf.oy - a.y * txf.pxPerM };
+    const s1 = { x: txf.ox + b.x * txf.pxPerM, y: txf.oy - b.y * txf.pxPerM };
+    ctx.beginPath();
+    ctx.moveTo(s0.x, s0.y);
+    ctx.lineTo(s1.x, s1.y);
+    ctx.stroke();
+    drawLabel(ctx, s1.x + 6, s1.y - 6, label, active ? COLORS.mirrorNeed : COLORS.mirror);
+    if (draggable) {
+      ctx.fillStyle = active ? 'rgba(255,204,0,0.5)' : 'rgba(34,211,238,0.4)';
+      ctx.beginPath();
+      ctx.arc(s1.x, s1.y, 12, 0, Math.PI * 2);
+      ctx.fill();
+      ctx.strokeStyle = active ? COLORS.mirrorNeed : COLORS.mirror;
+      ctx.lineWidth = 2;
+      ctx.stroke();
+    }
+  }
+
+  function draw(canvas) {
+    const { w, h, ctx } = resizeCanvasToDisplay(canvas);
+    const c = compute();
+    fitBounds(c);
+    const txf = computeTransform(view, w, h);
+    const apexWorld = { x: 0, y: 0 };
+    clear(ctx, w, h);
+    const gridR = Math.max(
+      3.5,
+      ...c.objectSets.flatMap((set) => [
+        Math.hypot(set.object.x, set.object.y),
+        ...set.images.map((im) => Math.hypot(im.pt.x, im.pt.y)),
+      ]),
+    ) + 0.5;
+    drawPolarWedgeGrid(ctx, view, txf, {
+      apex: apexWorld,
+      phi: c.phi,
+      halfAngle: c.half,
+      maxR: gridR,
+      stepR: 1,
+    });
+
+    const bisLen = Math.min(2.5, gridR - 0.3);
+    const bisEnd = {
+      x: bisLen * Math.cos(c.phi),
+      y: bisLen * Math.sin(c.phi),
+    };
+    const ax0 = toScreen(txf, apexWorld);
+    const ax1 = toScreen(txf, bisEnd);
+    ctx.strokeStyle = 'rgba(255,204,0,0.25)';
+    ctx.lineWidth = 1;
+    ctx.setLineDash([4, 6]);
+    ctx.beginPath();
+    ctx.moveTo(ax0.x, ax0.y);
+    ctx.lineTo(ax1.x, ax1.y);
+    ctx.stroke();
+    ctx.setLineDash([]);
+
+    const m1Active = dragTarget === 'm1' || dragTarget === 'm1line';
+    const m2Active = dragTarget === 'm2' || dragTarget === 'm2line';
+    const apexActive = dragTarget === 'apex';
+    drawMirror(ctx, view, txf, c.m1.a, c.m1.b, 'M₁', true, m1Active);
+    drawMirror(ctx, view, txf, c.m2.a, c.m2.b, 'M₂', true, m2Active);
+
+    if (apexActive) {
+      ctx.fillStyle = 'rgba(255,204,0,0.55)';
+    } else {
+      ctx.fillStyle = 'rgba(255,204,0,0.3)';
+    }
+    ctx.beginPath();
+    ctx.arc(ax0.x, ax0.y, 14, 0, Math.PI * 2);
+    ctx.fill();
+    ctx.strokeStyle = COLORS.mirrorNeed;
+    ctx.lineWidth = 2;
+    ctx.stroke();
+
+    if (params.showImages) {
+      c.objectSets.forEach((set) => {
+        if (params.showRays) {
+          set.images.forEach((img) => {
+            drawArrow(ctx, view, txf, set.object, img.pt, { dashed: true, color: COLORS.rayVirtual, width: 1 });
+          });
+        }
+        set.images.forEach((img) => {
+          const lbl = objects.length > 1 ? `${set.object.label}→${img.label}` : img.label;
+          drawPoint(ctx, view, txf, img.pt, 5, COLORS.image, lbl);
+        });
+      });
+    }
+
+    c.objectSets.forEach((set) => {
+      const active = draggingObjectId === set.object.id || dragTarget === set.object.id;
+      drawPoint(ctx, view, txf, set.object, active ? 10 : 8, active ? COLORS.mirrorNeed : COLORS.object, set.object.label);
+    });
+
+    const angM1 = Math.atan2(-c.m1.b.y, c.m1.b.x);
+    const angM2 = Math.atan2(-c.m2.b.y, c.m2.b.x);
+    ctx.strokeStyle = 'rgba(255,204,0,0.3)';
+    ctx.lineWidth = 1;
+    ctx.beginPath();
+    ctx.arc(ax0.x, ax0.y, 40, angM2, angM1);
+    ctx.stroke();
+    const midAng = (angM1 + angM2) / 2;
+    drawLabel(ctx, ax0.x + 50 * Math.cos(midAng), ax0.y + 50 * Math.sin(midAng), `θ=${params.theta}°`, COLORS.mirrorNeed);
+
+    if (placeMode) {
+      drawLabel(ctx, 12, 22, getLang() === 'zh' ? '點擊楔角內放置物件' : 'Click inside wedge to place', COLORS.mirrorNeed);
+    } else {
+      drawLabel(ctx, 12, 22, getLang() === 'zh' ? '拖曳頂點旋轉／物件移動' : 'Drag apex to rotate / move object', COLORS.mirrorNeed);
+    }
+  }
+
+  return {
+    id: 'angledMirrors', init, draw, compute, getControls, updateParams, preset, teardown,
+    getDescription, getStats, getFormula,
+    handleAction,
+    extraToggles: [
+      { id: 'showRays', labelKey: 'showRays' },
+      { id: 'showImages', labelKey: 'showImages' },
+    ],
+    extraButtons: [
+      { id: 'addObject', labelKey: 'addObject', action: 'click' },
+      { id: 'removeObject', labelKey: 'removeObject', action: 'click' },
+      { id: 'placeMode', labelKey: 'placeObject', toggle: true },
+    ],
+    get params() { return { ...params, placeMode }; },
+  };
+}
+
+
+/* --- sketchValidation.js --- */
+/** @file Validation for free ray-sketch practice mode. */
+
+const ANGLE_TOL_DEG = 3;
+const POS_TOL = 0.15;
+const PT_TOL = 0.22;
+
+function angleBetween(v1, v2) {
+  const l1 = Vec2.len(v1);
+  const l2 = Vec2.len(v2);
+  if (l1 < 1e-8 || l2 < 1e-8) return 0;
+  const dot = clamp(Vec2.dot(v1, v2) / (l1 * l2), -1, 1);
+  return Math.acos(dot);
+}
+
+function mirrorNormalTowardReflected(mirrorA, mirrorB, reflectDir) {
+  const ab = Vec2.sub(mirrorB, mirrorA);
+  const tangent = Vec2.norm(ab);
+  let n = { x: -tangent.y, y: tangent.x };
+  if (Vec2.dot(reflectDir, n) < 0) n = Vec2.scale(n, -1);
+  return n;
+}
+
+function checkReflectionAtPoint(from, via, to, mirrorA, mirrorB) {
+  if (!pointOnSegment(via, mirrorA, mirrorB, 0.02)) {
+    return { ok: false, diffDeg: 90, reason: 'offMirror' };
+  }
+  const incident = Vec2.sub(from, via);
+  const reflected = Vec2.sub(to, via);
+  const n = mirrorNormalTowardReflected(mirrorA, mirrorB, reflected);
+  const thetaI = angleBetween(incident, n);
+  const thetaR = angleBetween(reflected, n);
+  const diffDeg = Math.abs(rad2deg(thetaI) - rad2deg(thetaR));
+  return { ok: diffDeg <= ANGLE_TOL_DEG, diffDeg };
+}
+
+function nearPt(a, b, tol = PT_TOL) {
+  return Vec2.dist(a, b) <= tol;
+}
+
+function findMirrorAtPoint(pt, mirrors) {
+  for (const m of mirrors) {
+    if (pointOnSegment(pt, m.a, m.b, 0.03)) return m;
+  }
+  return null;
+}
+
+function rayEndpoints(ray) {
+  return [ray.from, ray.to];
+}
+
+function sharedMirrorPoint(r1, r2, mirrors) {
+  for (const p1 of rayEndpoints(r1)) {
+    for (const p2 of rayEndpoints(r2)) {
+      if (!nearPt(p1, p2, 0.12)) continue;
+      if (findMirrorAtPoint(p1, mirrors)) return p1;
+    }
+  }
+  return null;
+}
+
+function otherEndpoint(ray, pt) {
+  if (nearPt(ray.from, pt, 0.12)) return ray.to;
+  if (nearPt(ray.to, pt, 0.12)) return ray.from;
+  return null;
+}
+
+/** Pairs of real segments meeting on mirror → reflection check. */
+function bouncePairs(realRays, mirrors) {
+  const pairs = [];
+  for (let i = 0; i < realRays.length; i++) {
+    for (let j = i + 1; j < realRays.length; j++) {
+      const via = sharedMirrorPoint(realRays[i], realRays[j], mirrors);
+      if (!via) continue;
+      const from = otherEndpoint(realRays[i], via);
+      const to = otherEndpoint(realRays[j], via);
+      if (!from || !to) continue;
+      const mirror = findMirrorAtPoint(via, mirrors);
+      if (!mirror) continue;
+      pairs.push({ from, via, to, mirror, i, j });
+    }
+  }
+  return pairs;
+}
+
+/** Validate reflection at each mirror bounce formed by two real segments. */
+function validateReflections(state) {
+  const realRays = state.rays.filter((r) => r.kind === 'real');
+  if (!realRays.length) {
+    return { ok: null, messageKey: 'noRealRays', issues: [] };
+  }
+  const pairs = bouncePairs(realRays, state.mirrors);
+  if (!pairs.length) {
+    return { ok: null, messageKey: 'noBouncePair', issues: [] };
+  }
+  const issues = [];
+  pairs.forEach((bp, idx) => {
+    const res = checkReflectionAtPoint(bp.from, bp.via, bp.to, bp.mirror.a, bp.mirror.b);
+    if (!res.ok) {
+      issues.push({ index: idx + 1, diffDeg: res.diffDeg, reason: res.reason || 'angle' });
+    }
+  });
+  return { ok: issues.length === 0, issues, pairCount: pairs.length };
+}
+
+function barEndpointDistance(a1, a2, b1, b2) {
+  const d1 = Vec2.dist(a1, b1) + Vec2.dist(a2, b2);
+  const d2 = Vec2.dist(a1, b2) + Vec2.dist(a2, b1);
+  return Math.min(d1, d2);
+}
+
+function validateImagePosition(state) {
+  const { objects, images, mirrors } = state;
+  if (!objects.length || !images.length || !mirrors.length) {
+    return { ok: null, messageKey: 'needObjectMirrorImage' };
+  }
+  const obj = objects[0];
+  const img = images[0];
+  const mirror = mirrors[0];
+  const expA = reflectPoint(obj.a, mirror.a, mirror.b);
+  const expB = reflectPoint(obj.b, mirror.a, mirror.b);
+  const err = barEndpointDistance(expA, expB, img.a, img.b);
+  return { ok: err <= POS_TOL * 2, err, expA, expB };
+}
+
+function collinear(a, b, c) {
+  const cross = (b.x - a.x) * (c.y - a.y) - (b.y - a.y) * (c.x - a.x);
+  return Math.abs(cross) < 0.08;
+}
+
+function segmentTouchesPoint(ray, pt) {
+  return nearPt(ray.from, pt) || nearPt(ray.to, pt);
+}
+
+function findSightPath(objPt, eyePt, imgPt, realRays, virtRays, mirrors) {
+  for (const m of mirrors) {
+    for (let i = 0; i < realRays.length; i++) {
+      for (let j = 0; j < realRays.length; j++) {
+        if (i === j) continue;
+        const via = sharedMirrorPoint(realRays[i], realRays[j], [m]);
+        if (!via) continue;
+        const from = otherEndpoint(realRays[i], via);
+        const to = otherEndpoint(realRays[j], via);
+        if (!from || !to) continue;
+        if (!nearPt(from, objPt) || !nearPt(to, eyePt)) continue;
+        const refl = checkReflectionAtPoint(from, via, to, m.a, m.b);
+        if (!refl.ok) continue;
+        const hasVirt = virtRays.some((vr) => {
+          const touchesVia = nearPt(vr.from, via) || nearPt(vr.to, via);
+          const touchesImg = nearPt(vr.from, imgPt) || nearPt(vr.to, imgPt);
+          return touchesVia && touchesImg;
+        });
+        if (hasVirt) return true;
+      }
+    }
+  }
+  return false;
+}
+
+function validateWholeImage(state) {
+  const { objects, images, observers, rays, mirrors } = state;
+  if (!objects.length || !images.length || !observers.length || !mirrors.length) {
+    return { ok: null, messageKey: 'needFullSetup' };
+  }
+  const obj = objects[0];
+  const img = images[0];
+  const eye = observers[0].pt;
+  const realRays = rays.filter((r) => r.kind === 'real');
+  const virtRays = rays.filter((r) => r.kind === 'virtual');
+  if (realRays.length < 2) return { ok: null, messageKey: 'noRealRays' };
+
+  const endpoints = [
+    { objPt: obj.a, imgPt: img.a, label: 'A' },
+    { objPt: obj.b, imgPt: img.b, label: 'B' },
+  ];
+
+  const failed = [];
+  for (const ep of endpoints) {
+    if (!findSightPath(ep.objPt, eye, ep.imgPt, realRays, virtRays, mirrors)) {
+      failed.push(ep.label);
+    }
+  }
+  return { ok: failed.length === 0, failed };
+}
+
+function runAllValidations(state) {
+  return {
+    reflection: validateReflections(state),
+    imagePos: validateImagePosition(state),
+    wholeImage: validateWholeImage(state),
+  };
+}
+
+
+/* --- raySketch.js --- */
+
+
+
+const SKETCH_HIT_R = 0.32;
+const SEG_HIT_R = 0.22;
+const SNAP = 0.5;
+const TOOLS = ['select', 'mirror', 'object', 'image', 'observer', 'realRay', 'virtualRay'];
+
+const TOOL_META = {
+  select: { icon: '↖', hintKey: 'sketchHintSelect', group: 'nav', labelKey: 'toolSelect', cls: 'tool-select' },
+  mirror: { icon: '╱', hintKey: 'sketchHintMirror', group: 'place', labelKey: 'toolMirror' },
+  object: { icon: '▮', hintKey: 'sketchHintObject', group: 'place', labelKey: 'toolObject' },
+  image: { icon: '▯', hintKey: 'sketchHintImage', group: 'place', labelKey: 'toolImage' },
+  observer: { icon: '◎', hintKey: 'sketchHintObserver', group: 'place', labelKey: 'toolObserver' },
+  realRay: { icon: '→', hintKey: 'sketchHintRealRay', group: 'ray', labelKey: 'toolRealRay', cls: 'tool-ray' },
+  virtualRay: { icon: '⇢', hintKey: 'sketchHintVirtualRay', group: 'ray', labelKey: 'toolVirtualRay', cls: 'tool-virtual' },
+};
+
+function emptyState() {
+  return {
+    mirrors: [],
+    objects: [],
+    images: [],
+    observers: [],
+    rays: [],
+    tool: 'select',
+    pending: null,
+    selected: null,
+    gridSnap: true,
+    nextId: 1,
+  };
+}
+
+function snap(p, on) {
+  if (!on) return { ...p };
+  return { x: Math.round(p.x / SNAP) * SNAP, y: Math.round(p.y / SNAP) * SNAP };
+}
+
+function distToSegment(p, a, b) {
+  const abx = b.x - a.x;
+  const aby = b.y - a.y;
+  const len2 = abx * abx + aby * aby;
+  if (len2 < 1e-12) return Math.hypot(p.x - a.x, p.y - a.y);
+  const t = Math.max(0, Math.min(1, ((p.x - a.x) * abx + (p.y - a.y) * aby) / len2));
+  const cx = a.x + t * abx;
+  const cy = a.y + t * aby;
+  return Math.hypot(p.x - cx, p.y - cy);
+}
+
+function clonePt(p) { return { x: p.x, y: p.y }; }
+
+function createRaySketchScenario() {
+  let state = emptyState();
+  let view = null;
+  let canvasRef = null;
+  let dragTarget = null;
+  let dragWhole = null;
+  let cursorWorld = null;
+  let refreshToolbarRef = null;
+
+  function nid() { return state.nextId++; }
+
+  function preset() { state = emptyState(); }
+
+  function updateParams(id, v) {
+    if (id === 'gridSnap') state.gridSnap = v;
+    else if (TOOLS.includes(id)) state.tool = id;
+  }
+
+  function selectionName() {
+    if (!state.selected) return null;
+    const { type, id, part } = state.selected;
+    const lang = getLang();
+    if (type === 'ray') {
+      const r = state.rays.find((x) => x.id === id);
+      const kind = r?.kind === 'virtual'
+        ? (lang === 'zh' ? '虛線' : 'virtual')
+        : (lang === 'zh' ? '實線' : 'real');
+      return `${kind} #${id}`;
+    }
+    const names = {
+      mirror: lang === 'zh' ? '鏡面' : 'mirror',
+      object: lang === 'zh' ? '物件' : 'object',
+      image: lang === 'zh' ? '虛像' : 'image',
+      observer: lang === 'zh' ? '觀察者' : 'observer',
+    };
+    if (part && part !== 'pt') return `${names[type] || type} (${part})`;
+    return names[type] || type;
+  }
+
+  function notifyChange() {
+    refreshToolbarRef?.();
+    canvasRef && draw(canvasRef);
+  }
+
+  function handleAction(id) {
+    if (id === 'deleteSelected') {
+      deleteSelected();
+      notifyChange();
+      return;
+    }
+    if (TOOLS.includes(id)) {
+      state.tool = id;
+      state.pending = null;
+      if (canvasRef) {
+        canvasRef.style.cursor = id === 'select' ? 'default' : 'crosshair';
+      }
+    }
+    if (id === 'gridSnap') state.gridSnap = !state.gridSnap;
+  }
+
+  function deleteSelected() {
+    const s = state.selected;
+    if (!s) return;
+    const { type, id } = s;
+    if (type === 'mirror') state.mirrors = state.mirrors.filter((m) => m.id !== id);
+    else if (type === 'object') state.objects = state.objects.filter((o) => o.id !== id);
+    else if (type === 'image') state.images = state.images.filter((i) => i.id !== id);
+    else if (type === 'observer') state.observers = state.observers.filter((o) => o.id !== id);
+    else if (type === 'ray') state.rays = state.rays.filter((r) => r.id !== id);
+    state.selected = null;
+  }
+
+  function compute() {
+    return { state, validation: runAllValidations(state) };
+  }
+
+  function getControls() { return []; }
+
+  function getDescription() {
+    return getLang() === 'zh'
+      ? '放置鏡面、物件、虛像與觀察者，手繪光線。系統會檢查反射定律與能否看見整個像。'
+      : 'Place mirror, object, image and observer; sketch rays. Reflection law and whole-image visibility are checked.';
+  }
+
+  function getStats(c) {
+    const v = c.validation;
+    const lang = getLang();
+    const rows = [];
+
+    if (v.reflection.ok === null) {
+      const msg = v.reflection.messageKey === 'noBouncePair'
+        ? (lang === 'zh' ? '—（需兩段實線在鏡面相接）' : '— (join 2 real segments on mirror)')
+        : (lang === 'zh' ? '—（未畫實線）' : '— (no real rays)');
+      rows.push({ label: lang === 'zh' ? '反射定律' : 'Reflection', value: msg });
+    } else if (v.reflection.ok) {
+      rows.push({ label: lang === 'zh' ? '反射定律' : 'Reflection', value: '✓', ok: true });
+    } else {
+      const n = v.reflection.issues.map((i) => `#${i.index}`).join(', ');
+      rows.push({ label: lang === 'zh' ? '反射定律' : 'Reflection', value: `✗ ${n}`, fail: true });
+    }
+
+    if (v.imagePos.ok === null) {
+      rows.push({ label: lang === 'zh' ? '虛像位置' : 'Image pos.', value: '—' });
+    } else if (v.imagePos.ok) {
+      rows.push({ label: lang === 'zh' ? '虛像位置' : 'Image pos.', value: '✓', ok: true });
+    } else {
+      rows.push({ label: lang === 'zh' ? '虛像位置' : 'Image pos.', value: '⚠', fail: true });
+    }
+
+    if (v.wholeImage.ok === null) {
+      rows.push({ label: lang === 'zh' ? '整個像' : 'Whole image', value: '—' });
+    } else if (v.wholeImage.ok) {
+      rows.push({ label: lang === 'zh' ? '整個像' : 'Whole image', value: '✓', ok: true });
+    } else {
+      const f = v.wholeImage.failed?.join(', ') || '?';
+      rows.push({
+        label: lang === 'zh' ? '整個像' : 'Whole image',
+        value: lang === 'zh' ? `✗ 端點 ${f}` : `✗ end ${f}`,
+        fail: true,
+      });
+    }
+    return rows;
+  }
+
+  function getFormula(c) {
+    const lang = getLang();
+    const v = c.validation;
+    const lines = [];
+    if (v.reflection.ok === false && v.reflection.issues.length) {
+      v.reflection.issues.forEach((iss) => {
+        if (iss.reason === 'noMirror') {
+          lines.push(lang === 'zh' ? `反射點 #${iss.index}：不在鏡面上` : `Bounce #${iss.index}: not on mirror`);
+        } else {
+          lines.push(lang === 'zh'
+            ? `反射點 #${iss.index}：入射角≠反射角（差 ${iss.diffDeg?.toFixed(1)}°）`
+            : `Bounce #${iss.index}: angle error ${iss.diffDeg?.toFixed(1)}°`);
+        }
+      });
+    }
+    if (v.imagePos.ok === false) {
+      lines.push(lang === 'zh'
+        ? `虛像與理論反射位置偏差 ≈ ${v.imagePos.err?.toFixed(2)} m`
+        : `Image offset ≈ ${v.imagePos.err?.toFixed(2)} m`);
+    }
+    if (v.wholeImage.ok === false && v.wholeImage.failed?.length) {
+      lines.push(lang === 'zh'
+        ? `無法由光線看見端點：${v.wholeImage.failed.join(', ')}`
+        : `Cannot see endpoints: ${v.wholeImage.failed.join(', ')}`);
+    }
+    if (!lines.length) {
+      return lang === 'zh' ? '完成作圖後，檢查結果會顯示於此。' : 'Results appear here after sketching.';
+    }
+    return lines.join('\n');
+  }
+
+  function hitTest(world) {
+    const hits = [];
+
+    for (const r of state.rays) {
+      const df = Math.hypot(world.x - r.from.x, world.y - r.from.y);
+      const dt = Math.hypot(world.x - r.to.x, world.y - r.to.y);
+      if (df < SKETCH_HIT_R) hits.push({ type: 'ray', id: r.id, part: 'from', dist: df, priority: 0 });
+      if (dt < SKETCH_HIT_R) hits.push({ type: 'ray', id: r.id, part: 'to', dist: dt, priority: 0 });
+      const d = distToSegment(world, r.from, r.to);
+      if (d < SEG_HIT_R) hits.push({ type: 'ray', id: r.id, dist: d, priority: 1 });
+    }
+
+    for (const o of state.observers) {
+      const d = Math.hypot(world.x - o.pt.x, world.y - o.pt.y);
+      if (d < SKETCH_HIT_R) hits.push({ type: 'observer', id: o.id, part: 'pt', dist: d, priority: 0 });
+    }
+    for (const o of state.objects) {
+      const da = Math.hypot(world.x - o.a.x, world.y - o.a.y);
+      const db = Math.hypot(world.x - o.b.x, world.y - o.b.y);
+      if (da < SKETCH_HIT_R) hits.push({ type: 'object', id: o.id, part: 'a', dist: da, priority: 0 });
+      if (db < SKETCH_HIT_R) hits.push({ type: 'object', id: o.id, part: 'b', dist: db, priority: 0 });
+      const ds = distToSegment(world, o.a, o.b);
+      if (ds < SEG_HIT_R) hits.push({ type: 'object', id: o.id, dist: ds, priority: 2 });
+    }
+    for (const i of state.images) {
+      const da = Math.hypot(world.x - i.a.x, world.y - i.a.y);
+      const db = Math.hypot(world.x - i.b.x, world.y - i.b.y);
+      if (da < SKETCH_HIT_R) hits.push({ type: 'image', id: i.id, part: 'a', dist: da, priority: 0 });
+      if (db < SKETCH_HIT_R) hits.push({ type: 'image', id: i.id, part: 'b', dist: db, priority: 0 });
+      const ds = distToSegment(world, i.a, i.b);
+      if (ds < SEG_HIT_R) hits.push({ type: 'image', id: i.id, dist: ds, priority: 2 });
+    }
+    for (const m of state.mirrors) {
+      const da = Math.hypot(world.x - m.a.x, world.y - m.a.y);
+      const db = Math.hypot(world.x - m.b.x, world.y - m.b.y);
+      if (da < SKETCH_HIT_R) hits.push({ type: 'mirror', id: m.id, part: 'a', dist: da, priority: 0 });
+      if (db < SKETCH_HIT_R) hits.push({ type: 'mirror', id: m.id, part: 'b', dist: db, priority: 0 });
+      const ds = distToSegment(world, m.a, m.b);
+      if (ds < SEG_HIT_R) hits.push({ type: 'mirror', id: m.id, dist: ds, priority: 2 });
+    }
+
+    if (!hits.length) return null;
+    hits.sort((a, b) => a.priority - b.priority || a.dist - b.dist);
+    const h = hits[0];
+    return { type: h.type, id: h.id, part: h.part };
+  }
+
+  function snapshotElement(hit) {
+    const { type, id } = hit;
+    if (type === 'observer') {
+      const o = state.observers.find((x) => x.id === id);
+      return { type, id, pt: clonePt(o.pt) };
+    }
+    if (type === 'ray') {
+      const r = state.rays.find((x) => x.id === id);
+      return { type, id, from: clonePt(r.from), to: clonePt(r.to) };
+    }
+    const el = state[`${type}s`]?.find?.((x) => x.id === id)
+      || (type === 'mirror' ? state.mirrors.find((x) => x.id === id) : null);
+    if (!el) return null;
+    return { type, id, a: clonePt(el.a), b: clonePt(el.b) };
+  }
+
+  function applyWholeDrag(snapshot, dx, dy) {
+    const { type, id } = snapshot;
+    if (type === 'observer') {
+      const o = state.observers.find((x) => x.id === id);
+      if (o) o.pt = snap({ x: snapshot.pt.x + dx, y: snapshot.pt.y + dy }, state.gridSnap);
+    } else if (type === 'ray') {
+      const r = state.rays.find((x) => x.id === id);
+      if (r) {
+        r.from = snap({ x: snapshot.from.x + dx, y: snapshot.from.y + dy }, state.gridSnap);
+        r.to = snap({ x: snapshot.to.x + dx, y: snapshot.to.y + dy }, state.gridSnap);
+      }
+    } else if (type === 'mirror') {
+      const m = state.mirrors.find((x) => x.id === id);
+      if (m) {
+        m.a = snap({ x: snapshot.a.x + dx, y: snapshot.a.y + dy }, state.gridSnap);
+        m.b = snap({ x: snapshot.b.x + dx, y: snapshot.b.y + dy }, state.gridSnap);
+      }
+    } else if (type === 'object') {
+      const o = state.objects.find((x) => x.id === id);
+      if (o) {
+        o.a = snap({ x: snapshot.a.x + dx, y: snapshot.a.y + dy }, state.gridSnap);
+        o.b = snap({ x: snapshot.b.x + dx, y: snapshot.b.y + dy }, state.gridSnap);
+      }
+    } else if (type === 'image') {
+      const i = state.images.find((x) => x.id === id);
+      if (i) {
+        i.a = snap({ x: snapshot.a.x + dx, y: snapshot.a.y + dy }, state.gridSnap);
+        i.b = snap({ x: snapshot.b.x + dx, y: snapshot.b.y + dy }, state.gridSnap);
+      }
+    }
+  }
+
+  function placeClick(world) {
+    const p = snap(world, state.gridSnap);
+    const tool = state.tool;
+
+    if (tool === 'observer') {
+      state.observers.push({ id: nid(), pt: p });
+      state.pending = null;
+      return;
+    }
+
+    if (tool === 'mirror' || tool === 'object' || tool === 'image') {
+      if (!state.pending || state.pending.kind !== tool) {
+        state.pending = { kind: tool, clicks: [p] };
+        return;
+      }
+      const a = state.pending.clicks[0];
+      const b = p;
+      const id = nid();
+      if (tool === 'mirror') state.mirrors.push({ id, a, b });
+      else if (tool === 'object') state.objects.push({ id, a, b });
+      else state.images.push({ id, a, b });
+      state.pending = null;
+      return;
+    }
+
+    if (tool === 'realRay' || tool === 'virtualRay') {
+      if (!state.pending || state.pending.kind !== tool) {
+        state.pending = { kind: tool, clicks: [p] };
+        return;
+      }
+      const from = state.pending.clicks[0];
+      state.rays.push({
+        id: nid(),
+        kind: tool === 'realRay' ? 'real' : 'virtual',
+        from,
+        to: p,
+      });
+      state.pending = null;
+    }
+  }
+
+  let keyHandler = null;
+
+  function bindPointer(canvas) {
+    const getWorld = (clientX, clientY) => {
+      const rect = canvas.getBoundingClientRect();
+      const txf = computeTransform(view, rect.width, rect.height);
+      return { ...toWorld(view, txf, clientX - rect.left, clientY - rect.top), txf };
+    };
+
+    const onDown = (e) => {
+      e.preventDefault();
+      const world = getWorld(e.clientX, e.clientY);
+      cursorWorld = world;
+
+      if (state.tool === 'select') {
+        const hit = hitTest(world);
+        state.selected = hit;
+        if (hit) {
+          if (hit.part) {
+            dragTarget = hit;
+            dragWhole = null;
+          } else {
+            dragTarget = null;
+            dragWhole = { start: clonePt(world), snap: snapshotElement(hit) };
+          }
+        } else {
+          dragTarget = null;
+          dragWhole = null;
+        }
+        notifyChange();
+      } else {
+        placeClick(world);
+        draw(canvas);
+      }
+      if ((dragTarget || dragWhole) && canvas.setPointerCapture) canvas.setPointerCapture(e.pointerId);
+    };
+
+    const onMove = (e) => {
+      const world = getWorld(e.clientX, e.clientY);
+      cursorWorld = world;
+
+      if (dragWhole?.snap) {
+        e.preventDefault();
+        const dx = world.x - dragWhole.start.x;
+        const dy = world.y - dragWhole.start.y;
+        applyWholeDrag(dragWhole.snap, dx, dy);
+        draw(canvas);
+        return;
+      }
+
+      if (!dragTarget) {
+        if (state.pending) draw(canvas);
+        return;
+      }
+      e.preventDefault();
+      const p = snap(world, state.gridSnap);
+      const { type, id, part } = dragTarget;
+
+      if (type === 'observer') {
+        const o = state.observers.find((x) => x.id === id);
+        if (o) o.pt = p;
+      } else if (type === 'ray') {
+        const r = state.rays.find((x) => x.id === id);
+        if (r) {
+          if (part === 'from') r.from = p;
+          else if (part === 'to') r.to = p;
+        }
+      } else if (type === 'mirror') {
+        const m = state.mirrors.find((x) => x.id === id);
+        if (m) m[part] = p;
+      } else if (type === 'object') {
+        const o = state.objects.find((x) => x.id === id);
+        if (o) o[part] = p;
+      } else if (type === 'image') {
+        const i = state.images.find((x) => x.id === id);
+        if (i) i[part] = p;
+      }
+      draw(canvas);
+    };
+
+    const onUp = () => {
+      dragTarget = null;
+      dragWhole = null;
+    };
+
+    const onKey = (e) => {
+      if (state.tool !== 'select') return;
+      if (e.key === 'Delete' || e.key === 'Backspace') {
+        e.preventDefault();
+        deleteSelected();
+        notifyChange();
+      }
+    };
+
+    if (keyHandler) window.removeEventListener('keydown', keyHandler);
+    keyHandler = onKey;
+
+    canvas.style.touchAction = 'none';
+    canvas.style.cursor = 'default';
+    canvas.addEventListener('pointerdown', onDown);
+    canvas.addEventListener('pointermove', onMove);
+    canvas.addEventListener('pointerup', onUp);
+    canvas.addEventListener('pointercancel', onUp);
+    window.addEventListener('keydown', keyHandler);
+  }
+
+  function init(canvas) {
+    canvasRef = canvas;
+    view = createWorldView(canvas, {
+      worldBounds: { xMin: -2, xMax: 8, yMin: -2, yMax: 4 },
+      gridStep: SNAP,
+      margin: { left: 40, right: 40, top: 40, bottom: 40 },
+    });
+    bindPointer(canvas);
+  }
+
+  function drawPreview(ctx, view, txf) {
+    if (!state.pending || !cursorWorld) return;
+    const clicks = state.pending.clicks;
+    const p = snap(cursorWorld, state.gridSnap);
+    ctx.globalAlpha = 0.45;
+    if (state.pending.kind === 'mirror' || state.pending.kind === 'object' || state.pending.kind === 'image') {
+      drawArrow(ctx, view, txf, clicks[0], p, {
+        color: COLORS.mirrorNeed,
+        dashed: state.pending.kind !== 'mirror',
+        width: 2,
+        head: state.pending.kind !== 'mirror',
+      });
+    } else if (state.pending.kind === 'realRay') {
+      drawArrow(ctx, view, txf, clicks[0], p, { color: COLORS.rayReal, width: 2 });
+    } else if (state.pending.kind === 'virtualRay') {
+      drawArrow(ctx, view, txf, clicks[0], p, { color: COLORS.rayVirtual, width: 2, dashed: true });
+    }
+    ctx.globalAlpha = 1;
+  }
+
+  function draw(canvas) {
+    const { w, h, ctx } = resizeCanvasToDisplay(canvas);
+    const txf = computeTransform(view, w, h);
+    clear(ctx, w, h);
+    drawGrid(ctx, view, txf, w, h);
+
+    state.mirrors.forEach((m) => {
+      const sel = state.selected?.type === 'mirror' && state.selected.id === m.id;
+      drawMirrorSegment(ctx, view, txf, m.a, m.b, COLORS.mirror, 4, sel);
+    });
+
+    state.objects.forEach((o, i) => {
+      const sel = state.selected?.type === 'object' && state.selected.id === o.id;
+      drawBar(ctx, view, txf, o.a, o.b, {
+        color: COLORS.object,
+        width: 4,
+        labelA: i === 0 ? 'A' : '',
+        labelB: i === 0 ? 'B' : '',
+        selected: sel,
+      });
+    });
+
+    state.images.forEach((img, i) => {
+      const sel = state.selected?.type === 'image' && state.selected.id === img.id;
+      drawBar(ctx, view, txf, img.a, img.b, {
+        color: COLORS.image,
+        width: 3,
+        dashed: true,
+        labelA: i === 0 ? "A'" : '',
+        labelB: i === 0 ? "B'" : '',
+        selected: sel,
+      });
+    });
+
+    state.observers.forEach((o) => {
+      const sel = state.selected?.type === 'observer' && state.selected.id === o.id;
+      drawPoint(ctx, view, txf, o.pt, 7, sel ? COLORS.mirrorNeed : COLORS.eye, 'E');
+    });
+
+    state.rays.forEach((r) => {
+      const sel = state.selected?.type === 'ray' && state.selected.id === r.id;
+      const color = r.kind === 'real' ? COLORS.rayReal : COLORS.rayVirtual;
+      drawArrow(ctx, view, txf, r.from, r.to, {
+        color: sel ? COLORS.mirrorNeed : color,
+        width: sel ? 3 : 2,
+        dashed: r.kind === 'virtual',
+      });
+      if (sel) {
+        drawPoint(ctx, view, txf, r.from, 5, COLORS.mirrorNeed, '');
+        drawPoint(ctx, view, txf, r.to, 5, COLORS.mirrorNeed, '');
+      }
+    });
+
+    drawPreview(ctx, view, txf);
+  }
+
+  function buildToolbar(container, onChange) {
+    container.innerHTML = '';
+    const root = document.createElement('div');
+    root.className = 'sketch-toolbar';
+
+    const hintEl = document.createElement('div');
+    hintEl.className = 'sketch-hint';
+    root.appendChild(hintEl);
+
+    const selBox = document.createElement('div');
+    selBox.className = 'sketch-selection-box';
+    const selLabel = document.createElement('span');
+    selLabel.className = 'sketch-selection-label';
+    selLabel.dataset.i18n = 'sketchSelected';
+    const selValue = document.createElement('span');
+    selValue.className = 'sketch-selection-value';
+    selBox.appendChild(selLabel);
+    selBox.appendChild(selValue);
+    root.appendChild(selBox);
+
+    const toolBtns = {};
+
+    function makeToolBtn(id) {
+      const meta = TOOL_META[id];
+      const btn = document.createElement('button');
+      btn.type = 'button';
+      btn.className = 'sketch-tool-btn' + (meta.cls ? ` ${meta.cls}` : '');
+      btn.dataset.tool = id;
+      btn.innerHTML = `<span class="sketch-tool-icon">${meta.icon}</span><span data-i18n="${meta.labelKey || 'toolSelect'}"></span>`;
+      btn.addEventListener('click', () => {
+        handleAction(id);
+        refreshToolbar();
+        onChange?.();
+      });
+      toolBtns[id] = btn;
+      return btn;
+    }
+
+    function makeGroup(titleKey, toolIds, cols = 2) {
+      const g = document.createElement('div');
+      g.className = 'sketch-tool-group';
+      const title = document.createElement('p');
+      title.className = 'sketch-tool-group-title';
+      title.dataset.i18n = titleKey;
+      g.appendChild(title);
+      const grid = document.createElement('div');
+      grid.className = 'sketch-tool-grid' + (cols === 1 ? ' cols-1' : '');
+      toolIds.forEach((id) => grid.appendChild(makeToolBtn(id)));
+      g.appendChild(grid);
+      root.appendChild(g);
+    }
+
+    makeGroup('sketchGroupNav', ['select'], 1);
+    makeGroup('sketchGroupPlace', ['mirror', 'object', 'image', 'observer']);
+    makeGroup('sketchGroupRays', ['realRay', 'virtualRay']);
+
+    const actions = document.createElement('div');
+    actions.className = 'sketch-tool-group';
+    const actTitle = document.createElement('p');
+    actTitle.className = 'sketch-tool-group-title';
+    actTitle.dataset.i18n = 'sketchGroupActions';
+    actions.appendChild(actTitle);
+
+    const delBtn = document.createElement('button');
+    delBtn.type = 'button';
+    delBtn.className = 'btn-sketch-delete';
+    delBtn.innerHTML = `<span data-i18n="deleteSelected"></span>`;
+    delBtn.addEventListener('click', () => {
+      if (!state.selected) return;
+      handleAction('deleteSelected');
+      onChange?.();
+    });
+    actions.appendChild(delBtn);
+
+    const snapRow = document.createElement('div');
+    snapRow.className = 'sketch-action-row';
+    snapRow.style.marginTop = '8px';
+    const snapLabel = document.createElement('label');
+    snapLabel.dataset.i18n = 'gridSnap';
+    const snapToggle = document.createElement('button');
+    snapToggle.type = 'button';
+    snapToggle.className = 'sketch-toggle' + (state.gridSnap ? ' on' : '');
+    snapToggle.setAttribute('aria-pressed', state.gridSnap ? 'true' : 'false');
+    snapToggle.addEventListener('click', () => {
+      handleAction('gridSnap');
+      snapToggle.classList.toggle('on', state.gridSnap);
+      snapToggle.setAttribute('aria-pressed', state.gridSnap ? 'true' : 'false');
+      onChange?.();
+    });
+    snapRow.appendChild(snapLabel);
+    snapRow.appendChild(snapToggle);
+    actions.appendChild(snapRow);
+    root.appendChild(actions);
+
+    container.appendChild(root);
+    applyI18n(root);
+
+    function refreshToolbar() {
+      hintEl.textContent = t(TOOL_META[state.tool]?.hintKey || 'sketchHintSelect');
+      Object.entries(toolBtns).forEach(([id, btn]) => {
+        btn.classList.toggle('active', state.tool === id);
+      });
+      snapToggle.classList.toggle('on', state.gridSnap);
+
+      const name = selectionName();
+      if (name) {
+        selValue.textContent = name;
+        selBox.classList.add('has-selection');
+        delBtn.disabled = false;
+        delBtn.classList.remove('disabled');
+      } else {
+        selValue.textContent = t('sketchNothingSelected');
+        selBox.classList.remove('has-selection');
+        delBtn.disabled = true;
+        delBtn.classList.add('disabled');
+      }
+    }
+    refreshToolbar();
+    refreshToolbarRef = refreshToolbar;
+    return refreshToolbar;
+  }
+
+  function teardown() {
+    if (keyHandler) {
+      window.removeEventListener('keydown', keyHandler);
+      keyHandler = null;
+    }
+    canvasRef = null;
+    dragTarget = null;
+    dragWhole = null;
+  }
+
+  return {
+    id: 'raySketch',
+    hideAnimation: true,
+    hideResults: true,
+    controlsTitleKey: 'sketchTools',
+    init,
+    draw,
+    compute,
+    getControls,
+    updateParams,
+    preset,
+    teardown,
+    handleAction,
+    buildToolbar,
+    getDescription,
+    getStats,
+    getFormula,
+    get params() {
+      const p = { gridSnap: state.gridSnap };
+      TOOLS.forEach((tid) => { p[tid] = state.tool === tid; });
+      return p;
+    },
+  };
+}
+
+
+/* --- app.js --- */
+
+
+
+
+
+
+
+const SCENARIOS = [
+  createImageFormationScenario(),
+  createMinMirrorLengthScenario(),
+  createMinMirrorHeightScenario(),
+  createSeeBackObjectScenario(),
+  createAngledMirrorsScenario(),
+  createRaySketchScenario(),
+];
+
+const TAB_KEYS = [
+  'imageFormation', 'minLength', 'minHeight', 'seeBack', 'angledMirrors', 'raySketch',
+];
+
+let currentIdx = 0;
+let currentSub = null;
+
+const els = {
+  canvas: null,
+  canvasTop: null,
+  controls: null,
+  stats: null,
+  formula: null,
+  formulaLatex: null,
+  desc: null,
+  subTabs: null,
+  vizPanel: null,
+  sceneBadge: null,
+};
+
+function getScenario() { return SCENARIOS[currentIdx]; }
+
+/**
+ * Build LaTeX from compute() — numbers update when sliders/drag change (teaching feedback loop).
+ * Falls back to plain text in #formula if KaTeX CDN unavailable (offline file://).
+ */
+function buildLatex(sc, c) {
+  const id = sc.id;
+  switch (id) {
+    case 'imageFormation':
+      return [
+        '\\begin{aligned}',
+        `u &= ${c.u.toFixed(2)}\\,\\mathrm{m},\\quad v = ${c.v.toFixed(2)}\\,\\mathrm{m} \\\\[4pt]`,
+        'u &= v \\\\[4pt]',
+        `u + v &= ${(c.u + c.v).toFixed(2)}\\,\\mathrm{m}`,
+        '\\end{aligned}',
+      ].join('\n');
+    case 'minLength':
+      return [
+        '\\begin{aligned}',
+        `p &= \\tfrac{H}{2} = ${c.req.length.toFixed(2)}\\,\\mathrm{m} \\\\`,
+        `q &= \\tfrac{h}{2} = ${c.req.bottom.toFixed(2)}\\,\\mathrm{m} \\\\`,
+        `y_{\\mathrm{top}} &= \\tfrac{H+h}{2} = ${c.req.top.toFixed(2)}\\,\\mathrm{m}`,
+        '\\end{aligned}',
+      ].join('\n');
+    case 'minHeight':
+      if (c.mode === 'feet') {
+        return `\\begin{aligned} 2y &= h_{\\mathrm{eye}} \\\\ y &= ${c.y.toFixed(2)}\\,\\mathrm{m} \\end{aligned}`;
+      }
+      if (c.mode === 'cockroach') {
+        return `\\tfrac{y}{h-y} = \\tfrac{d_{\\mathrm{obj}}}{d_{\\mathrm{eye}}},\\; y = ${c.y.toFixed(2)}\\,\\mathrm{m}`;
+      }
+      return `p \\geq ${(c.req.minP * 100).toFixed(0)}\\,\\mathrm{cm}`;
+    case 'seeBack':
+      return c.mode === 'ceiling'
+        ? '\\tfrac{h}{d_E} = \\tfrac{1}{d_E + d_L},\\; y_{\\mathrm{mirror}} = 1.83\\,\\mathrm{m}'
+        : '\\tfrac{0.2}{1} = \\tfrac{h - 1.6}{5} \\Rightarrow h = 2.6\\,\\mathrm{m}';
+    case 'angledMirrors': {
+      const th = sc.params ? sc.params.theta : 45;
+      return `n = \\dfrac{360^{\\circ}}{\\theta} - 1 = \\dfrac{360^{\\circ}}{${th}} - 1 = ${c.nFormula}`;
+    }
+    case 'raySketch':
+      return '\\theta_i = \\theta_r';
+    default:
+      return null;
+  }
+}
+
+function renderFormulaPanel(latexEl, fallbackEl, latex, fallbackText, opts = {}) {
+  const katex = typeof window !== 'undefined' ? window.katex : null;
+  if (latexEl && latex && katex?.renderToString) {
+    try {
+      latexEl.innerHTML = katex.renderToString(latex, { throwOnError: false, displayMode: true });
+      latexEl.hidden = false;
+      if (fallbackEl) {
+        fallbackEl.textContent = fallbackText || '';
+        fallbackEl.hidden = !opts.keepFallback;
+      }
+      return;
+    } catch (_) { /* plain text */ }
+  }
+  if (latexEl) latexEl.hidden = true;
+  if (fallbackEl) {
+    fallbackEl.textContent = fallbackText || '';
+    fallbackEl.hidden = false;
+  }
+}
+
+function buildTabs() {
+  const bar = document.getElementById('tabBar');
+  bar.innerHTML = '';
+  TAB_KEYS.forEach((key, i) => {
+    const btn = document.createElement('button');
+    btn.type = 'button';
+    btn.className = 'tab-btn' + (i === currentIdx ? ' active' : '');
+    btn.dataset.i18n = `tabs.${key}`;
+    btn.addEventListener('click', () => switchScenario(i));
+    bar.appendChild(btn);
+  });
+  applyI18n(bar);
+}
+
+function buildSubTabs(scenario) {
+  if (!els.subTabs) return;
+  els.subTabs.innerHTML = '';
+  if (!scenario.getSubTabs) {
+    els.subTabs.style.display = 'none';
+    currentSub = null;
+    return;
+  }
+  els.subTabs.style.display = 'flex';
+  const subs = scenario.getSubTabs();
+  if (!currentSub || !subs.includes(currentSub)) currentSub = subs[0];
+  subs.forEach((sub) => {
+    const btn = document.createElement('button');
+    btn.type = 'button';
+    btn.className = 'sub-tab-btn' + (sub === currentSub ? ' active' : '');
+    btn.dataset.i18n = `sub.${sub}`;
+    btn.addEventListener('click', () => {
+      currentSub = sub;
+      scenario.setSub(sub);
+      buildSubTabs(scenario);
+      rebuildControls();
+      render();
+    });
+    els.subTabs.appendChild(btn);
+  });
+  applyI18n(els.subTabs);
+}
+
+function updateAnimPanel() {
+  const panel = document.getElementById('animPanel');
+  if (panel) panel.style.display = getScenario().hideAnimation ? 'none' : '';
+}
+
+function updateResultsPanel() {
+  const sc = getScenario();
+  const hide = !!sc.hideResults;
+  const title = document.getElementById('resultsTitle');
+  const stats = document.getElementById('stats');
+  if (title) {
+    title.style.display = hide ? 'none' : '';
+    title.dataset.i18n = hide ? 'formulaLive' : 'results';
+    if (!hide) title.textContent = t('results');
+  }
+  if (stats) stats.style.display = hide ? 'none' : '';
+}
+
+function pauseAllAnimators() {
+  SCENARIOS.forEach((s) => {
+    const anim = s.getAnimator?.();
+    if (anim) {
+      anim.pause();
+      anim.onUpdate = null;
+    }
+  });
+}
+
+/** Clear stale canvas refs / listeners before destroying the canvas element. */
+function teardownAllScenarios() {
+  pauseAllAnimators();
+  SCENARIOS.forEach((s) => s.teardown?.());
+}
+
+function switchScenario(i) {
+  if (i < 0 || i >= SCENARIOS.length) return;
+
+  teardownAllScenarios();
+
+  currentIdx = i;
+  const sc = getScenario();
+  const subs = sc.getSubTabs?.();
+  currentSub = subs ? subs[0] : null;
+
+  buildTabs();
+  setupCanvas();
+  sc.preset();
+
+  if (subs) sc.setSub(currentSub);
+
+  buildSubTabs(sc);
+  sc.getAnimator?.()?.reset?.();
+  rebuildControls();
+  updateAnimPanel();
+  updateResultsPanel();
+  render();
+}
+
+function setupCanvas() {
+  const sc = getScenario();
+  const panel = els.vizPanel;
+
+  /* 保留 viz-chrome（場景徽章 + 操作提示），只替換 canvas 區域 */
+  let chrome = panel.querySelector('.viz-chrome');
+  if (!chrome) {
+    chrome = document.createElement('div');
+    chrome.className = 'viz-chrome';
+    chrome.innerHTML = '<span class="scene-badge" id="sceneBadge" aria-live="polite"></span>'
+      + '<span class="viz-hint" id="vizHint" data-i18n="vizHint"></span>';
+    panel.insertBefore(chrome, panel.firstChild);
+    applyI18n(chrome);
+  }
+  els.sceneBadge = document.getElementById('sceneBadge');
+
+  let wrap = document.getElementById('vizCanvasWrap');
+  if (!wrap) {
+    wrap = document.createElement('div');
+    wrap.className = 'viz-canvas-wrap';
+    wrap.id = 'vizCanvasWrap';
+    const legend = panel.querySelector('.viz-legend');
+    panel.insertBefore(wrap, legend || null);
+  }
+  wrap.innerHTML = '';
+
+  if (sc.dualCanvas) {
+    const dual = document.createElement('div');
+    dual.className = 'dual-canvas';
+    const c1 = document.createElement('canvas');
+    const c2 = document.createElement('canvas');
+    c1.id = 'simCanvas';
+    c2.id = 'simCanvasTop';
+    dual.appendChild(c1);
+    dual.appendChild(c2);
+    wrap.appendChild(dual);
+    els.canvas = c1;
+    els.canvasTop = c2;
+    sc.init(c1, c2);
+  } else {
+    const c = document.createElement('canvas');
+    c.id = 'simCanvas';
+    c.setAttribute('aria-label', 'Optics simulation');
+    wrap.appendChild(c);
+    els.canvas = c;
+    els.canvasTop = null;
+    sc.init(c);
+  }
+}
+
+function rebuildControls() {
+  const sc = getScenario();
+  els.controls.innerHTML = '';
+
+  const controlsPanel = els.controls.closest('.panel-section');
+  const controlsTitle = controlsPanel?.querySelector('.panel-title');
+  if (controlsTitle) {
+    const key = sc.controlsTitleKey || 'controls';
+    controlsTitle.dataset.i18n = key;
+    controlsTitle.textContent = t(key);
+  }
+
+  sc.getControls().forEach((ctrl) => {
+    const g = document.createElement('div');
+    g.className = 'control-group';
+    const id = `ctrl-${ctrl.id}`;
+    g.innerHTML = `
+      <div class="label-row">
+        <span data-i18n="${ctrl.labelKey}"></span>
+        <span class="badge" id="${id}-val">${ctrl.value}${ctrl.unit || ''}</span>
+      </div>
+      <input type="range" id="${id}" min="${ctrl.min}" max="${ctrl.max}" step="${ctrl.step}" value="${ctrl.value}">
+    `;
+    els.controls.appendChild(g);
+    const slider = g.querySelector('input');
+    slider.addEventListener('input', () => {
+      const v = parseFloat(slider.value);
+      sc.updateParams(ctrl.id, v);
+      g.querySelector('.badge').textContent = `${v}${ctrl.unit || ''}`;
+      updateResults();
+      render();
+    });
+  });
+
+  if (sc.buildToolbar) {
+    sc._refreshToolbar = sc.buildToolbar(els.controls, () => {
+      updateResults();
+      render();
+    });
+  } else if (sc.extraToggles) {
+    const row = document.createElement('div');
+    row.className = 'btn-row';
+    sc.extraToggles.forEach((tog) => {
+      const btn = document.createElement('button');
+      const isOn = (p) => p[tog.id] !== false;
+      btn.className = 'btn' + (isOn(sc.params || {}) ? ' btn-primary' : '');
+      btn.dataset.i18n = tog.labelKey;
+      btn.textContent = t(tog.labelKey);
+      btn.addEventListener('click', () => {
+        const cur = sc.params?.[tog.id] !== false;
+        sc.updateParams(tog.id, !cur);
+        btn.classList.toggle('btn-primary', !cur);
+        render();
+      });
+      row.appendChild(btn);
+    });
+    els.controls.appendChild(row);
+    applyI18n(row);
+  }
+
+  if (!sc.buildToolbar && sc.extraButtons) {
+    const row = document.createElement('div');
+    row.className = 'btn-row';
+    sc.extraButtons.forEach((btnDef) => {
+      const btn = document.createElement('button');
+      btn.className = 'btn btn-accent';
+      btn.dataset.i18n = btnDef.labelKey;
+      if (btnDef.toggle) {
+        let on = sc.params?.[btnDef.id] === true;
+        btn.classList.toggle('btn-primary', on);
+        btn.addEventListener('click', () => {
+          if (sc.handleAction) sc.handleAction(btnDef.id);
+          else {
+            on = !on;
+            sc.updateParams(btnDef.id, on);
+          }
+          rebuildControls();
+          updateResults();
+          render();
+        });
+      } else {
+        btn.addEventListener('click', () => {
+          if (sc.handleAction) sc.handleAction(btnDef.id);
+          else sc.updateParams(btnDef.id, true);
+          updateResults();
+          render();
+        });
+      }
+      row.appendChild(btn);
+    });
+    els.controls.appendChild(row);
+    applyI18n(row);
+  }
+
+  applyI18n(els.controls);
+}
+
+function updateSceneBadge() {
+  const sc = getScenario();
+  if (els.sceneBadge) {
+    els.sceneBadge.textContent = t(`concept.${TAB_KEYS[currentIdx]}`) || '';
+  }
+}
+
+function updateResults() {
+  const sc = getScenario();
+  const c = sc.compute();
+  updateResultsPanel();
+  els.stats.innerHTML = '';
+  if (!sc.hideResults) {
+    (sc.getStats(c) || []).forEach((row) => {
+    const div = document.createElement('div');
+    div.className = 'stat-row';
+    const valCls = row.ok ? 'ok' : row.fail ? 'fail' : '';
+    div.innerHTML = `<span>${row.label}</span><span class="stat-val ${valCls}">${row.value}</span>`;
+    els.stats.appendChild(div);
+    });
+  }
+  const fallback = sc.getFormula(c) || '';
+  const latex = buildLatex(sc, c);
+  renderFormulaPanel(els.formulaLatex, els.formula, latex, fallback, {
+    keepFallback: sc.id === 'raySketch',
+  });
+  els.desc.textContent = sc.getDescription();
+  updateSceneBadge();
+}
+
+function render() {
+  const sc = getScenario();
+  if (sc.dualCanvas) sc.draw(els.canvas, els.canvasTop);
+  else sc.draw(els.canvas);
+  updateResults();
+}
+
+function bindAnim() {
+  document.getElementById('btnPlay').addEventListener('click', () => {
+    const anim = getScenario().getAnimator?.();
+    if (!anim?.play) return;
+    anim.play();
+  });
+  document.getElementById('btnPause').addEventListener('click', () => {
+    const anim = getScenario().getAnimator?.();
+    anim?.pause?.();
+    render();
+  });
+  document.getElementById('btnStep').addEventListener('click', () => {
+    const anim = getScenario().getAnimator?.();
+    anim?.stepNext?.();
+    render();
+  });
+  document.getElementById('btnShowAll').addEventListener('click', () => {
+    const anim = getScenario().getAnimator?.();
+    anim?.showAll?.();
+    render();
+  });
+  document.getElementById('btnReplay').addEventListener('click', () => {
+    const anim = getScenario().getAnimator?.();
+    anim?.reset?.();
+    anim?.play?.();
+  });
+}
+
+function bindReset() {
+  document.getElementById('btnReset').addEventListener('click', () => {
+    getScenario().preset();
+    rebuildControls();
+    getScenario().getAnimator?.()?.reset?.();
+    render();
+  });
+}
+
+function init() {
+  els.controls = document.getElementById('controls');
+  els.stats = document.getElementById('stats');
+  els.formula = document.getElementById('formula');
+  els.formulaLatex = document.getElementById('formulaLatex');
+  els.desc = document.getElementById('desc');
+  els.subTabs = document.getElementById('subTabs');
+  els.vizPanel = document.getElementById('vizPanel');
+  els.sceneBadge = document.getElementById('sceneBadge');
+
+  document.getElementById('langToggle').addEventListener('click', () => {
+    toggleLang();
+    buildTabs();
+    buildSubTabs(getScenario());
+    rebuildControls();
+    updateResults();
+    applyI18n(document.getElementById('legendPanel'));
+  });
+
+  applyI18n();
+  buildTabs();
+  setupCanvas();
+  const sc = getScenario();
+  if (sc.getSubTabs) {
+    currentSub = sc.getSubTabs()[0];
+    sc.setSub(currentSub);
+  }
+  buildSubTabs(sc);
+  rebuildControls();
+  updateAnimPanel();
+  updateResultsPanel();
+  bindAnim();
+  bindReset();
+  render();
+
+  window.addEventListener('resize', () => render());
+}
+
+document.addEventListener('DOMContentLoaded', init);
+
