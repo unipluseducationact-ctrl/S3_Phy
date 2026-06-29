@@ -735,7 +735,22 @@ html.s3phy-embed body {
 }
 
 html.s3phy-embed .app-header {
+  display: flex;
+  justify-content: flex-end;
+  align-items: center;
+  padding: 6px 12px 2px;
+  min-height: 0;
+}
+
+html.s3phy-embed .header-brand {
   display: none;
+}
+
+html.s3phy-embed .lang-toggle {
+  position: static;
+  margin: 0;
+  padding: 5px 12px;
+  font-size: 0.75rem;
 }
 
 html.s3phy-embed .tab-bar {
@@ -748,7 +763,7 @@ html.s3phy-embed .dashboard {
   max-width: none;
   margin: 0;
   padding: 8px;
-  height: calc(100% - 44px);
+  height: calc(100% - 72px);
   min-height: 0;
   align-items: stretch;
   box-sizing: border-box;

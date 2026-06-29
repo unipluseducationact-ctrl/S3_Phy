@@ -883,6 +883,17 @@ let currentLang = 'zh';
 
 function getLang() { return currentLang; }
 
+/** Map S3_PHY hub locale to lab locale. */
+function hubLangToLocal(hubLang) {
+  if (hubLang === 'zh-Hant' || hubLang === 'zh') return 'zh';
+  return 'en';
+}
+
+function initLangFromLocation() {
+  const lang = new URLSearchParams(location.search).get('lang');
+  if (lang) setLang(hubLangToLocal(lang));
+}
+
 function setLang(lang) {
   currentLang = lang === 'en' ? 'en' : 'zh';
   document.documentElement.lang = currentLang === 'zh' ? 'zh-HK' : 'en';
@@ -986,8 +997,8 @@ function createImageFormationScenario() {
 
   function init(canvas) {
     view = createWorldView(canvas, {
-      worldBounds: { xMin: -0.5, xMax: 6.5, yMin: 0, yMax: 3.2 },
-      gridStep: 1,
+      worldBounds: { xMin: -0.15, xMax: 4.5, yMin: 0, yMax: 2.2 },
+      gridStep: 0.5,
     });
     animator.onUpdate = () => draw(canvas);
   }
@@ -995,7 +1006,9 @@ function createImageFormationScenario() {
   function draw(canvas) {
     const { w, h, ctx } = resizeCanvasToDisplay(canvas);
     const c = compute();
-    view.worldBounds.xMax = Math.max(4, c.mirrorX + c.v + 1);
+    view.worldBounds.xMin = -0.15;
+    view.worldBounds.xMax = Math.max(c.mirrorX + c.v + 0.45, c.mirrorX + 0.5);
+    view.worldBounds.yMax = Math.max(params.H, params.hEye) + 0.35;
     const txf = computeTransform(view, w, h);
     clear(ctx, w, h);
     drawGrid(ctx, view, txf, w, h);
@@ -1105,9 +1118,9 @@ function createMinMirrorLengthScenario() {
 
   function init(canvas) {
     view = createWorldView(canvas, {
-      worldBounds: { xMin: -0.5, xMax: 6.5, yMin: 0, yMax: 3.2 },
-      gridStep: 1,
-      horizontalGridScale: 0.5,
+      worldBounds: { xMin: -0.15, xMax: 3.5, yMin: 0, yMax: 2.2 },
+      gridStep: 0.5,
+      horizontalGridScale: 1,
     });
     animator.onUpdate = () => draw(canvas);
   }
@@ -1115,6 +1128,9 @@ function createMinMirrorLengthScenario() {
   function draw(canvas) {
     const { w, h, ctx } = resizeCanvasToDisplay(canvas);
     const c = compute();
+    view.worldBounds.xMin = -0.15;
+    view.worldBounds.xMax = c.mirrorX + 0.55;
+    view.worldBounds.yMax = Math.max(params.H, params.hEye) + 0.35;
     const txf = computeTransform(view, w, h);
     clear(ctx, w, h);
     drawGrid(ctx, view, txf, w, h);
@@ -1156,8 +1172,8 @@ function createMinMirrorLengthScenario() {
 function createMinMirrorHeightScenario() {
   let sub = 'feet';
   let params = {
-    feet: { hEye: 1.5, dEye: 0.8 },
-    cockroach: { hEye: 1.5, dEye: 0.8, dObj: 0.4 },
+    feet: { H: 1.7, hEye: 1.5, dEye: 0.8 },
+    cockroach: { hEye: 1.5, dEye: 0.8, dObj: 0.4, hObj: 0 },
     mc: { H: 1.8, hEye: 1.7, p: 0.9, q: 0.85 },
   };
   let view = null;
@@ -1175,23 +1191,23 @@ function createMinMirrorHeightScenario() {
 
   function compute() {
     if (sub === 'feet') {
-      const { hEye, dEye } = params.feet;
+      const { hEye, dEye, H } = params.feet;
       const mirrorX = dEye;
       const y = mirrorHeightForFloorObject(dEye, dEye, hEye, 0);
       const eye = { x: 0, y: hEye };
       const foot = { x: 0, y: 0 };
       const ray = sightRayVertical(foot, eye, mirrorX, 0, 3);
-      return { mirrorX, eye, foot, y, ray, mode: 'feet', hEye, dEye };
+      return { mirrorX, eye, foot, y, ray, mode: 'feet', hEye, dEye, H };
     }
     if (sub === 'cockroach') {
-      const { hEye, dEye, dObj } = params.cockroach;
+      const { hEye, dEye, dObj, hObj } = params.cockroach;
       const mirrorX = dEye;
       const objX = dEye - dObj;
-      const y = mirrorHeightForFloorObject(dObj, dEye, hEye, 0);
+      const y = mirrorHeightForFloorObject(dObj, dEye, hEye, hObj);
       const eye = { x: 0, y: hEye };
-      const obj = { x: objX, y: 0 };
+      const obj = { x: objX, y: hObj };
       const ray = sightRayVertical(obj, eye, mirrorX, 0, 3);
-      return { mirrorX, eye, obj, y, ray, mode: 'cockroach', hEye, dEye, dObj, objX };
+      return { mirrorX, eye, obj, y, ray, mode: 'cockroach', hEye, dEye, dObj, hObj, objX, H: hEye };
     }
     const { H, hEye, p, q } = params.mc;
     const mirrorX2 = 1.5;
@@ -1212,7 +1228,8 @@ function createMinMirrorHeightScenario() {
     if (sub === 'feet') {
       const p = params.feet;
       return [
-        { id: 'hEye', labelKey: 'eyeHeight', min: 1.2, max: 1.8, step: 0.05, value: p.hEye, unit: 'm' },
+        { id: 'H', labelKey: 'personHeight', min: 1.4, max: 2, step: 0.05, value: p.H, unit: 'm' },
+        { id: 'hEye', labelKey: 'eyeHeight', min: 1.2, max: 1.9, step: 0.05, value: p.hEye, unit: 'm' },
         { id: 'dEye', labelKey: 'distToMirror', min: 0.4, max: 2, step: 0.05, value: p.dEye, unit: 'm' },
       ];
     }
@@ -1222,6 +1239,7 @@ function createMinMirrorHeightScenario() {
         { id: 'hEye', labelKey: 'eyeHeight', min: 1.2, max: 1.8, step: 0.05, value: p.hEye, unit: 'm' },
         { id: 'dEye', labelKey: 'distToMirror', min: 0.4, max: 2, step: 0.05, value: p.dEye, unit: 'm' },
         { id: 'dObj', labelKey: 'distObjToMirror', min: 0.1, max: 1.5, step: 0.05, value: p.dObj, unit: 'm' },
+        { id: 'hObj', labelKey: 'objectHeight', min: 0, max: 0.4, step: 0.02, value: p.hObj, unit: 'm' },
       ];
     }
     const p = params.mc;
@@ -1235,19 +1253,34 @@ function createMinMirrorHeightScenario() {
 
   function updateParams(id, v) {
     params[sub][id] = v;
+    if (sub === 'feet') {
+      if (params.feet.hEye > params.feet.H) params.feet.H = params.feet.hEye;
+      if (params.feet.H < params.feet.hEye) params.feet.hEye = params.feet.H;
+    }
+    if (sub === 'mc' && id === 'hEye' && v > params.mc.H) params.mc.H = v;
+    if (sub === 'mc' && id === 'H' && v < params.mc.hEye) params.mc.hEye = v;
   }
 
   function preset() {
     params = {
-      feet: { hEye: 1.5, dEye: 0.8 },
-      cockroach: { hEye: 1.5, dEye: 0.8, dObj: 0.4 },
+      feet: { H: 1.7, hEye: 1.5, dEye: 0.8 },
+      cockroach: { hEye: 1.5, dEye: 0.8, dObj: 0.4, hObj: 0 },
       mc: { H: 1.8, hEye: 1.7, p: 0.9, q: 0.85 },
     };
   }
 
   function getDescription() {
-    if (sub === 'feet') return getLang() === 'zh' ? '（Q22a）全等三角形：x = y，鏡底 y = h/2 = 0.75 m' : '(Q22a) Congruent triangles: y = h/2 = 0.75 m';
-    if (sub === 'cockroach') return getLang() === 'zh' ? '（Q22b）相似三角形：y/(h−y) = 0.4/0.8 → y = 0.50 m' : '(Q22b) Similar triangles: y = 0.50 m';
+    const c = compute();
+    if (sub === 'feet') {
+      return getLang() === 'zh'
+        ? `（Q22a）全等三角形：鏡底 y = ${c.y.toFixed(2)} m（眼高 ${c.hEye.toFixed(2)} m，身高 ${c.H.toFixed(2)} m）`
+        : `(Q22a) Congruent triangles: mirror bottom y = ${c.y.toFixed(2)} m (eye ${c.hEye.toFixed(2)} m, height ${c.H.toFixed(2)} m)`;
+    }
+    if (sub === 'cockroach') {
+      return getLang() === 'zh'
+        ? `（Q22b）相似三角形：y = ${c.y.toFixed(2)} m（物件高 ${c.hObj.toFixed(2)} m）`
+        : `(Q22b) Similar triangles: y = ${c.y.toFixed(2)} m (object height ${c.hObj.toFixed(2)} m)`;
+    }
     return getLang() === 'zh' ? '（Q17）最小要求 p=90 cm, q=85 cm（選 B）' : '(Q17) Minimum p=90 cm, q=85 cm (answer B)';
   }
 
@@ -1281,13 +1314,24 @@ function createMinMirrorHeightScenario() {
   }
 
   function init(canvas) {
-    view = createWorldView(canvas, { worldBounds: { xMin: -0.5, xMax: 4, yMin: 0, yMax: 2.2 } });
+    view = createWorldView(canvas, {
+      worldBounds: { xMin: -0.15, xMax: 2.2, yMin: 0, yMax: 2 },
+      gridStep: 0.5,
+    });
     animator.onUpdate = () => draw(canvas);
+  }
+
+  function fitViewBounds(c) {
+    const topY = c.mode === 'feet' ? c.H : c.mode === 'cockroach' ? c.hEye : c.H;
+    view.worldBounds.xMin = -0.15;
+    view.worldBounds.xMax = c.mirrorX + 0.55;
+    view.worldBounds.yMax = Math.max(topY, c.hEye ?? 0) + 0.35;
   }
 
   function draw(canvas) {
     const { w, h, ctx } = resizeCanvasToDisplay(canvas);
     const c = compute();
+    fitViewBounds(c);
     const txf = computeTransform(view, w, h);
     clear(ctx, w, h);
     drawGrid(ctx, view, txf, w, h);
@@ -1301,7 +1345,7 @@ function createMinMirrorHeightScenario() {
     };
 
     if (c.mode === 'feet') {
-      drawPerson(ctx, view, txf, 0, c.hEye, c.hEye);
+      drawPerson(ctx, view, txf, 0, c.H, c.hEye);
       drawVerticalMirror(ctx, view, txf, c.mirrorX, c.y, c.y + 1.5, COLORS.mirrorNeed, 5);
       const rp = { x: c.mirrorX, y: c.y };
       const s0 = { x: txf.ox + rp.x * txf.pxPerM, y: txf.oy - rp.y * txf.pxPerM };
@@ -1318,7 +1362,13 @@ function createMinMirrorHeightScenario() {
       RayAnimator.drawSightRay(ctx, view, txf, helpers, ray, stepIndex, 0, 1);
     } else if (c.mode === 'cockroach') {
       drawPerson(ctx, view, txf, 0, c.hEye, c.hEye);
-      drawPoint(ctx, view, txf, c.obj, 6, '#fbbf24', 'Bug');
+      if (c.hObj > 0.01) {
+        drawArrow(ctx, view, txf, { x: c.objX, y: 0 }, { x: c.objX, y: c.hObj }, {
+          color: '#fbbf24', width: 3, head: true,
+        });
+      } else {
+        drawPoint(ctx, view, txf, c.obj, 6, '#fbbf24', getLang() === 'zh' ? '蟲' : 'Bug');
+      }
       drawVerticalMirror(ctx, view, txf, c.mirrorX, c.y, c.y + 1.5, COLORS.mirrorNeed, 5);
       const rp = { x: c.mirrorX, y: c.y };
       const ray = { objectPt: c.obj, eye: c.eye, image: c.ray.image, reflectPt: rp };
@@ -3436,6 +3486,35 @@ function bindReset() {
   });
 }
 
+function refreshLangUi() {
+  applyI18n();
+  buildTabs();
+  const sc = getScenario();
+  buildSubTabs(sc);
+  rebuildControls();
+  updateResults();
+  applyI18n(document.getElementById('legendPanel'));
+  render();
+}
+
+function bindLangToggle() {
+  const handler = () => {
+    toggleLang();
+    refreshLangUi();
+  };
+  document.getElementById('langToggle')?.addEventListener('click', handler);
+}
+
+function bindHubLangSync() {
+  window.addEventListener('message', (ev) => {
+    if (ev.data?.type !== 's3phy:lang') return;
+    const next = hubLangToLocal(ev.data.lang);
+    if (next === getLang()) return;
+    setLang(next);
+    refreshLangUi();
+  });
+}
+
 function init() {
   els.controls = document.getElementById('controls');
   els.stats = document.getElementById('stats');
@@ -3446,14 +3525,9 @@ function init() {
   els.vizPanel = document.getElementById('vizPanel');
   els.sceneBadge = document.getElementById('sceneBadge');
 
-  document.getElementById('langToggle').addEventListener('click', () => {
-    toggleLang();
-    buildTabs();
-    buildSubTabs(getScenario());
-    rebuildControls();
-    updateResults();
-    applyI18n(document.getElementById('legendPanel'));
-  });
+  initLangFromLocation();
+  bindLangToggle();
+  bindHubLangSync();
 
   applyI18n();
   buildTabs();
