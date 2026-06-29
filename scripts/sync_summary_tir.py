@@ -9,12 +9,10 @@ from pathlib import Path
 from PIL import Image
 
 ROOT = Path(__file__).resolve().parents[1]
-SRC_DIR = Path(
-    r"C:\Users\UniplusUser02\Desktop\PHYS\S3\Optics\Summary\Total internal reflection"
-)
+SRC_DIR = Path(r"C:\Users\user\Desktop\TIR summary poster")
 POSTERS = {
-    "tir-en.webp": SRC_DIR / "EN-TIR-Summary-Poster-v11.png",
-    "tir-zhHant.webp": SRC_DIR / "ZH-TIR-Summary-Poster-v10.png",
+    "tir-en.webp": SRC_DIR / "EN-TIR-Summary-Poster-v12.png",
+    "tir-zhHant.webp": SRC_DIR / "ZH-TIR-Summary-Poster-v11.png",
 }
 OUT_DIR = ROOT / "public" / "summary"
 MAX_WIDTH = 1400
