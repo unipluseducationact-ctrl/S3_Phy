@@ -1128,8 +1128,9 @@ function createMinMirrorLengthScenario() {
   function draw(canvas) {
     const { w, h, ctx } = resizeCanvasToDisplay(canvas);
     const c = compute();
+    const imgX = c.mirrorX + params.d;
     view.worldBounds.xMin = -0.15;
-    view.worldBounds.xMax = c.mirrorX + 0.55;
+    view.worldBounds.xMax = imgX + 0.45;
     view.worldBounds.yMax = Math.max(params.H, params.hEye) + 0.35;
     const txf = computeTransform(view, w, h);
     clear(ctx, w, h);
@@ -1140,7 +1141,6 @@ function createMinMirrorLengthScenario() {
     drawVerticalMirror(ctx, view, txf, c.mirrorX, c.yBot, c.yTop, COLORS.mirrorNeed, 5);
 
     const stepIndex = animator.stepIndex;
-    const imgX = c.mirrorX + params.d;
     const rays = [
       { objectPt: c.top, eye: c.eye, image: c.rayTop.image, reflectPt: c.rayTop.reflectPt },
       { objectPt: c.foot, eye: c.eye, image: c.rayFoot.image, reflectPt: c.rayFoot.reflectPt },
