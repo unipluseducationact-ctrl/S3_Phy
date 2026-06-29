@@ -52,6 +52,9 @@ export const en = {
   'tools.showLabList': 'Show lab list',
   'tools.rotatingMirror.title': 'Rotating plane mirror',
   'tools.rotatingMirror.subtitle': 'Ray shift when the mirror turns (?θ_ray = 2θ_mirror).',
+  'tools.planeMirror.title': 'Plane mirror lab',
+  'tools.planeMirror.subtitle':
+    'Image formation, minimum mirror size, seeing behind objects, wedge mirrors, and ray sketching with live formulas.',
   'tools.rotatingMirror.toggle.origNormal': 'Orig. normal',
   'tools.rotatingMirror.toggle.origRay': 'Orig. reflected',
   'tools.rotatingMirror.toggle.newNormal': 'New normal',

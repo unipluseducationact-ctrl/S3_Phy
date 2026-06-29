@@ -691,6 +691,7 @@ a {
 
 .tool-lens-simulator,
 .tool-tir-escape,
+.tool-plane-mirror-lab,
 .tool-em-spectrum {
   width: 100%;
   height: var(--tool-viewport-min-h);
@@ -726,6 +727,7 @@ a {
 
 .tool-lens-simulator iframe,
 .tool-tir-escape iframe,
+.tool-plane-mirror-lab iframe,
 .tool-em-spectrum iframe,
 .tool-specific-heat iframe,
 .tool-thermal-mixing iframe,

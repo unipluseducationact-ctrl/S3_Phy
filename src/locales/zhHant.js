@@ -52,6 +52,9 @@ export const zhHant = {
   'tools.showLabList': '\u986f\u793a\u5be6\u9a57\u5217\u8868',
   'tools.rotatingMirror.title': '\u65cb\u8f49\u5e73\u9762\u93e1',
   'tools.rotatingMirror.subtitle': '\u93e1\u9762\u8f49\u52d5\u6642\u53cd\u5c04\u5149\u7dda\u7684\u504f\u79fb\uff08\u5149\u7dda\u504f\u89d2 = 2 \u00d7 \u93e1\u89d2\uff09\u3002',
+  'tools.planeMirror.title': '\u5e73\u9762\u93e1\u53cd\u5c04\u5be6\u9a57\u5ba4',
+  'tools.planeMirror.subtitle':
+    '\u50cf\u7684\u5f62\u6210\u3001\u6700\u5c0f\u93e1\u9577\uff0f\u93e1\u9ad8\u3001\u770b\u5f8c\u65b9\u7269\u4ef6\u3001\u593e\u89d2\u93e1\u8207\u7df4\u7fd2\u4f5c\u5716\uff0c\u914d\u5408\u5373\u6642\u516c\u5f0f\u3002',
   'tools.rotatingMirror.toggle.origNormal': '\u539f\u6cd5\u7dda',
   'tools.rotatingMirror.toggle.origRay': '\u539f\u53cd\u5c04\u5149',
   'tools.rotatingMirror.toggle.newNormal': '\u65b0\u6cd5\u7dda',

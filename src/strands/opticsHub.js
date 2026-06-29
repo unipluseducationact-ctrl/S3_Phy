@@ -1,6 +1,7 @@
 import { t, getLang } from '../i18n.js';
 import questions from '../data/questions.json';
 import { createRotatingMirrorLab } from '../tools/rotatingMirrorLab.js';
+import { createPlaneMirrorLab } from '../tools/planeMirrorLab.js';
 import { createTirEscapeLab } from '../tools/tirEscapeLab.js';
 import { createLensLab } from '../tools/lensLab.js';
 import { createEmLab } from '../tools/emLab.js';
@@ -11,11 +12,12 @@ import { renderWorksheets, hydrateWorksheets } from '../worksheets/mcqWorksheet.
 import { mountFlashcardStudy } from '../flashcards/flashcardStudy.js';
 import { buildOpticsDeck } from '../flashcards/flashcardDeck.js';
 
-const TOOL_ORDER = ['rotatingMirror', 'refractionTir', 'lens', 'rgbMixer', 'em'];
+const TOOL_ORDER = ['rotatingMirror', 'planeMirrorLab', 'refractionTir', 'lens', 'rgbMixer', 'em'];
 const SUMMARY_ASSET_VERSION = '20260627-em-v2';
 
 const TOOL_FACTORIES = {
   rotatingMirror: (tr) => createRotatingMirrorLab(tr),
+  planeMirrorLab: (tr) => createPlaneMirrorLab(tr),
   refractionTir: (tr) => createTirEscapeLab(tr),
   lens: (tr, kind) => createLensLab(tr, { defaultKind: kind }),
   rgbMixer: (tr) => createRgbColorMixerLab(tr),
@@ -25,6 +27,7 @@ const TOOL_FACTORIES = {
 function toolLabel(id) {
   const map = {
     rotatingMirror: 'tools.rotatingMirror.title',
+    planeMirrorLab: 'tools.planeMirror.title',
     refractionTir: 'tools.refractionTir.title',
     lens: 'tools.lens.title',
     rgbMixer: 'tools.rgbMixer.title',
@@ -137,7 +140,7 @@ export function mountOpticsHub(root) {
 
   function renderTopics() {
     const cards = [
-      ['rotatingMirror', 'topic.reflection'],
+      ['planeMirrorLab', 'topic.reflection'],
       ['refraction', 'topic.refractionSnell'],
       ['tir', 'topic.tir'],
       ['convex', 'topic.convex'],
