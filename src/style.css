@@ -692,7 +692,8 @@ a {
 .tool-lens-simulator,
 .tool-tir-escape,
 .tool-plane-mirror-lab,
-.tool-em-spectrum {
+.tool-em-spectrum,
+.tool-optics-light-lens-quiz {
   width: 100%;
   height: var(--tool-viewport-min-h);
   min-height: var(--tool-viewport-min-h);
@@ -729,6 +730,7 @@ a {
 .tool-tir-escape iframe,
 .tool-plane-mirror-lab iframe,
 .tool-em-spectrum iframe,
+.tool-optics-light-lens-quiz iframe,
 .tool-specific-heat iframe,
 .tool-thermal-mixing iframe,
 .tool-change-of-state iframe,
@@ -794,6 +796,16 @@ canvas.lab-canvas {
 }
 
 /* ===== Worksheet generator (Biology-style) ===== */
+.panel--worksheets-embed {
+  padding: 0;
+  overflow: hidden;
+}
+
+.panel--worksheets-embed .tool-optics-light-lens-quiz {
+  height: clamp(640px, calc(100dvh - 120px), 1500px);
+  min-height: clamp(640px, calc(100dvh - 120px), 1500px);
+}
+
 .panel--worksheets {
   --ws-primary: #004e9f;
   --ws-primary-container: #0066cc;

@@ -1,5 +1,4 @@
 import { t, getLang } from '../i18n.js';
-import questions from '../data/questions.json';
 import { createRotatingMirrorLab } from '../tools/rotatingMirrorLab.js';
 import { createPlaneMirrorLab } from '../tools/planeMirrorLab.js';
 import { createTirEscapeLab } from '../tools/tirEscapeLab.js';
@@ -8,7 +7,7 @@ import { createEmLab } from '../tools/emLab.js';
 import { createRgbColorMixerLab } from '../tools/rgbColorMixerLab.js';
 import { mountHubShell } from '../hubShell.js';
 import { renderToolsShell, hydrateToolsShell } from '../tools/toolsShell.js';
-import { renderWorksheets, hydrateWorksheets } from '../worksheets/mcqWorksheet.js';
+import { createOpticsLightLensWorksheet } from '../worksheets/opticsLightLensWorksheet.js';
 import { mountFlashcardStudy } from '../flashcards/flashcardStudy.js';
 import { buildOpticsDeck } from '../flashcards/flashcardDeck.js';
 
@@ -62,6 +61,7 @@ export function mountOpticsHub(root) {
   let shell = null;
   let el = { main: null };
   let destroyFlashcards = null;
+  let destroyWorksheet = null;
 
   const OPTICS_DECK_OPTIONS = [
     { value: 'all', labelKey: 'flashcards.all' },
@@ -77,6 +77,8 @@ export function mountOpticsHub(root) {
 
     destroyFlashcards?.();
     destroyFlashcards = null;
+    destroyWorksheet?.();
+    destroyWorksheet = null;
 
     if (section === 'topics') el.main.innerHTML = renderTopics();
     else if (section === 'notes') el.main.innerHTML = renderNotesShell();
@@ -88,7 +90,13 @@ export function mountOpticsHub(root) {
         t,
       });
     }
-    else if (section === 'worksheets') el.main.innerHTML = renderWorksheets(t);
+    else if (section === 'worksheets') {
+      el.main.innerHTML = '<section class="panel panel--worksheets-embed"></section>';
+      const panel = el.main.querySelector('.panel--worksheets-embed');
+      const node = createOpticsLightLensWorksheet(t);
+      panel.appendChild(node);
+      destroyWorksheet = node._opticsLightLensWorksheetCleanup || null;
+    }
     else if (section === 'flashcards') {
       destroyFlashcards = mountFlashcardStudy(el.main, {
         deckOptions: OPTICS_DECK_OPTIONS.map((o) => ({
@@ -117,7 +125,6 @@ export function mountOpticsHub(root) {
         },
       });
     }
-    if (section === 'worksheets') hydrateWorksheets(root, questions, t, langKey);
     if (section === 'summary') void hydrateSummary();
   }
 
@@ -347,6 +354,7 @@ export function mountOpticsHub(root) {
     window.removeEventListener('s3phy:lang', onLang);
     root.removeEventListener('click', onClick);
     destroyFlashcards?.();
+    destroyWorksheet?.();
     shell?.destroy();
   };
 }
