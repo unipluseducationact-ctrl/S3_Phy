@@ -6,6 +6,26 @@ import { createFlashcardSession } from './flashcardSession.js';
  * @typedef {(deckKey: string) => import('./flashcardDeck.js').Flashcard[]} BuildDeckFn
  */
 
+const SUBTOPIC_LABEL_KEYS = {
+  thermometry: 'flashcards.deck.thermometry',
+  heatInternalEnergy: 'flashcards.deck.heatInternalEnergy',
+  changeOfState: 'flashcards.deck.changeOfState',
+  heatTransfer: 'flashcards.deck.heatTransfer',
+  reflection: 'topic.reflection',
+  refraction: 'topic.refraction',
+  tir: 'topic.tir',
+  em: 'topic.em',
+  convex: 'topic.convex',
+  concave: 'topic.concave',
+  rotatingMirror: 'topic.reflection',
+};
+
+function subtopicLabel(topic) {
+  const key = SUBTOPIC_LABEL_KEYS[topic] || `topic.${topic}`;
+  const label = t(key);
+  return label === key ? topic : label;
+}
+
 /**
  * @param {HTMLElement} container
  * @param {{ deckOptions: DeckOption[], buildDeck: BuildDeckFn, initialDeck?: string }} opts
@@ -20,46 +40,85 @@ export function mountFlashcardStudy(container, { deckOptions, buildDeck, initial
     <section class="panel panel--flashcards">
       <h2>${t('flashcards.title')}</h2>
       <p class="lead">${t('flashcards.intro')}</p>
-      <div class="flash-study-controls no-print">
+      <div class="fc-controls no-print">
         <div class="control">
           <label>${t('flashcards.deck')}</label>
           <select data-fc-deck>
             ${deckOptions.map((o) => `<option value="${o.value}">${o.label}</option>`).join('')}
           </select>
         </div>
-        <div class="flash-mode-toggle" data-fc-mode>
-          <button type="button" data-mode="sequence" class="active">${t('flashcards.mode.sequence')}</button>
-          <button type="button" data-mode="random">${t('flashcards.mode.random')}</button>
+        <div class="fc-controls-right">
+          <div class="fc-mode-group">
+            <span class="fc-mode-label">${t('flashcards.studyMode')}</span>
+            <div class="fc-mode-toggle" data-fc-mode>
+              <button type="button" data-mode="sequence" class="active">${t('flashcards.mode.sequence')}</button>
+              <button type="button" data-mode="random">${t('flashcards.mode.random')}</button>
+            </div>
+          </div>
+          <span class="fc-round-badge" data-fc-round></span>
+          <div class="fc-progress-block">
+            <span class="fc-progress-label">${t('flashcards.progressLabel')}</span>
+            <span class="fc-progress-num" data-fc-progress></span>
+          </div>
         </div>
-      </div>
-      <div class="flash-study-header no-print">
-        <span class="flash-round-badge" data-fc-round></span>
-        <span class="flashcard-progress muted" data-fc-progress></span>
       </div>
       <div data-fc-study-panel>
-        <div class="flashcard-box">
-          <div class="flashcard-surface" data-fc-card>
-            <div class="label" data-fc-label>${t('flashcards.question')}</div>
-            <div class="body" data-fc-body></div>
-          </div>
-          <p class="flash-rating-hint muted" data-fc-hint></p>
-          <div class="flash-toolbar flash-rating-row no-print">
-            <button class="btn" type="button" data-fc-prev>${t('flashcards.prev')}</button>
-            <button class="btn danger" type="button" data-fc-again>${t('flashcards.again')}</button>
-            <button class="btn primary" type="button" data-fc-flip>${t('flashcards.flip')}</button>
-            <button class="btn success" type="button" data-fc-gotit>${t('flashcards.gotIt')}</button>
-            <button class="btn" type="button" data-fc-next>${t('flashcards.next')}</button>
+        <div class="fc-study-stage">
+          <div class="fc-card-layer fc-card-layer-back" aria-hidden="true"></div>
+          <div class="fc-card-layer fc-card-layer-mid" aria-hidden="true"></div>
+          <div class="fc-card-container" data-fc-card-wrap>
+            <div class="fc-card-inner" data-fc-card-inner>
+              <div class="fc-card-face fc-card-face-front">
+                <div class="fc-card-top">
+                  <span class="fc-subtopic-pill" data-fc-subtopic-pill></span>
+                  <span class="fc-card-code" data-fc-card-code></span>
+                </div>
+                <div class="fc-card-body-scroll">
+                  <div class="fc-card-text" data-fc-front-body></div>
+                </div>
+                <p class="fc-flip-prompt" data-fc-flip-prompt>${t('flashcards.tapFlip')}</p>
+              </div>
+              <div class="fc-card-face fc-card-face-back">
+                <div class="fc-card-top">
+                  <span class="fc-subtopic-pill" data-fc-subtopic-pill-back></span>
+                  <span class="fc-card-code" data-fc-card-code-back></span>
+                </div>
+                <div class="fc-card-body-scroll">
+                  <div class="fc-card-text" data-fc-back-body></div>
+                </div>
+              </div>
+            </div>
           </div>
         </div>
+        <p class="fc-rating-hint" data-fc-hint></p>
+        <div class="fc-toolbar no-print">
+          <button type="button" class="fc-btn-nav" data-fc-prev>
+            <span class="material-symbols-outlined" aria-hidden="true">chevron_left</span>
+            <span data-fc-prev-label>${t('flashcards.prev')}</span>
+          </button>
+          <button type="button" class="fc-btn-circle fc-btn-again" data-fc-again title="${t('flashcards.again')}">
+            <span class="material-symbols-outlined" aria-hidden="true">history</span>
+          </button>
+          <button type="button" class="fc-btn-circle fc-btn-flip" data-fc-flip title="${t('flashcards.flip')}">
+            <span class="material-symbols-outlined fc-flip-icon" aria-hidden="true">sync</span>
+          </button>
+          <button type="button" class="fc-btn-circle fc-btn-gotit" data-fc-gotit title="${t('flashcards.gotIt')}">
+            <span class="material-symbols-outlined" aria-hidden="true">check</span>
+          </button>
+          <button type="button" class="fc-btn-nav" data-fc-next>
+            <span data-fc-next-label>${t('flashcards.next')}</span>
+            <span class="material-symbols-outlined" aria-hidden="true">chevron_right</span>
+          </button>
+        </div>
       </div>
-      <div class="flash-summary-panel" data-fc-summary hidden>
+      <div class="fc-summary-panel" data-fc-summary hidden>
         <h3 data-fc-summary-title></h3>
         <p class="muted" data-fc-summary-stats></p>
-        <div class="flash-summary-counts">
+        <div class="fc-summary-counts">
           <span data-fc-summary-keep></span>
           <span data-fc-summary-confident></span>
         </div>
-        <div class="flash-toolbar no-print">
+        <div class="fc-toolbar no-print">
           <button class="btn primary" type="button" data-fc-next-round>${t('flashcards.summary.nextRound')}</button>
           <button class="btn" type="button" data-fc-restart>${t('flashcards.summary.restart')}</button>
         </div>
@@ -73,9 +132,15 @@ export function mountFlashcardStudy(container, { deckOptions, buildDeck, initial
     progress: container.querySelector('[data-fc-progress]'),
     studyPanel: container.querySelector('[data-fc-study-panel]'),
     summaryPanel: container.querySelector('[data-fc-summary]'),
-    card: container.querySelector('[data-fc-card]'),
-    label: container.querySelector('[data-fc-label]'),
-    body: container.querySelector('[data-fc-body]'),
+    cardWrap: container.querySelector('[data-fc-card-wrap]'),
+    cardInner: container.querySelector('[data-fc-card-inner]'),
+    subtopicPill: container.querySelector('[data-fc-subtopic-pill]'),
+    subtopicPillBack: container.querySelector('[data-fc-subtopic-pill-back]'),
+    cardCode: container.querySelector('[data-fc-card-code]'),
+    cardCodeBack: container.querySelector('[data-fc-card-code-back]'),
+    frontBody: container.querySelector('[data-fc-front-body]'),
+    backBody: container.querySelector('[data-fc-back-body]'),
+    flipPrompt: container.querySelector('[data-fc-flip-prompt]'),
     hint: container.querySelector('[data-fc-hint]'),
     prev: container.querySelector('[data-fc-prev]'),
     again: container.querySelector('[data-fc-again]'),
@@ -103,67 +168,86 @@ export function mountFlashcardStudy(container, { deckOptions, buildDeck, initial
     els.next.disabled = dis;
   }
 
-  function applyTextCardSize(html) {
-    els.body.classList.remove('flashcard-text-long', 'flashcard-text-compact');
-    const plain = els.body.textContent?.trim() || '';
+  function applyTextCardSize(el, html) {
+    el.classList.remove('fc-card-text-long', 'fc-card-text-compact');
+    const tmp = document.createElement('div');
+    tmp.innerHTML = html || '';
+    const plain = (tmp.textContent || '').trim();
     const lines = plain.split('\n').filter(Boolean).length;
     const len = plain.length;
     if (lines >= 5 || len > 220) {
-      els.body.classList.add('flashcard-text-compact');
+      el.classList.add('fc-card-text-compact');
     } else if (lines >= 4 || len > 130) {
-      els.body.classList.add('flashcard-text-long');
+      el.classList.add('fc-card-text-long');
+    }
+  }
+
+  function renderImageBody(el, src, alt) {
+    const safeAlt = (alt || '').replace(/"/g, '&quot;');
+    const fallback = (alt || t('flashcards.question')).replace(/</g, '&lt;');
+    el.innerHTML = `<img src="${src}" alt="${safeAlt}" loading="lazy" class="fc-card-img" data-fc-img /><p class="fc-img-fallback muted" data-fc-img-fallback hidden>${fallback}</p>`;
+    const img = el.querySelector('[data-fc-img]');
+    const fb = el.querySelector('[data-fc-img-fallback]');
+    if (img && fb) {
+      img.onerror = () => {
+        img.hidden = true;
+        fb.hidden = false;
+      };
+      img.onload = () => {
+        img.hidden = false;
+        fb.hidden = true;
+      };
     }
   }
 
   function renderCard() {
     const card = session.currentCard();
     const flipped = session.isFlipped();
+
+    els.cardInner.classList.toggle('fc-flipped', flipped);
+
     if (!card) {
-      els.label.hidden = true;
-      els.body.textContent = '';
-      els.card.classList.remove('flashcard-surface--image');
+      els.subtopicPill.textContent = '';
+      els.subtopicPillBack.textContent = '';
+      els.cardCode.textContent = '';
+      els.cardCodeBack.textContent = '';
+      els.frontBody.innerHTML = '';
+      els.backBody.innerHTML = '';
+      els.flipPrompt.hidden = true;
+      els.cardWrap.classList.remove('fc-card-container--image');
       setControlsEnabled(false, false);
       els.hint.textContent = '';
       return;
     }
 
+    const label = subtopicLabel(card.subtopic);
+    const code = t('flashcards.cardCode').replace('{id}', String(card.id));
+    els.subtopicPill.textContent = label;
+    els.subtopicPillBack.textContent = label;
+    els.cardCode.textContent = code;
+    els.cardCodeBack.textContent = code;
+
     if (card.isImage) {
-      els.card.classList.add('flashcard-surface--image');
-      const twoSided = card.backImage && card.backImage !== card.frontImage;
-      if (!twoSided) {
-        els.label.hidden = true;
+      els.cardWrap.classList.add('fc-card-container--image');
+      els.flipPrompt.hidden = true;
+      renderImageBody(els.frontBody, card.frontImage, card.alt);
+      if (card.backImage && card.backImage !== card.frontImage) {
+        renderImageBody(els.backBody, card.backImage, card.alt);
       } else {
-        els.label.hidden = false;
-        els.label.textContent = flipped ? t('flashcards.answer') : t('flashcards.question');
-      }
-      const src = flipped && card.backImage ? card.backImage : card.frontImage;
-      const alt = (card.alt || '').replace(/"/g, '&quot;');
-      const fallback = (card.alt || t('flashcards.question')).replace(/</g, '&lt;');
-      els.body.innerHTML = `<img src="${src}" alt="${alt}" loading="lazy" data-fc-img /><p class="flash-img-fallback muted" data-fc-img-fallback hidden>${fallback}</p>`;
-      const img = els.body.querySelector('[data-fc-img]');
-      const fb = els.body.querySelector('[data-fc-img-fallback]');
-      if (img && fb) {
-        img.onerror = () => {
-          img.hidden = true;
-          fb.hidden = false;
-        };
-        img.onload = () => {
-          img.hidden = false;
-          fb.hidden = true;
-        };
+        els.backBody.innerHTML = els.frontBody.innerHTML;
       }
     } else {
-      els.card.classList.remove('flashcard-surface--image');
-      els.label.hidden = false;
-      els.label.textContent = flipped ? t('flashcards.answer') : t('flashcards.question');
-      els.body.innerHTML = flipped ? card.back : card.front;
-      applyTextCardSize(flipped ? card.back : card.front);
+      els.cardWrap.classList.remove('fc-card-container--image');
+      els.flipPrompt.hidden = flipped;
+      els.frontBody.innerHTML = card.front;
+      els.backBody.innerHTML = card.back;
+      applyTextCardSize(els.frontBody, card.front);
+      applyTextCardSize(els.backBody, card.back);
     }
 
     setControlsEnabled(flipped, true);
-    els.hint.textContent = flipped
-      ? t('flashcards.hint.rated')
-      : t('flashcards.flipFirst');
+    els.hint.textContent = flipped ? t('flashcards.hint.rated') : t('flashcards.flipFirst');
+    els.hint.classList.toggle('fc-rating-hint--action', !flipped);
   }
 
   function renderSummary() {
@@ -196,9 +280,7 @@ export function mountFlashcardStudy(container, { deckOptions, buildDeck, initial
     els.round.textContent = t('flashcards.round')
       .replace('{round}', String(session.getRoundNumber()))
       .replace('{total}', String(total));
-    els.progress.textContent = total
-      ? t('flashcards.progress').replace('{current}', String(index)).replace('{total}', String(total))
-      : '';
+    els.progress.textContent = total ? `${index} / ${total}` : '—';
 
     const summary = session.isSummary();
     els.studyPanel.hidden = summary;
@@ -225,13 +307,13 @@ export function mountFlashcardStudy(container, { deckOptions, buildDeck, initial
     container.querySelector('h2').textContent = t('flashcards.title');
     container.querySelector('.lead').textContent = t('flashcards.intro');
     container.querySelector('[data-fc-deck]').previousElementSibling.textContent = t('flashcards.deck');
+    container.querySelector('.fc-mode-label').textContent = t('flashcards.studyMode');
+    container.querySelector('.fc-progress-label').textContent = t('flashcards.progressLabel');
     els.mode.querySelector('[data-mode="sequence"]').textContent = t('flashcards.mode.sequence');
     els.mode.querySelector('[data-mode="random"]').textContent = t('flashcards.mode.random');
-    els.prev.textContent = t('flashcards.prev');
-    els.again.textContent = t('flashcards.again');
-    els.flip.textContent = t('flashcards.flip');
-    els.gotit.textContent = t('flashcards.gotIt');
-    els.next.textContent = t('flashcards.next');
+    els.flipPrompt.textContent = t('flashcards.tapFlip');
+    container.querySelector('[data-fc-prev-label]').textContent = t('flashcards.prev');
+    container.querySelector('[data-fc-next-label]').textContent = t('flashcards.next');
     els.nextRound.textContent = t('flashcards.summary.nextRound');
     els.restart.textContent = t('flashcards.summary.restart');
     renderUI();
@@ -253,7 +335,7 @@ export function mountFlashcardStudy(container, { deckOptions, buildDeck, initial
     });
   });
 
-  els.card.addEventListener('click', (e) => {
+  els.cardWrap.addEventListener('click', (e) => {
     if (e.target.closest('button')) return;
     doFlip();
   });
