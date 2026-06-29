@@ -1560,6 +1560,29 @@ canvas.lab-canvas {
   margin-top: 8px;
   color: var(--text);
   white-space: pre-line;
+  overflow-wrap: break-word;
+  line-height: 1.45;
+}
+
+.flashcard-surface .body strong {
+  font-weight: 800;
+  color: var(--primary, #004e9f);
+}
+
+.flashcard-surface .body sub {
+  font-size: 0.72em;
+  vertical-align: sub;
+  font-weight: inherit;
+}
+
+.flashcard-surface .body.flashcard-text-long {
+  font-size: clamp(0.88rem, 3.4cqi, 1rem);
+  line-height: 1.4;
+}
+
+.flashcard-surface .body.flashcard-text-compact {
+  font-size: clamp(0.8rem, 3cqi, 0.92rem);
+  line-height: 1.35;
 }
 
 .flashcard-surface--image .body {

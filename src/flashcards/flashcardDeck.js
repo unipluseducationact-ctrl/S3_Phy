@@ -6,17 +6,7 @@ import tirImages from '../data/flashcards-tir.json';
 import emImages from '../data/flashcards-em.json';
 import convexImages from '../data/flashcards-convex.json';
 import concaveImages from '../data/flashcards-concave.json';
-import thermometerImages from '../data/flashcards-thermometer.json';
-import heatInternalEnergyImages from '../data/flashcards-heat-internal-energy.json';
-import changeOfStateImages from '../data/flashcards-change-of-state.json';
-import heatTransferImages from '../data/flashcards-heat-transfer.json';
-
-const THERMOMETRY_SUBTOPICS = [
-  'liquidThermometer',
-  'faultyThermometer',
-  'resistanceThermometer',
-  'thermistor',
-];
+import heatCh1Cards from '../data/flashcards-heat-ch1.json';
 
 function langKey(lang) {
   return lang === 'zh-Hant' ? 'zhHant' : 'en';
@@ -123,21 +113,8 @@ function opticsRawDeck(deckKey) {
 }
 
 function heatRawDeck(deckKey) {
-  if (deckKey === 'all') {
-    return [
-      ...thermometerImages,
-      ...heatInternalEnergyImages,
-      ...changeOfStateImages,
-      ...heatTransferImages,
-    ];
-  }
-  if (deckKey === 'thermometry') return thermometerImages.slice();
-  if (deckKey === 'heatInternalEnergy') return heatInternalEnergyImages.slice();
-  if (deckKey === 'changeOfState') return changeOfStateImages.slice();
-  if (deckKey === 'heatTransfer') return heatTransferImages.slice();
-  const heatText = flashcards.filter((c) => THERMOMETRY_SUBTOPICS.includes(c.topic));
-  const list = heatText.filter((c) => c.topic === deckKey);
-  return list.length ? list : heatText;
+  if (deckKey === 'all') return heatCh1Cards.slice();
+  return heatCh1Cards.filter((card) => card.topic === deckKey);
 }
 
 /**

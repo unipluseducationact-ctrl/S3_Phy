@@ -103,6 +103,18 @@ export function mountFlashcardStudy(container, { deckOptions, buildDeck, initial
     els.next.disabled = dis;
   }
 
+  function applyTextCardSize(html) {
+    els.body.classList.remove('flashcard-text-long', 'flashcard-text-compact');
+    const plain = els.body.textContent?.trim() || '';
+    const lines = plain.split('\n').filter(Boolean).length;
+    const len = plain.length;
+    if (lines >= 5 || len > 220) {
+      els.body.classList.add('flashcard-text-compact');
+    } else if (lines >= 4 || len > 130) {
+      els.body.classList.add('flashcard-text-long');
+    }
+  }
+
   function renderCard() {
     const card = session.currentCard();
     const flipped = session.isFlipped();
@@ -144,7 +156,8 @@ export function mountFlashcardStudy(container, { deckOptions, buildDeck, initial
       els.card.classList.remove('flashcard-surface--image');
       els.label.hidden = false;
       els.label.textContent = flipped ? t('flashcards.answer') : t('flashcards.question');
-      els.body.textContent = flipped ? card.back : card.front;
+      els.body.innerHTML = flipped ? card.back : card.front;
+      applyTextCardSize(flipped ? card.back : card.front);
     }
 
     setControlsEnabled(flipped, true);
