@@ -157,6 +157,8 @@ export const en = {
   'worksheets.hintEmpty': 'Generate questions to see topic hints here.',
   'worksheets.practiceTitle': 'On-screen practice',
   'worksheets.practiceHint': 'First wrong: hint only. Second wrong: model answer.',
+  'worksheets.keyboardHint':
+    'You may press A, B, C, D on your keyboard to choose your answers. Hover over a question and press Enter (Windows) or Return (macOS) to check that question only.',
   'worksheets.checkAnswer': 'Check answer',
   'worksheets.correct': 'Correct.',
   'worksheets.modelAnswer': 'Model answer',

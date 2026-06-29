@@ -1,3 +1,9 @@
+import {
+  bindWsKeyboardShortcuts,
+  getActiveWsQuestion,
+  setActiveWsQuestion,
+} from './wsKeyboardShortcuts.js';
+
 const LETTERS = ['A', 'B', 'C', 'D'];
 
 function shuffle(arr) {
@@ -171,6 +177,7 @@ export function renderWorksheets(t, options = {}) {
                 <div>
                   <h2 class="ws-practice-title">${t('worksheets.practiceTitle')}</h2>
                   <p class="ws-practice-hint">${t('worksheets.practiceHint')}</p>
+                  <p class="ws-keyboard-hint">${t('worksheets.keyboardHint')}</p>
                 </div>
                 <button type="button" class="ws-summary-btn" data-ws-summary-btn>${t('worksheets.sessionSummary')}</button>
               </div>
@@ -411,11 +418,23 @@ export function hydrateWorksheets(root, questions, t, langKey, options = {}) {
     if (!state.items.length) {
       body.className = 'ws-quiz-area ws-quiz-empty';
       body.innerHTML = `<p>${escapeHtml(t('worksheets.empty'))}</p>`;
+      setActiveWsQuestion(root, null);
       return;
     }
 
     body.className = 'ws-quiz-area';
     body.innerHTML = state.items.map((q, i) => paintQuestionBlock(q, i)).join('');
+    setActiveWsQuestion(root, null);
+
+    body.querySelectorAll('.ws-q-block').forEach((block) => {
+      const qi = Number(block.getAttribute('data-ws-block'));
+      block.addEventListener('mouseenter', () => setActiveWsQuestion(root, qi));
+      block.addEventListener('mouseleave', (e) => {
+        if (!e.relatedTarget || !block.contains(e.relatedTarget)) {
+          if (getActiveWsQuestion(root) === qi) setActiveWsQuestion(root, null);
+        }
+      });
+    });
 
     body.querySelectorAll('[data-ws-option]').forEach((btn) => {
       btn.addEventListener('click', () => {
@@ -626,6 +645,17 @@ export function hydrateWorksheets(root, questions, t, langKey, options = {}) {
   root.querySelector('[data-ws-word-a]')?.addEventListener('click', () => downloadWord(true));
   root.querySelector('[data-ws-print-p]')?.addEventListener('click', () => printWorksheet(false));
   root.querySelector('[data-ws-print-a]')?.addEventListener('click', () => printWorksheet(true));
+
+  bindWsKeyboardShortcuts(root, {
+    getItemCount: () => state.items.length,
+    isResolved: (i) => Boolean(state.resolved[i]),
+    findOptionBtn: (qi, letter) => {
+      const j = LETTERS.indexOf(letter);
+      if (j < 0) return null;
+      return body.querySelector(`[data-ws-q="${qi}"][data-ws-option="${j}"]`);
+    },
+    findCheckBtn: (qi) => body.querySelector(`[data-ws-check="${qi}"]`),
+  });
 
   updateBankSummary();
 }

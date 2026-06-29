@@ -1136,6 +1136,13 @@ canvas.lab-canvas {
   color: var(--muted);
 }
 
+.ws-keyboard-hint {
+  margin: 0.35rem 0 0;
+  font-size: 0.8rem;
+  color: var(--muted);
+  opacity: 0.9;
+}
+
 .ws-summary-btn {
   padding: 10px 20px;
   border: 1px solid rgba(193, 198, 213, 0.35);
