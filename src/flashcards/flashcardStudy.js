@@ -168,16 +168,18 @@ export function mountFlashcardStudy(container, { deckOptions, buildDeck, initial
     els.next.disabled = dis;
   }
 
-  function applyTextCardSize(el, html) {
+  function applyTextCardSize(el, html, forceCompact = false) {
     el.classList.remove('fc-card-text-long', 'fc-card-text-compact');
     const tmp = document.createElement('div');
     tmp.innerHTML = html || '';
     const plain = (tmp.textContent || '').trim();
-    const lines = plain.split('\n').filter(Boolean).length;
+    const plainLines = plain.split('\n').filter(Boolean).length;
+    const brLines = (html || '').match(/<br\s*\/?>/gi)?.length ?? 0;
+    const visualLines = Math.max(plainLines, brLines > 0 ? brLines + 1 : 0);
     const len = plain.length;
-    if (lines >= 5 || len > 220) {
+    if (forceCompact || visualLines >= 5 || len > 220) {
       el.classList.add('fc-card-text-compact');
-    } else if (lines >= 4 || len > 130) {
+    } else if (visualLines >= 4 || len > 130) {
       el.classList.add('fc-card-text-long');
     }
   }
@@ -241,8 +243,8 @@ export function mountFlashcardStudy(container, { deckOptions, buildDeck, initial
       els.flipPrompt.hidden = flipped;
       els.frontBody.innerHTML = card.front;
       els.backBody.innerHTML = card.back;
-      applyTextCardSize(els.frontBody, card.front);
-      applyTextCardSize(els.backBody, card.back);
+      applyTextCardSize(els.frontBody, card.front, card.compactFront);
+      applyTextCardSize(els.backBody, card.back, card.compactBack);
     }
 
     setControlsEnabled(flipped, true);

@@ -1,8 +1,5 @@
 import { assetUrl } from '../assetUrl.js';
-import flashcards from '../data/flashcards.json';
-import reflectionImages from '../data/flashcards-reflection.json';
-import refractionImages from '../data/flashcards-refraction.json';
-import tirImages from '../data/flashcards-tir.json';
+import lightCh3Cards from '../data/flashcards-light-ch3.json';
 import emImages from '../data/flashcards-em.json';
 import convexImages from '../data/flashcards-convex.json';
 import concaveImages from '../data/flashcards-concave.json';
@@ -14,6 +11,10 @@ function langKey(lang) {
 
 function flashImageUrl(relPath) {
   return assetUrl(relPath);
+}
+
+function lightByTopic(topic) {
+  return lightCh3Cards.filter((card) => card.topic === topic);
 }
 
 /**
@@ -63,6 +64,8 @@ function normalizeCard(card, lang, id, subtopic) {
     front: pack?.q || '',
     back: pack?.a || '',
     isImage: false,
+    compactFront: Boolean(card.compactFront),
+    compactBack: Boolean(card.compactBack),
   };
 }
 
@@ -81,35 +84,22 @@ function normalizeDeck(rawCards, lang, defaultSubtopic = 'General') {
 }
 
 function opticsRawDeck(deckKey) {
-  const text = flashcards.slice();
   const deck = deckKey === 'rotatingMirror' ? 'reflection' : deckKey;
 
   if (deck === 'all') {
-    const textNoLensImages = text.filter(
-      (c) =>
-        c.topic !== 'convex' &&
-        c.topic !== 'concave' &&
-        c.topic !== 'refraction' &&
-        c.topic !== 'tir' &&
-        c.topic !== 'em',
-    );
     return [
-      ...reflectionImages,
-      ...refractionImages,
-      ...tirImages,
+      ...lightCh3Cards,
       ...emImages,
       ...convexImages,
       ...concaveImages,
-      ...textNoLensImages,
     ];
   }
-  if (deck === 'reflection') return reflectionImages.slice();
+  if (deck === 'reflection') return lightByTopic('reflection');
   if (deck === 'convex') return convexImages.slice();
   if (deck === 'concave') return concaveImages.slice();
-  if (deck === 'refractionTir') return [...refractionImages, ...tirImages];
+  if (deck === 'refractionTir') return [...lightByTopic('refraction'), ...lightByTopic('tir')];
   if (deck === 'em') return emImages.slice();
-  const list = text.filter((c) => c.topic === deck);
-  return list.length ? list : text;
+  return lightCh3Cards.slice();
 }
 
 function heatRawDeck(deckKey) {
