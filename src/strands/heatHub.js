@@ -1,5 +1,4 @@
 import { t, getLang } from '../i18n.js';
-import questions from '../data/questions.json';
 import { createThermometerLab } from '../tools/thermometerLab.js';
 import { createSpecificHeatLab } from '../tools/specificHeatLab.js';
 import { createThermalMixingLab } from '../tools/thermalMixingLab.js';
@@ -7,7 +6,7 @@ import { createChangeOfStateLab } from '../tools/changeOfStateLab.js';
 import { createHeatTransferLab } from '../tools/heatTransferLab.js';
 import { mountHubShell } from '../hubShell.js';
 import { renderToolsShell, hydrateToolsShell } from '../tools/toolsShell.js';
-import { renderWorksheets, hydrateWorksheets } from '../worksheets/mcqWorksheet.js';
+import { createHeatFinalExamWorksheet } from '../worksheets/heatFinalExamWorksheet.js';
 import { mountFlashcardStudy } from '../flashcards/flashcardStudy.js';
 import { buildHeatDeck } from '../flashcards/flashcardDeck.js';
 
@@ -40,27 +39,6 @@ const HEAT_TOPICS = [
     fileZh: 'heat-transfer-zhHant.pdf',
     tool: 'heatTransfer',
   },
-];
-
-const THERMOMETRY_SUBTOPICS = [
-  'liquidThermometer',
-  'faultyThermometer',
-  'resistanceThermometer',
-  'thermistor',
-];
-
-const HEAT_WORKSHEET_TOPICS = [
-  ['thermometer', 'topic.thermometer'],
-  ['heatInternalEnergy', 'topic.heatInternalEnergy'],
-  ['changeOfState', 'topic.changeOfState'],
-  ['heatTransfer', 'topic.heatTransfer'],
-];
-
-const HEAT_QUESTION_TOPICS = [
-  ...THERMOMETRY_SUBTOPICS,
-  'heatInternalEnergy',
-  'changeOfState',
-  'heatTransfer',
 ];
 
 const TOOL_ORDER = [
@@ -117,6 +95,7 @@ export function mountHeatHub(root) {
   let el = { main: null };
   let activeLabInstance = null;
   let destroyFlashcards = null;
+  let destroyWorksheet = null;
 
   const HEAT_DECK_OPTIONS = [
     { value: 'all', labelKey: 'flashcards.all' },
@@ -131,6 +110,8 @@ export function mountHeatHub(root) {
 
     destroyFlashcards?.();
     destroyFlashcards = null;
+    destroyWorksheet?.();
+    destroyWorksheet = null;
 
     if (section === 'topics') el.main.innerHTML = renderTopics();
     else if (section === 'notes') el.main.innerHTML = renderNotesShell();
@@ -143,10 +124,11 @@ export function mountHeatHub(root) {
       });
     }
     else if (section === 'worksheets') {
-      el.main.innerHTML = renderWorksheets(t, {
-        topics: HEAT_WORKSHEET_TOPICS,
-        paperTitleKey: 'worksheets.paperTitleHeat',
-      });
+      el.main.innerHTML = '<section class="panel panel--worksheets-embed"></section>';
+      const panel = el.main.querySelector('.panel--worksheets-embed');
+      const node = createHeatFinalExamWorksheet(t);
+      panel.appendChild(node);
+      destroyWorksheet = node._heatFinalExamWorksheetCleanup || null;
     } else if (section === 'flashcards') {
       destroyFlashcards = mountFlashcardStudy(el.main, {
         deckOptions: HEAT_DECK_OPTIONS.map((o) => ({
@@ -175,28 +157,6 @@ export function mountHeatHub(root) {
           if (!factory) return;
           activeLabInstance = factory(t);
           stage.appendChild(activeLabInstance);
-        },
-      });
-    }
-    if (section === 'worksheets') {
-      const heatQuestions = questions.filter((q) =>
-        HEAT_QUESTION_TOPICS.includes(q.topic),
-      );
-      hydrateWorksheets(root, heatQuestions, t, langKey, {
-        topicFilter: (q, picked) => {
-          if (picked.includes('thermometer') && THERMOMETRY_SUBTOPICS.includes(q.topic)) {
-            return true;
-          }
-          if (picked.includes('heatInternalEnergy') && q.topic === 'heatInternalEnergy') {
-            return true;
-          }
-          if (picked.includes('changeOfState') && q.topic === 'changeOfState') {
-            return true;
-          }
-          if (picked.includes('heatTransfer') && q.topic === 'heatTransfer') {
-            return true;
-          }
-          return false;
         },
       });
     }

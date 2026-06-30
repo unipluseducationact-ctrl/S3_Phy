@@ -693,7 +693,8 @@ a {
 .tool-tir-escape,
 .tool-plane-mirror-lab,
 .tool-em-spectrum,
-.tool-optics-light-lens-quiz {
+.tool-optics-light-lens-quiz,
+.tool-heat-final-exam-quiz {
   width: 100%;
   height: var(--tool-viewport-min-h);
   min-height: var(--tool-viewport-min-h);
@@ -731,6 +732,7 @@ a {
 .tool-plane-mirror-lab iframe,
 .tool-em-spectrum iframe,
 .tool-optics-light-lens-quiz iframe,
+.tool-heat-final-exam-quiz iframe,
 .tool-specific-heat iframe,
 .tool-thermal-mixing iframe,
 .tool-change-of-state iframe,
@@ -801,7 +803,8 @@ canvas.lab-canvas {
   overflow: hidden;
 }
 
-.panel--worksheets-embed .tool-optics-light-lens-quiz {
+.panel--worksheets-embed .tool-optics-light-lens-quiz,
+.panel--worksheets-embed .tool-heat-final-exam-quiz {
   height: clamp(640px, calc(100dvh - 120px), 1500px);
   min-height: clamp(640px, calc(100dvh - 120px), 1500px);
 }
