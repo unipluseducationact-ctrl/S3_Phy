@@ -7,7 +7,7 @@ import json
 from pathlib import Path
 
 ROOT = Path(__file__).resolve().parents[1]
-OUT = ROOT / "src" / "data" / "questions.json"
+OUT = ROOT / "scripts" / "data" / "questions.json"
 REVIEW = ROOT / "scripts" / "worksheet-questions-review.md"
 
 # Curated from PHYS S3 Summary PDFs (6 topics). Each item: topic, section, en, zhHant packs.

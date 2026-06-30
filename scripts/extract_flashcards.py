@@ -12,7 +12,7 @@ from pypdf import PdfReader
 
 ROOT = Path(__file__).resolve().parents[1]
 FLASH_SRC = Path(r"C:\Users\UniplusUser02\Desktop\PHYS\S3\Flashcards")
-OUT_JSON = ROOT / "src" / "data" / "flashcards.json"
+OUT_JSON = ROOT / "scripts" / "data" / "flashcards.json"
 REPORT = ROOT / "scripts" / "flashcards-extraction-report.md"
 
 TOPICS = [

@@ -4,6 +4,9 @@
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>Electromagnetic Spectrum Explorer (v2)</title>
+  <link rel="stylesheet" href="../shared/s3phy-tokens.css">
+  <link rel="stylesheet" href="../shared/s3phy-embed.css">
+  <script src="../shared/s3phy-embed-init.js"></script>
   <style>
     :root {
       --bg: #0d1117;
@@ -16,13 +19,13 @@
     }
     * { box-sizing: border-box; margin: 0; padding: 0; }
     body {
-      font-family: "Segoe UI", "Microsoft JhengHei", "Noto Sans TC", system-ui, -apple-system, sans-serif;
+      font-family: var(--s3-font, "Inter", "Segoe UI", "Microsoft JhengHei", "Noto Sans TC", system-ui, -apple-system, sans-serif);
       background: var(--bg);
       color: var(--text);
       line-height: 1.5;
       min-height: 100vh;
     }
-    .wrap { max-width: 1180px; margin: 0 auto; padding: 1.25rem; }
+    .wrap { max-width: var(--s3-content-max, 1200px); margin: 0 auto; padding: 1.25rem; }
     .workspace {
       display: grid;
       grid-template-columns: 1fr minmax(300px, 360px);

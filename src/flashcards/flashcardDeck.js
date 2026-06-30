@@ -1,6 +1,23 @@
 import { assetUrl } from '../assetUrl.js';
-import lightCh3Cards from '../data/flashcards-light-ch3.json';
-import heatCh1Cards from '../data/flashcards-heat-ch1.json';
+
+/** @type {Promise<object[]> | null} */
+let lightCardsPromise = null;
+/** @type {Promise<object[]> | null} */
+let heatCardsPromise = null;
+
+function loadLightCards() {
+  if (!lightCardsPromise) {
+    lightCardsPromise = import('../data/flashcards-light-ch3.json').then((m) => m.default);
+  }
+  return lightCardsPromise;
+}
+
+function loadHeatCards() {
+  if (!heatCardsPromise) {
+    heatCardsPromise = import('../data/flashcards-heat-ch1.json').then((m) => m.default);
+  }
+  return heatCardsPromise;
+}
 
 function langKey(lang) {
   return lang === 'zh-Hant' ? 'zhHant' : 'en';
@@ -10,8 +27,8 @@ function flashImageUrl(relPath) {
   return assetUrl(relPath);
 }
 
-function lightByTopic(topic) {
-  return lightCh3Cards.filter((card) => card.topic === topic);
+function lightByTopic(cards, topic) {
+  return cards.filter((card) => card.topic === topic);
 }
 
 /**
@@ -80,16 +97,20 @@ function normalizeDeck(rawCards, lang, defaultSubtopic = 'General') {
   });
 }
 
-function opticsRawDeck(deckKey) {
+async function opticsRawDeck(deckKey) {
+  const lightCh3Cards = await loadLightCards();
   const deck = deckKey === 'rotatingMirror' ? 'reflection' : deckKey;
 
   if (deck === 'all') return lightCh3Cards.slice();
-  if (deck === 'reflection') return lightByTopic('reflection');
-  if (deck === 'refractionTir') return [...lightByTopic('refraction'), ...lightByTopic('tir')];
+  if (deck === 'reflection') return lightByTopic(lightCh3Cards, 'reflection');
+  if (deck === 'refractionTir') {
+    return [...lightByTopic(lightCh3Cards, 'refraction'), ...lightByTopic(lightCh3Cards, 'tir')];
+  }
   return lightCh3Cards.slice();
 }
 
-function heatRawDeck(deckKey) {
+async function heatRawDeck(deckKey) {
+  const heatCh1Cards = await loadHeatCards();
   if (deckKey === 'all') return heatCh1Cards.slice();
   return heatCh1Cards.filter((card) => card.topic === deckKey);
 }
@@ -98,14 +119,14 @@ function heatRawDeck(deckKey) {
  * @param {string} deckKey
  * @param {string} lang
  */
-export function buildOpticsDeck(deckKey, lang) {
-  return normalizeDeck(opticsRawDeck(deckKey), lang);
+export async function buildOpticsDeck(deckKey, lang) {
+  return normalizeDeck(await opticsRawDeck(deckKey), lang);
 }
 
 /**
  * @param {string} deckKey
  * @param {string} lang
  */
-export function buildHeatDeck(deckKey, lang) {
-  return normalizeDeck(heatRawDeck(deckKey), lang);
+export async function buildHeatDeck(deckKey, lang) {
+  return normalizeDeck(await heatRawDeck(deckKey), lang);
 }

@@ -1,14 +1,14 @@
 /* thermometerLab.js - Ported high-fidelity Thermometer Simulation Lab */
 
 const STYLE_ID = 's3phy-thermometer-lab-css';
-const THERM_FLOAT_BREAKPOINT = 900;
+const THERM_FLOAT_BREAKPOINT = 1024;
 
 const CSS = `
 .tl-wrap {
   --tl-bg: #09090b;
   --tl-panel: #151518;
   --tl-border: #27272a;
-  --tl-green: #10b981;
+  --tl-green: #00e676;
   --tl-cyan: #06b6d4;
   --tl-yellow: #f59e0b;
   --tl-red: #ef4444;
@@ -275,7 +275,7 @@ const CSS = `
     grid-template-columns: repeat(4, 1fr);
   }
 }
-@media (min-width: 900px) {
+@media (min-width: 1024px) {
   .tl-wrap .tl-dash {
     display: grid;
     grid-template-columns: minmax(0, 460px) 1fr;

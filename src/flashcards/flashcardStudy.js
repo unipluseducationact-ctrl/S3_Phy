@@ -152,8 +152,9 @@ export function mountFlashcardStudy(container, { deckOptions, buildDeck, initial
     restart: container.querySelector('[data-fc-restart]'),
   };
 
-  function makeSession() {
-    session = createFlashcardSession(() => buildDeck(deckKey));
+  async function makeSession() {
+    const cards = await buildDeck(deckKey);
+    session = createFlashcardSession(() => cards);
   }
 
   function setControlsEnabled(flipped, hasCard) {
@@ -321,9 +322,10 @@ export function mountFlashcardStudy(container, { deckOptions, buildDeck, initial
   els.deck.value = deckKey;
   els.deck.addEventListener('change', () => {
     deckKey = els.deck.value;
-    makeSession();
-    renderModeToggle();
-    renderUI();
+    void makeSession().then(() => {
+      renderModeToggle();
+      renderUI();
+    });
   });
 
   els.mode.querySelectorAll('button').forEach((btn) => {
@@ -416,15 +418,17 @@ export function mountFlashcardStudy(container, { deckOptions, buildDeck, initial
   window.addEventListener('keydown', onKeyDown);
 
   const onLang = () => {
-    makeSession();
-    renderModeToggle();
-    refreshLabels();
+    void makeSession().then(() => {
+      renderModeToggle();
+      refreshLabels();
+    });
   };
   window.addEventListener('s3phy:lang', onLang);
 
-  makeSession();
-  renderModeToggle();
-  renderUI();
+  void makeSession().then(() => {
+    renderModeToggle();
+    renderUI();
+  });
 
   return () => {
     window.removeEventListener('keydown', onKeyDown);

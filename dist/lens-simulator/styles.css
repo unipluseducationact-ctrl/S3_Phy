@@ -2,11 +2,11 @@
     margin: 0;
     padding: 0;
     box-sizing: border-box;
-    font-family: 'Arial', sans-serif;
+    font-family: var(--s3-font, 'Inter', sans-serif);
 }
 
 :root {
-    --primary-color: #3182ce;
+    --primary-color: #2563eb;
     --secondary-color: #4a5568;
     --accent-color: #3b82f6;
     --success-color: #38a169;
@@ -30,7 +30,7 @@
 }
 
 body {
-    font-family: 'Arial', sans-serif;
+    font-family: var(--s3-font, 'Inter', sans-serif);
     margin: 0;
     padding: 0;
     background-color: var(--bg-color);
@@ -38,7 +38,7 @@ body {
 }
 
 .main-container {
-    max-width: 1400px;
+    max-width: var(--s3-content-max, 1200px);
     margin: 0 auto;
     padding: 20px;
 }
@@ -1386,7 +1386,8 @@ html.s3phy-embed .canvas-container {
 
 /* Side control column: narrower */
 html.s3phy-embed .control-panel {
-    width: 176px;
+    width: var(--s3-float-panel-w, min(360px, calc(100% - 24px)));
+    max-width: var(--s3-float-panel-w, min(360px, calc(100% - 24px)));
     max-height: min(68vh, calc(100% - 24px));
 }
 

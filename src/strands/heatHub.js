@@ -1,9 +1,5 @@
 import { t, getLang } from '../i18n.js';
-import { createThermometerLab } from '../tools/thermometerLab.js';
-import { createSpecificHeatLab } from '../tools/specificHeatLab.js';
-import { createThermalMixingLab } from '../tools/thermalMixingLab.js';
-import { createChangeOfStateLab } from '../tools/changeOfStateLab.js';
-import { createHeatTransferLab } from '../tools/heatTransferLab.js';
+import { langKey, assetExists, noteExists, hydrateNoteCards } from './hubHelpers.js';
 import { mountHubShell } from '../hubShell.js';
 import { renderToolsShell, hydrateToolsShell } from '../tools/toolsShell.js';
 import { createHeatFinalExamWorksheet } from '../worksheets/heatFinalExamWorksheet.js';
@@ -46,14 +42,14 @@ const TOOL_ORDER = [
   'specificHeat', 'thermalMixing', 'changeOfState', 'heatTransfer'
 ];
 
-const TOOL_FACTORIES = {
-  liquid: (tr) => createThermometerLab(tr, { type: 'liquid' }),
-  resistance: (tr) => createThermometerLab(tr, { type: 'resistance' }),
-  thermistor: (tr) => createThermometerLab(tr, { type: 'thermistor' }),
-  specificHeat: (tr) => createSpecificHeatLab(tr),
-  thermalMixing: (tr) => createThermalMixingLab(tr),
-  changeOfState: (tr) => createChangeOfStateLab(tr),
-  heatTransfer: (tr) => createHeatTransferLab(tr),
+const TOOL_LOADERS = {
+  liquid: () => import('../tools/thermometerLab.js').then((m) => m.createThermometerLab),
+  resistance: () => import('../tools/thermometerLab.js').then((m) => m.createThermometerLab),
+  thermistor: () => import('../tools/thermometerLab.js').then((m) => m.createThermometerLab),
+  specificHeat: () => import('../tools/specificHeatLab.js').then((m) => m.createSpecificHeatLab),
+  thermalMixing: () => import('../tools/thermalMixingLab.js').then((m) => m.createThermalMixingLab),
+  changeOfState: () => import('../tools/changeOfStateLab.js').then((m) => m.createChangeOfStateLab),
+  heatTransfer: () => import('../tools/heatTransferLab.js').then((m) => m.createHeatTransferLab),
 };
 
 function toolLabel(id) {
@@ -67,24 +63,6 @@ function toolLabel(id) {
     heatTransfer: 'tools.heatTransfer.title',
   };
   return t(map[id] || id);
-}
-
-function langKey() {
-  return getLang() === 'zh-Hant' ? 'zhHant' : 'en';
-}
-
-async function assetExists(folder, name) {
-  const url = `${import.meta.env.BASE_URL}${folder}/${name}`;
-  try {
-    const res = await fetch(url, { method: 'HEAD' });
-    return res.ok;
-  } catch {
-    return false;
-  }
-}
-
-async function noteExists(name) {
-  return assetExists('notes', name);
 }
 
 export function mountHeatHub(root) {
@@ -104,6 +82,28 @@ export function mountHeatHub(root) {
     { value: 'changeOfState', labelKey: 'flashcards.deck.changeOfState' },
     { value: 'heatTransfer', labelKey: 'flashcards.deck.heatTransfer' },
   ];
+
+  const THERMOMETER_TYPES = {
+    liquid: 'liquid',
+    resistance: 'resistance',
+    thermistor: 'thermistor',
+  };
+
+  async function mountActiveTool(stage) {
+    stage.innerHTML = '';
+    if (activeLabInstance?._thermometerLabCleanup) {
+      activeLabInstance._thermometerLabCleanup();
+    }
+    const loader = TOOL_LOADERS[toolId];
+    if (!loader) return;
+    const factory = await loader();
+    if (THERMOMETER_TYPES[toolId]) {
+      activeLabInstance = factory(t, { type: THERMOMETER_TYPES[toolId] });
+    } else {
+      activeLabInstance = factory(t);
+    }
+    stage.appendChild(activeLabInstance);
+  }
 
   function renderMain() {
     if (!el.main) return;
@@ -149,14 +149,7 @@ export function mountHeatHub(root) {
           toolId = id;
         },
         mountTool: (stage) => {
-          stage.innerHTML = '';
-          if (activeLabInstance?._thermometerLabCleanup) {
-            activeLabInstance._thermometerLabCleanup();
-          }
-          const factory = TOOL_FACTORIES[toolId];
-          if (!factory) return;
-          activeLabInstance = factory(t);
-          stage.appendChild(activeLabInstance);
+          void mountActiveTool(stage);
         },
       });
     }
@@ -247,22 +240,12 @@ export function mountHeatHub(root) {
   }
 
   async function hydrateNotes() {
-    const lk = langKey();
-    for (const r of HEAT_TOPICS) {
-      const card = root.querySelector(`[data-note-card="${r.id}"]`);
-      if (!card) continue;
-      const body = card.querySelector('[data-note-body]');
-      const file = lk === 'zhHant' ? r.fileZh : r.fileEn;
-      const ok = await noteExists(file);
-      const url = `${import.meta.env.BASE_URL}notes/${file}`;
-      if (ok) {
-        body.innerHTML = `
-          <iframe class="notes-grid" title="${t(`notes.card.${r.id}`)}" src="${url}"></iframe>
-          <p style="margin-top:8px"><a href="${url}" target="_blank" rel="noopener">${t('notes.openPdf')}</a></p>`;
-      } else {
-        body.innerHTML = `<p class="lead">${t('notes.missing')}</p>`;
-      }
-    }
+    const rows = HEAT_TOPICS.map((r) => ({
+      key: r.id,
+      fileEn: r.fileEn,
+      fileZh: r.fileZh,
+    }));
+    await hydrateNoteCards(root, rows);
   }
 
   function renderSummary() {
@@ -292,39 +275,41 @@ export function mountHeatHub(root) {
 
   async function hydrateSummary() {
     const lk = langKey();
-    for (const r of HEAT_TOPICS) {
-      const card = root.querySelector(`[data-summary-card="${r.id}"]`);
-      if (!card) continue;
-      const body = card.querySelector('[data-summary-body]');
+    await Promise.all(
+      HEAT_TOPICS.map(async (r) => {
+        const card = root.querySelector(`[data-summary-card="${r.id}"]`);
+        if (!card) return;
+        const body = card.querySelector('[data-summary-body]');
 
-      const posterBase = SUMMARY_POSTER_BASE[r.id];
-      if (posterBase) {
-        const file = lk === 'zhHant'
-          ? `${posterBase}-zhHant.webp`
-          : `${posterBase}-en.webp`;
-        const ok = await assetExists('summary', file);
-        const url = `${import.meta.env.BASE_URL}summary/${file}`;
-        if (ok) {
-          body.innerHTML = `
+        const posterBase = SUMMARY_POSTER_BASE[r.id];
+        if (posterBase) {
+          const file = lk === 'zhHant'
+            ? `${posterBase}-zhHant.webp`
+            : `${posterBase}-en.webp`;
+          const ok = await assetExists('summary', file);
+          const url = `${import.meta.env.BASE_URL}summary/${file}`;
+          if (ok) {
+            body.innerHTML = `
           <img class="summary-thumb" src="${url}" alt="${t(`summary.item.${r.id}`)}" loading="lazy" />
           <p style="margin-top:8px"><a href="${url}" target="_blank" rel="noopener">${t('summary.viewImage')}</a></p>`;
+          } else {
+            body.innerHTML = `<p class="lead">${t('summary.missing')}</p>`;
+          }
+          return;
+        }
+
+        const file = lk === 'zhHant' ? r.fileZh : r.fileEn;
+        const ok = await noteExists(file);
+        const url = `${import.meta.env.BASE_URL}notes/${file}`;
+        if (ok) {
+          body.innerHTML = `
+          <iframe class="notes-grid" title="${t(`summary.item.${r.id}`)}" src="${url}" loading="lazy"></iframe>
+          <p style="margin-top:8px"><a href="${url}" target="_blank" rel="noopener">${t('summary.download')}</a></p>`;
         } else {
           body.innerHTML = `<p class="lead">${t('summary.missing')}</p>`;
         }
-        continue;
-      }
-
-      const file = lk === 'zhHant' ? r.fileZh : r.fileEn;
-      const ok = await noteExists(file);
-      const url = `${import.meta.env.BASE_URL}notes/${file}`;
-      if (ok) {
-        body.innerHTML = `
-          <iframe class="notes-grid" title="${t(`summary.item.${r.id}`)}" src="${url}"></iframe>
-          <p style="margin-top:8px"><a href="${url}" target="_blank" rel="noopener">${t('summary.download')}</a></p>`;
-      } else {
-        body.innerHTML = `<p class="lead">${t('summary.missing')}</p>`;
-      }
-    }
+      }),
+    );
   }
 
   const onLang = () => render();

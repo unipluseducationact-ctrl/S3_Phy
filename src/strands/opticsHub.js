@@ -1,10 +1,5 @@
 import { t, getLang } from '../i18n.js';
-import { createRotatingMirrorLab } from '../tools/rotatingMirrorLab.js';
-import { createPlaneMirrorLab } from '../tools/planeMirrorLab.js';
-import { createTirEscapeLab } from '../tools/tirEscapeLab.js';
-import { createLensLab } from '../tools/lensLab.js';
-import { createEmLab } from '../tools/emLab.js';
-import { createRgbColorMixerLab } from '../tools/rgbColorMixerLab.js';
+import { langKey, hydrateNoteCards, hydrateSummaryCards } from './hubHelpers.js';
 import { mountHubShell } from '../hubShell.js';
 import { renderToolsShell, hydrateToolsShell } from '../tools/toolsShell.js';
 import { createOpticsLightLensWorksheet } from '../worksheets/opticsLightLensWorksheet.js';
@@ -14,13 +9,13 @@ import { buildOpticsDeck } from '../flashcards/flashcardDeck.js';
 const TOOL_ORDER = ['rotatingMirror', 'planeMirrorLab', 'refractionTir', 'lens', 'rgbMixer', 'em'];
 const SUMMARY_ASSET_VERSION = '20260627-em-v2';
 
-const TOOL_FACTORIES = {
-  rotatingMirror: (tr) => createRotatingMirrorLab(tr),
-  planeMirrorLab: (tr) => createPlaneMirrorLab(tr),
-  refractionTir: (tr) => createTirEscapeLab(tr),
-  lens: (tr, kind) => createLensLab(tr, { defaultKind: kind }),
-  rgbMixer: (tr) => createRgbColorMixerLab(tr),
-  em: (tr) => createEmLab(tr),
+const TOOL_LOADERS = {
+  rotatingMirror: () => import('../tools/rotatingMirrorLab.js').then((m) => m.createRotatingMirrorLab),
+  planeMirrorLab: () => import('../tools/planeMirrorLab.js').then((m) => m.createPlaneMirrorLab),
+  refractionTir: () => import('../tools/tirEscapeLab.js').then((m) => m.createTirEscapeLab),
+  lens: () => import('../tools/lensLab.js').then((m) => m.createLensLab),
+  rgbMixer: () => import('../tools/rgbColorMixerLab.js').then((m) => m.createRgbColorMixerLab),
+  em: () => import('../tools/emLab.js').then((m) => m.createEmLab),
 };
 
 function toolLabel(id) {
@@ -33,24 +28,6 @@ function toolLabel(id) {
     em: 'tools.em.title',
   };
   return t(map[id] || id);
-}
-
-function langKey() {
-  return getLang() === 'zh-Hant' ? 'zhHant' : 'en';
-}
-
-async function assetExists(folder, name) {
-  const url = `${import.meta.env.BASE_URL}${folder}/${name}`;
-  try {
-    const res = await fetch(url, { method: 'HEAD' });
-    return res.ok;
-  } catch {
-    return false;
-  }
-}
-
-async function noteExists(name) {
-  return assetExists('notes', name);
 }
 
 export function mountOpticsHub(root) {
@@ -68,6 +45,15 @@ export function mountOpticsHub(root) {
     { value: 'reflection', labelKey: 'topic.reflection' },
     { value: 'refractionTir', labelKey: 'flashcards.deck.refractionTir' },
   ];
+
+  async function mountActiveTool(stage) {
+    stage.innerHTML = '';
+    const loader = TOOL_LOADERS[toolId];
+    if (!loader) return;
+    const factory = await loader();
+    const node = toolId === 'lens' ? factory(t, { defaultKind: lensDefaultKind }) : factory(t);
+    stage.appendChild(node);
+  }
 
   function renderMain() {
     if (!el.main) return;
@@ -114,11 +100,7 @@ export function mountOpticsHub(root) {
           toolId = id;
         },
         mountTool: (stage) => {
-          stage.innerHTML = '';
-          const factory = TOOL_FACTORIES[toolId];
-          if (!factory) return;
-          const node = toolId === 'lens' ? factory(t, lensDefaultKind) : factory(t);
-          stage.appendChild(node);
+          void mountActiveTool(stage);
         },
       });
     }
@@ -228,23 +210,7 @@ export function mountOpticsHub(root) {
       { key: 'concaveLens', fileEn: 'concave-lens-en.pdf', fileZh: 'concave-lens-zhHant.pdf' },
       { key: 'em', fileEn: 'emwaves-en.pdf', fileZh: 'emwaves-zhHant.pdf' },
     ];
-    const lk = langKey();
-    for (const r of rows) {
-      const card = root.querySelector(`[data-note-card="${r.key}"]`);
-      if (!card) continue;
-      const body = card.querySelector('[data-note-body]');
-      const file = lk === 'zhHant' ? r.fileZh : r.fileEn;
-      const ok = await noteExists(file);
-      const url = `${import.meta.env.BASE_URL}notes/${file}`;
-      if (ok) {
-        body.innerHTML = `
-          <iframe class="notes-grid" title="${t(`notes.card.${r.key}`)}" src="${url}"></iframe>
-          <p style="margin-top:8px"><a href="${url}" target="_blank" rel="noopener">${t('notes.openPdf')}</a></p>`;
-      } else {
-        body.innerHTML = `<p class="lead">${t('notes.missing')}</p>
-          <p><a class="btn" href="${import.meta.env.BASE_URL}notes/README.txt" target="_blank" rel="noopener">README</a></p>`;
-      }
-    }
+    await hydrateNoteCards(root, rows);
   }
 
   function renderSummary() {
@@ -305,38 +271,7 @@ export function mountOpticsHub(root) {
       { key: 'concave', type: 'image', fileEn: 'concave-en.webp', fileZh: 'concave-zhHant.webp' },
       { key: 'em', type: 'image', fileEn: 'em-en.webp', fileZh: 'em-zhHant.webp' },
     ];
-    const lk = langKey();
-    for (const r of rows) {
-      const card = root.querySelector(`[data-summary-card="${r.key}"]`);
-      if (!card) continue;
-      const body = card.querySelector('[data-summary-body]');
-
-      if (r.type === 'image') {
-        const file = r.fileEn && r.fileZh ? (lk === 'zhHant' ? r.fileZh : r.fileEn) : r.file;
-        const ok = await assetExists('summary', file);
-        const baseUrl = `${import.meta.env.BASE_URL}summary/${file}`;
-        const url = `${baseUrl}?v=${SUMMARY_ASSET_VERSION}`;
-        if (ok) {
-          body.innerHTML = `
-          <img class="summary-thumb" src="${url}" alt="${t(`summary.item.${r.key}`)}" loading="lazy" />
-          <p style="margin-top:8px"><a href="${url}" target="_blank" rel="noopener">${t('summary.viewImage')}</a></p>`;
-        } else {
-          body.innerHTML = `<p class="lead">${t('summary.missing')}</p>`;
-        }
-        continue;
-      }
-
-      const file = lk === 'zhHant' ? r.fileZh : r.fileEn;
-      const ok = await assetExists('summary-pdfs', file);
-      const url = `${import.meta.env.BASE_URL}summary-pdfs/${file}`;
-      if (ok) {
-        body.innerHTML = `
-          <iframe class="notes-grid" title="${t(`summary.item.${r.key}`)}" src="${url}"></iframe>
-          <p style="margin-top:8px"><a href="${url}" target="_blank" rel="noopener">${t('summary.download')}</a></p>`;
-      } else {
-        body.innerHTML = `<p class="lead">${t('summary.missing')}</p>`;
-      }
-    }
+    await hydrateSummaryCards(root, rows, { version: SUMMARY_ASSET_VERSION });
   }
 
   const onLang = () => render();

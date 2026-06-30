@@ -66,7 +66,7 @@ const RML_CSS = `
 .rml .rml-controls {
   flex: 1;
   min-width: min(100%, 280px);
-  max-width: 420px;
+  max-width: min(360px, calc(100% - 24px));
   background: var(--rml-panel);
   border-radius: 16px;
   padding: 18px;

@@ -2,8 +2,6 @@ import './style.css';
 import { initI18n, t } from './i18n.js';
 import { initHubScale } from './hubScale.js';
 import { mountStrandHub } from './strandHub.js';
-import { mountOpticsHub } from './strands/opticsHub.js';
-import { mountHeatHub } from './strands/heatHub.js';
 import { SPLASH_PHRASES } from './splashPhrases.js';
 
 initI18n();
@@ -11,18 +9,19 @@ const unmountHubScale = initHubScale();
 
 const SPLASH_KEY = 's3phy_splash_seen';
 
-const STRANDS = {
-  optics: mountOpticsHub,
-  heat: mountHeatHub,
+const STRAND_LOADERS = {
+  optics: () => import('./strands/opticsHub.js').then((m) => m.mountOpticsHub),
+  heat: () => import('./strands/heatHub.js').then((m) => m.mountHeatHub),
 };
 
 let unmountActive = null;
 let unmountPicker = null;
+let splashTimers = [];
 
 function parseStrandFromHash() {
   const m = location.hash.match(/^#\/(\w+)/);
   const id = m?.[1];
-  return id && Object.prototype.hasOwnProperty.call(STRANDS, id) ? id : null;
+  return id && Object.prototype.hasOwnProperty.call(STRAND_LOADERS, id) ? id : null;
 }
 
 function clearHash() {
@@ -30,7 +29,7 @@ function clearHash() {
   history.replaceState(null, '', base);
 }
 
-function navigateStrand(id) {
+async function navigateStrand(id) {
   unmountActive?.();
   unmountActive = null;
   unmountPicker?.();
@@ -52,11 +51,12 @@ function navigateStrand(id) {
     return;
   }
 
-  unmountActive = STRANDS[id](app) ?? null;
+  const mount = await STRAND_LOADERS[id]();
+  unmountActive = mount(app) ?? null;
 }
 
 function routeStrand() {
-  navigateStrand(parseStrandFromHash());
+  void navigateStrand(parseStrandFromHash());
 }
 
 function logoSrc() {
@@ -85,6 +85,11 @@ function createSplash() {
   return splash;
 }
 
+function clearSplashTimers() {
+  splashTimers.forEach((timerId) => window.clearTimeout(timerId));
+  splashTimers = [];
+}
+
 function startDanmaku(splashEl, danmakuField) {
   const pool = [...SPLASH_PHRASES.en, ...SPLASH_PHRASES.zhHant];
 
@@ -105,10 +110,12 @@ function startDanmaku(splashEl, danmakuField) {
     danmakuField.appendChild(item);
     item.addEventListener('animationend', () => item.remove());
 
-    window.setTimeout(spawn, 1500 + Math.random() * 1000);
+    splashTimers.push(window.setTimeout(spawn, 1500 + Math.random() * 1000));
   };
 
-  for (let i = 0; i < 4; i += 1) window.setTimeout(spawn, i * 1000);
+  for (let i = 0; i < 4; i += 1) {
+    splashTimers.push(window.setTimeout(spawn, i * 1000));
+  }
 }
 
 function wireSplashAnimations(splash) {
@@ -116,12 +123,14 @@ function wireSplashAnimations(splash) {
   const danmaku = splash.querySelector('#splashDanmaku');
   const startWrap = splash.querySelector('#splashStartWrap');
 
-  window.setTimeout(() => logoWrap?.classList.add('splash-logo-wrap--in'), 800);
-  window.setTimeout(() => {
-    danmaku?.classList.add('splash-danmaku--visible');
-    startWrap?.classList.add('splash-start-wrap--in');
-    if (danmaku) startDanmaku(splash, danmaku);
-  }, 1600);
+  splashTimers.push(window.setTimeout(() => logoWrap?.classList.add('splash-logo-wrap--in'), 800));
+  splashTimers.push(
+    window.setTimeout(() => {
+      danmaku?.classList.add('splash-danmaku--visible');
+      startWrap?.classList.add('splash-start-wrap--in');
+      if (danmaku) startDanmaku(splash, danmaku);
+    }, 1600),
+  );
 }
 
 function startApp() {
@@ -145,6 +154,7 @@ function trySplashThenApp() {
 
   const btn = splash.querySelector('#splashStart');
   const finish = () => {
+    clearSplashTimers();
     splash.remove();
     startApp();
   };
@@ -154,6 +164,7 @@ function trySplashThenApp() {
     } catch {
       /* ignore */
     }
+    clearSplashTimers();
     splash.classList.add('splash--hide');
     splash.addEventListener('transitionend', finish, { once: true });
     window.setTimeout(finish, 480);
@@ -162,7 +173,10 @@ function trySplashThenApp() {
 
 window.addEventListener('hashchange', routeStrand);
 window.addEventListener('s3phy:strand', (e) => {
-  navigateStrand(e.detail ?? null);
+  void navigateStrand(e.detail ?? null);
+});
+window.addEventListener('pagehide', () => {
+  unmountHubScale?.();
 });
 
 trySplashThenApp();

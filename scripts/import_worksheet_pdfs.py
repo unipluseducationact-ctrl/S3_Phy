@@ -19,8 +19,8 @@ HEAT_PDF_DIR = Path(
     r"C:\Users\UniplusUser02\Desktop\PHYS\S3\Heat\Final exam"
 )
 IMAGES_DIR = ROOT / "public" / "worksheet-images"
-IMPORTED_JSON = ROOT / "src" / "data" / "imported-questions.json"
-QUESTIONS_JSON = ROOT / "src" / "data" / "questions.json"
+IMPORTED_JSON = ROOT / "scripts" / "data" / "imported-questions.json"
+QUESTIONS_JSON = ROOT / "scripts" / "data" / "questions.json"
 
 MAX_IMAGE_WIDTH = 1200
 WEBP_QUALITY = 82
