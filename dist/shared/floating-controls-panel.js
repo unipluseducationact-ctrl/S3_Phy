@@ -6,11 +6,16 @@
   'use strict';
 
   const FLOAT_BREAKPOINT = 1024;
+  const HUB_FLOAT_BREAKPOINT = 900;
   const DEFAULT_POS = { x: 12, y: 12 };
   const LAYOUT_DEBOUNCE_MS = 200;
 
   function isFloatingEnabled(container, breakpoint) {
-    return window.innerWidth >= (breakpoint || FLOAT_BREAKPOINT);
+    const bp = breakpoint || FLOAT_BREAKPOINT;
+    const width = container
+      ? container.getBoundingClientRect().width
+      : window.innerWidth;
+    return width >= bp;
   }
 
   function readPosition(storageKey) {
@@ -190,4 +195,5 @@
 
   window.initFloatingControlsPanel = initFloatingControlsPanel;
   window.S3PHY_FLOAT_BREAKPOINT = FLOAT_BREAKPOINT;
+  window.S3PHY_HUB_FLOAT_BREAKPOINT = HUB_FLOAT_BREAKPOINT;
 })();
