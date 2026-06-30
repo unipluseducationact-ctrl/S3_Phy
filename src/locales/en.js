@@ -163,7 +163,7 @@ export const en = {
   'worksheets.correct': 'Correct.',
   'worksheets.modelAnswer': 'Model answer',
   'flashcards.title': 'Flashcards',
-  'flashcards.intro': 'Study with spaced repetition — cards you find harder appear more often in later rounds. Picture decks for reflection, refraction, TIR, EM waves, and lenses.',
+  'flashcards.intro': 'Study with spaced repetition — cards you find harder appear more often in later rounds. Picture decks for reflection, refraction, and TIR.',
   'flashcards.progress': 'Card {current} of {total}',
   'flashcards.deck': 'Deck',
   'flashcards.question': 'Question',

@@ -14,9 +14,6 @@ const SUBTOPIC_LABEL_KEYS = {
   reflection: 'topic.reflection',
   refraction: 'topic.refraction',
   tir: 'topic.tir',
-  em: 'topic.em',
-  convex: 'topic.convex',
-  concave: 'topic.concave',
   rotatingMirror: 'topic.reflection',
 };
 

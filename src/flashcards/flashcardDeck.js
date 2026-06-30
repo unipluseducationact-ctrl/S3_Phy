@@ -1,8 +1,5 @@
 import { assetUrl } from '../assetUrl.js';
 import lightCh3Cards from '../data/flashcards-light-ch3.json';
-import emImages from '../data/flashcards-em.json';
-import convexImages from '../data/flashcards-convex.json';
-import concaveImages from '../data/flashcards-concave.json';
 import heatCh1Cards from '../data/flashcards-heat-ch1.json';
 
 function langKey(lang) {
@@ -86,19 +83,9 @@ function normalizeDeck(rawCards, lang, defaultSubtopic = 'General') {
 function opticsRawDeck(deckKey) {
   const deck = deckKey === 'rotatingMirror' ? 'reflection' : deckKey;
 
-  if (deck === 'all') {
-    return [
-      ...lightCh3Cards,
-      ...emImages,
-      ...convexImages,
-      ...concaveImages,
-    ];
-  }
+  if (deck === 'all') return lightCh3Cards.slice();
   if (deck === 'reflection') return lightByTopic('reflection');
-  if (deck === 'convex') return convexImages.slice();
-  if (deck === 'concave') return concaveImages.slice();
   if (deck === 'refractionTir') return [...lightByTopic('refraction'), ...lightByTopic('tir')];
-  if (deck === 'em') return emImages.slice();
   return lightCh3Cards.slice();
 }
 
