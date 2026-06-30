@@ -543,7 +543,7 @@ function drawBar(ctx, view, t, a, b, opts = {}) {
 /* --- rayAnimator.js --- */
 /** @file Step-by-step ray diagram animation (HKDSE drawing order). */
 
-const STEPS_PER_RAY = 5;
+const STEPS_PER_RAY = 2;
 
 class RayAnimator {
   constructor() {
@@ -606,6 +606,9 @@ class RayAnimator {
 
   stepNext() {
     this.pause();
+    if (this.totalSteps > 0 && this.stepIndex >= this.totalSteps) {
+      this.stepIndex = 0;
+    }
     if (this.stepIndex < this.totalSteps) {
       this.stepIndex += 1;
       this.onUpdate?.();
@@ -613,7 +616,7 @@ class RayAnimator {
   }
 
   /**
-   * Draw one sight ray with discrete steps (1–5 per ray).
+   * Draw one sight ray with discrete steps (1–2 per ray).
    * stepIndex: global count of completed steps (0 = blank).
    */
   static drawSightRay(ctx, view, t, draw, ray, stepIndex, rayIndex, rayCount, fail = false) {
@@ -626,21 +629,14 @@ class RayAnimator {
 
     if (localSteps >= 1) {
       draw.drawPoint?.(objectPt, fail ? '#ff5252' : undefined);
+      if (image) draw.drawImageLine?.(objectPt, image, 1);
+      if (image && reflectPt) {
+        draw.drawArrow(image, eye, { dashed: true, progress: 1, color: realColor || undefined });
+      }
     }
 
-    if (localSteps >= 2 && image) {
-      draw.drawImageLine?.(objectPt, image, 1);
-    }
-
-    if (localSteps >= 3 && image && reflectPt) {
-      draw.drawArrow(image, eye, { dashed: true, progress: 1, color: realColor || undefined });
-    }
-
-    if (localSteps >= 4 && reflectPt) {
+    if (localSteps >= 2 && reflectPt) {
       draw.drawArrow(objectPt, reflectPt, { progress: 1, color: realColor || undefined });
-    }
-
-    if (localSteps >= 5 && reflectPt) {
       draw.drawArrow(reflectPt, eye, { progress: 1, color: realColor || undefined });
     }
   }
