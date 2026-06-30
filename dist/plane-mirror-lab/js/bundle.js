@@ -438,7 +438,7 @@ function drawArrow(ctx, view, t, from, to, opts = {}) {
   ctx.setLineDash([]);
   if (head && progress >= 0.95) {
     const ang = Math.atan2(s1.y - s0.y, s1.x - s0.x);
-    const hl = 9;
+    const hl = 15;
     ctx.fillStyle = color;
     ctx.beginPath();
     ctx.moveTo(s1.x, s1.y);
