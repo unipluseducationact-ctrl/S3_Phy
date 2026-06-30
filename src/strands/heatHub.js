@@ -1,5 +1,5 @@
 import { t, getLang } from '../i18n.js';
-import { langKey, assetExists, noteExists, hydrateNoteCards } from './hubHelpers.js';
+import { langKey, assetExists, noteExists, hydrateNoteCards, renderPdfPreviewBlock } from './hubHelpers.js';
 import { mountHubShell } from '../hubShell.js';
 import { renderToolsShell, hydrateToolsShell } from '../tools/toolsShell.js';
 import { createHeatFinalExamWorksheet } from '../worksheets/heatFinalExamWorksheet.js';
@@ -302,9 +302,11 @@ export function mountHeatHub(root) {
         const ok = await noteExists(file);
         const url = `${import.meta.env.BASE_URL}notes/${file}`;
         if (ok) {
-          body.innerHTML = `
-          <iframe class="notes-grid" title="${t(`summary.item.${r.id}`)}" src="${url}" loading="lazy"></iframe>
-          <p style="margin-top:8px"><a href="${url}" target="_blank" rel="noopener">${t('summary.download')}</a></p>`;
+          body.innerHTML = renderPdfPreviewBlock(
+            t(`summary.item.${r.id}`),
+            url,
+            t('summary.download'),
+          );
         } else {
           body.innerHTML = `<p class="lead">${t('summary.missing')}</p>`;
         }

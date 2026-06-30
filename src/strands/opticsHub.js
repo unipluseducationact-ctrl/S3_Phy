@@ -137,7 +137,7 @@ export function mountOpticsHub(root) {
       <section class="panel panel--topic-hub">
         <h2>${t('topics.title')}</h2>
         <p class="lead">${t('topics.intro')}</p>
-        <div class="grid cols-2 topic-hub-grid">
+        <div class="grid cols-3x2 topic-hub-grid">
           ${cards
             .map(([id, key]) => {
               const tid =
@@ -186,7 +186,7 @@ export function mountOpticsHub(root) {
         <h2>${t('notes.title')}</h2>
         <p class="lead">${t('notes.intro')}</p>
         <p class="lead">${t('notes.embedHint')}</p>
-        <div class="grid cols-2" data-notes-grid>
+        <div class="grid cols-3x2" data-notes-grid>
           ${rows
             .map((r) => {
               const title = t(`notes.card.${r.key}`);
@@ -237,7 +237,7 @@ export function mountOpticsHub(root) {
         <h2>${t('summary.title')}</h2>
         <p class="lead">${t('summary.intro')}</p>
         <p class="lead">${t('notes.embedHint')}</p>
-        <div class="grid cols-2" data-summary-grid>
+        <div class="grid cols-3x2" data-summary-grid>
           ${items
             .map((it) => {
               const title = t(`summary.item.${it.key}`);

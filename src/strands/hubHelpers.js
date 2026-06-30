@@ -18,6 +18,21 @@ export async function noteExists(name) {
   return assetExists('notes', name);
 }
 
+export function pdfPreviewSrc(url) {
+  const base = String(url).split('#')[0];
+  return `${base}#view=FitH&toolbar=0&navpanes=0&scrollbar=0`;
+}
+
+export function renderPdfPreviewBlock(title, pdfUrl, linkLabel) {
+  const previewSrc = pdfPreviewSrc(pdfUrl);
+  const safeTitle = title.replace(/"/g, '&quot;');
+  return `
+    <div class="note-preview-wrap">
+      <iframe class="note-preview" title="${safeTitle}" src="${previewSrc}" loading="lazy"></iframe>
+    </div>
+    <p class="note-preview-link"><a href="${pdfUrl}" target="_blank" rel="noopener">${linkLabel}</a></p>`;
+}
+
 export async function hydrateNoteCards(root, rows) {
   const lk = langKey();
   await Promise.all(
@@ -29,9 +44,11 @@ export async function hydrateNoteCards(root, rows) {
       const ok = await noteExists(file);
       const url = `${import.meta.env.BASE_URL}notes/${file}`;
       if (ok) {
-        body.innerHTML = `
-          <iframe class="notes-grid" title="${t(`notes.card.${r.key}`)}" src="${url}" loading="lazy"></iframe>
-          <p style="margin-top:8px"><a href="${url}" target="_blank" rel="noopener">${t('notes.openPdf')}</a></p>`;
+        body.innerHTML = renderPdfPreviewBlock(
+          t(`notes.card.${r.key}`),
+          url,
+          t('notes.openPdf'),
+        );
       } else {
         body.innerHTML = `<p class="lead">${t('notes.missing')}</p>
           <p><a class="btn" href="${import.meta.env.BASE_URL}notes/README.txt" target="_blank" rel="noopener">README</a></p>`;
@@ -68,9 +85,11 @@ export async function hydrateSummaryCards(root, rows, { version = '' } = {}) {
       const ok = await assetExists('summary-pdfs', file);
       const url = `${import.meta.env.BASE_URL}summary-pdfs/${file}`;
       if (ok) {
-        body.innerHTML = `
-          <iframe class="notes-grid" title="${t(`summary.item.${r.key}`)}" src="${url}" loading="lazy"></iframe>
-          <p style="margin-top:8px"><a href="${url}" target="_blank" rel="noopener">${t('summary.download')}</a></p>`;
+        body.innerHTML = renderPdfPreviewBlock(
+          t(`summary.item.${r.key}`),
+          url,
+          t('summary.download'),
+        );
       } else {
         body.innerHTML = `<p class="lead">${t('summary.missing')}</p>`;
       }
