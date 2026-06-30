@@ -543,7 +543,7 @@ function drawBar(ctx, view, t, a, b, opts = {}) {
 /* --- rayAnimator.js --- */
 /** @file Step-by-step ray diagram animation (HKDSE drawing order). */
 
-const STEPS_PER_RAY = 2;
+const STEPS_PER_RAY = 5;
 
 class RayAnimator {
   constructor() {
@@ -616,7 +616,7 @@ class RayAnimator {
   }
 
   /**
-   * Draw one sight ray with discrete steps (1–2 per ray).
+   * Draw one sight ray with discrete steps (1–5 per ray).
    * stepIndex: global count of completed steps (0 = blank).
    */
   static drawSightRay(ctx, view, t, draw, ray, stepIndex, rayIndex, rayCount, fail = false) {
@@ -629,14 +629,21 @@ class RayAnimator {
 
     if (localSteps >= 1) {
       draw.drawPoint?.(objectPt, fail ? '#ff5252' : undefined);
-      if (image) draw.drawImageLine?.(objectPt, image, 1);
-      if (image && reflectPt) {
-        draw.drawArrow(image, eye, { dashed: true, progress: 1, color: realColor || undefined });
-      }
     }
 
-    if (localSteps >= 2 && reflectPt) {
+    if (localSteps >= 2 && image) {
+      draw.drawImageLine?.(objectPt, image, 1);
+    }
+
+    if (localSteps >= 3 && image && reflectPt) {
+      draw.drawArrow(image, eye, { dashed: true, progress: 1, color: realColor || undefined });
+    }
+
+    if (localSteps >= 4 && reflectPt) {
       draw.drawArrow(objectPt, reflectPt, { progress: 1, color: realColor || undefined });
+    }
+
+    if (localSteps >= 5 && reflectPt) {
       draw.drawArrow(reflectPt, eye, { progress: 1, color: realColor || undefined });
     }
   }
@@ -1025,6 +1032,8 @@ function createImageFormationScenario() {
             const sy = txf.oy - params.H * txf.pxPerM;
             drawLabel(ctx, sx, sy, "A'B'", COLORS.image);
           }
+        } else if (rayIndex === 1 && pr > 0) {
+          drawPoint(ctx, view, txf, { x: imgX, y: 0 }, 5, COLORS.image, "B'");
         }
       },
       drawPoint: (p) => drawPoint(ctx, view, txf, p, 5, COLORS.object),
@@ -1145,6 +1154,7 @@ function createMinMirrorLengthScenario() {
       drawArrow: (from, to, opts) => drawArrow(ctx, view, txf, from, to, opts),
       drawImageLine: (_a, _b, pr) => {
         if (rayIndex === 0 && pr > 0) drawArrowBody(ctx, view, txf, 0, params.H, imgX, true);
+        else if (rayIndex === 1 && pr > 0) drawPoint(ctx, view, txf, { x: imgX, y: 0 }, 5, COLORS.image, "B'");
       },
       drawPoint: () => {},
     });
