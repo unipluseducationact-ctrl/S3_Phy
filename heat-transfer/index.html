@@ -10,10 +10,10 @@
     <script src="https://unpkg.com/lucide@latest"></script>
     <!-- Chart.js for real-time graphs -->
     <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    <link rel="stylesheet" href="../shared/s3phy-tokens.css">
+    <link rel="stylesheet" href="../shared/s3phy-embed.css">
+    <script src="../shared/s3phy-embed-init.js"></script>
     <style>
-        @import url('https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@300;400;500;600;700;800&family=JetBrains+Mono:wght@400;700&display=swap');
-
-        /* Thermodynamic semantic color system 熱力學語義配色 */
         :root {
             --heat-hot: #ef4444;
             --heat-warm: #f59e0b;
@@ -32,13 +32,13 @@
         body[data-active-tab="convection"] { --tab-accent: var(--tab-convection); --tab-accent-glow: rgba(14, 165, 233, 0.4); }
         body[data-active-tab="radiation"] { --tab-accent: var(--tab-radiation); --tab-accent-glow: rgba(244, 63, 94, 0.4); }
         body[data-active-tab="applications"] { --tab-accent: var(--tab-applications); --tab-accent-glow: rgba(16, 185, 129, 0.4); }
-        
+
         html {
             scrollbar-gutter: stable;
         }
 
         body {
-            font-family: 'Plus Jakarta Sans', sans-serif;
+            font-family: var(--s3-font, 'Inter', sans-serif);
             background-color: #0f172a;
             color: #f8fafc;
             overflow-x: hidden;
@@ -102,7 +102,7 @@
 
         .sim-main-col { transition: all 0.3s ease; }
 
-        .svg-annotation text { font-family: 'Plus Jakarta Sans', sans-serif; }
+        .svg-annotation text { font-family: var(--s3-font, 'Inter', sans-serif); }
         .probe-badge {
             background: rgba(15, 23, 42, 0.85);
             border: 1px solid var(--tab-accent);
@@ -130,7 +130,7 @@
             left: 50% !important;
             transform: translate(-50%, -50%) !important;
             width: 90vw !important;
-            max-width: 950px !important;
+            max-width: var(--s3-content-max, 1200px) !important;
             height: 82vh !important;
             max-height: 680px !important;
             z-index: 50 !important;

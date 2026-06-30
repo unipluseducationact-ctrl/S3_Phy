@@ -6,7 +6,6 @@
   'use strict';
 
   const FLOAT_BREAKPOINT = 1024;
-  const THERM_BREAKPOINT = 900;
   const DEFAULT_POS = { x: 12, y: 12 };
   const LAYOUT_DEBOUNCE_MS = 200;
 
@@ -191,5 +190,4 @@
 
   window.initFloatingControlsPanel = initFloatingControlsPanel;
   window.S3PHY_FLOAT_BREAKPOINT = FLOAT_BREAKPOINT;
-  window.S3PHY_THERM_FLOAT_BREAKPOINT = THERM_BREAKPOINT;
 })();
