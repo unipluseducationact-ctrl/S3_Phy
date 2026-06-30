@@ -38,11 +38,13 @@ const HEAT_TOPICS = [
 ];
 
 const TOOL_ORDER = [
+  'faultyCalibration',
   'liquid', 'resistance', 'thermistor',
   'specificHeat', 'thermalMixing', 'changeOfState', 'heatTransfer'
 ];
 
 const TOOL_LOADERS = {
+  faultyCalibration: () => import('../tools/thermometerLab.js').then((m) => m.createFaultyScaleCalibrationLab),
   liquid: () => import('../tools/thermometerLab.js').then((m) => m.createThermometerLab),
   resistance: () => import('../tools/thermometerLab.js').then((m) => m.createThermometerLab),
   thermistor: () => import('../tools/thermometerLab.js').then((m) => m.createThermometerLab),
@@ -54,6 +56,7 @@ const TOOL_LOADERS = {
 
 function toolLabel(id) {
   const map = {
+    faultyCalibration: 'tools.faultyCalibration.title',
     liquid: 'tools.thermometerLab.liquid.title',
     resistance: 'tools.thermometerLab.resistance.title',
     thermistor: 'tools.thermometerLab.thermistor.title',

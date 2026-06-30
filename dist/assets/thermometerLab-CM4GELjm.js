@@ -1,4 +1,4 @@
-const Tt="s3phy-thermometer-lab-css";const At=`
+const Tt="s3phy-thermometer-lab-css";const Ht=`
 .tl-wrap {
   --tl-bg: #09090b;
   --tl-panel: #151518;
@@ -789,10 +789,46 @@ const Tt="s3phy-thermometer-lab-css";const At=`
   font-weight: 600;
   margin: 0;
 }
-`;function It(){if(document.getElementById(Tt))return;const b=document.createElement("style");b.id=Tt,b.textContent=At,document.head.appendChild(b)}function Wt(b){const K={x:12,y:12},j=200,{container:A,panel:a,toggleBtn:e,dragHandle:W,dragSurface:it,storageKey:X,onLayoutChange:Y,breakpoint:U=1024,collapsedClass:J="controls-collapsed",floatingClass:H="controls-floating"}=b,x=it||W;if(!A||!a||!e)return null;let w=sessionStorage.getItem(X)!=="false",T=(()=>{try{const C=localStorage.getItem(X+":pos");if(!C)return{...K};const v=JSON.parse(C);if(typeof v.x=="number"&&typeof v.y=="number")return v}catch{}return{...K}})(),M=null,ot=null;const _=()=>window.innerWidth>=U,Q=(C,v)=>{const at=A.getBoundingClientRect(),st=a.getBoundingClientRect(),pt=Math.max(0,at.width-st.width),ft=Math.max(0,at.height-st.height);return{x:Math.min(Math.max(0,C),pt),y:Math.min(Math.max(0,v),ft)}},I=()=>{a.style.left=T.x+"px",a.style.top=T.y+"px",a.style.right="auto",a.style.bottom="auto"},et=()=>{typeof Y=="function"&&(clearTimeout(ot),ot=setTimeout(Y,j))},Z=()=>{e.setAttribute("aria-expanded",w?"false":"true"),b.getToggleTitle&&(e.title=b.getToggleTitle(w));const C=e.querySelector("[data-float-chevron]");C&&(C.textContent=w?"v":"^")},P=()=>{_()&&(T=Q(T.x,T.y),I())},tt=C=>{w=C,a.classList.toggle(J,w),sessionStorage.setItem(X,w?"true":"false"),Z(),et(),requestAnimationFrame(P),setTimeout(P,260)},O=()=>{A.classList.add(H),a.classList.add("lab-controls-float"),T=Q(T.x,T.y),I(),W&&(W.style.display="")},$=()=>{A.classList.remove(H),a.classList.remove("lab-controls-float"),a.style.left="",a.style.top="",a.style.right="",a.style.bottom="",W&&(W.style.display="none")},lt=()=>{_()?(O(),T=Q(T.x,T.y),I()):$(),et()};if(a.classList.toggle(J,w),Z(),lt(),e.addEventListener("click",C=>{C.stopPropagation(),tt(!w)}),x){x.addEventListener("pointerdown",v=>{_()&&(e.contains(v.target)||(v.preventDefault(),M={pointerId:v.pointerId,startX:v.clientX,startY:v.clientY,originX:T.x,originY:T.y},x.setPointerCapture(v.pointerId),x.classList.add("is-dragging")))}),x.addEventListener("pointermove",v=>{!M||M.pointerId!==v.pointerId||(T=Q(M.originX+v.clientX-M.startX,M.originY+v.clientY-M.startY),I())});const C=v=>{if(!(!M||M.pointerId!==v.pointerId)){x.releasePointerCapture(v.pointerId),x.classList.remove("is-dragging");try{localStorage.setItem(X+":pos",JSON.stringify(T))}catch{}M=null,et()}};x.addEventListener("pointerup",C),x.addEventListener("pointercancel",C)}return window.addEventListener("resize",lt),{setCollapsed:tt,refreshMode:lt,isCollapsed:()=>w}}function Yt(b,V={}){It();const K=V.type||"liquid";let j=b("tools.thermometerLab.title"),A=b("tools.thermometerLab.subtitle");V.type==="liquid"?(j=b("tools.thermometerLab.liquid.title"),A=b("tools.thermometerLab.liquid.subtitle")||b("tools.thermometerLab.subtitle")):V.type==="resistance"?(j=b("tools.thermometerLab.resistance.title"),A=b("tools.thermometerLab.resistance.subtitle")||b("tools.thermometerLab.subtitle")):V.type==="thermistor"&&(j=b("tools.thermometerLab.thermistor.title"),A=b("tools.thermometerLab.thermistor.subtitle")||b("tools.thermometerLab.subtitle"));const a=document.createElement("div");a.className="tl-wrap",a.innerHTML=`
+.tl-wrap--faulty-cal .tl-dash--faulty {
+  position: relative;
+  min-height: min(72vh, 720px);
+}
+.tl-wrap--faulty-cal .tl-faulty-hero {
+  background: var(--tl-panel);
+  padding: 16px 20px 20px;
+  border-radius: 16px;
+  border: 1px solid var(--tl-border);
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+  min-height: min(52vh, 520px);
+}
+.tl-wrap--faulty-cal .tl-faulty-hero-viz {
+  flex: 1;
+  min-height: 240px;
+  background: rgba(0, 0, 0, 0.25);
+  border-radius: 12px;
+  border: 1px solid var(--tl-border);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 12px;
+}
+.tl-wrap--faulty-cal .tl-faulty-live {
+  background: var(--tl-panel);
+  border: 1px solid var(--tl-border);
+  border-radius: 16px;
+  padding: 14px 16px;
+}
+@media (min-width: 1024px) {
+  .tl-wrap--faulty-cal .tl-controls {
+    width: min(380px, calc(100% - 24px));
+  }
+}
+`;function St(){if(document.getElementById(Tt))return;const f=document.createElement("style");f.id=Tt,f.textContent=Ht,document.head.appendChild(f)}function kt(f){const V={x:12,y:12},U=200,{container:H,panel:a,toggleBtn:e,dragHandle:_,dragSurface:et,storageKey:Q,onLayoutChange:K,breakpoint:J=1024,collapsedClass:k="controls-collapsed",floatingClass:w="controls-floating"}=f,y=et||_;if(!H||!a||!e)return null;let T=sessionStorage.getItem(Q)!=="false",S=(()=>{try{const M=localStorage.getItem(Q+":pos");if(!M)return{...V};const C=JSON.parse(M);if(typeof C.x=="number"&&typeof C.y=="number")return C}catch{}return{...V}})(),L=null,W=null;const z=()=>window.innerWidth>=J,N=(M,C)=>{const rt=H.getBoundingClientRect(),st=a.getBoundingClientRect(),ft=Math.max(0,rt.width-st.width),pt=Math.max(0,rt.height-st.height);return{x:Math.min(Math.max(0,M),ft),y:Math.min(Math.max(0,C),pt)}},E=()=>{a.style.left=S.x+"px",a.style.top=S.y+"px",a.style.right="auto",a.style.bottom="auto"},q=()=>{typeof K=="function"&&(clearTimeout(W),W=setTimeout(K,U))},D=()=>{e.setAttribute("aria-expanded",T?"false":"true"),f.getToggleTitle&&(e.title=f.getToggleTitle(T));const M=e.querySelector("[data-float-chevron]");M&&(M.textContent=T?"v":"^")},B=()=>{z()&&(S=N(S.x,S.y),E())},Z=M=>{T=M,a.classList.toggle(k,T),sessionStorage.setItem(Q,T?"true":"false"),D(),q(),requestAnimationFrame(B),setTimeout(B,260)},lt=()=>{H.classList.add(w),a.classList.add("lab-controls-float"),S=N(S.x,S.y),E(),_&&(_.style.display="")},j=()=>{H.classList.remove(w),a.classList.remove("lab-controls-float"),a.style.left="",a.style.top="",a.style.right="",a.style.bottom="",_&&(_.style.display="none")},it=()=>{z()?(lt(),S=N(S.x,S.y),E()):j(),q()};if(a.classList.toggle(k,T),D(),it(),e.addEventListener("click",M=>{M.stopPropagation(),Z(!T)}),y){y.addEventListener("pointerdown",C=>{z()&&(e.contains(C.target)||(C.preventDefault(),L={pointerId:C.pointerId,startX:C.clientX,startY:C.clientY,originX:S.x,originY:S.y},y.setPointerCapture(C.pointerId),y.classList.add("is-dragging")))}),y.addEventListener("pointermove",C=>{!L||L.pointerId!==C.pointerId||(S=N(L.originX+C.clientX-L.startX,L.originY+C.clientY-L.startY),E())});const M=C=>{if(!(!L||L.pointerId!==C.pointerId)){y.releasePointerCapture(C.pointerId),y.classList.remove("is-dragging");try{localStorage.setItem(Q+":pos",JSON.stringify(S))}catch{}L=null,q()}};y.addEventListener("pointerup",M),y.addEventListener("pointercancel",M)}return window.addEventListener("resize",it),{setCollapsed:Z,refreshMode:it,isCollapsed:()=>T}}function Wt(f,h={}){St();const V=h.type||"liquid";let U=f("tools.thermometerLab.title"),H=f("tools.thermometerLab.subtitle");h.type==="liquid"?(U=f("tools.thermometerLab.liquid.title"),H=f("tools.thermometerLab.liquid.subtitle")||f("tools.thermometerLab.subtitle")):h.type==="resistance"?(U=f("tools.thermometerLab.resistance.title"),H=f("tools.thermometerLab.resistance.subtitle")||f("tools.thermometerLab.subtitle")):h.type==="thermistor"&&(U=f("tools.thermometerLab.thermistor.title"),H=f("tools.thermometerLab.thermistor.subtitle")||f("tools.thermometerLab.subtitle"));const a=document.createElement("div");a.className="tl-wrap",a.innerHTML=`
     <div class="tl-head">
-      <h2 class="tl-title">${j}</h2>
-      <div class="tl-sub">${A}</div>
+      <h2 class="tl-title">${U}</h2>
+      <div class="tl-sub">${H}</div>
     </div>
     <div class="tl-dash">
       <!-- TOP ROW LEFT: THERMOMETER VIEW -->
@@ -800,7 +836,7 @@ const Tt="s3phy-thermometer-lab-css";const At=`
         <canvas class="tl-canvas-phys" id="tl-thermometerCanvas" width="460" height="340"></canvas>
         <button class="tl-btn" id="tl-btn-toggle-labels" style="margin-top:4px;width:100%;display:flex;align-items:center;justify-content:center;gap:6px;font-size:0.75rem;padding:6px 10px;">
           <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"></circle><line x1="12" y1="16" x2="12" y2="12"></line><line x1="12" y1="8" x2="12.01" y2="8"></line></svg>
-          <span id="tl-lbl-toggle-labels">${b("tools.thermometerLab.labels.hide")}</span>
+          <span id="tl-lbl-toggle-labels">${f("tools.thermometerLab.labels.hide")}</span>
         </button>
       </div>
 
@@ -872,7 +908,7 @@ const Tt="s3phy-thermometer-lab-css";const At=`
         </div>
         <div class="tl-live-tab" id="tl-live-thermistor">
           <div class="tl-controls-steps">
-            <div class="tl-info-label" style="margin-top:0;font-size:0.8rem;color:var(--tl-green)">${b("tools.thermometerLab.thermistor.liveBetaLabel")}</div>
+            <div class="tl-info-label" style="margin-top:0;font-size:0.8rem;color:var(--tl-green)">${f("tools.thermometerLab.thermistor.liveBetaLabel")}</div>
             <div class="tl-worked-solution" style="background-color:rgba(16,185,129,0.05);border-left-color:var(--tl-green)">
               <div id="tl-svg-formula-thermistor" class="tl-math-formula" style="font-size:0.85rem"></div>
               <p style="font-size:0.85rem">Substitute current resistance <b class="tl-live-value" id="tl-live-thermistor-rt">10.00 kΩ</b>:</p>
@@ -885,10 +921,10 @@ const Tt="s3phy-thermometer-lab-css";const At=`
       <!-- FLOATING CONTROLS & SOLVERS -->
       <div class="tl-controls controls-collapsed">
         <div class="tl-controls-float-bar">
-          <button type="button" class="tl-controls-drag-handle" id="tl-controls-drag" aria-label="${b("tools.floatingControls.dragHint")}" title="${b("tools.floatingControls.dragHint")}">⋮⋮</button>
+          <button type="button" class="tl-controls-drag-handle" id="tl-controls-drag" aria-label="${f("tools.floatingControls.dragHint")}" title="${f("tools.floatingControls.dragHint")}">⋮⋮</button>
           <button type="button" class="tl-controls-toggle" id="tl-controls-toggle" aria-expanded="false">
             <span data-float-chevron>▾</span>
-            <span>${b("tools.thermometerLab.paramSettings")}</span>
+            <span>${f("tools.thermometerLab.paramSettings")}</span>
           </button>
         </div>
         <div class="tl-controls-body">
@@ -896,7 +932,7 @@ const Tt="s3phy-thermometer-lab-css";const At=`
         <!-- TAB 1: LIQUID-IN-GLASS -->
         <div class="tl-tab-content active" id="tl-tab-liquid">
           <details class="tl-details">
-            <summary>${b("tools.thermometerLab.paramSettings")}</summary>
+            <summary>${f("tools.thermometerLab.paramSettings")}</summary>
             <div class="tl-details-body">
               <div class="tl-cg">
                 <span class="tl-section-label">Thermometric liquid</span>
@@ -954,75 +990,12 @@ const Tt="s3phy-thermometer-lab-css";const At=`
               </div>
             </div>
           </details>
-
-          <details class="tl-details">
-            <summary>${b("tools.thermometerLab.faultySolver")}</summary>
-            <div class="tl-details-body">
-              <p style="font-size:0.75rem;color:var(--tl-muted);margin:0">Set faulty readings at ice (0°C) and steam (100°C), then solve for T or C.</p>
-              <div class="tl-info-card" style="margin-bottom:4px">
-                <div class="tl-info-label">Faulty scale calibration</div>
-                <p style="margin:0;font-size:0.75rem">T / 100 = (C − C<sub>f</sub>) / (C<sub>u</sub> − C<sub>f</sub>)</p>
-              </div>
-              <div class="tl-info-label" style="font-size:0.75rem;color:var(--tl-muted);margin-top:4px;">${b("tools.thermometerLab.faulty.dualScale")}</div>
-              <div id="tl-faulty-svg-container" style="width:100%; height:190px; margin:4px 0; background:rgba(0,0,0,0.25); border-radius:10px; border:1px solid var(--tl-border); display:flex; justify-content:center; align-items:center; padding:8px;"></div>
-              <div class="tl-faulty-cal">
-                <div class="tl-calc-inputs">
-                  <span>Ice reading C<sub>f</sub> (true 0°C)</span>
-                  <div class="tl-input-with-unit">
-                    <input type="number" id="tl-input-faulty-cf" value="-1.5" step="0.1" class="tl-calc-input" aria-label="Ice point faulty reading">
-                    <span class="tl-unit">°C</span>
-                  </div>
-                </div>
-                <div class="tl-calc-inputs">
-                  <span>Steam reading C<sub>u</sub> (true 100°C)</span>
-                  <div class="tl-input-with-unit">
-                    <input type="number" id="tl-input-faulty-cu" value="105" step="0.1" class="tl-calc-input" aria-label="Steam point faulty reading">
-                    <span class="tl-unit">°C</span>
-                  </div>
-                </div>
-              </div>
-              <div class="tl-faulty-interval">
-                <span>Proportional interval (C<sub>u</sub> − C<sub>f</sub>)</span>
-                <b id="tl-val-faulty-interval">106.5 °C</b>
-              </div>
-              <div class="tl-solver-tabs">
-                <button class="tl-solver-tab-btn active" id="tl-btn-solve-q10a">Find True Temp (T)</button>
-                <button class="tl-solver-tab-btn" id="tl-btn-solve-q10b">Find Faulty Reading (C)</button>
-              </div>
-              <div id="tl-pane-q10a" class="tl-solver-pane active">
-                <div class="tl-calc-inputs">
-                  <span>Faulty reading C</span>
-                  <div class="tl-input-with-unit">
-                    <input type="number" id="tl-input-q10a-cm" value="25.0" step="0.5" class="tl-calc-input">
-                    <span class="tl-unit">°C</span>
-                  </div>
-                </div>
-                <p class="tl-solver-error" id="tl-faulty-error-a" hidden></p>
-                <div class="tl-worked-solution" style="background:rgba(0,0,0,0.15)">
-                  <div id="tl-svg-formula-faulty-a" class="tl-math-formula" style="font-size:0.85rem"></div>
-                </div>
-              </div>
-              <div id="tl-pane-q10b" class="tl-solver-pane">
-                <div class="tl-calc-inputs">
-                  <span>True temperature T</span>
-                  <div class="tl-input-with-unit">
-                    <input type="number" id="tl-input-q10b-t" value="70.0" step="1.0" class="tl-calc-input">
-                    <span class="tl-unit">°C</span>
-                  </div>
-                </div>
-                <p class="tl-solver-error" id="tl-faulty-error-b" hidden></p>
-                <div class="tl-worked-solution" style="background:rgba(0,0,0,0.15)">
-                  <div id="tl-svg-formula-faulty-b" class="tl-math-formula" style="font-size:0.85rem"></div>
-                </div>
-              </div>
-            </div>
-          </details>
         </div>
 
         <!-- TAB 2: PLATINUM RESISTANCE -->
         <div class="tl-tab-content" id="tl-tab-resistance">
           <details class="tl-details">
-            <summary>${b("tools.thermometerLab.paramSettings")}</summary>
+            <summary>${f("tools.thermometerLab.paramSettings")}</summary>
             <div class="tl-details-body">
               <div class="tl-probe-specs">
                 <div class="tl-spec-tile">
@@ -1058,7 +1031,7 @@ const Tt="s3phy-thermometer-lab-css";const At=`
           </details>
 
           <details class="tl-details">
-            <summary>${b("tools.thermometerLab.resistanceSolver")}</summary>
+            <summary>${f("tools.thermometerLab.resistanceSolver")}</summary>
             <div class="tl-details-body">
               <div class="tl-calc-inputs">
                 <span>Measured Resistance (R):</span>
@@ -1077,7 +1050,7 @@ const Tt="s3phy-thermometer-lab-css";const At=`
         <!-- TAB 3: THERMISTOR -->
         <div class="tl-tab-content" id="tl-tab-thermistor">
           <details class="tl-details">
-            <summary>${b("tools.thermometerLab.paramSettings")}</summary>
+            <summary>${f("tools.thermometerLab.paramSettings")}</summary>
             <div class="tl-details-body">
               <div class="tl-probe-specs">
                 <div class="tl-spec-tile">
@@ -1112,7 +1085,7 @@ const Tt="s3phy-thermometer-lab-css";const At=`
         </div>
       </div>
     </div>
-  `;const e={liquidType:"mercury",thermometerType:K,bulbVolume:200,wallThickness:.5,capillaryBore:.3,liquidL0:3,liquidL100:13,resistanceR0:5,resistanceR100:6.2,thermistorR25:10,thermistorBeta:3500,bathTemp:25,thermometerTemp:25,bubbles:[],iceCubes:[],heatWaves:[],steamParticles:[],currentLength:5.5,currentResistance:5.3,currentThermistorR:10,lastTimestamp:0,showLabels:!0},W=460,it=340,X=80,Y=800,U=560;function J(){const t={left:110,top:48,right:30,bottom:65};return{gx:t.left,gy:t.top,gw:Y-t.left-t.right,gh:U-t.top-t.bottom,tickFont:`bold ${Math.round(Y*.024)}px Arial`,axisFont:`bold ${Math.round(Y*.026)}px Arial`,dotR:8,yLabelX:t.left-75,xLabelY:U-t.bottom+32}}function H(){return{minT:0,maxT:200,tickStep:25}}function x(t,l,i,o,r){return o+(t-l)/(i-l)*r}function w(t,l,i,o,r){return o+r-(t-l)/(i-l)*r}function T(t,l,i,o,r,m,n=null){const{gx:s,gy:d,gw:c,gh:p,tickFont:h,axisFont:g,yLabelX:f,xLabelY:S}=l;t.strokeStyle="#1e1e24",t.lineWidth=1;for(const u of m){const y=w(u.value,u.min,u.max,d,p);t.beginPath(),t.moveTo(s,y),t.lineTo(s+c,y),t.stroke()}for(let u=i;u<=o+.01;u+=r){const y=x(u,i,o,s,c);t.beginPath(),t.moveTo(y,d),t.lineTo(y,d+p),t.stroke()}t.strokeStyle="#4b5563",t.lineWidth=2.5,t.beginPath(),t.moveTo(s,d),t.lineTo(s,d+p),t.lineTo(s+c,d+p),t.stroke(),t.fillStyle="#e4e4e7",t.font=h,t.textAlign="right",t.textBaseline="middle";for(const u of m){const y=w(u.value,u.min,u.max,d,p);t.fillText(u.label,s-15,y)}t.textAlign="center",t.textBaseline="top";for(let u=i;u<=o+.01;u+=r){if(n!=null&&Math.abs(u-n)<.25)continue;const y=x(u,i,o,s,c);t.fillText(`${Math.round(u)}`,y,d+p+10)}return{gx:s,gy:d,gw:c,gh:p,axisFont:g,yLabelX:f,xLabelY:S}}function M(t,l){const i=l-t,o=i<=8?1:i<=14?2:5,r=[],m=Math.ceil(t/o)*o;for(let n=m;n<=l+.001;n+=o)r.push({value:n,label:n%1===0?`${n.toFixed(0)}`:`${n.toFixed(1)}`,min:t,max:l});return r}function ot(){const{maxT:t}=H(),l=_(0),i=_(t),o=i-l,r=Math.max(1,o*.1),m=Math.max(0,Math.round((l-r)*10)/10),n=Math.round((i+r)*10)/10;return{minL:m,maxL:n}}function _(t){return e.liquidL0+(e.liquidL100-e.liquidL0)/100*t}function Q(){const{maxT:t}=H(),l=I(0),i=I(t),o=i-l,r=Math.max(.2,o*.1),m=Math.max(0,l-r),n=i+r,s=o<=2?.5:o<=4?1:2,d=[],c=Math.ceil(m/s)*s;for(let p=c;p<=n+.001;p+=s)d.push({value:p,label:p.toFixed(1),min:m,max:n});return{minR:m,maxR:n,ticks:d}}function I(t){return e.resistanceR0+(e.resistanceR100-e.resistanceR0)/100*t}function et(t){const{maxT:l}=t;let i=e.thermistorR25;for(let n=0;n<=l;n+=5){const s=n+273.15,d=e.thermistorR25*Math.exp(e.thermistorBeta*(1/s-1/298.15));i=Math.max(i,d)}i=Math.ceil(i*1.08*10)/10;const o=0,r=i<=12?2:4,m=[];for(let n=0;n<=i+.001;n+=r)m.push({value:n,label:n.toFixed(0),min:o,max:i});return{minR:o,maxR:i,ticks:m}}const Z=a.querySelector("#tl-thermometerCanvas"),P=Z.getContext("2d"),tt=a.querySelector("#tl-graphCanvas"),O=tt.getContext("2d"),$=window.devicePixelRatio||1;Z.width=W*$,Z.height=it*$,P.scale($,$),tt.width=Y*$,tt.height=U*$,O.scale($,$);function lt(){e.iceCubes=[];for(let t=0;t<5;t++)e.iceCubes.push({x:60+Math.random()*120,y:200+Math.random()*15,size:12+Math.random()*8,angle:Math.random()*Math.PI,speedX:(Math.random()-.5)*.15,speedY:(Math.random()-.5)*.15});e.bubbles=[];for(let t=0;t<20;t++)e.bubbles.push({x:60+Math.random()*120,y:190+Math.random()*70,r:1+Math.random()*3.5,speedY:.8+Math.random()*1.5,phase:Math.random()*Math.PI*2,wobbleSpeed:.08+Math.random()*.08});e.heatWaves=[];for(let t=0;t<8;t++)e.heatWaves.push({x:65+Math.random()*110,y:190+Math.random()*60,length:15+Math.random()*15,speedY:.5+Math.random()*.6,opacity:.15+Math.random()*.25});e.steamParticles=[];for(let t=0;t<12;t++)e.steamParticles.push({x:60+Math.random()*120,y:175+Math.random()*10,r:2+Math.random()*4,vx:(Math.random()-.5)*.3,vy:-.4-Math.random()*.6,alpha:.2+Math.random()*.4})}const C=200,v=11;function at(){const t=Math.pow(e.bulbVolume/C,.3333333333333333);return v*t}function st(){if(e.thermometerType==="resistance"||e.thermometerType==="thermistor")return .35;const t=e.liquidType==="mercury"?1:8,l=.2+e.wallThickness*1.5,i=.4+e.bulbVolume*.003,o=1.35-e.capillaryBore*.45;return Math.max(.1,l*i*o*t*.15)}function pt(t){e.bathTemp<=8&&e.iceCubes.forEach(l=>{l.x+=l.speedX,l.y+=l.speedY,(l.x<65||l.x>175)&&(l.speedX*=-1),(l.y<195||l.y>210)&&(l.speedY*=-1)}),e.bathTemp>35&&e.heatWaves.forEach(l=>{l.y-=l.speedY*(1+e.bathTemp/100),l.y<185&&(l.y=265,l.x=65+Math.random()*110)}),e.bathTemp>=80&&e.bubbles.forEach(l=>{l.y-=l.speedY*(1+(e.bathTemp-80)/40),l.phase+=l.wobbleSpeed,l.x+=Math.sin(l.phase)*.3,l.y<185&&(l.y=260+Math.random()*10,l.x=60+Math.random()*120)}),e.bathTemp>=95&&e.steamParticles.forEach(l=>{l.x+=l.vx,l.y+=l.vy,l.alpha-=.005,(l.alpha<=0||l.y<130)&&(l.x=60+Math.random()*120,l.y=175+Math.random()*5,l.alpha=.2+Math.random()*.4)})}function ft(t){let n=59,s=130,d=246;if(e.bathTemp<25){const f=e.bathTemp/25;n=Math.round(180-f*121),s=Math.round(210-f*80),d=Math.round(250-f*4)}else{const f=Math.min(1,(e.bathTemp-25)/125);n=Math.round(59+f*180),s=Math.round(130-f*100),d=Math.round(246-f*190)}if(e.bathTemp>40){const f=Math.min(1,(e.bathTemp-40)/100),S=Date.now()*.02;t.fillStyle=`rgba(239, 68, 68, ${f*.25})`,t.beginPath(),t.roundRect(45,284,150,10,4),t.fill(),t.fillStyle="rgba(249, 115, 22, 0.85)",t.beginPath(),t.moveTo(55+130/2-25,284);for(let u=-25;u<=25;u+=6){const y=f*(12+Math.sin(u*.4+S)*5);t.lineTo(55+130/2+u,284-y)}t.lineTo(55+130/2+25,284),t.closePath(),t.fill()}t.strokeStyle="#4b5563",t.lineWidth=2,t.fillStyle="#121214",t.beginPath(),t.roundRect(55,180,130,100,[0,0,10,10]),t.fill();const c=t.createLinearGradient(55,190,55,280);c.addColorStop(0,`rgba(${n}, ${s}, ${d}, 0.25)`),c.addColorStop(1,`rgba(${n}, ${s}, ${d}, 0.55)`),t.fillStyle=c,t.beginPath(),t.moveTo(55,190);const p=e.bathTemp>=80?2:.5,h=e.bathTemp>=80?.09:.03,g=Date.now()*h;for(let f=55;f<=185;f+=5){const S=190+Math.sin(f*.15+g)*p;t.lineTo(f,S)}t.lineTo(185,280),t.lineTo(55,280),t.closePath(),t.fill(),e.bathTemp>35&&(t.strokeStyle=`rgba(239, 68, 68, ${Math.min(.5,(e.bathTemp-35)/120)})`,t.lineWidth=1.2,e.heatWaves.forEach(f=>{t.beginPath(),t.moveTo(f.x,f.y),t.quadraticCurveTo(f.x+Math.sin(f.y*.06)*5,f.y-f.length/2,f.x,f.y-f.length),t.stroke()})),e.bathTemp<=8&&(t.fillStyle="rgba(224, 242, 254, 0.55)",t.strokeStyle="rgba(186, 230, 253, 0.8)",t.lineWidth=1,e.iceCubes.forEach(f=>{t.save(),t.translate(f.x,f.y),t.rotate(f.angle),t.beginPath(),t.roundRect(-f.size/2,-f.size/2,f.size,f.size,3),t.fill(),t.stroke(),t.restore()})),e.bathTemp>=80&&(t.fillStyle="rgba(255, 255, 255, 0.4)",t.strokeStyle="rgba(255, 255, 255, 0.65)",t.lineWidth=.6,e.bubbles.forEach(f=>{t.beginPath(),t.arc(f.x,f.y,f.r,0,Math.PI*2),t.fill(),t.stroke()})),e.bathTemp>=95&&e.steamParticles.forEach(f=>{t.fillStyle=`rgba(255, 255, 255, ${f.alpha})`,t.beginPath(),t.arc(f.x,f.y,f.r,0,Math.PI*2),t.fill()}),t.strokeStyle="#9ca3af",t.lineWidth=3.5,t.beginPath(),t.moveTo(54,180),t.lineTo(54,272),t.arcTo(54,281,65,281,8),t.lineTo(175,281),t.arcTo(186,281,186,272,8),t.lineTo(186,180),t.stroke(),t.strokeStyle="rgba(255, 255, 255, 0.4)",t.lineWidth=1.5,t.beginPath(),t.moveTo(59,190),t.lineTo(59,270),t.stroke()}function D(t,l,i,o,r,m,n="left"){if(!e.showLabels)return;t.strokeStyle="rgba(6, 182, 212, 0.7)",t.lineWidth=1,t.setLineDash([3,3]),t.beginPath(),t.moveTo(l,i),t.lineTo(o,r),t.stroke(),t.setLineDash([]),t.fillStyle="#06b6d4",t.beginPath(),t.arc(l,i,3,0,Math.PI*2),t.fill(),t.font="bold 9px system-ui, sans-serif";const d=t.measureText(m).width+10,c=16,p=n==="left"?o:o-d,h=r-c/2;t.fillStyle="rgba(21, 21, 24, 0.9)",t.strokeStyle="#06b6d4",t.lineWidth=1,t.beginPath(),t.roundRect(p,h,d,c,4),t.fill(),t.stroke(),t.fillStyle="#f4f4f5",t.textAlign="center",t.textBaseline="middle",t.fillText(m,p+d/2,h+c/2+.5)}function St(t){const o=at(),r=250+Math.max(0,o-v)*.35,m=r-o-1,n=10+e.wallThickness*8,s=120-n/2,d=120+n/2,c=t.createLinearGradient(s,20,d,20);c.addColorStop(0,"rgba(209, 213, 219, 0.85)"),c.addColorStop(.2,"rgba(255, 255, 255, 0.95)"),c.addColorStop(.5,"rgba(243, 244, 246, 0.15)"),c.addColorStop(.8,"rgba(255, 255, 255, 0.95)"),c.addColorStop(1,"rgba(156, 163, 175, 0.9)"),t.fillStyle=c,t.strokeStyle="rgba(156, 163, 175, 0.8)",t.lineWidth=1,t.beginPath(),t.moveTo(s,m),t.lineTo(s,25),t.arcTo(s,20,s+5,20,5),t.arcTo(d,20,d,25,5),t.lineTo(d,m),t.closePath(),t.fill(),t.stroke();const p=t.createRadialGradient(120-o*.2,r-o*.2,o*.1,120,r,o);p.addColorStop(0,"rgba(255, 255, 255, 0.8)"),p.addColorStop(1,"rgba(156, 163, 175, 0.35)"),t.fillStyle=p,t.strokeStyle="#6b7280",t.lineWidth=.8+e.wallThickness*.6,t.beginPath(),t.arc(120,r,o+.5+e.wallThickness*.5,0,Math.PI*2),t.fill(),t.stroke();const h=Math.min(n*.72,.8+e.capillaryBore*4.5);t.fillStyle="#0a0a0c",t.fillRect(120-h/2,28,h,m-20-8);const g=e.liquidType==="mercury",f=g?"#a1a1aa":"#ef4444",S=g?"#f4f4f5":"#fee2e2",u=210,y=220,F=(u-40)/y,L=u-Math.min(y,e.thermometerTemp)*F;t.fillStyle=f,t.fillRect(120-h/2,L,h,m-L),t.beginPath(),t.ellipse(120,L,h/2,1.5,0,0,Math.PI*2),t.fill(),t.fillStyle=S,t.fillRect(120-h/6,L,h/3,m-L);const q=o*.9,k=t.createRadialGradient(120-q*.2,r-q*.2,q*.1,120,r,q);g?(k.addColorStop(0,"#f4f4f5"),k.addColorStop(.3,"#d4d4d8"),k.addColorStop(.8,"#71717a"),k.addColorStop(1,"#3f3f46")):(k.addColorStop(0,"#fee2e2"),k.addColorStop(.2,"#fca5a5"),k.addColorStop(.7,"#ef4444"),k.addColorStop(1,"#991b1b")),t.fillStyle=k,t.beginPath(),t.arc(120,r,q,0,Math.PI*2),t.fill(),t.strokeStyle="rgba(161, 161, 170, 0.6)",t.lineWidth=.5,t.font="6.5px Arial",t.fillStyle="#a1a1aa",t.textAlign="right",t.textBaseline="middle";for(let z=0;z<=200;z+=50){const G=u-z*F;t.beginPath(),t.moveTo(s,G),t.lineTo(s+4,G),t.stroke(),t.fillText(`${z}°C`,s-22,G+2.5)}e.showLabels&&(D(t,s+1,80,10,50,b("tools.thermometerLab.labels.thinWall"),"left"),D(t,120,L,230,L-15,b("tools.thermometerLab.labels.meniscus"),"left"),D(t,120-h/2,130,10,130,b("tools.thermometerLab.labels.narrowBore"),"left"),D(t,120,r,230,r+15,b("tools.thermometerLab.labels.largeBulb"),"left"))}function kt(t){const n=t.createLinearGradient(115,20,125,20);n.addColorStop(0,"#71717a"),n.addColorStop(.3,"#f4f4f5"),n.addColorStop(.7,"#d4d4d8"),n.addColorStop(1,"#3f3f46"),t.fillStyle=n,t.strokeStyle="#4b5563",t.lineWidth=1,t.beginPath(),t.roundRect(115,20,10,225,[0,0,4,4]),t.fill(),t.stroke(),t.fillStyle="rgba(21, 21, 24, 0.8)",t.fillRect(117,200,6,40),t.strokeStyle="#e2e8f0",t.lineWidth=1.2,t.beginPath();let s=205;t.moveTo(118,s);for(let g=0;g<8;g++)s+=4,t.lineTo(122,s),s+=4,t.lineTo(118,s);t.stroke(),t.lineWidth=1.5,t.strokeStyle="#ef4444",t.beginPath(),t.moveTo(118,20),t.bezierCurveTo(110,5,200,30,245,60),t.stroke(),t.strokeStyle="#111827",t.beginPath(),t.moveTo(122,20),t.bezierCurveTo(130,8,210,45,245,75),t.stroke();const d=245,c=40,p=135,h=90;t.fillStyle="#18181b",t.strokeStyle="#6366f1",t.lineWidth=2.5,t.beginPath(),t.roundRect(d,c,p,h,10),t.fill(),t.stroke(),t.fillStyle="#022c22",t.beginPath(),t.roundRect(d+10,c+12,p-20,34,4),t.fill(),t.font='bold 17px "Courier New"',t.fillStyle="#10b981",t.textAlign="right",t.fillText(e.currentResistance.toFixed(2)+" Ω",d+p-16,c+34),t.font="6px Arial",t.fillStyle="#a7f3d0",t.textAlign="left",t.fillText("PLATINUM RTD METER",d+14,c+21),e.showLabels&&(D(t,116,100,10,70,b("tools.thermometerLab.labels.metalSheath"),"left"),D(t,120,225,230,205,b("tools.thermometerLab.labels.platinumCoil"),"left"))}function Ct(t){t.strokeStyle="#111827",t.lineWidth=1.2,t.beginPath(),t.moveTo(118,20),t.lineTo(118,245),t.stroke(),t.beginPath(),t.moveTo(122,20),t.lineTo(122,245),t.stroke();const r=20,m=225,n=12,s=120-n/2,d=t.createLinearGradient(s,r,s+n,r);d.addColorStop(0,"rgba(229, 231, 235, 0.4)"),d.addColorStop(.3,"rgba(255, 255, 255, 0.8)"),d.addColorStop(.7,"rgba(243, 244, 246, 0.5)"),d.addColorStop(1,"rgba(209, 213, 219, 0.6)"),t.fillStyle=d,t.strokeStyle="rgba(156, 163, 175, 0.6)",t.lineWidth=.8,t.beginPath(),t.roundRect(s,r,n,m-r,[0,0,3,3]),t.fill(),t.stroke();const c=7,p=t.createRadialGradient(120-c*.2,245-c*.2,c*.1,120,245,c);p.addColorStop(0,"#6b7280"),p.addColorStop(.7,"#1f2937"),p.addColorStop(1,"#09090b"),t.fillStyle=p,t.strokeStyle="#030712",t.lineWidth=1.2,t.beginPath(),t.arc(120,245,c,0,Math.PI*2),t.fill(),t.stroke(),t.lineWidth=1.5,t.strokeStyle="#ef4444",t.beginPath(),t.moveTo(118,20),t.bezierCurveTo(110,5,200,30,245,60),t.stroke(),t.strokeStyle="#111827",t.beginPath(),t.moveTo(122,20),t.bezierCurveTo(130,8,210,45,245,75),t.stroke();const h=245,g=40,f=135,S=90;t.fillStyle="#18181b",t.strokeStyle="#10b981",t.lineWidth=2.5,t.beginPath(),t.roundRect(h,g,f,S,10),t.fill(),t.stroke(),t.fillStyle="#022c22",t.beginPath(),t.roundRect(h+10,g+12,f-20,34,4),t.fill(),t.font='bold 17px "Courier New"',t.fillStyle="#34d399",t.textAlign="right",t.fillText(e.currentThermistorR.toFixed(2)+" kΩ",h+f-16,g+34),t.font="5px Arial",t.fillStyle="#a7f3d0",t.textAlign="left",t.fillText(b("tools.thermometerLab.thermistor.meterLabelLine1"),h+14,g+52),t.fillText(b("tools.thermometerLab.thermistor.meterLabelLine2"),h+14,g+59),e.showLabels&&(D(t,118,120,10,90,b("tools.thermometerLab.labels.leads"),"left"),D(t,120,245,230,225,b("tools.thermometerLab.labels.semiconductorBead"),"left"))}function ct(t,l,i,o,r,m,n,s,d){const{gx:c,gy:p,gw:h,gh:g,tickFont:f}=l;t.strokeStyle="rgba(255, 255, 255, 0.2)",t.lineWidth=1,t.setLineDash([4,4]),t.beginPath(),t.moveTo(i,o),t.lineTo(i,p+g),t.stroke(),t.beginPath(),t.moveTo(i,o),t.lineTo(c,o),t.stroke(),t.setLineDash([]);const S=p+g+10;t.font=f,t.textAlign="center",t.textBaseline="top";const u=`${r.toFixed(1)}${n}`,y=t.measureText(u).width+10,E=18;t.fillStyle=d,t.beginPath(),t.roundRect(i-y/2,S-2,y,E,3),t.fill(),t.fillStyle="#000",t.fillText(u,i,S),t.textAlign="right",t.textBaseline="middle";const F=`${m.toFixed(2)} ${s}`,L=t.measureText(F).width+10;t.fillStyle=d,t.beginPath(),t.roundRect(c-L-2,o-7,L,15,3),t.fill(),t.fillStyle="#000",t.fillText(F,c-7,o)}function Lt(t){const l=J(),{minL:i,maxL:o}=ot(),{minT:r,maxT:m,tickStep:n}=H(),s=M(i,o),d=T(t,l,r,m,n,s,e.thermometerTemp),{gx:c,gy:p,gw:h,gh:g,axisFont:f,yLabelX:S,xLabelY:u,dotR:y}={...l,...d};t.save(),t.translate(S,p+g/2),t.rotate(-Math.PI/2),t.font=f,t.fillStyle="#e4e4e7",t.fillText("Length of liquid column / cm",0,0),t.restore(),t.font=f,t.fillStyle="#e4e4e7",t.textAlign="center",t.fillText("temperature / °C",c+h/2,u);const E=m,F=x(0,r,m,c,h),L=w(_(0),i,o,p,g),q=x(E,r,m,c,h),k=w(_(E),i,o,p,g);t.strokeStyle="#ef4444",t.lineWidth=3,t.beginPath(),t.moveTo(F,L),t.lineTo(q,k),t.stroke();const z=e.thermometerTemp,G=e.currentLength;if(z>=r&&z<=m){const B=x(z,r,m,c,h),rt=w(G,i,o,p,g);ct(t,l,B,rt,z,G,"°C","cm","#ef4444"),t.shadowColor="#ef4444",t.shadowBlur=10,t.fillStyle="#ef4444",t.beginPath(),t.arc(B,rt,y,0,Math.PI*2),t.fill(),t.shadowBlur=0}}function qt(t){const l=J(),{minR:i,maxR:o,ticks:r}=Q(),m=H(),n=T(t,l,m.minT,m.maxT,m.tickStep,r,e.thermometerTemp),{gx:s,gy:d,gw:c,gh:p,axisFont:h,yLabelX:g,xLabelY:f,dotR:S}={...l,...n};t.save(),t.translate(g,d+p/2),t.rotate(-Math.PI/2),t.font=h,t.fillStyle="#e4e4e7",t.fillText("Resistance of platinum / Ω",0,0),t.restore(),t.font=h,t.fillStyle="#e4e4e7",t.textAlign="center",t.fillText("temperature / °C",s+c/2,f);const{minT:u,maxT:y}=m,E=y,F=x(0,u,y,s,c),L=w(I(0),i,o,d,p),q=x(E,u,y,s,c),k=w(I(E),i,o,d,p);t.strokeStyle="#6366f1",t.lineWidth=3,t.beginPath(),t.moveTo(F,L),t.lineTo(q,k),t.stroke();const z=e.thermometerTemp,G=e.currentResistance;if(z>=u&&z<=y){const B=x(z,u,y,s,c),rt=w(G,i,o,d,p);ct(t,l,B,rt,z,G,"°C","Ω","#6366f1"),t.shadowColor="#6366f1",t.shadowBlur=10,t.fillStyle="#6366f1",t.beginPath(),t.arc(B,rt,S,0,Math.PI*2),t.fill(),t.shadowBlur=0}}function zt(t){const l=J(),i=H(),{minR:o,maxR:r,ticks:m}=et(i),n=T(t,l,i.minT,i.maxT,i.tickStep,m,e.thermometerTemp),{gx:s,gy:d,gw:c,gh:p,axisFont:h,yLabelX:g,xLabelY:f,dotR:S}={...l,...n},{minT:u,maxT:y}=i;t.save(),t.translate(g,d+p/2),t.rotate(-Math.PI/2),t.font=h,t.fillStyle="#e4e4e7",t.fillText("Resistance of thermistor / kΩ",0,0),t.restore(),t.font=h,t.fillStyle="#e4e4e7",t.textAlign="center",t.fillText("temperature / °C",s+c/2,f),t.strokeStyle="#10b981",t.lineWidth=3,t.beginPath();let E=!1;for(let q=u;q<=y;q+=1){const k=q+273.15,z=e.thermistorR25*Math.exp(e.thermistorBeta*(1/k-1/298.15)),G=x(q,u,y,s,c),B=w(Math.min(r,z),o,r,d,p);B>=d&&B<=d+p&&(E?t.lineTo(G,B):(t.moveTo(G,B),E=!0))}t.stroke();const F=e.thermometerTemp,L=e.currentThermistorR;if(F>=u&&F<=y){const q=x(F,u,y,s,c),k=w(Math.min(r,L),o,r,d,p);ct(t,l,q,k,F,L,"°C","kΩ","#10b981"),t.shadowColor="#10b981",t.shadowBlur=10,t.fillStyle="#10b981",t.beginPath(),t.arc(q,k,S,0,Math.PI*2),t.fill(),t.shadowBlur=0}}function bt(){P.clearRect(0,0,W,it),O.clearRect(0,0,Y,U),P.save(),P.translate(X,0),ft(P),e.thermometerType==="liquid"?St(P):e.thermometerType==="resistance"?kt(P):Ct(P),P.restore(),e.thermometerType==="liquid"?Lt(O):e.thermometerType==="resistance"?qt(O):zt(O)}function Rt(){const t=a.querySelector("#tl-svg-formula-liquid");t&&(t.innerHTML=`
+  `;const e={liquidType:"mercury",thermometerType:V,bulbVolume:200,wallThickness:.5,capillaryBore:.3,liquidL0:3,liquidL100:13,resistanceR0:5,resistanceR100:6.2,thermistorR25:10,thermistorBeta:3500,bathTemp:25,thermometerTemp:25,bubbles:[],iceCubes:[],heatWaves:[],steamParticles:[],currentLength:5.5,currentResistance:5.3,currentThermistorR:10,lastTimestamp:0,showLabels:!0},_=460,et=340,Q=80,K=800,J=560;function k(){const t={left:110,top:48,right:30,bottom:65};return{gx:t.left,gy:t.top,gw:K-t.left-t.right,gh:J-t.top-t.bottom,tickFont:`bold ${Math.round(K*.024)}px Arial`,axisFont:`bold ${Math.round(K*.026)}px Arial`,dotR:8,yLabelX:t.left-75,xLabelY:J-t.bottom+32}}function w(){return{minT:0,maxT:200,tickStep:25}}function y(t,l,i,o,s){return o+(t-l)/(i-l)*s}function T(t,l,i,o,s){return o+s-(t-l)/(i-l)*s}function S(t,l,i,o,s,b,d=null){const{gx:n,gy:p,gw:u,gh:r,tickFont:g,axisFont:x,yLabelX:c,xLabelY:F}=l;t.strokeStyle="#1e1e24",t.lineWidth=1;for(const m of b){const v=T(m.value,m.min,m.max,p,r);t.beginPath(),t.moveTo(n,v),t.lineTo(n+u,v),t.stroke()}for(let m=i;m<=o+.01;m+=s){const v=y(m,i,o,n,u);t.beginPath(),t.moveTo(v,p),t.lineTo(v,p+r),t.stroke()}t.strokeStyle="#4b5563",t.lineWidth=2.5,t.beginPath(),t.moveTo(n,p),t.lineTo(n,p+r),t.lineTo(n+u,p+r),t.stroke(),t.fillStyle="#e4e4e7",t.font=g,t.textAlign="right",t.textBaseline="middle";for(const m of b){const v=T(m.value,m.min,m.max,p,r);t.fillText(m.label,n-15,v)}t.textAlign="center",t.textBaseline="top";for(let m=i;m<=o+.01;m+=s){if(d!=null&&Math.abs(m-d)<.25)continue;const v=y(m,i,o,n,u);t.fillText(`${Math.round(m)}`,v,p+r+10)}return{gx:n,gy:p,gw:u,gh:r,axisFont:x,yLabelX:c,xLabelY:F}}function L(t,l){const i=l-t,o=i<=8?1:i<=14?2:5,s=[],b=Math.ceil(t/o)*o;for(let d=b;d<=l+.001;d+=o)s.push({value:d,label:d%1===0?`${d.toFixed(0)}`:`${d.toFixed(1)}`,min:t,max:l});return s}function W(){const{maxT:t}=w(),l=z(0),i=z(t),o=i-l,s=Math.max(1,o*.1),b=Math.max(0,Math.round((l-s)*10)/10),d=Math.round((i+s)*10)/10;return{minL:b,maxL:d}}function z(t){return e.liquidL0+(e.liquidL100-e.liquidL0)/100*t}function N(){const{maxT:t}=w(),l=E(0),i=E(t),o=i-l,s=Math.max(.2,o*.1),b=Math.max(0,l-s),d=i+s,n=o<=2?.5:o<=4?1:2,p=[],u=Math.ceil(b/n)*n;for(let r=u;r<=d+.001;r+=n)p.push({value:r,label:r.toFixed(1),min:b,max:d});return{minR:b,maxR:d,ticks:p}}function E(t){return e.resistanceR0+(e.resistanceR100-e.resistanceR0)/100*t}function q(t){const{maxT:l}=t;let i=e.thermistorR25;for(let d=0;d<=l;d+=5){const n=d+273.15,p=e.thermistorR25*Math.exp(e.thermistorBeta*(1/n-1/298.15));i=Math.max(i,p)}i=Math.ceil(i*1.08*10)/10;const o=0,s=i<=12?2:4,b=[];for(let d=0;d<=i+.001;d+=s)b.push({value:d,label:d.toFixed(0),min:o,max:i});return{minR:o,maxR:i,ticks:b}}const D=a.querySelector("#tl-thermometerCanvas"),B=D.getContext("2d"),Z=a.querySelector("#tl-graphCanvas"),lt=Z.getContext("2d"),j=window.devicePixelRatio||1;D.width=_*j,D.height=et*j,B.scale(j,j),Z.width=K*j,Z.height=J*j,lt.scale(j,j);function it(){e.iceCubes=[];for(let t=0;t<5;t++)e.iceCubes.push({x:60+Math.random()*120,y:200+Math.random()*15,size:12+Math.random()*8,angle:Math.random()*Math.PI,speedX:(Math.random()-.5)*.15,speedY:(Math.random()-.5)*.15});e.bubbles=[];for(let t=0;t<20;t++)e.bubbles.push({x:60+Math.random()*120,y:190+Math.random()*70,r:1+Math.random()*3.5,speedY:.8+Math.random()*1.5,phase:Math.random()*Math.PI*2,wobbleSpeed:.08+Math.random()*.08});e.heatWaves=[];for(let t=0;t<8;t++)e.heatWaves.push({x:65+Math.random()*110,y:190+Math.random()*60,length:15+Math.random()*15,speedY:.5+Math.random()*.6,opacity:.15+Math.random()*.25});e.steamParticles=[];for(let t=0;t<12;t++)e.steamParticles.push({x:60+Math.random()*120,y:175+Math.random()*10,r:2+Math.random()*4,vx:(Math.random()-.5)*.3,vy:-.4-Math.random()*.6,alpha:.2+Math.random()*.4})}const M=200,C=11;function rt(){const t=Math.pow(e.bulbVolume/M,.3333333333333333);return C*t}function st(){if(e.thermometerType==="resistance"||e.thermometerType==="thermistor")return .35;const t=e.liquidType==="mercury"?1:8,l=.2+e.wallThickness*1.5,i=.4+e.bulbVolume*.003,o=1.35-e.capillaryBore*.45;return Math.max(.1,l*i*o*t*.15)}function ft(t){e.bathTemp<=8&&e.iceCubes.forEach(l=>{l.x+=l.speedX,l.y+=l.speedY,(l.x<65||l.x>175)&&(l.speedX*=-1),(l.y<195||l.y>210)&&(l.speedY*=-1)}),e.bathTemp>35&&e.heatWaves.forEach(l=>{l.y-=l.speedY*(1+e.bathTemp/100),l.y<185&&(l.y=265,l.x=65+Math.random()*110)}),e.bathTemp>=80&&e.bubbles.forEach(l=>{l.y-=l.speedY*(1+(e.bathTemp-80)/40),l.phase+=l.wobbleSpeed,l.x+=Math.sin(l.phase)*.3,l.y<185&&(l.y=260+Math.random()*10,l.x=60+Math.random()*120)}),e.bathTemp>=95&&e.steamParticles.forEach(l=>{l.x+=l.vx,l.y+=l.vy,l.alpha-=.005,(l.alpha<=0||l.y<130)&&(l.x=60+Math.random()*120,l.y=175+Math.random()*5,l.alpha=.2+Math.random()*.4)})}function pt(t){let d=59,n=130,p=246;if(e.bathTemp<25){const c=e.bathTemp/25;d=Math.round(180-c*121),n=Math.round(210-c*80),p=Math.round(250-c*4)}else{const c=Math.min(1,(e.bathTemp-25)/125);d=Math.round(59+c*180),n=Math.round(130-c*100),p=Math.round(246-c*190)}if(e.bathTemp>40){const c=Math.min(1,(e.bathTemp-40)/100),F=Date.now()*.02;t.fillStyle=`rgba(239, 68, 68, ${c*.25})`,t.beginPath(),t.roundRect(45,284,150,10,4),t.fill(),t.fillStyle="rgba(249, 115, 22, 0.85)",t.beginPath(),t.moveTo(55+130/2-25,284);for(let m=-25;m<=25;m+=6){const v=c*(12+Math.sin(m*.4+F)*5);t.lineTo(55+130/2+m,284-v)}t.lineTo(55+130/2+25,284),t.closePath(),t.fill()}t.strokeStyle="#4b5563",t.lineWidth=2,t.fillStyle="#121214",t.beginPath(),t.roundRect(55,180,130,100,[0,0,10,10]),t.fill();const u=t.createLinearGradient(55,190,55,280);u.addColorStop(0,`rgba(${d}, ${n}, ${p}, 0.25)`),u.addColorStop(1,`rgba(${d}, ${n}, ${p}, 0.55)`),t.fillStyle=u,t.beginPath(),t.moveTo(55,190);const r=e.bathTemp>=80?2:.5,g=e.bathTemp>=80?.09:.03,x=Date.now()*g;for(let c=55;c<=185;c+=5){const F=190+Math.sin(c*.15+x)*r;t.lineTo(c,F)}t.lineTo(185,280),t.lineTo(55,280),t.closePath(),t.fill(),e.bathTemp>35&&(t.strokeStyle=`rgba(239, 68, 68, ${Math.min(.5,(e.bathTemp-35)/120)})`,t.lineWidth=1.2,e.heatWaves.forEach(c=>{t.beginPath(),t.moveTo(c.x,c.y),t.quadraticCurveTo(c.x+Math.sin(c.y*.06)*5,c.y-c.length/2,c.x,c.y-c.length),t.stroke()})),e.bathTemp<=8&&(t.fillStyle="rgba(224, 242, 254, 0.55)",t.strokeStyle="rgba(186, 230, 253, 0.8)",t.lineWidth=1,e.iceCubes.forEach(c=>{t.save(),t.translate(c.x,c.y),t.rotate(c.angle),t.beginPath(),t.roundRect(-c.size/2,-c.size/2,c.size,c.size,3),t.fill(),t.stroke(),t.restore()})),e.bathTemp>=80&&(t.fillStyle="rgba(255, 255, 255, 0.4)",t.strokeStyle="rgba(255, 255, 255, 0.65)",t.lineWidth=.6,e.bubbles.forEach(c=>{t.beginPath(),t.arc(c.x,c.y,c.r,0,Math.PI*2),t.fill(),t.stroke()})),e.bathTemp>=95&&e.steamParticles.forEach(c=>{t.fillStyle=`rgba(255, 255, 255, ${c.alpha})`,t.beginPath(),t.arc(c.x,c.y,c.r,0,Math.PI*2),t.fill()}),t.strokeStyle="#9ca3af",t.lineWidth=3.5,t.beginPath(),t.moveTo(54,180),t.lineTo(54,272),t.arcTo(54,281,65,281,8),t.lineTo(175,281),t.arcTo(186,281,186,272,8),t.lineTo(186,180),t.stroke(),t.strokeStyle="rgba(255, 255, 255, 0.4)",t.lineWidth=1.5,t.beginPath(),t.moveTo(59,190),t.lineTo(59,270),t.stroke()}function tt(t,l,i,o,s,b,d="left"){if(!e.showLabels)return;t.strokeStyle="rgba(6, 182, 212, 0.7)",t.lineWidth=1,t.setLineDash([3,3]),t.beginPath(),t.moveTo(l,i),t.lineTo(o,s),t.stroke(),t.setLineDash([]),t.fillStyle="#06b6d4",t.beginPath(),t.arc(l,i,3,0,Math.PI*2),t.fill(),t.font="bold 9px system-ui, sans-serif";const p=t.measureText(b).width+10,u=16,r=d==="left"?o:o-p,g=s-u/2;t.fillStyle="rgba(21, 21, 24, 0.9)",t.strokeStyle="#06b6d4",t.lineWidth=1,t.beginPath(),t.roundRect(r,g,p,u,4),t.fill(),t.stroke(),t.fillStyle="#f4f4f5",t.textAlign="center",t.textBaseline="middle",t.fillText(b,r+p/2,g+u/2+.5)}function Ct(t){const o=rt(),s=250+Math.max(0,o-C)*.35,b=s-o-1,d=10+e.wallThickness*8,n=120-d/2,p=120+d/2,u=t.createLinearGradient(n,20,p,20);u.addColorStop(0,"rgba(209, 213, 219, 0.85)"),u.addColorStop(.2,"rgba(255, 255, 255, 0.95)"),u.addColorStop(.5,"rgba(243, 244, 246, 0.15)"),u.addColorStop(.8,"rgba(255, 255, 255, 0.95)"),u.addColorStop(1,"rgba(156, 163, 175, 0.9)"),t.fillStyle=u,t.strokeStyle="rgba(156, 163, 175, 0.8)",t.lineWidth=1,t.beginPath(),t.moveTo(n,b),t.lineTo(n,25),t.arcTo(n,20,n+5,20,5),t.arcTo(p,20,p,25,5),t.lineTo(p,b),t.closePath(),t.fill(),t.stroke();const r=t.createRadialGradient(120-o*.2,s-o*.2,o*.1,120,s,o);r.addColorStop(0,"rgba(255, 255, 255, 0.8)"),r.addColorStop(1,"rgba(156, 163, 175, 0.35)"),t.fillStyle=r,t.strokeStyle="#6b7280",t.lineWidth=.8+e.wallThickness*.6,t.beginPath(),t.arc(120,s,o+.5+e.wallThickness*.5,0,Math.PI*2),t.fill(),t.stroke();const g=Math.min(d*.72,.8+e.capillaryBore*4.5);t.fillStyle="#0a0a0c",t.fillRect(120-g/2,28,g,b-20-8);const x=e.liquidType==="mercury",c=x?"#a1a1aa":"#ef4444",F=x?"#f4f4f5":"#fee2e2",m=210,v=220,I=(m-40)/v,$=m-Math.min(v,e.thermometerTemp)*I;t.fillStyle=c,t.fillRect(120-g/2,$,g,b-$),t.beginPath(),t.ellipse(120,$,g/2,1.5,0,0,Math.PI*2),t.fill(),t.fillStyle=F,t.fillRect(120-g/6,$,g/3,b-$);const P=o*.9,R=t.createRadialGradient(120-P*.2,s-P*.2,P*.1,120,s,P);x?(R.addColorStop(0,"#f4f4f5"),R.addColorStop(.3,"#d4d4d8"),R.addColorStop(.8,"#71717a"),R.addColorStop(1,"#3f3f46")):(R.addColorStop(0,"#fee2e2"),R.addColorStop(.2,"#fca5a5"),R.addColorStop(.7,"#ef4444"),R.addColorStop(1,"#991b1b")),t.fillStyle=R,t.beginPath(),t.arc(120,s,P,0,Math.PI*2),t.fill(),t.strokeStyle="rgba(161, 161, 170, 0.6)",t.lineWidth=.5,t.font="6.5px Arial",t.fillStyle="#a1a1aa",t.textAlign="right",t.textBaseline="middle";for(let G=0;G<=200;G+=50){const Y=m-G*I;t.beginPath(),t.moveTo(n,Y),t.lineTo(n+4,Y),t.stroke(),t.fillText(`${G}°C`,n-22,Y+2.5)}e.showLabels&&(tt(t,n+1,80,10,50,f("tools.thermometerLab.labels.thinWall"),"left"),tt(t,120,$,230,$-15,f("tools.thermometerLab.labels.meniscus"),"left"),tt(t,120-g/2,130,10,130,f("tools.thermometerLab.labels.narrowBore"),"left"),tt(t,120,s,230,s+15,f("tools.thermometerLab.labels.largeBulb"),"left"))}function Lt(t){const d=t.createLinearGradient(115,20,125,20);d.addColorStop(0,"#71717a"),d.addColorStop(.3,"#f4f4f5"),d.addColorStop(.7,"#d4d4d8"),d.addColorStop(1,"#3f3f46"),t.fillStyle=d,t.strokeStyle="#4b5563",t.lineWidth=1,t.beginPath(),t.roundRect(115,20,10,225,[0,0,4,4]),t.fill(),t.stroke(),t.fillStyle="rgba(21, 21, 24, 0.8)",t.fillRect(117,200,6,40),t.strokeStyle="#e2e8f0",t.lineWidth=1.2,t.beginPath();let n=205;t.moveTo(118,n);for(let x=0;x<8;x++)n+=4,t.lineTo(122,n),n+=4,t.lineTo(118,n);t.stroke(),t.lineWidth=1.5,t.strokeStyle="#ef4444",t.beginPath(),t.moveTo(118,20),t.bezierCurveTo(110,5,200,30,245,60),t.stroke(),t.strokeStyle="#111827",t.beginPath(),t.moveTo(122,20),t.bezierCurveTo(130,8,210,45,245,75),t.stroke();const p=245,u=40,r=135,g=90;t.fillStyle="#18181b",t.strokeStyle="#6366f1",t.lineWidth=2.5,t.beginPath(),t.roundRect(p,u,r,g,10),t.fill(),t.stroke(),t.fillStyle="#022c22",t.beginPath(),t.roundRect(p+10,u+12,r-20,34,4),t.fill(),t.font='bold 17px "Courier New"',t.fillStyle="#10b981",t.textAlign="right",t.fillText(e.currentResistance.toFixed(2)+" Ω",p+r-16,u+34),t.font="6px Arial",t.fillStyle="#a7f3d0",t.textAlign="left",t.fillText("PLATINUM RTD METER",p+14,u+21),e.showLabels&&(tt(t,116,100,10,70,f("tools.thermometerLab.labels.metalSheath"),"left"),tt(t,120,225,230,205,f("tools.thermometerLab.labels.platinumCoil"),"left"))}function qt(t){t.strokeStyle="#111827",t.lineWidth=1.2,t.beginPath(),t.moveTo(118,20),t.lineTo(118,245),t.stroke(),t.beginPath(),t.moveTo(122,20),t.lineTo(122,245),t.stroke();const s=20,b=225,d=12,n=120-d/2,p=t.createLinearGradient(n,s,n+d,s);p.addColorStop(0,"rgba(229, 231, 235, 0.4)"),p.addColorStop(.3,"rgba(255, 255, 255, 0.8)"),p.addColorStop(.7,"rgba(243, 244, 246, 0.5)"),p.addColorStop(1,"rgba(209, 213, 219, 0.6)"),t.fillStyle=p,t.strokeStyle="rgba(156, 163, 175, 0.6)",t.lineWidth=.8,t.beginPath(),t.roundRect(n,s,d,b-s,[0,0,3,3]),t.fill(),t.stroke();const u=7,r=t.createRadialGradient(120-u*.2,245-u*.2,u*.1,120,245,u);r.addColorStop(0,"#6b7280"),r.addColorStop(.7,"#1f2937"),r.addColorStop(1,"#09090b"),t.fillStyle=r,t.strokeStyle="#030712",t.lineWidth=1.2,t.beginPath(),t.arc(120,245,u,0,Math.PI*2),t.fill(),t.stroke(),t.lineWidth=1.5,t.strokeStyle="#ef4444",t.beginPath(),t.moveTo(118,20),t.bezierCurveTo(110,5,200,30,245,60),t.stroke(),t.strokeStyle="#111827",t.beginPath(),t.moveTo(122,20),t.bezierCurveTo(130,8,210,45,245,75),t.stroke();const g=245,x=40,c=135,F=90;t.fillStyle="#18181b",t.strokeStyle="#10b981",t.lineWidth=2.5,t.beginPath(),t.roundRect(g,x,c,F,10),t.fill(),t.stroke(),t.fillStyle="#022c22",t.beginPath(),t.roundRect(g+10,x+12,c-20,34,4),t.fill(),t.font='bold 17px "Courier New"',t.fillStyle="#34d399",t.textAlign="right",t.fillText(e.currentThermistorR.toFixed(2)+" kΩ",g+c-16,x+34),t.font="5px Arial",t.fillStyle="#a7f3d0",t.textAlign="left",t.fillText(f("tools.thermometerLab.thermistor.meterLabelLine1"),g+14,x+52),t.fillText(f("tools.thermometerLab.thermistor.meterLabelLine2"),g+14,x+59),e.showLabels&&(tt(t,118,120,10,90,f("tools.thermometerLab.labels.leads"),"left"),tt(t,120,245,230,225,f("tools.thermometerLab.labels.semiconductorBead"),"left"))}function ct(t,l,i,o,s,b,d,n,p){const{gx:u,gy:r,gw:g,gh:x,tickFont:c}=l;t.strokeStyle="rgba(255, 255, 255, 0.2)",t.lineWidth=1,t.setLineDash([4,4]),t.beginPath(),t.moveTo(i,o),t.lineTo(i,r+x),t.stroke(),t.beginPath(),t.moveTo(i,o),t.lineTo(u,o),t.stroke(),t.setLineDash([]);const F=r+x+10;t.font=c,t.textAlign="center",t.textBaseline="top";const m=`${s.toFixed(1)}${d}`,v=t.measureText(m).width+10,O=18;t.fillStyle=p,t.beginPath(),t.roundRect(i-v/2,F-2,v,O,3),t.fill(),t.fillStyle="#000",t.fillText(m,i,F),t.textAlign="right",t.textBaseline="middle";const I=`${b.toFixed(2)} ${n}`,$=t.measureText(I).width+10;t.fillStyle=p,t.beginPath(),t.roundRect(u-$-2,o-7,$,15,3),t.fill(),t.fillStyle="#000",t.fillText(I,u-7,o)}function zt(t){const l=k(),{minL:i,maxL:o}=W(),{minT:s,maxT:b,tickStep:d}=w(),n=L(i,o),p=S(t,l,s,b,d,n,e.thermometerTemp),{gx:u,gy:r,gw:g,gh:x,axisFont:c,yLabelX:F,xLabelY:m,dotR:v}={...l,...p};t.save(),t.translate(F,r+x/2),t.rotate(-Math.PI/2),t.font=c,t.fillStyle="#e4e4e7",t.fillText("Length of liquid column / cm",0,0),t.restore(),t.font=c,t.fillStyle="#e4e4e7",t.textAlign="center",t.fillText("temperature / °C",u+g/2,m);const O=b,I=y(0,s,b,u,g),$=T(z(0),i,o,r,x),P=y(O,s,b,u,g),R=T(z(O),i,o,r,x);t.strokeStyle="#ef4444",t.lineWidth=3,t.beginPath(),t.moveTo(I,$),t.lineTo(P,R),t.stroke();const G=e.thermometerTemp,Y=e.currentLength;if(G>=s&&G<=b){const X=y(G,s,b,u,g),ot=T(Y,i,o,r,x);ct(t,l,X,ot,G,Y,"°C","cm","#ef4444"),t.shadowColor="#ef4444",t.shadowBlur=10,t.fillStyle="#ef4444",t.beginPath(),t.arc(X,ot,v,0,Math.PI*2),t.fill(),t.shadowBlur=0}}function Ft(t){const l=k(),{minR:i,maxR:o,ticks:s}=N(),b=w(),d=S(t,l,b.minT,b.maxT,b.tickStep,s,e.thermometerTemp),{gx:n,gy:p,gw:u,gh:r,axisFont:g,yLabelX:x,xLabelY:c,dotR:F}={...l,...d};t.save(),t.translate(x,p+r/2),t.rotate(-Math.PI/2),t.font=g,t.fillStyle="#e4e4e7",t.fillText("Resistance of platinum / Ω",0,0),t.restore(),t.font=g,t.fillStyle="#e4e4e7",t.textAlign="center",t.fillText("temperature / °C",n+u/2,c);const{minT:m,maxT:v}=b,O=v,I=y(0,m,v,n,u),$=T(E(0),i,o,p,r),P=y(O,m,v,n,u),R=T(E(O),i,o,p,r);t.strokeStyle="#6366f1",t.lineWidth=3,t.beginPath(),t.moveTo(I,$),t.lineTo(P,R),t.stroke();const G=e.thermometerTemp,Y=e.currentResistance;if(G>=m&&G<=v){const X=y(G,m,v,n,u),ot=T(Y,i,o,p,r);ct(t,l,X,ot,G,Y,"°C","Ω","#6366f1"),t.shadowColor="#6366f1",t.shadowBlur=10,t.fillStyle="#6366f1",t.beginPath(),t.arc(X,ot,F,0,Math.PI*2),t.fill(),t.shadowBlur=0}}function Rt(t){const l=k(),i=w(),{minR:o,maxR:s,ticks:b}=q(i),d=S(t,l,i.minT,i.maxT,i.tickStep,b,e.thermometerTemp),{gx:n,gy:p,gw:u,gh:r,axisFont:g,yLabelX:x,xLabelY:c,dotR:F}={...l,...d},{minT:m,maxT:v}=i;t.save(),t.translate(x,p+r/2),t.rotate(-Math.PI/2),t.font=g,t.fillStyle="#e4e4e7",t.fillText("Resistance of thermistor / kΩ",0,0),t.restore(),t.font=g,t.fillStyle="#e4e4e7",t.textAlign="center",t.fillText("temperature / °C",n+u/2,c),t.strokeStyle="#10b981",t.lineWidth=3,t.beginPath();let O=!1;for(let P=m;P<=v;P+=1){const R=P+273.15,G=e.thermistorR25*Math.exp(e.thermistorBeta*(1/R-1/298.15)),Y=y(P,m,v,n,u),X=T(Math.min(s,G),o,s,p,r);X>=p&&X<=p+r&&(O?t.lineTo(Y,X):(t.moveTo(Y,X),O=!0))}t.stroke();const I=e.thermometerTemp,$=e.currentThermistorR;if(I>=m&&I<=v){const P=y(I,m,v,n,u),R=T(Math.min(s,$),o,s,p,r);ct(t,l,P,R,I,$,"°C","kΩ","#10b981"),t.shadowColor="#10b981",t.shadowBlur=10,t.fillStyle="#10b981",t.beginPath(),t.arc(P,R,F,0,Math.PI*2),t.fill(),t.shadowBlur=0}}function bt(){B.clearRect(0,0,_,et),lt.clearRect(0,0,K,J),B.save(),B.translate(Q,0),pt(B),e.thermometerType==="liquid"?Ct(B):e.thermometerType==="resistance"?Lt(B):qt(B),B.restore(),e.thermometerType==="liquid"?zt(lt):e.thermometerType==="resistance"?Ft(lt):Rt(lt)}function Mt(){const t=a.querySelector("#tl-svg-formula-liquid");t&&(t.innerHTML=`
         <svg height="55" width="280" style="background:transparent; overflow:visible;">
           <text x="10" y="31" fill="#fff" font-family="Cambria, Georgia, serif" font-size="15">Slope Equation:</text>
           <line x1="120" y1="26" x2="210" y2="26" stroke="#fff" stroke-width="1.5" />
@@ -1125,7 +1098,7 @@ const Tt="s3phy-thermometer-lab-css";const At=`
           <text x="285" y="18" fill="#fff" font-family="Cambria, Georgia, serif" font-size="12" text-anchor="middle">L<tspan dy="2" font-size="8">T</tspan><tspan dy="-2"> - L</tspan><tspan dy="2" font-size="8">0</tspan><tspan dy="-2"></tspan></text>
           <text x="285" y="41" fill="#fff" font-family="Cambria, Georgia, serif" font-size="12" text-anchor="middle">T - 0</text>
         </svg>
-      `);const l=a.querySelector("#tl-svg-formula-liquid-sub");if(l){const n=e.liquidL100-e.liquidL0,s=e.currentLength-e.liquidL0;l.innerHTML=`
+      `);const l=a.querySelector("#tl-svg-formula-liquid-sub");if(l){const d=e.liquidL100-e.liquidL0,n=e.currentLength-e.liquidL0;l.innerHTML=`
         <svg height="110" width="340" style="background:transparent; overflow:visible;">
           <!-- Step 1: Slope Equivalence -->
           <text x="10" y="22" fill="#fff" font-family="Cambria, Georgia, serif" font-size="13">Step 1: Equate Slopes</text>
@@ -1142,8 +1115,8 @@ const Tt="s3phy-thermometer-lab-css";const At=`
           <!-- Step 2: Simplify Ratio -->
           <text x="10" y="85" fill="#fff" font-family="Cambria, Georgia, serif" font-size="13">Step 2: Solve for T</text>
           <line x1="120" y1="80" x2="200" y2="80" stroke="#fff" stroke-width="1.2" />
-          <text x="160" y="72" fill="#06b6d4" font-family="Cambria, Georgia, serif" font-weight="bold" font-size="11" text-anchor="middle">${s.toFixed(2)} &times; 100</text>
-          <text x="160" y="94" fill="#a1a1aa" font-family="Cambria, Georgia, serif" font-size="11" text-anchor="middle">${n.toFixed(1)}</text>
+          <text x="160" y="72" fill="#06b6d4" font-family="Cambria, Georgia, serif" font-weight="bold" font-size="11" text-anchor="middle">${n.toFixed(2)} &times; 100</text>
+          <text x="160" y="94" fill="#a1a1aa" font-family="Cambria, Georgia, serif" font-size="11" text-anchor="middle">${d.toFixed(1)}</text>
           
           <text x="215" y="85" fill="#10b981" font-family="system-ui, sans-serif" font-weight="900" font-size="15" class="tl-final-ans">&rArr; T = ${e.thermometerTemp.toFixed(1)}°C</text>
         </svg>
@@ -1160,7 +1133,7 @@ const Tt="s3phy-thermometer-lab-css";const At=`
           <text x="285" y="18" fill="#fff" font-family="Cambria, Georgia, serif" font-size="12" text-anchor="middle">R<tspan dy="2" font-size="8">T</tspan><tspan dy="-2"> - R</tspan><tspan dy="2" font-size="8">0</tspan><tspan dy="-2"></tspan></text>
           <text x="285" y="41" fill="#fff" font-family="Cambria, Georgia, serif" font-size="12" text-anchor="middle">T - 0</text>
         </svg>
-      `);const o=a.querySelector("#tl-svg-formula-resistance-sub");if(o){const n=e.resistanceR100-e.resistanceR0,s=e.currentResistance-e.resistanceR0;o.innerHTML=`
+      `);const o=a.querySelector("#tl-svg-formula-resistance-sub");if(o){const d=e.resistanceR100-e.resistanceR0,n=e.currentResistance-e.resistanceR0;o.innerHTML=`
         <svg height="110" width="340" style="background:transparent; overflow:visible;">
           <!-- Step 1: Slope Equivalence -->
           <text x="10" y="22" fill="#fff" font-family="Cambria, Georgia, serif" font-size="13">Step 1: Equate Slopes</text>
@@ -1177,12 +1150,12 @@ const Tt="s3phy-thermometer-lab-css";const At=`
           <!-- Step 2: Simplify Ratio -->
           <text x="10" y="85" fill="#fff" font-family="Cambria, Georgia, serif" font-size="13">Step 2: Solve for T</text>
           <line x1="120" y1="80" x2="200" y2="80" stroke="#fff" stroke-width="1.2" />
-          <text x="160" y="72" fill="#6366f1" font-family="Cambria, Georgia, serif" font-weight="bold" font-size="11" text-anchor="middle">${s.toFixed(2)} &times; 100</text>
-          <text x="160" y="94" fill="#a1a1aa" font-family="Cambria, Georgia, serif" font-size="11" text-anchor="middle">${n.toFixed(1)}</text>
+          <text x="160" y="72" fill="#6366f1" font-family="Cambria, Georgia, serif" font-weight="bold" font-size="11" text-anchor="middle">${n.toFixed(2)} &times; 100</text>
+          <text x="160" y="94" fill="#a1a1aa" font-family="Cambria, Georgia, serif" font-size="11" text-anchor="middle">${d.toFixed(1)}</text>
           
           <text x="215" y="85" fill="#10b981" font-family="system-ui, sans-serif" font-weight="900" font-size="15" class="tl-final-ans">&rArr; T = ${e.thermometerTemp.toFixed(1)}°C</text>
         </svg>
-      `}const r=a.querySelector("#tl-svg-formula-thermistor");r&&(r.innerHTML=`
+      `}const s=a.querySelector("#tl-svg-formula-thermistor");s&&(s.innerHTML=`
         <svg height="50" width="280" style="background:transparent; overflow:visible;">
           <text x="10" y="28" fill="#fff" font-family="Cambria, Georgia, serif" font-size="15">T =</text>
           <line x1="40" y1="23" x2="220" y2="23" stroke="#fff" stroke-width="1.5" />
@@ -1190,15 +1163,15 @@ const Tt="s3phy-thermometer-lab-css";const At=`
           <text x="130" y="38" fill="#fff" font-family="Cambria, Georgia, serif" font-size="11" text-anchor="middle">(1/&beta;) &bull; ln(R<tspan dy="2" font-size="8">T</tspan><tspan dy="-2">/R</tspan><tspan dy="2" font-size="8">25</tspan><tspan dy="-2">) + 1/298.15</tspan></text>
           <text x="230" y="28" fill="#fff" font-family="Cambria, Georgia, serif" font-size="15">- 273.15</text>
         </svg>
-      `);const m=a.querySelector("#tl-svg-formula-thermistor-sub");if(m){const n=e.thermometerTemp+273.15;m.innerHTML=`
+      `);const b=a.querySelector("#tl-svg-formula-thermistor-sub");if(b){const d=e.thermometerTemp+273.15;b.innerHTML=`
         <svg height="45" width="280" style="background:transparent; overflow:visible;">
           <text x="10" y="26" fill="#fff" font-family="Cambria, Georgia, serif" font-size="15">
-            T<tspan dy="3" font-size="10">K</tspan><tspan dy="-3" fill="#10b981" font-weight="bold"> = ${n.toFixed(2)} K</tspan>
+            T<tspan dy="3" font-size="10">K</tspan><tspan dy="-3" fill="#10b981" font-weight="bold"> = ${d.toFixed(2)} K</tspan>
             <tspan fill="#fff"> &rArr; T = </tspan>
             <tspan fill="#10b981" font-family="system-ui, sans-serif" font-weight="900" class="tl-final-ans">${e.thermometerTemp.toFixed(1)}°C</tspan>
           </text>
         </svg>
-      `}}function Ft(){const t=a.querySelector("#tl-faulty-svg-container");if(!t)return;const{cf:l,cu:i,interval:o}=ht(),r=parseFloat(a.querySelector("#tl-input-q10a-cm").value)||0,m=parseFloat(a.querySelector("#tl-input-q10b-t").value)||0,n=a.querySelector("#tl-pane-q10a").classList.contains("active"),s=n?(r-l)/o*100:m,d=n?r:m/100*o+l,p=(h=>130-h/100*80)(s);t.innerHTML=`
+      `}}function $t(){const t=a.querySelector("#tl-faulty-svg-container");if(!t)return;const{cf:l,cu:i,interval:o}=ht(),s=parseFloat(a.querySelector("#tl-input-q10a-cm").value)||0,b=parseFloat(a.querySelector("#tl-input-q10b-t").value)||0,d=a.querySelector("#tl-pane-q10a").classList.contains("active"),n=d?(s-l)/o*100:b,p=d?s:b/100*o+l,r=(g=>130-g/100*80)(n);t.innerHTML=`
       <svg width="100%" height="100%" viewBox="0 0 340 180" style="background:transparent; overflow:visible;">
         <!-- Left Scale: True Scale -->
         <g transform="translate(0, 0)">
@@ -1207,7 +1180,7 @@ const Tt="s3phy-thermometer-lab-css";const At=`
           <!-- Bulb -->
           <circle cx="86" cy="144" r="10" fill="rgba(255,255,255,0.05)" stroke="#4b5563" stroke-width="1" />
           <!-- Liquid Core -->
-          <rect x="84" y="${p}" width="4" height="${144-p}" fill="#3b82f6" />
+          <rect x="84" y="${r}" width="4" height="${144-r}" fill="#3b82f6" />
           <circle cx="86" cy="144" r="8" fill="#3b82f6" />
           
           <!-- Ticks -->
@@ -1220,9 +1193,9 @@ const Tt="s3phy-thermometer-lab-css";const At=`
           <text x="65" y="53" fill="#ef4444" font-size="10" font-weight="bold" text-anchor="end">100°C</text>
 
           <!-- Current Point -->
-          <text x="65" y="${p+3}" fill="#34d399" font-size="10" font-weight="bold" text-anchor="end">${s.toFixed(1)}°C</text>
+          <text x="65" y="${r+3}" fill="#34d399" font-size="10" font-weight="bold" text-anchor="end">${n.toFixed(1)}°C</text>
 
-          <text x="86" y="170" fill="#a1a1aa" font-size="9" font-weight="bold" text-anchor="middle">${b("tools.thermometerLab.faulty.trueScale")}</text>
+          <text x="86" y="170" fill="#a1a1aa" font-size="9" font-weight="bold" text-anchor="middle">${f("tools.thermometerLab.faulty.trueScale")}</text>
         </g>
 
         <!-- Right Scale: Faulty Scale -->
@@ -1232,7 +1205,7 @@ const Tt="s3phy-thermometer-lab-css";const At=`
           <!-- Bulb -->
           <circle cx="106" cy="144" r="10" fill="rgba(255,255,255,0.05)" stroke="#4b5563" stroke-width="1" />
           <!-- Liquid Core -->
-          <rect x="104" y="${p}" width="4" height="${144-p}" fill="#f59e0b" />
+          <rect x="104" y="${r}" width="4" height="${144-r}" fill="#f59e0b" />
           <circle cx="106" cy="144" r="8" fill="#f59e0b" />
           
           <!-- Ticks -->
@@ -1245,37 +1218,37 @@ const Tt="s3phy-thermometer-lab-css";const At=`
           <text x="125" y="53" fill="#ef4444" font-size="10" font-weight="bold" text-anchor="start">C<tspan dy="3" font-size="7">u</tspan><tspan dy="-3"> = ${i.toFixed(1)}°C</tspan></text>
 
           <!-- Current Faulty Point -->
-          <text x="125" y="${p+3}" fill="#34d399" font-size="10" font-weight="bold" text-anchor="start">C = ${d.toFixed(1)}°C</text>
+          <text x="125" y="${r+3}" fill="#34d399" font-size="10" font-weight="bold" text-anchor="start">C = ${p.toFixed(1)}°C</text>
 
-          <text x="106" y="170" fill="#a1a1aa" font-size="9" font-weight="bold" text-anchor="middle">${b("tools.thermometerLab.faulty.faultyScale")}</text>
+          <text x="106" y="170" fill="#a1a1aa" font-size="9" font-weight="bold" text-anchor="middle">${f("tools.thermometerLab.faulty.faultyScale")}</text>
         </g>
 
         <!-- Connecting Ratio Indicator Line -->
-        <line x1="86" y1="${p}" x2="236" y2="${p}" stroke="#34d399" stroke-dasharray="3,3" stroke-width="1.5" />
-        <circle cx="86" cy="${p}" r="3" fill="#34d399" />
-        <circle cx="236" cy="${p}" r="3" fill="#34d399" />
+        <line x1="86" y1="${r}" x2="236" y2="${r}" stroke="#34d399" stroke-dasharray="3,3" stroke-width="1.5" />
+        <circle cx="86" cy="${r}" r="3" fill="#34d399" />
+        <circle cx="236" cy="${r}" r="3" fill="#34d399" />
       </svg>
-    `}function Mt(t){a.querySelector("#tl-bath-temp-display").innerHTML=e.bathTemp.toFixed(1)+"°C",a.querySelector("#tl-val-bath-temp").innerHTML=e.bathTemp.toFixed(1)+" °C";const l=a.querySelector("#tl-bath-state");e.bathTemp<=0?l.textContent="Melting Ice Bath":e.bathTemp>=100?l.textContent="Boiling Water/Steam":e.bathTemp===150?l.textContent="Hot Cooking Oil":l.textContent="Liquid Water",a.querySelector("#tl-val-response-time").textContent=t.toFixed(2)+" s";const i=a.querySelector("#tl-alcohol-boiling-warning");e.thermometerType==="liquid"&&e.liquidType==="alcohol"&&e.bathTemp>=78?i.style.display="block":i.style.display="none",e.thermometerType==="liquid"?(a.querySelector("#tl-live-liquid-lt").textContent=e.currentLength.toFixed(2)+" cm",a.querySelector("#tl-live-liquid-t-sub").textContent=e.thermometerTemp.toFixed(1)+"°C"):e.thermometerType==="resistance"?(a.querySelector("#tl-live-resistance-rt").textContent=e.currentResistance.toFixed(2)+" Ω",a.querySelector("#tl-live-resistance-t-sub").textContent=e.thermometerTemp.toFixed(1)+"°C"):a.querySelector("#tl-live-thermistor-rt").textContent=e.currentThermistorR.toFixed(2)+" kΩ",Rt()}let nt=null;function ut(t){e.lastTimestamp||(e.lastTimestamp=t);const l=(t-e.lastTimestamp)/1e3;e.lastTimestamp=t;const i=Math.min(l,.1),o=st(),r=i/o*(e.bathTemp-e.thermometerTemp);e.thermometerTemp+=r,e.currentLength=e.liquidL0+(e.liquidL100-e.liquidL0)/100*e.thermometerTemp,e.currentResistance=e.resistanceR0+(e.resistanceR100-e.resistanceR0)/100*e.thermometerTemp;const m=e.thermometerTemp+273.15;e.currentThermistorR=e.thermistorR25*Math.exp(e.thermistorBeta*(1/m-1/298.15)),pt(),bt(),Mt(o),nt=requestAnimationFrame(ut)}function ht(){const t=parseFloat(a.querySelector("#tl-input-faulty-cf").value),l=parseFloat(a.querySelector("#tl-input-faulty-cu").value),i=Number.isFinite(t)?t:-1.5,o=Number.isFinite(l)?l:105,r=o-i;return{cf:i,cu:o,interval:r}}function mt(t){const l=Math.round(t*100)/100;return l>=0?l.toFixed(1):`(${l.toFixed(1)})`}function N(){const{cf:t,cu:l,interval:i}=ht(),o=a.querySelector("#tl-val-faulty-interval"),r=a.querySelector("#tl-faulty-error-a"),m=a.querySelector("#tl-faulty-error-b"),n=Math.abs(i)<.01;o.textContent=i.toFixed(1)+" °C";const s=a.querySelector("#tl-svg-formula-faulty-a"),d=a.querySelector("#tl-svg-formula-faulty-b");if(n){r.hidden=!1,r.textContent="C_u must differ from C_f (interval cannot be zero).",m.hidden=!1,m.textContent=r.textContent,s&&(s.innerHTML=""),d&&(d.innerHTML="");return}r.hidden=!0,m.hidden=!0;const c=parseFloat(a.querySelector("#tl-input-q10a-cm").value)||0,p=parseFloat(a.querySelector("#tl-input-q10b-t").value)||0,h=(c-t)/i*100,g=p/100*i+t;s&&(s.innerHTML=`
+    `}function Pt(t){a.querySelector("#tl-bath-temp-display").innerHTML=e.bathTemp.toFixed(1)+"°C",a.querySelector("#tl-val-bath-temp").innerHTML=e.bathTemp.toFixed(1)+" °C";const l=a.querySelector("#tl-bath-state");e.bathTemp<=0?l.textContent="Melting Ice Bath":e.bathTemp>=100?l.textContent="Boiling Water/Steam":e.bathTemp===150?l.textContent="Hot Cooking Oil":l.textContent="Liquid Water",a.querySelector("#tl-val-response-time").textContent=t.toFixed(2)+" s";const i=a.querySelector("#tl-alcohol-boiling-warning");e.thermometerType==="liquid"&&e.liquidType==="alcohol"&&e.bathTemp>=78?i.style.display="block":i.style.display="none",e.thermometerType==="liquid"?(a.querySelector("#tl-live-liquid-lt").textContent=e.currentLength.toFixed(2)+" cm",a.querySelector("#tl-live-liquid-t-sub").textContent=e.thermometerTemp.toFixed(1)+"°C"):e.thermometerType==="resistance"?(a.querySelector("#tl-live-resistance-rt").textContent=e.currentResistance.toFixed(2)+" Ω",a.querySelector("#tl-live-resistance-t-sub").textContent=e.thermometerTemp.toFixed(1)+"°C"):a.querySelector("#tl-live-thermistor-rt").textContent=e.currentThermistorR.toFixed(2)+" kΩ",Mt()}let nt=null;function mt(t){e.lastTimestamp||(e.lastTimestamp=t);const l=(t-e.lastTimestamp)/1e3;e.lastTimestamp=t;const i=Math.min(l,.1),o=st(),s=i/o*(e.bathTemp-e.thermometerTemp);e.thermometerTemp+=s,e.currentLength=e.liquidL0+(e.liquidL100-e.liquidL0)/100*e.thermometerTemp,e.currentResistance=e.resistanceR0+(e.resistanceR100-e.resistanceR0)/100*e.thermometerTemp;const b=e.thermometerTemp+273.15;e.currentThermistorR=e.thermistorR25*Math.exp(e.thermistorBeta*(1/b-1/298.15)),ft(),bt(),Pt(o),nt=requestAnimationFrame(mt)}function ht(){const t=parseFloat(a.querySelector("#tl-input-faulty-cf").value),l=parseFloat(a.querySelector("#tl-input-faulty-cu").value),i=Number.isFinite(t)?t:-1.5,o=Number.isFinite(l)?l:105,s=o-i;return{cf:i,cu:o,interval:s}}function ut(t){const l=Math.round(t*100)/100;return l>=0?l.toFixed(1):`(${l.toFixed(1)})`}function at(){if(!a.querySelector("#tl-input-faulty-cf"))return;const{cf:t,cu:l,interval:i}=ht(),o=a.querySelector("#tl-val-faulty-interval"),s=a.querySelector("#tl-faulty-error-a"),b=a.querySelector("#tl-faulty-error-b"),d=Math.abs(i)<.01;o.textContent=i.toFixed(1)+" °C";const n=a.querySelector("#tl-svg-formula-faulty-a"),p=a.querySelector("#tl-svg-formula-faulty-b");if(d){s.hidden=!1,s.textContent="C_u must differ from C_f (interval cannot be zero).",b.hidden=!1,b.textContent=s.textContent,n&&(n.innerHTML=""),p&&(p.innerHTML="");return}s.hidden=!0,b.hidden=!0;const u=parseFloat(a.querySelector("#tl-input-q10a-cm").value)||0,r=parseFloat(a.querySelector("#tl-input-q10b-t").value)||0,g=(u-t)/i*100,x=r/100*i+t;n&&(n.innerHTML=`
         <svg height="45" width="280" style="background:transparent; overflow:visible;">
           <text x="10" y="26" fill="#fff" font-family="Cambria, Georgia, serif" font-size="15">T =</text>
           <line x1="40" y1="21" x2="160" y2="21" stroke="#fff" stroke-width="1.5" />
-          <text x="100" y="15" fill="#06b6d4" font-family="Cambria, Georgia, serif" font-weight="bold" font-size="12" text-anchor="middle">${c.toFixed(1)} - ${mt(t)}</text>
-          <text x="100" y="36" fill="#a1a1aa" font-family="Cambria, Georgia, serif" font-size="12" text-anchor="middle">${l.toFixed(1)} - ${mt(t)}</text>
+          <text x="100" y="15" fill="#06b6d4" font-family="Cambria, Georgia, serif" font-weight="bold" font-size="12" text-anchor="middle">${u.toFixed(1)} - ${ut(t)}</text>
+          <text x="100" y="36" fill="#a1a1aa" font-family="Cambria, Georgia, serif" font-size="12" text-anchor="middle">${l.toFixed(1)} - ${ut(t)}</text>
           <text x="170" y="26" fill="#fff" font-family="Cambria, Georgia, serif" font-size="15">
-            &times; 100 = <tspan fill="#10b981" font-family="system-ui, sans-serif" font-weight="900" class="tl-final-ans">${h.toFixed(1)}°C</tspan>
+            &times; 100 = <tspan fill="#10b981" font-family="system-ui, sans-serif" font-weight="900" class="tl-final-ans">${g.toFixed(1)}°C</tspan>
           </text>
         </svg>
-      `),d&&(d.innerHTML=`
+      `),p&&(p.innerHTML=`
         <svg height="45" width="280" style="background:transparent; overflow:visible;">
           <text x="10" y="26" fill="#fff" font-family="Cambria, Georgia, serif" font-size="15">C =</text>
           <line x1="40" y1="21" x2="150" y2="21" stroke="#fff" stroke-width="1.5" />
-          <text x="95" y="15" fill="#06b6d4" font-family="Cambria, Georgia, serif" font-weight="bold" font-size="12" text-anchor="middle">${p.toFixed(1)} &times; ${i.toFixed(1)}</text>
+          <text x="95" y="15" fill="#06b6d4" font-family="Cambria, Georgia, serif" font-weight="bold" font-size="12" text-anchor="middle">${r.toFixed(1)} &times; ${i.toFixed(1)}</text>
           <text x="95" y="36" fill="#a1a1aa" font-family="Cambria, Georgia, serif" font-size="12" text-anchor="middle">100</text>
           <text x="158" y="26" fill="#fff" font-family="Cambria, Georgia, serif" font-size="14">
-            + ${mt(t)} = <tspan fill="#10b981" font-family="system-ui, sans-serif" font-weight="900" class="tl-final-ans">${g.toFixed(2)}°C</tspan>
+            + ${ut(t)} = <tspan fill="#10b981" font-family="system-ui, sans-serif" font-weight="900" class="tl-final-ans">${x.toFixed(2)}°C</tspan>
           </text>
         </svg>
-      `),Ft()}function gt(){const t=parseFloat(a.querySelector("#tl-input-q11-r").value)||0,l=(t-e.resistanceR0)/(e.resistanceR100-e.resistanceR0)*100,i=a.querySelector("#tl-svg-formula-resistance-solver");i&&(i.innerHTML=`
+      `),$t()}function gt(){const t=parseFloat(a.querySelector("#tl-input-q11-r").value)||0,l=(t-e.resistanceR0)/(e.resistanceR100-e.resistanceR0)*100,i=a.querySelector("#tl-svg-formula-resistance-solver");i&&(i.innerHTML=`
         <svg height="45" width="280" style="background:transparent; overflow:visible;">
           <text x="10" y="26" fill="#fff" font-family="Cambria, Georgia, serif" font-size="15">&theta; =</text>
           <line x1="40" y1="21" x2="160" y2="21" stroke="#fff" stroke-width="1.5" />
@@ -1285,7 +1258,7 @@ const Tt="s3phy-thermometer-lab-css";const At=`
             &times; 100 = <tspan fill="#10b981" font-family="system-ui, sans-serif" font-weight="900" class="tl-final-ans">${l.toFixed(1)}°C</tspan>
           </text>
         </svg>
-      `)}function Pt(){const t=e.thermometerTemp,l=e.liquidL100-e.liquidL0,i=e.liquidL0+l/100*t,o=a.querySelector("#tl-svg-formula-t-to-l");o&&(o.innerHTML=`
+      `)}function Gt(){const t=e.thermometerTemp,l=e.liquidL100-e.liquidL0,i=e.liquidL0+l/100*t,o=a.querySelector("#tl-svg-formula-t-to-l");o&&(o.innerHTML=`
         <svg height="110" width="340" style="background:transparent; overflow:visible;">
           <!-- Step 1: Slope Equivalence -->
           <text x="10" y="22" fill="#fff" font-family="Cambria, Georgia, serif" font-size="13">Step 1: Equate Slopes</text>
@@ -1305,7 +1278,7 @@ const Tt="s3phy-thermometer-lab-css";const At=`
             <tspan fill="#a1a1aa">(${l.toFixed(1)} / 100)</tspan> &times; ${t.toFixed(1)} = <tspan fill="#10b981" font-family="system-ui, sans-serif" font-weight="900" class="tl-final-ans">${i.toFixed(2)} cm</tspan>
           </text>
         </svg>
-      `)}function Gt(){const t=e.thermometerTemp,l=e.resistanceR100-e.resistanceR0,i=e.resistanceR0+l/100*t,o=a.querySelector("#tl-svg-formula-t-to-r");o&&(o.innerHTML=`
+      `)}function Et(){const t=e.thermometerTemp,l=e.resistanceR100-e.resistanceR0,i=e.resistanceR0+l/100*t,o=a.querySelector("#tl-svg-formula-t-to-r");o&&(o.innerHTML=`
         <svg height="110" width="340" style="background:transparent; overflow:visible;">
           <!-- Step 1: Slope Equivalence -->
           <text x="10" y="22" fill="#fff" font-family="Cambria, Georgia, serif" font-size="13">Step 1: Equate Slopes</text>
@@ -1325,4 +1298,140 @@ const Tt="s3phy-thermometer-lab-css";const At=`
             <tspan fill="#a1a1aa">(${l.toFixed(1)} / 100)</tspan> &times; ${t.toFixed(1)} = <tspan fill="#10b981" font-family="system-ui, sans-serif" font-weight="900" class="tl-final-ans">${i.toFixed(2)} Ω</tspan>
           </text>
         </svg>
-      `)}function R(){N(),gt(),Pt(),Gt()}function dt(t,l){a.querySelector("#"+t).addEventListener("click",()=>{e.bathTemp=l,a.querySelector("#tl-bath-temp-slider").value=l,R()})}function yt(t){a.querySelectorAll(".tl-tab-btn").forEach(l=>{l.classList.toggle("active",l.getAttribute("data-tl-tab")===t)}),a.querySelectorAll(".tl-tab-content").forEach(l=>{l.classList.toggle("active",l.id==="tl-tab-"+t)}),a.querySelectorAll(".tl-live-tab").forEach(l=>{l.classList.toggle("active",l.id==="tl-live-"+t)}),e.thermometerType=t}function Et(){a.querySelectorAll(".tl-tab-btn").forEach(r=>{r.addEventListener("click",()=>{yt(r.getAttribute("data-tl-tab")),R()})}),a.querySelector("#tl-btn-toggle-labels").addEventListener("click",()=>{e.showLabels=!e.showLabels,a.querySelector("#tl-lbl-toggle-labels").textContent=e.showLabels?b("tools.thermometerLab.labels.hide"):b("tools.thermometerLab.labels.show")}),a.querySelector("#tl-bath-temp-slider").addEventListener("input",r=>{e.bathTemp=parseFloat(r.target.value),R()}),dt("tl-btn-preset-ice",0),dt("tl-btn-preset-room",25),dt("tl-btn-preset-steam",100),dt("tl-btn-preset-oil",150),a.querySelector("#tl-card-mercury").addEventListener("click",()=>{e.liquidType="mercury",a.querySelector("#tl-card-mercury").className="tl-seg-btn active-mercury",a.querySelector("#tl-card-alcohol").className="tl-seg-btn",R()}),a.querySelector("#tl-card-alcohol").addEventListener("click",()=>{e.liquidType="alcohol",a.querySelector("#tl-card-mercury").className="tl-seg-btn",a.querySelector("#tl-card-alcohol").className="tl-seg-btn active-alcohol",R()}),a.querySelector("#tl-slider-bulb-vol").addEventListener("input",r=>{e.bulbVolume=parseFloat(r.target.value),a.querySelector("#tl-val-bulb-vol").textContent=e.bulbVolume+" mm³"}),a.querySelector("#tl-slider-wall-thick").addEventListener("input",r=>{e.wallThickness=parseFloat(r.target.value),a.querySelector("#tl-val-wall-thickness").textContent=e.wallThickness.toFixed(1)+" mm"}),a.querySelector("#tl-slider-capillary-bore").addEventListener("input",r=>{e.capillaryBore=parseFloat(r.target.value),a.querySelector("#tl-val-capillary-bore").textContent=e.capillaryBore.toFixed(2)+" mm"}),a.querySelector("#tl-slider-liquid-l0").addEventListener("input",r=>{e.liquidL0=parseFloat(r.target.value),a.querySelector("#tl-val-liquid-l0").textContent=e.liquidL0.toFixed(1)+" cm",R()}),a.querySelector("#tl-slider-liquid-l100").addEventListener("input",r=>{e.liquidL100=parseFloat(r.target.value),a.querySelector("#tl-val-liquid-l100").textContent=e.liquidL100.toFixed(1)+" cm",R()}),a.querySelector("#tl-slider-resistance-r0").addEventListener("input",r=>{e.resistanceR0=parseFloat(r.target.value),a.querySelector("#tl-val-resistance-r0").textContent=e.resistanceR0.toFixed(1)+" Ω",a.querySelector("#tl-spec-resistance-r0").textContent=e.resistanceR0.toFixed(1)+" Ω",R()}),a.querySelector("#tl-slider-resistance-r100").addEventListener("input",r=>{e.resistanceR100=parseFloat(r.target.value),a.querySelector("#tl-val-resistance-r100").textContent=e.resistanceR100.toFixed(1)+" Ω",a.querySelector("#tl-spec-resistance-r100").textContent=e.resistanceR100.toFixed(1)+" Ω",R()}),a.querySelector("#tl-slider-thermistor-r25").addEventListener("input",r=>{e.thermistorR25=parseFloat(r.target.value),a.querySelector("#tl-val-thermistor-r25").textContent=e.thermistorR25.toFixed(1)+" kΩ",a.querySelector("#tl-spec-thermistor-r25").textContent=e.thermistorR25.toFixed(1)+" kΩ",R()}),a.querySelector("#tl-slider-thermistor-beta").addEventListener("input",r=>{e.thermistorBeta=parseFloat(r.target.value),a.querySelector("#tl-val-thermistor-beta").textContent=e.thermistorBeta+" K",a.querySelector("#tl-spec-thermistor-beta").textContent=e.thermistorBeta+" K",R()}),a.querySelector("#tl-btn-solve-q10a").addEventListener("click",()=>{a.querySelector("#tl-btn-solve-q10a").classList.add("active"),a.querySelector("#tl-btn-solve-q10b").classList.remove("active"),a.querySelector("#tl-pane-q10a").classList.add("active"),a.querySelector("#tl-pane-q10b").classList.remove("active"),N()}),a.querySelector("#tl-btn-solve-q10b").addEventListener("click",()=>{a.querySelector("#tl-btn-solve-q10a").classList.remove("active"),a.querySelector("#tl-btn-solve-q10b").classList.add("active"),a.querySelector("#tl-pane-q10a").classList.remove("active"),a.querySelector("#tl-pane-q10b").classList.add("active"),N()}),a.querySelector("#tl-input-faulty-cf").addEventListener("input",N),a.querySelector("#tl-input-faulty-cu").addEventListener("input",N),a.querySelector("#tl-input-q10a-cm").addEventListener("input",N),a.querySelector("#tl-input-q10b-t").addEventListener("input",N),a.querySelector("#tl-input-q11-r").addEventListener("input",gt);const i=a.querySelector("#tl-input-t-to-l");i&&i.addEventListener("input",R);const o=a.querySelector("#tl-input-t-to-r");o&&o.addEventListener("input",R)}if(V.type){const t=a.querySelector(".tl-tabs-container");t&&(t.style.display="none")}yt(K),lt(),Et(),R();const vt=a.querySelector(".tl-dash"),xt=a.querySelector(".tl-controls"),wt=a.querySelector("#tl-controls-toggle"),$t=a.querySelector("#tl-controls-drag"),Bt=a.querySelector(".tl-controls-float-bar");return vt&&xt&&wt&&Wt({container:vt,panel:xt,toggleBtn:wt,dragHandle:$t,dragSurface:Bt,storageKey:`s3phy-thermo-${K}`,breakpoint:1024,getToggleTitle:t=>b(t?"tools.floatingControls.showParams":"tools.floatingControls.hideParams"),onLayoutChange:()=>bt()}),nt=requestAnimationFrame(ut),a._thermometerLabCleanup=()=>{nt&&cancelAnimationFrame(nt)},a}export{Yt as createThermometerLab};
+      `)}function A(){at(),gt(),Gt(),Et()}function dt(t,l){a.querySelector("#"+t).addEventListener("click",()=>{e.bathTemp=l,a.querySelector("#tl-bath-temp-slider").value=l,A()})}function yt(t){a.querySelectorAll(".tl-tab-btn").forEach(l=>{l.classList.toggle("active",l.getAttribute("data-tl-tab")===t)}),a.querySelectorAll(".tl-tab-content").forEach(l=>{l.classList.toggle("active",l.id==="tl-tab-"+t)}),a.querySelectorAll(".tl-live-tab").forEach(l=>{l.classList.toggle("active",l.id==="tl-live-"+t)}),e.thermometerType=t}function Bt(){var d,n,p,u;a.querySelectorAll(".tl-tab-btn").forEach(r=>{r.addEventListener("click",()=>{yt(r.getAttribute("data-tl-tab")),A()})}),a.querySelector("#tl-btn-toggle-labels").addEventListener("click",()=>{e.showLabels=!e.showLabels,a.querySelector("#tl-lbl-toggle-labels").textContent=e.showLabels?f("tools.thermometerLab.labels.hide"):f("tools.thermometerLab.labels.show")}),a.querySelector("#tl-bath-temp-slider").addEventListener("input",r=>{e.bathTemp=parseFloat(r.target.value),A()}),dt("tl-btn-preset-ice",0),dt("tl-btn-preset-room",25),dt("tl-btn-preset-steam",100),dt("tl-btn-preset-oil",150),a.querySelector("#tl-card-mercury").addEventListener("click",()=>{e.liquidType="mercury",a.querySelector("#tl-card-mercury").className="tl-seg-btn active-mercury",a.querySelector("#tl-card-alcohol").className="tl-seg-btn",A()}),a.querySelector("#tl-card-alcohol").addEventListener("click",()=>{e.liquidType="alcohol",a.querySelector("#tl-card-mercury").className="tl-seg-btn",a.querySelector("#tl-card-alcohol").className="tl-seg-btn active-alcohol",A()}),a.querySelector("#tl-slider-bulb-vol").addEventListener("input",r=>{e.bulbVolume=parseFloat(r.target.value),a.querySelector("#tl-val-bulb-vol").textContent=e.bulbVolume+" mm³"}),a.querySelector("#tl-slider-wall-thick").addEventListener("input",r=>{e.wallThickness=parseFloat(r.target.value),a.querySelector("#tl-val-wall-thickness").textContent=e.wallThickness.toFixed(1)+" mm"}),a.querySelector("#tl-slider-capillary-bore").addEventListener("input",r=>{e.capillaryBore=parseFloat(r.target.value),a.querySelector("#tl-val-capillary-bore").textContent=e.capillaryBore.toFixed(2)+" mm"}),a.querySelector("#tl-slider-liquid-l0").addEventListener("input",r=>{e.liquidL0=parseFloat(r.target.value),a.querySelector("#tl-val-liquid-l0").textContent=e.liquidL0.toFixed(1)+" cm",A()}),a.querySelector("#tl-slider-liquid-l100").addEventListener("input",r=>{e.liquidL100=parseFloat(r.target.value),a.querySelector("#tl-val-liquid-l100").textContent=e.liquidL100.toFixed(1)+" cm",A()}),a.querySelector("#tl-slider-resistance-r0").addEventListener("input",r=>{e.resistanceR0=parseFloat(r.target.value),a.querySelector("#tl-val-resistance-r0").textContent=e.resistanceR0.toFixed(1)+" Ω",a.querySelector("#tl-spec-resistance-r0").textContent=e.resistanceR0.toFixed(1)+" Ω",A()}),a.querySelector("#tl-slider-resistance-r100").addEventListener("input",r=>{e.resistanceR100=parseFloat(r.target.value),a.querySelector("#tl-val-resistance-r100").textContent=e.resistanceR100.toFixed(1)+" Ω",a.querySelector("#tl-spec-resistance-r100").textContent=e.resistanceR100.toFixed(1)+" Ω",A()}),a.querySelector("#tl-slider-thermistor-r25").addEventListener("input",r=>{e.thermistorR25=parseFloat(r.target.value),a.querySelector("#tl-val-thermistor-r25").textContent=e.thermistorR25.toFixed(1)+" kΩ",a.querySelector("#tl-spec-thermistor-r25").textContent=e.thermistorR25.toFixed(1)+" kΩ",A()}),a.querySelector("#tl-slider-thermistor-beta").addEventListener("input",r=>{e.thermistorBeta=parseFloat(r.target.value),a.querySelector("#tl-val-thermistor-beta").textContent=e.thermistorBeta+" K",a.querySelector("#tl-spec-thermistor-beta").textContent=e.thermistorBeta+" K",A()});const i=a.querySelector("#tl-btn-solve-q10a"),o=a.querySelector("#tl-btn-solve-q10b");i&&o&&(i.addEventListener("click",()=>{i.classList.add("active"),o.classList.remove("active"),a.querySelector("#tl-pane-q10a").classList.add("active"),a.querySelector("#tl-pane-q10b").classList.remove("active"),at()}),o.addEventListener("click",()=>{i.classList.remove("active"),o.classList.add("active"),a.querySelector("#tl-pane-q10a").classList.remove("active"),a.querySelector("#tl-pane-q10b").classList.add("active"),at()})),(d=a.querySelector("#tl-input-faulty-cf"))==null||d.addEventListener("input",at),(n=a.querySelector("#tl-input-faulty-cu"))==null||n.addEventListener("input",at),(p=a.querySelector("#tl-input-q10a-cm"))==null||p.addEventListener("input",at),(u=a.querySelector("#tl-input-q10b-t"))==null||u.addEventListener("input",at),a.querySelector("#tl-input-q11-r").addEventListener("input",gt);const s=a.querySelector("#tl-input-t-to-l");s&&s.addEventListener("input",A);const b=a.querySelector("#tl-input-t-to-r");b&&b.addEventListener("input",A)}if(h.type){const t=a.querySelector(".tl-tabs-container");t&&(t.style.display="none")}yt(V),it(),Bt(),A();const xt=a.querySelector(".tl-dash"),vt=a.querySelector(".tl-controls"),wt=a.querySelector("#tl-controls-toggle"),At=a.querySelector("#tl-controls-drag"),It=a.querySelector(".tl-controls-float-bar");return xt&&vt&&wt&&kt({container:xt,panel:vt,toggleBtn:wt,dragHandle:At,dragSurface:It,storageKey:`s3phy-thermo-${V}`,breakpoint:1024,getToggleTitle:t=>f(t?"tools.floatingControls.showParams":"tools.floatingControls.hideParams"),onLayoutChange:()=>bt()}),nt=requestAnimationFrame(mt),a._thermometerLabCleanup=()=>{nt&&cancelAnimationFrame(nt)},a}function Yt(f){St();const h=document.createElement("div");h.className="tl-wrap tl-wrap--faulty-cal",h.innerHTML=`
+    <div class="tl-head">
+      <h2 class="tl-title">${f("tools.faultyCalibration.title")}</h2>
+      <div class="tl-sub">${f("tools.faultyCalibration.subtitle")}</div>
+    </div>
+    <div class="tl-dash tl-dash--faulty">
+      <section class="tl-faulty-hero">
+        <div class="tl-info-card" style="margin:0">
+          <div class="tl-info-label">${f("tools.faultyCalibration.formulaTitle")}</div>
+          <p style="margin:0;font-size:0.82rem">T / 100 = (C − C<sub>f</sub>) / (C<sub>u</sub> − C<sub>f</sub>)</p>
+        </div>
+        <div class="tl-info-label" style="font-size:0.78rem;color:var(--tl-muted);margin:0;">${f("tools.thermometerLab.faulty.dualScale")}</div>
+        <div id="fsc-faulty-svg-container" class="tl-faulty-hero-viz"></div>
+      </section>
+
+      <section class="tl-faulty-live">
+        <div class="tl-info-label" style="margin-top:0;font-size:0.8rem;color:var(--tl-cyan)">${f("tools.faultyCalibration.liveLabel")}</div>
+        <div id="fsc-pane-q10a" class="tl-solver-pane active">
+          <div class="tl-worked-solution" style="background:rgba(0,0,0,0.15);margin:0">
+            <div id="fsc-svg-formula-faulty-a" class="tl-math-formula" style="font-size:0.85rem"></div>
+          </div>
+        </div>
+        <div id="fsc-pane-q10b" class="tl-solver-pane">
+          <div class="tl-worked-solution" style="background:rgba(0,0,0,0.15);margin:0">
+            <div id="fsc-svg-formula-faulty-b" class="tl-math-formula" style="font-size:0.85rem"></div>
+          </div>
+        </div>
+      </section>
+
+      <div class="tl-controls controls-collapsed">
+        <div class="tl-controls-float-bar">
+          <button type="button" class="tl-controls-drag-handle" id="fsc-controls-drag" aria-label="${f("tools.floatingControls.dragHint")}" title="${f("tools.floatingControls.dragHint")}">⋮⋮</button>
+          <button type="button" class="tl-controls-toggle" id="fsc-controls-toggle" aria-expanded="false">
+            <span data-float-chevron>▾</span>
+            <span>${f("tools.thermometerLab.paramSettings")}</span>
+          </button>
+        </div>
+        <div class="tl-controls-body">
+          <p style="font-size:0.75rem;color:var(--tl-muted);margin:0 0 8px">${f("tools.faultyCalibration.intro")}</p>
+          <div class="tl-faulty-cal">
+            <div class="tl-calc-inputs">
+              <span>${f("tools.faultyCalibration.iceReading")}</span>
+              <div class="tl-input-with-unit">
+                <input type="number" id="fsc-input-faulty-cf" value="-1.5" step="0.1" class="tl-calc-input" aria-label="Ice point faulty reading">
+                <span class="tl-unit">°C</span>
+              </div>
+            </div>
+            <div class="tl-calc-inputs">
+              <span>${f("tools.faultyCalibration.steamReading")}</span>
+              <div class="tl-input-with-unit">
+                <input type="number" id="fsc-input-faulty-cu" value="105" step="0.1" class="tl-calc-input" aria-label="Steam point faulty reading">
+                <span class="tl-unit">°C</span>
+              </div>
+            </div>
+          </div>
+          <div class="tl-faulty-interval">
+            <span>${f("tools.faultyCalibration.interval")}</span>
+            <b id="fsc-val-faulty-interval">106.5 °C</b>
+          </div>
+          <div class="tl-solver-tabs">
+            <button class="tl-solver-tab-btn active" id="fsc-btn-solve-q10a">${f("tools.faultyCalibration.findTrueTemp")}</button>
+            <button class="tl-solver-tab-btn" id="fsc-btn-solve-q10b">${f("tools.faultyCalibration.findFaultyReading")}</button>
+          </div>
+          <div id="fsc-input-pane-q10a" class="tl-solver-pane active">
+            <div class="tl-calc-inputs">
+              <span>${f("tools.faultyCalibration.faultyReadingC")}</span>
+              <div class="tl-input-with-unit">
+                <input type="number" id="fsc-input-q10a-cm" value="25.0" step="0.5" class="tl-calc-input">
+                <span class="tl-unit">°C</span>
+              </div>
+            </div>
+            <p class="tl-solver-error" id="fsc-faulty-error-a" hidden></p>
+          </div>
+          <div id="fsc-input-pane-q10b" class="tl-solver-pane">
+            <div class="tl-calc-inputs">
+              <span>${f("tools.faultyCalibration.trueTempT")}</span>
+              <div class="tl-input-with-unit">
+                <input type="number" id="fsc-input-q10b-t" value="70.0" step="1.0" class="tl-calc-input">
+                <span class="tl-unit">°C</span>
+              </div>
+            </div>
+            <p class="tl-solver-error" id="fsc-faulty-error-b" hidden></p>
+          </div>
+        </div>
+      </div>
+    </div>
+  `;function V(k){const w=Math.round(k*100)/100;return w>=0?w.toFixed(1):`(${w.toFixed(1)})`}function U(){const k=parseFloat(h.querySelector("#fsc-input-faulty-cf").value),w=parseFloat(h.querySelector("#fsc-input-faulty-cu").value),y=Number.isFinite(k)?k:-1.5,T=Number.isFinite(w)?w:105,S=T-y;return{cf:y,cu:T,interval:S}}function H(){const k=h.querySelector("#fsc-faulty-svg-container");if(!k)return;const{cf:w,cu:y,interval:T}=U(),S=parseFloat(h.querySelector("#fsc-input-q10a-cm").value)||0,L=parseFloat(h.querySelector("#fsc-input-q10b-t").value)||0,W=h.querySelector("#fsc-input-pane-q10a").classList.contains("active"),z=W?(S-w)/T*100:L,N=W?S:L/100*T+w,E=D=>130-D/100*80,q=Number.isFinite(z)?E(z):130;k.innerHTML=`
+      <svg width="100%" height="100%" viewBox="0 0 340 180" style="background:transparent; overflow:visible;">
+        <g transform="translate(0, 0)">
+          <rect x="80" y="25" width="12" height="115" rx="6" fill="rgba(255,255,255,0.05)" stroke="#4b5563" stroke-width="1" />
+          <circle cx="86" cy="144" r="10" fill="rgba(255,255,255,0.05)" stroke="#4b5563" stroke-width="1" />
+          <rect x="84" y="${q}" width="4" height="${144-q}" fill="#3b82f6" />
+          <circle cx="86" cy="144" r="8" fill="#3b82f6" />
+          <line x1="70" y1="130" x2="78" y2="130" stroke="#3b82f6" stroke-width="1.5" />
+          <text x="65" y="133" fill="#3b82f6" font-size="10" font-weight="bold" text-anchor="end">0°C</text>
+          <line x1="70" y1="50" x2="78" y2="50" stroke="#ef4444" stroke-width="1.5" />
+          <text x="65" y="53" fill="#ef4444" font-size="10" font-weight="bold" text-anchor="end">100°C</text>
+          <text x="65" y="${q+3}" fill="#34d399" font-size="10" font-weight="bold" text-anchor="end">${Number.isFinite(z)?z.toFixed(1):"—"}°C</text>
+          <text x="86" y="170" fill="#a1a1aa" font-size="9" font-weight="bold" text-anchor="middle">${f("tools.thermometerLab.faulty.trueScale")}</text>
+        </g>
+        <g transform="translate(130, 0)">
+          <rect x="100" y="25" width="12" height="115" rx="6" fill="rgba(255,255,255,0.05)" stroke="#4b5563" stroke-width="1" />
+          <circle cx="106" cy="144" r="10" fill="rgba(255,255,255,0.05)" stroke="#4b5563" stroke-width="1" />
+          <rect x="104" y="${q}" width="4" height="${144-q}" fill="#f59e0b" />
+          <circle cx="106" cy="144" r="8" fill="#f59e0b" />
+          <line x1="112" y1="130" x2="120" y2="130" stroke="#f59e0b" stroke-width="1.5" />
+          <text x="125" y="133" fill="#f59e0b" font-size="10" font-weight="bold" text-anchor="start">C<tspan dy="3" font-size="7">f</tspan><tspan dy="-3"> = ${w.toFixed(1)}°C</tspan></text>
+          <line x1="112" y1="50" x2="120" y2="50" stroke="#ef4444" stroke-width="1.5" />
+          <text x="125" y="53" fill="#ef4444" font-size="10" font-weight="bold" text-anchor="start">C<tspan dy="3" font-size="7">u</tspan><tspan dy="-3"> = ${y.toFixed(1)}°C</tspan></text>
+          <text x="125" y="${q+3}" fill="#34d399" font-size="10" font-weight="bold" text-anchor="start">C = ${Number.isFinite(N)?N.toFixed(1):"—"}°C</text>
+          <text x="106" y="170" fill="#a1a1aa" font-size="9" font-weight="bold" text-anchor="middle">${f("tools.thermometerLab.faulty.faultyScale")}</text>
+        </g>
+        <line x1="86" y1="${q}" x2="236" y2="${q}" stroke="#34d399" stroke-dasharray="3,3" stroke-width="1.5" />
+        <circle cx="86" cy="${q}" r="3" fill="#34d399" />
+        <circle cx="236" cy="${q}" r="3" fill="#34d399" />
+      </svg>
+    `}function a(k){const w=k==="a";h.querySelector("#fsc-btn-solve-q10a").classList.toggle("active",w),h.querySelector("#fsc-btn-solve-q10b").classList.toggle("active",!w),h.querySelector("#fsc-input-pane-q10a").classList.toggle("active",w),h.querySelector("#fsc-input-pane-q10b").classList.toggle("active",!w),h.querySelector("#fsc-pane-q10a").classList.toggle("active",w),h.querySelector("#fsc-pane-q10b").classList.toggle("active",!w),e()}function e(){const{cf:k,cu:w,interval:y}=U(),T=h.querySelector("#fsc-val-faulty-interval"),S=h.querySelector("#fsc-faulty-error-a"),L=h.querySelector("#fsc-faulty-error-b"),W=h.querySelector("#fsc-svg-formula-faulty-a"),z=h.querySelector("#fsc-svg-formula-faulty-b"),N=Math.abs(y)<.01,E=f("tools.faultyCalibration.invalidInterval");if(T.textContent=y.toFixed(1)+" °C",N){S.hidden=!1,S.textContent=E,L.hidden=!1,L.textContent=E,W&&(W.innerHTML=""),z&&(z.innerHTML=""),H();return}S.hidden=!0,L.hidden=!0;const q=parseFloat(h.querySelector("#fsc-input-q10a-cm").value)||0,D=parseFloat(h.querySelector("#fsc-input-q10b-t").value)||0,B=(q-k)/y*100,Z=D/100*y+k;W&&(W.innerHTML=`
+        <svg height="45" width="280" style="background:transparent; overflow:visible;">
+          <text x="10" y="26" fill="#fff" font-family="Cambria, Georgia, serif" font-size="15">T =</text>
+          <line x1="40" y1="21" x2="160" y2="21" stroke="#fff" stroke-width="1.5" />
+          <text x="100" y="15" fill="#06b6d4" font-family="Cambria, Georgia, serif" font-weight="bold" font-size="12" text-anchor="middle">${q.toFixed(1)} - ${V(k)}</text>
+          <text x="100" y="36" fill="#a1a1aa" font-family="Cambria, Georgia, serif" font-size="12" text-anchor="middle">${w.toFixed(1)} - ${V(k)}</text>
+          <text x="170" y="26" fill="#fff" font-family="Cambria, Georgia, serif" font-size="15">
+            &times; 100 = <tspan fill="#10b981" font-family="system-ui, sans-serif" font-weight="900" class="tl-final-ans">${B.toFixed(1)}°C</tspan>
+          </text>
+        </svg>
+      `),z&&(z.innerHTML=`
+        <svg height="45" width="280" style="background:transparent; overflow:visible;">
+          <text x="10" y="26" fill="#fff" font-family="Cambria, Georgia, serif" font-size="15">C =</text>
+          <line x1="40" y1="21" x2="150" y2="21" stroke="#fff" stroke-width="1.5" />
+          <text x="95" y="15" fill="#06b6d4" font-family="Cambria, Georgia, serif" font-weight="bold" font-size="12" text-anchor="middle">${D.toFixed(1)} &times; ${y.toFixed(1)}</text>
+          <text x="95" y="36" fill="#a1a1aa" font-family="Cambria, Georgia, serif" font-size="12" text-anchor="middle">100</text>
+          <text x="158" y="26" fill="#fff" font-family="Cambria, Georgia, serif" font-size="14">
+            + ${V(k)} = <tspan fill="#10b981" font-family="system-ui, sans-serif" font-weight="900" class="tl-final-ans">${Z.toFixed(2)}°C</tspan>
+          </text>
+        </svg>
+      `),H()}h.querySelector("#fsc-btn-solve-q10a").addEventListener("click",()=>a("a")),h.querySelector("#fsc-btn-solve-q10b").addEventListener("click",()=>a("b")),h.querySelector("#fsc-input-faulty-cf").addEventListener("input",e),h.querySelector("#fsc-input-faulty-cu").addEventListener("input",e),h.querySelector("#fsc-input-q10a-cm").addEventListener("input",e),h.querySelector("#fsc-input-q10b-t").addEventListener("input",e);const _=h.querySelector(".tl-dash--faulty"),et=h.querySelector(".tl-controls"),Q=h.querySelector("#fsc-controls-toggle"),K=h.querySelector("#fsc-controls-drag"),J=h.querySelector(".tl-controls-float-bar");return _&&et&&Q&&kt({container:_,panel:et,toggleBtn:Q,dragHandle:K,dragSurface:J,storageKey:"s3phy-faulty-calibration",breakpoint:1024,getToggleTitle:k=>f(k?"tools.floatingControls.showParams":"tools.floatingControls.hideParams")}),e(),h._thermometerLabCleanup=()=>{},h}export{Yt as createFaultyScaleCalibrationLab,Wt as createThermometerLab};

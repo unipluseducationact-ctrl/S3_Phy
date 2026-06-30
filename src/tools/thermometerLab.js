@@ -794,6 +794,42 @@ const CSS = `
   font-weight: 600;
   margin: 0;
 }
+.tl-wrap--faulty-cal .tl-dash--faulty {
+  position: relative;
+  min-height: min(72vh, 720px);
+}
+.tl-wrap--faulty-cal .tl-faulty-hero {
+  background: var(--tl-panel);
+  padding: 16px 20px 20px;
+  border-radius: 16px;
+  border: 1px solid var(--tl-border);
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+  min-height: min(52vh, 520px);
+}
+.tl-wrap--faulty-cal .tl-faulty-hero-viz {
+  flex: 1;
+  min-height: 240px;
+  background: rgba(0, 0, 0, 0.25);
+  border-radius: 12px;
+  border: 1px solid var(--tl-border);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 12px;
+}
+.tl-wrap--faulty-cal .tl-faulty-live {
+  background: var(--tl-panel);
+  border: 1px solid var(--tl-border);
+  border-radius: 16px;
+  padding: 14px 16px;
+}
+@media (min-width: 1024px) {
+  .tl-wrap--faulty-cal .tl-controls {
+    width: min(380px, calc(100% - 24px));
+  }
+}
 `;
 
 function ensureStyles() {
@@ -1133,69 +1169,6 @@ export function createThermometerLab(t, options = {}) {
               </div>
               <div class="tl-info-card tl-info-card--compact">
                 τ = <b id="tl-val-response-time">0.65 s</b> · larger V<sub>b</sub> → slower equilibration
-              </div>
-            </div>
-          </details>
-
-          <details class="tl-details">
-            <summary>${t('tools.thermometerLab.faultySolver')}</summary>
-            <div class="tl-details-body">
-              <p style="font-size:0.75rem;color:var(--tl-muted);margin:0">Set faulty readings at ice (0°C) and steam (100°C), then solve for T or C.</p>
-              <div class="tl-info-card" style="margin-bottom:4px">
-                <div class="tl-info-label">Faulty scale calibration</div>
-                <p style="margin:0;font-size:0.75rem">T / 100 = (C − C<sub>f</sub>) / (C<sub>u</sub> − C<sub>f</sub>)</p>
-              </div>
-              <div class="tl-info-label" style="font-size:0.75rem;color:var(--tl-muted);margin-top:4px;">${t('tools.thermometerLab.faulty.dualScale')}</div>
-              <div id="tl-faulty-svg-container" style="width:100%; height:190px; margin:4px 0; background:rgba(0,0,0,0.25); border-radius:10px; border:1px solid var(--tl-border); display:flex; justify-content:center; align-items:center; padding:8px;"></div>
-              <div class="tl-faulty-cal">
-                <div class="tl-calc-inputs">
-                  <span>Ice reading C<sub>f</sub> (true 0°C)</span>
-                  <div class="tl-input-with-unit">
-                    <input type="number" id="tl-input-faulty-cf" value="-1.5" step="0.1" class="tl-calc-input" aria-label="Ice point faulty reading">
-                    <span class="tl-unit">°C</span>
-                  </div>
-                </div>
-                <div class="tl-calc-inputs">
-                  <span>Steam reading C<sub>u</sub> (true 100°C)</span>
-                  <div class="tl-input-with-unit">
-                    <input type="number" id="tl-input-faulty-cu" value="105" step="0.1" class="tl-calc-input" aria-label="Steam point faulty reading">
-                    <span class="tl-unit">°C</span>
-                  </div>
-                </div>
-              </div>
-              <div class="tl-faulty-interval">
-                <span>Proportional interval (C<sub>u</sub> − C<sub>f</sub>)</span>
-                <b id="tl-val-faulty-interval">106.5 °C</b>
-              </div>
-              <div class="tl-solver-tabs">
-                <button class="tl-solver-tab-btn active" id="tl-btn-solve-q10a">Find True Temp (T)</button>
-                <button class="tl-solver-tab-btn" id="tl-btn-solve-q10b">Find Faulty Reading (C)</button>
-              </div>
-              <div id="tl-pane-q10a" class="tl-solver-pane active">
-                <div class="tl-calc-inputs">
-                  <span>Faulty reading C</span>
-                  <div class="tl-input-with-unit">
-                    <input type="number" id="tl-input-q10a-cm" value="25.0" step="0.5" class="tl-calc-input">
-                    <span class="tl-unit">°C</span>
-                  </div>
-                </div>
-                <p class="tl-solver-error" id="tl-faulty-error-a" hidden></p>
-                <div class="tl-worked-solution" style="background:rgba(0,0,0,0.15)">
-                  <div id="tl-svg-formula-faulty-a" class="tl-math-formula" style="font-size:0.85rem"></div>
-                </div>
-              </div>
-              <div id="tl-pane-q10b" class="tl-solver-pane">
-                <div class="tl-calc-inputs">
-                  <span>True temperature T</span>
-                  <div class="tl-input-with-unit">
-                    <input type="number" id="tl-input-q10b-t" value="70.0" step="1.0" class="tl-calc-input">
-                    <span class="tl-unit">°C</span>
-                  </div>
-                </div>
-                <p class="tl-solver-error" id="tl-faulty-error-b" hidden></p>
-                <div class="tl-worked-solution" style="background:rgba(0,0,0,0.15)">
-                  <div id="tl-svg-formula-faulty-b" class="tl-math-formula" style="font-size:0.85rem"></div>
-                </div>
               </div>
             </div>
           </details>
@@ -2642,6 +2615,7 @@ export function createThermometerLab(t, options = {}) {
   }
 
   function updateFaultySolver() {
+    if (!wrap.querySelector('#tl-input-faulty-cf')) return;
     const { cf, cu, interval } = getFaultyCalibration();
     const intervalEl = wrap.querySelector('#tl-val-faulty-interval');
     const errA = wrap.querySelector('#tl-faulty-error-a');
@@ -2911,26 +2885,30 @@ export function createThermometerLab(t, options = {}) {
       updateCalculations();
     });
 
-    wrap.querySelector('#tl-btn-solve-q10a').addEventListener('click', () => {
-      wrap.querySelector('#tl-btn-solve-q10a').classList.add('active');
-      wrap.querySelector('#tl-btn-solve-q10b').classList.remove('active');
-      wrap.querySelector('#tl-pane-q10a').classList.add('active');
-      wrap.querySelector('#tl-pane-q10b').classList.remove('active');
-      updateFaultySolver();
-    });
+    const btnSolveQ10a = wrap.querySelector('#tl-btn-solve-q10a');
+    const btnSolveQ10b = wrap.querySelector('#tl-btn-solve-q10b');
+    if (btnSolveQ10a && btnSolveQ10b) {
+      btnSolveQ10a.addEventListener('click', () => {
+        btnSolveQ10a.classList.add('active');
+        btnSolveQ10b.classList.remove('active');
+        wrap.querySelector('#tl-pane-q10a').classList.add('active');
+        wrap.querySelector('#tl-pane-q10b').classList.remove('active');
+        updateFaultySolver();
+      });
 
-    wrap.querySelector('#tl-btn-solve-q10b').addEventListener('click', () => {
-      wrap.querySelector('#tl-btn-solve-q10a').classList.remove('active');
-      wrap.querySelector('#tl-btn-solve-q10b').classList.add('active');
-      wrap.querySelector('#tl-pane-q10a').classList.remove('active');
-      wrap.querySelector('#tl-pane-q10b').classList.add('active');
-      updateFaultySolver();
-    });
+      btnSolveQ10b.addEventListener('click', () => {
+        btnSolveQ10a.classList.remove('active');
+        btnSolveQ10b.classList.add('active');
+        wrap.querySelector('#tl-pane-q10a').classList.remove('active');
+        wrap.querySelector('#tl-pane-q10b').classList.add('active');
+        updateFaultySolver();
+      });
+    }
 
-    wrap.querySelector('#tl-input-faulty-cf').addEventListener('input', updateFaultySolver);
-    wrap.querySelector('#tl-input-faulty-cu').addEventListener('input', updateFaultySolver);
-    wrap.querySelector('#tl-input-q10a-cm').addEventListener('input', updateFaultySolver);
-    wrap.querySelector('#tl-input-q10b-t').addEventListener('input', updateFaultySolver);
+    wrap.querySelector('#tl-input-faulty-cf')?.addEventListener('input', updateFaultySolver);
+    wrap.querySelector('#tl-input-faulty-cu')?.addEventListener('input', updateFaultySolver);
+    wrap.querySelector('#tl-input-q10a-cm')?.addEventListener('input', updateFaultySolver);
+    wrap.querySelector('#tl-input-q10b-t')?.addEventListener('input', updateFaultySolver);
     wrap.querySelector('#tl-input-q11-r').addEventListener('input', calculateQ11);
     
     // T to L and T to R solvers
@@ -2989,5 +2967,263 @@ export function createThermometerLab(t, options = {}) {
     }
   };
 
+  return wrap;
+}
+
+export function createFaultyScaleCalibrationLab(t) {
+  ensureStyles();
+
+  const wrap = document.createElement('div');
+  wrap.className = 'tl-wrap tl-wrap--faulty-cal';
+  wrap.innerHTML = `
+    <div class="tl-head">
+      <h2 class="tl-title">${t('tools.faultyCalibration.title')}</h2>
+      <div class="tl-sub">${t('tools.faultyCalibration.subtitle')}</div>
+    </div>
+    <div class="tl-dash tl-dash--faulty">
+      <section class="tl-faulty-hero">
+        <div class="tl-info-card" style="margin:0">
+          <div class="tl-info-label">${t('tools.faultyCalibration.formulaTitle')}</div>
+          <p style="margin:0;font-size:0.82rem">T / 100 = (C − C<sub>f</sub>) / (C<sub>u</sub> − C<sub>f</sub>)</p>
+        </div>
+        <div class="tl-info-label" style="font-size:0.78rem;color:var(--tl-muted);margin:0;">${t('tools.thermometerLab.faulty.dualScale')}</div>
+        <div id="fsc-faulty-svg-container" class="tl-faulty-hero-viz"></div>
+      </section>
+
+      <section class="tl-faulty-live">
+        <div class="tl-info-label" style="margin-top:0;font-size:0.8rem;color:var(--tl-cyan)">${t('tools.faultyCalibration.liveLabel')}</div>
+        <div id="fsc-pane-q10a" class="tl-solver-pane active">
+          <div class="tl-worked-solution" style="background:rgba(0,0,0,0.15);margin:0">
+            <div id="fsc-svg-formula-faulty-a" class="tl-math-formula" style="font-size:0.85rem"></div>
+          </div>
+        </div>
+        <div id="fsc-pane-q10b" class="tl-solver-pane">
+          <div class="tl-worked-solution" style="background:rgba(0,0,0,0.15);margin:0">
+            <div id="fsc-svg-formula-faulty-b" class="tl-math-formula" style="font-size:0.85rem"></div>
+          </div>
+        </div>
+      </section>
+
+      <div class="tl-controls controls-collapsed">
+        <div class="tl-controls-float-bar">
+          <button type="button" class="tl-controls-drag-handle" id="fsc-controls-drag" aria-label="${t('tools.floatingControls.dragHint')}" title="${t('tools.floatingControls.dragHint')}">⋮⋮</button>
+          <button type="button" class="tl-controls-toggle" id="fsc-controls-toggle" aria-expanded="false">
+            <span data-float-chevron>▾</span>
+            <span>${t('tools.thermometerLab.paramSettings')}</span>
+          </button>
+        </div>
+        <div class="tl-controls-body">
+          <p style="font-size:0.75rem;color:var(--tl-muted);margin:0 0 8px">${t('tools.faultyCalibration.intro')}</p>
+          <div class="tl-faulty-cal">
+            <div class="tl-calc-inputs">
+              <span>${t('tools.faultyCalibration.iceReading')}</span>
+              <div class="tl-input-with-unit">
+                <input type="number" id="fsc-input-faulty-cf" value="-1.5" step="0.1" class="tl-calc-input" aria-label="Ice point faulty reading">
+                <span class="tl-unit">°C</span>
+              </div>
+            </div>
+            <div class="tl-calc-inputs">
+              <span>${t('tools.faultyCalibration.steamReading')}</span>
+              <div class="tl-input-with-unit">
+                <input type="number" id="fsc-input-faulty-cu" value="105" step="0.1" class="tl-calc-input" aria-label="Steam point faulty reading">
+                <span class="tl-unit">°C</span>
+              </div>
+            </div>
+          </div>
+          <div class="tl-faulty-interval">
+            <span>${t('tools.faultyCalibration.interval')}</span>
+            <b id="fsc-val-faulty-interval">106.5 °C</b>
+          </div>
+          <div class="tl-solver-tabs">
+            <button class="tl-solver-tab-btn active" id="fsc-btn-solve-q10a">${t('tools.faultyCalibration.findTrueTemp')}</button>
+            <button class="tl-solver-tab-btn" id="fsc-btn-solve-q10b">${t('tools.faultyCalibration.findFaultyReading')}</button>
+          </div>
+          <div id="fsc-input-pane-q10a" class="tl-solver-pane active">
+            <div class="tl-calc-inputs">
+              <span>${t('tools.faultyCalibration.faultyReadingC')}</span>
+              <div class="tl-input-with-unit">
+                <input type="number" id="fsc-input-q10a-cm" value="25.0" step="0.5" class="tl-calc-input">
+                <span class="tl-unit">°C</span>
+              </div>
+            </div>
+            <p class="tl-solver-error" id="fsc-faulty-error-a" hidden></p>
+          </div>
+          <div id="fsc-input-pane-q10b" class="tl-solver-pane">
+            <div class="tl-calc-inputs">
+              <span>${t('tools.faultyCalibration.trueTempT')}</span>
+              <div class="tl-input-with-unit">
+                <input type="number" id="fsc-input-q10b-t" value="70.0" step="1.0" class="tl-calc-input">
+                <span class="tl-unit">°C</span>
+              </div>
+            </div>
+            <p class="tl-solver-error" id="fsc-faulty-error-b" hidden></p>
+          </div>
+        </div>
+      </div>
+    </div>
+  `;
+
+  function formatFaultyNum(n) {
+    const rounded = Math.round(n * 100) / 100;
+    return rounded >= 0 ? rounded.toFixed(1) : `(${rounded.toFixed(1)})`;
+  }
+
+  function getFaultyCalibration() {
+    const cf = parseFloat(wrap.querySelector('#fsc-input-faulty-cf').value);
+    const cu = parseFloat(wrap.querySelector('#fsc-input-faulty-cu').value);
+    const cfVal = Number.isFinite(cf) ? cf : -1.5;
+    const cuVal = Number.isFinite(cu) ? cu : 105;
+    const interval = cuVal - cfVal;
+    return { cf: cfVal, cu: cuVal, interval };
+  }
+
+  function drawDualScaleSVG() {
+    const container = wrap.querySelector('#fsc-faulty-svg-container');
+    if (!container) return;
+
+    const { cf, cu, interval } = getFaultyCalibration();
+    const cm = parseFloat(wrap.querySelector('#fsc-input-q10a-cm').value) || 0;
+    const tVal = parseFloat(wrap.querySelector('#fsc-input-q10b-t').value) || 0;
+    const isPaneA = wrap.querySelector('#fsc-input-pane-q10a').classList.contains('active');
+    const displayT = isPaneA ? ((cm - cf) / interval) * 100 : tVal;
+    const displayC = isPaneA ? cm : (tVal / 100) * interval + cf;
+    const mapY = (temp) => 130 - (temp / 100) * 80;
+    const currentY = Number.isFinite(displayT) ? mapY(displayT) : 130;
+
+    container.innerHTML = `
+      <svg width="100%" height="100%" viewBox="0 0 340 180" style="background:transparent; overflow:visible;">
+        <g transform="translate(0, 0)">
+          <rect x="80" y="25" width="12" height="115" rx="6" fill="rgba(255,255,255,0.05)" stroke="#4b5563" stroke-width="1" />
+          <circle cx="86" cy="144" r="10" fill="rgba(255,255,255,0.05)" stroke="#4b5563" stroke-width="1" />
+          <rect x="84" y="${currentY}" width="4" height="${144 - currentY}" fill="#3b82f6" />
+          <circle cx="86" cy="144" r="8" fill="#3b82f6" />
+          <line x1="70" y1="130" x2="78" y2="130" stroke="#3b82f6" stroke-width="1.5" />
+          <text x="65" y="133" fill="#3b82f6" font-size="10" font-weight="bold" text-anchor="end">0°C</text>
+          <line x1="70" y1="50" x2="78" y2="50" stroke="#ef4444" stroke-width="1.5" />
+          <text x="65" y="53" fill="#ef4444" font-size="10" font-weight="bold" text-anchor="end">100°C</text>
+          <text x="65" y="${currentY + 3}" fill="#34d399" font-size="10" font-weight="bold" text-anchor="end">${Number.isFinite(displayT) ? displayT.toFixed(1) : '—'}°C</text>
+          <text x="86" y="170" fill="#a1a1aa" font-size="9" font-weight="bold" text-anchor="middle">${t('tools.thermometerLab.faulty.trueScale')}</text>
+        </g>
+        <g transform="translate(130, 0)">
+          <rect x="100" y="25" width="12" height="115" rx="6" fill="rgba(255,255,255,0.05)" stroke="#4b5563" stroke-width="1" />
+          <circle cx="106" cy="144" r="10" fill="rgba(255,255,255,0.05)" stroke="#4b5563" stroke-width="1" />
+          <rect x="104" y="${currentY}" width="4" height="${144 - currentY}" fill="#f59e0b" />
+          <circle cx="106" cy="144" r="8" fill="#f59e0b" />
+          <line x1="112" y1="130" x2="120" y2="130" stroke="#f59e0b" stroke-width="1.5" />
+          <text x="125" y="133" fill="#f59e0b" font-size="10" font-weight="bold" text-anchor="start">C<tspan dy="3" font-size="7">f</tspan><tspan dy="-3"> = ${cf.toFixed(1)}°C</tspan></text>
+          <line x1="112" y1="50" x2="120" y2="50" stroke="#ef4444" stroke-width="1.5" />
+          <text x="125" y="53" fill="#ef4444" font-size="10" font-weight="bold" text-anchor="start">C<tspan dy="3" font-size="7">u</tspan><tspan dy="-3"> = ${cu.toFixed(1)}°C</tspan></text>
+          <text x="125" y="${currentY + 3}" fill="#34d399" font-size="10" font-weight="bold" text-anchor="start">C = ${Number.isFinite(displayC) ? displayC.toFixed(1) : '—'}°C</text>
+          <text x="106" y="170" fill="#a1a1aa" font-size="9" font-weight="bold" text-anchor="middle">${t('tools.thermometerLab.faulty.faultyScale')}</text>
+        </g>
+        <line x1="86" y1="${currentY}" x2="236" y2="${currentY}" stroke="#34d399" stroke-dasharray="3,3" stroke-width="1.5" />
+        <circle cx="86" cy="${currentY}" r="3" fill="#34d399" />
+        <circle cx="236" cy="${currentY}" r="3" fill="#34d399" />
+      </svg>
+    `;
+  }
+
+  function setSolverMode(mode) {
+    const isA = mode === 'a';
+    wrap.querySelector('#fsc-btn-solve-q10a').classList.toggle('active', isA);
+    wrap.querySelector('#fsc-btn-solve-q10b').classList.toggle('active', !isA);
+    wrap.querySelector('#fsc-input-pane-q10a').classList.toggle('active', isA);
+    wrap.querySelector('#fsc-input-pane-q10b').classList.toggle('active', !isA);
+    wrap.querySelector('#fsc-pane-q10a').classList.toggle('active', isA);
+    wrap.querySelector('#fsc-pane-q10b').classList.toggle('active', !isA);
+    updateFaultySolver();
+  }
+
+  function updateFaultySolver() {
+    const { cf, cu, interval } = getFaultyCalibration();
+    const intervalEl = wrap.querySelector('#fsc-val-faulty-interval');
+    const errA = wrap.querySelector('#fsc-faulty-error-a');
+    const errB = wrap.querySelector('#fsc-faulty-error-b');
+    const formulaPaneA = wrap.querySelector('#fsc-svg-formula-faulty-a');
+    const formulaPaneB = wrap.querySelector('#fsc-svg-formula-faulty-b');
+    const invalid = Math.abs(interval) < 0.01;
+    const errMsg = t('tools.faultyCalibration.invalidInterval');
+
+    intervalEl.textContent = interval.toFixed(1) + ' °C';
+
+    if (invalid) {
+      errA.hidden = false;
+      errA.textContent = errMsg;
+      errB.hidden = false;
+      errB.textContent = errMsg;
+      if (formulaPaneA) formulaPaneA.innerHTML = '';
+      if (formulaPaneB) formulaPaneB.innerHTML = '';
+      drawDualScaleSVG();
+      return;
+    }
+
+    errA.hidden = true;
+    errB.hidden = true;
+
+    const cm = parseFloat(wrap.querySelector('#fsc-input-q10a-cm').value) || 0;
+    const tVal = parseFloat(wrap.querySelector('#fsc-input-q10b-t').value) || 0;
+    const trueT = ((cm - cf) / interval) * 100;
+    const faultyC = (tVal / 100) * interval + cf;
+
+    if (formulaPaneA) {
+      formulaPaneA.innerHTML = `
+        <svg height="45" width="280" style="background:transparent; overflow:visible;">
+          <text x="10" y="26" fill="#fff" font-family="Cambria, Georgia, serif" font-size="15">T =</text>
+          <line x1="40" y1="21" x2="160" y2="21" stroke="#fff" stroke-width="1.5" />
+          <text x="100" y="15" fill="#06b6d4" font-family="Cambria, Georgia, serif" font-weight="bold" font-size="12" text-anchor="middle">${cm.toFixed(1)} - ${formatFaultyNum(cf)}</text>
+          <text x="100" y="36" fill="#a1a1aa" font-family="Cambria, Georgia, serif" font-size="12" text-anchor="middle">${cu.toFixed(1)} - ${formatFaultyNum(cf)}</text>
+          <text x="170" y="26" fill="#fff" font-family="Cambria, Georgia, serif" font-size="15">
+            &times; 100 = <tspan fill="#10b981" font-family="system-ui, sans-serif" font-weight="900" class="tl-final-ans">${trueT.toFixed(1)}°C</tspan>
+          </text>
+        </svg>
+      `;
+    }
+
+    if (formulaPaneB) {
+      formulaPaneB.innerHTML = `
+        <svg height="45" width="280" style="background:transparent; overflow:visible;">
+          <text x="10" y="26" fill="#fff" font-family="Cambria, Georgia, serif" font-size="15">C =</text>
+          <line x1="40" y1="21" x2="150" y2="21" stroke="#fff" stroke-width="1.5" />
+          <text x="95" y="15" fill="#06b6d4" font-family="Cambria, Georgia, serif" font-weight="bold" font-size="12" text-anchor="middle">${tVal.toFixed(1)} &times; ${interval.toFixed(1)}</text>
+          <text x="95" y="36" fill="#a1a1aa" font-family="Cambria, Georgia, serif" font-size="12" text-anchor="middle">100</text>
+          <text x="158" y="26" fill="#fff" font-family="Cambria, Georgia, serif" font-size="14">
+            + ${formatFaultyNum(cf)} = <tspan fill="#10b981" font-family="system-ui, sans-serif" font-weight="900" class="tl-final-ans">${faultyC.toFixed(2)}°C</tspan>
+          </text>
+        </svg>
+      `;
+    }
+
+    drawDualScaleSVG();
+  }
+
+  wrap.querySelector('#fsc-btn-solve-q10a').addEventListener('click', () => setSolverMode('a'));
+  wrap.querySelector('#fsc-btn-solve-q10b').addEventListener('click', () => setSolverMode('b'));
+  wrap.querySelector('#fsc-input-faulty-cf').addEventListener('input', updateFaultySolver);
+  wrap.querySelector('#fsc-input-faulty-cu').addEventListener('input', updateFaultySolver);
+  wrap.querySelector('#fsc-input-q10a-cm').addEventListener('input', updateFaultySolver);
+  wrap.querySelector('#fsc-input-q10b-t').addEventListener('input', updateFaultySolver);
+
+  const dash = wrap.querySelector('.tl-dash--faulty');
+  const controlsPanel = wrap.querySelector('.tl-controls');
+  const toggleBtn = wrap.querySelector('#fsc-controls-toggle');
+  const dragHandle = wrap.querySelector('#fsc-controls-drag');
+  const floatBar = wrap.querySelector('.tl-controls-float-bar');
+  if (dash && controlsPanel && toggleBtn) {
+    initFloatingControlsPanel({
+      container: dash,
+      panel: controlsPanel,
+      toggleBtn,
+      dragHandle,
+      dragSurface: floatBar,
+      storageKey: 's3phy-faulty-calibration',
+      breakpoint: THERM_FLOAT_BREAKPOINT,
+      getToggleTitle: (collapsed) => collapsed
+        ? t('tools.floatingControls.showParams')
+        : t('tools.floatingControls.hideParams'),
+    });
+  }
+
+  updateFaultySolver();
+  wrap._thermometerLabCleanup = () => {};
   return wrap;
 }
