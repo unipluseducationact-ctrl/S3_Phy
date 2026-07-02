@@ -802,29 +802,6 @@ const MCQ_ITEMS = [
     }
   },
   {
-    "id": "light-2024-q27",
-    "section": "refraction-snells-law",
-    "difficulty": "Applied",
-    "stem": "The following figure shows a light ray travelling from medium X to a vacuum. What is the refractive index of medium X?",
-    "options": [
-      {
-        "key": "A",
-        "text": "B"
-      },
-      {
-        "key": "C",
-        "text": "D"
-      }
-    ],
-    "answer": "A",
-    "hint": "The following figure shows a light ray travelling from medium X to a vacuum. What is the refractive index of medium X?",
-    "image": {
-      "src": "./assets/light-2024-q27-fig.png",
-      "alt": "Diagram for light-2024-q27",
-      "caption": "Fig - Question 27"
-    }
-  },
-  {
     "id": "light-2024-q28",
     "section": "reflection",
     "difficulty": "Applied",
