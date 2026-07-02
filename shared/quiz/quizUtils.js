@@ -260,11 +260,11 @@ export function countFillBlanks(q) {
   );
 }
 
-export function fillLineAnswerText(line) {
+export function fillLineAnswerText(line, fallbackAnswer) {
   return line.segments
     .map((seg) => {
       if (seg.type === "text") return seg.value || "";
-      return seg.accept?.[0] || "___";
+      return fallbackAnswer || seg.accept?.[0] || "___";
     })
     .join("");
 }
@@ -272,11 +272,14 @@ export function fillLineAnswerText(line) {
 export function allFillFieldsCorrect(q, values) {
   const lines = getFillLines(q);
   if (!lines.length) return false;
+  const blankCount = countFillBlanks(q);
   let i = 0;
   for (const line of lines) {
     for (const seg of line.segments) {
       if (seg.type !== "blank") continue;
-      if (!fillAnswerMatches(values[i], seg.accept)) return false;
+      const accept = [...(seg.accept || [])];
+      if (blankCount === 1 && q.answer && !accept.includes(q.answer)) accept.push(q.answer);
+      if (!fillAnswerMatches(values[i], accept)) return false;
       i += 1;
     }
   }
@@ -294,7 +297,7 @@ export function modelAnswerText(q) {
   if (f === "fill") {
     const lines = getFillLines(q);
     if (lines.length) {
-      return { en: lines.map((line) => fillLineAnswerText(line)).join(" | "), zh: "" };
+      return { en: lines.map((line) => fillLineAnswerText(line, q.answer)).join(" | "), zh: "" };
     }
   }
   if (f === "typein") {
