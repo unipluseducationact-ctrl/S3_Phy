@@ -91,37 +91,6 @@
     }
   },
   {
-    "topic": "liquidThermometer",
-    "section": "Imported: F3 Heat MC 2024-25",
-    "source": "f3-heat-mc-2425",
-    "en": {
-      "q": "Which of the following substances would be a liquid at a temperature of 800 °C?\nSubstance        melting point / °C\n      boiling point / °C",
-      "choices": [
-        "aluminium",
-        "mercury −39 357",
-        "potassium 64 774",
-        "silver 962"
-      ],
-      "a": 0,
-      "exp": "The metal will be liquid at a temperature which is below its boiling point and higher than the melting point.",
-      "hint": "The metal will be liquid at a temperature which is below its boiling point and higher tha…",
-      "image": "./worksheet-images/f3-heat-mc-2425-q05.webp"
-    },
-    "zhHant": {
-      "q": "Which of the following substances would be a liquid at a temperature of 800 °C?\nSubstance        melting point / °C\n      boiling point / °C",
-      "choices": [
-        "aluminium",
-        "mercury −39 357",
-        "potassium 64 774",
-        "silver 962"
-      ],
-      "a": 0,
-      "exp": "The metal will be liquid at a temperature which is below its boiling point and higher than the melting point.",
-      "hint": "The metal will be liquid at a temperature which is below its boiling point and higher tha…",
-      "image": "./worksheet-images/f3-heat-mc-2425-q05.webp"
-    }
-  },
-  {
     "topic": "heatInternalEnergy",
     "section": "Imported: F3 Heat MC 2024-25",
     "source": "f3-heat-mc-2425",
@@ -2839,15 +2808,15 @@
     "source": "f3-heat-lq-2425",
     "en": {
       "q": "In the following experiment, a liquid of mass 0.3 kg is heated in the polystyrene cup by a 50-W heater.\n\n(a) The thermometer is wrongly calibrated. It reads 4 °C and 98 °C in melting ice and boiling water\nrespectively. What is the actual temperature when it reads T?",
-      "answer": "The thermometer is wrongly calibrated. It reads 4 °C and 98 °C in melting ice and boiling water",
-      "exp": "The thermometer is wrongly calibrated. It reads 4 °C and 98 °C in melting ice and boiling water\nrespectively. What is the actual temperature when it reads T?\n(2 marks)",
+      "answer": "T' = ((T-4)/94)*100",
+      "exp": "T' = ((T-4)/94)*100\n(2 marks)",
       "hint": "The thermometer is wrongly calibrated.",
       "image": "./worksheet-images/f3-heat-lq-2425-q09-a-x.webp"
     },
     "zhHant": {
       "q": "In the following experiment, a liquid of mass 0.3 kg is heated in the polystyrene cup by a 50-W heater.\n\n(a) The thermometer is wrongly calibrated. It reads 4 °C and 98 °C in melting ice and boiling water\nrespectively. What is the actual temperature when it reads T?",
-      "answer": "The thermometer is wrongly calibrated. It reads 4 °C and 98 °C in melting ice and boiling water",
-      "exp": "The thermometer is wrongly calibrated. It reads 4 °C and 98 °C in melting ice and boiling water\nrespectively. What is the actual temperature when it reads T?\n(2 marks)",
+      "answer": "T' = ((T-4)/94)*100",
+      "exp": "T' = ((T-4)/94)*100\n(2 marks)",
       "hint": "The thermometer is wrongly calibrated.",
       "image": "./worksheet-images/f3-heat-lq-2425-q09-a-x.webp"
     }

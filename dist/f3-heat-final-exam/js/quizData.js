@@ -102,37 +102,6 @@ export const QUIZ_ITEMS = [
     "hint": "A faulty thermometer has a wrong calibration."
   },
   {
-    "id": "heat-mc-2425-q04",
-    "section": "thermometer",
-    "difficulty": "Foundation",
-    "stem": "Which of the following substances would be a liquid at a temperature of 800 °C?",
-    "options": [
-      {
-        "key": "A",
-        "text": "aluminium"
-      },
-      {
-        "key": "B",
-        "text": "mercury"
-      },
-      {
-        "key": "C",
-        "text": "potassium"
-      },
-      {
-        "key": "D",
-        "text": "silver"
-      }
-    ],
-    "answer": "A",
-    "hint": "The metal will be liquid at a temperature which is below its boiling point and higher tha…",
-    "image": {
-      "src": "./assets/f3-heat-mc-2425-q4.png",
-      "alt": "Which of the following substances would be a liquid at a temperature of 800 °C? Substance melting p…",
-      "caption": "Fig · Imported: F3 Heat MC 2024-25"
-    }
-  },
-  {
     "id": "heat-mc-2425-q05",
     "section": "heat-internal-energy",
     "difficulty": "Foundation",
@@ -260,49 +229,7 @@ export const QUIZ_ITEMS = [
       }
     ],
     "answer": "C",
-    "hint": "𝐸= (1)(4200)(∆𝑇𝑃) , ∆𝑇𝑃= 𝐸 𝐸= (2)(2300)(∆𝑇𝑄) , ∆𝑇𝑄= 𝐸 𝐸= (3)(2200)(∆𝑇𝑅) , ∆𝑇𝑅= 𝐸 𝐸= (4)(9…",
-    "optionsLayout": "table",
-    "optionTable": {
-      "headers": [
-        "Substance",
-        "Mass / kg",
-        "Specific heat capacity / J kg⁻¹ °C⁻¹"
-      ],
-      "rows": [
-        {
-          "key": "A",
-          "cells": [
-            "P",
-            "1",
-            "4200"
-          ]
-        },
-        {
-          "key": "B",
-          "cells": [
-            "Q",
-            "2",
-            "2300"
-          ]
-        },
-        {
-          "key": "C",
-          "cells": [
-            "R",
-            "3",
-            "2200"
-          ]
-        },
-        {
-          "key": "D",
-          "cells": [
-            "S",
-            "4",
-            "900"
-          ]
-        }
-      ]
-    }
+    "hint": "𝐸= (1)(4200)(∆𝑇𝑃) , ∆𝑇𝑃= 𝐸 𝐸= (2)(2300)(∆𝑇𝑄) , ∆𝑇𝑄= 𝐸 𝐸= (3)(2200)(∆𝑇𝑅) , ∆𝑇𝑅= 𝐸 𝐸= (4)(9…"
   },
   {
     "id": "heat-mc-2425-q10",
@@ -386,27 +313,32 @@ export const QUIZ_ITEMS = [
     "id": "heat-mc-2425-q13",
     "section": "heat-internal-energy",
     "difficulty": "Foundation",
-    "stem": "Liquids X, Y and Z of equal mass are heated separately by three identical heaters. The graph below shows\nthe variation of the temperatures of the liquids with time. Let cX, cY and cZ be the specific heat capacities of\nX, Y and Z respectively.\nWhich of the following relations is correct?",
+    "stem": "Liquids X, Y and Z of equal mass are heated separately by three identical heaters. The graph below shows\nthe variation of the temperatures of the liquids with time. Let cₓ, cᵧ and c<sub>z</sub> be the specific heat capacities of\nX, Y and Z respectively.\nWhich of the following relations is correct?",
     "options": [
       {
         "key": "A",
-        "text": "cX = cY > cZ"
+        "text": "cₓ = cᵧ > c<sub>z</sub>"
       },
       {
         "key": "B",
-        "text": "cX > cY > cZ"
+        "text": "cₓ > cᵧ > c<sub>z</sub>"
       },
       {
         "key": "C",
-        "text": "cX > cY = cZ"
+        "text": "cₓ > cᵧ = c<sub>z</sub>"
       },
       {
         "key": "D",
-        "text": "cX < cY = cZ"
+        "text": "cₓ < cᵧ = c<sub>z</sub>"
       }
     ],
     "answer": "A",
-    "hint": "Liquids X, Y and Z of equal mass are heated separately by three identical heaters."
+    "hint": "Liquids X, Y and Z of equal mass are heated separately by three identical heaters.",
+    "image": {
+      "src": "./assets/f3-heat-mc-2425-q14.png",
+      "alt": "Liquids X, Y and Z of equal mass are heated separately by three identical heaters. The graph below shows the variation of the temperatures of the liquids with time. Let cₓ, cᵧ and c<sub>z</sub> be the specific heat capacities of X, Y and Z respectively. Which of the following relations is correct?",
+      "caption": "Fig · Imported: F3 Heat MC 2024-25"
+    }
   },
   {
     "id": "heat-mc-2425-q14",
@@ -434,7 +366,7 @@ export const QUIZ_ITEMS = [
     "answer": "C",
     "hint": "𝑃𝑡= 𝐶𝑋(75 −25) , 𝐶𝑋= 𝑃𝑡 𝑃𝑡= 𝐶𝑌(50 −25) , 𝐶𝑌= 𝑃𝑡 𝐶𝑋∶𝐶𝑌= 1 ∶2",
     "image": {
-      "src": "./assets/f3-heat-mc-2425-q14.png",
+      "src": "./assets/f3-heat-mc-2425-q15.png",
       "alt": "Energy is transferred to two copper blocks X and Y at the same rate. The graph below shows how the …",
       "caption": "Fig · Imported: F3 Heat MC 2024-25"
     }
@@ -463,12 +395,7 @@ export const QUIZ_ITEMS = [
       }
     ],
     "answer": "D",
-    "hint": "Energy loss from the water at 18°C= 2(4200)(18 −6) = 100800 𝐽 Energy gain by water at 2°C…",
-    "image": {
-      "src": "./assets/f3-heat-mc-2425-q15.png",
-      "alt": "A student mixes 5 kg of water at 2 °C with 2 kg water at 18 °C. The final temperature of the mixtur…",
-      "caption": "Fig · Imported: F3 Heat MC 2024-25"
-    }
+    "hint": "Energy loss from the water at 18°C= 2(4200)(18 −6) = 100800 𝐽 Energy gain by water at 2°C…"
   },
   {
     "id": "heat-mc-2425-q16",
@@ -1184,7 +1111,12 @@ export const QUIZ_ITEMS = [
       }
     ],
     "answer": "C",
-    "hint": "(1): Total internal energy (P.E.+K.E.) is used to describe the total energy in a body."
+    "hint": "(1): Total internal energy (P.E.+K.E.) is used to describe the total energy in a body.",
+    "image": {
+      "src": "./assets/f3-heat-mc-2425-q43.png",
+      "alt": "The specific heat capacity of aluminium is measured by the set-up as shown in the diagram below. Which of the following cannot reduce experimental error?",
+      "caption": "Fig · Imported: F3 Heat MC 2024-25"
+    }
   },
   {
     "id": "heat-mc-2425-q42",
@@ -1210,36 +1142,10 @@ export const QUIZ_ITEMS = [
       }
     ],
     "answer": "D",
-    "hint": "(1): Measuring the temperature immediately without mixing the liquid allow uneven distrib…"
-  },
-  {
-    "id": "heat-mc-2425-q43",
-    "section": "heat-internal-energy",
-    "difficulty": "Foundation",
-    "stem": "Which of the following is/are the precaution(s) for giving an accurate result?\n(1) Use ice of temperature well below 0 °C.\n(2) Insert the heating part of each immersion heater into the ice completely.\n(3) Cover the funnels with lids.",
-    "options": [
-      {
-        "key": "A",
-        "text": "(1) only"
-      },
-      {
-        "key": "B",
-        "text": "(2) only"
-      },
-      {
-        "key": "C",
-        "text": "(1) and (3) only"
-      },
-      {
-        "key": "D",
-        "text": "(1), (2) and (3)"
-      }
-    ],
-    "answer": "A",
-    "hint": "Which of the following is/are the precaution(s) for giving an accurate result?\n(1) Use ic…",
+    "hint": "(1): Measuring the temperature immediately without mixing the liquid allow uneven distrib…",
     "image": {
-      "src": "./assets/f3-heat-mc-2425-q43.png",
-      "alt": "Which of the following is/are the precaution(s) for giving an accurate result? (1) Use ice of tempe…",
+      "src": "./assets/f3-heat-mc-2425-q44.png",
+      "alt": "The above apparatus is used to find the specific heat capacity of a liquid. Which of the following can improve the accuracy of the experiment? (1) Taking the final temperature immediately after switching off the power supply. (2) Covering the cup with a lid. (3) Stirring the liquid throughout the experiment.",
       "caption": "Fig · Imported: F3 Heat MC 2024-25"
     }
   },
@@ -1360,7 +1266,19 @@ export const QUIZ_ITEMS = [
       }
     ],
     "answer": "C",
-    "hint": "The figure below shows 3 identical metal cans containing the same amount of hot water at…"
+    "hint": "The figure below shows 3 identical metal cans containing the same amount of hot water at…",
+    "images": [
+      {
+        "src": "./assets/f3-heat-mc-2425-q49-1.png",
+        "alt": "The figure below shows 3 identical metal cans containing the same amount of hot water at the same temperature. The cans are covered by a black paper, a shiny aluminium foil and a green paper respectively. Which of the following graphs best shows how the temperature of the water varies with time?",
+        "caption": "Fig · Imported: F3 Heat MC 2024-25 (1/2)"
+      },
+      {
+        "src": "./assets/f3-heat-mc-2425-q49-2.png",
+        "alt": "The figure below shows 3 identical metal cans containing the same amount of hot water at the same temperature. The cans are covered by a black paper, a shiny aluminium foil and a green paper respectively. Which of the following graphs best shows how the temperature of the water varies with time?",
+        "caption": "Fig · Imported: F3 Heat MC 2024-25 (2/2)"
+      }
+    ]
   },
   {
     "id": "heat-mc-2425-q48",
@@ -1455,12 +1373,7 @@ export const QUIZ_ITEMS = [
       }
     ],
     "answer": "A",
-    "hint": "Which of the following methods can keep ice for a longer time in a metal container?\n(1) P…",
-    "image": {
-      "src": "./assets/f3-heat-mc-2425-q50.png",
-      "alt": "Which of the following methods can keep ice for a longer time in a metal container? (1) Paint the w…",
-      "caption": "Fig · Imported: F3 Heat MC 2024-25"
-    }
+    "hint": "Which of the following methods can keep ice for a longer time in a metal container?\n(1) P…"
   },
   {
     "id": "heat-mc-2425-q51",
@@ -1647,7 +1560,12 @@ export const QUIZ_ITEMS = [
       }
     ],
     "answer": "A",
-    "hint": "Two insulated metal blocks X and Y are made of different materials with unknown mass."
+    "hint": "Two insulated metal blocks X and Y are made of different materials with unknown mass.",
+    "image": {
+      "src": "./assets/f3-heat-mc3-2425-q13.png",
+      "alt": "Two insulated metal blocks X and Y are made of different materials with unknown mass. They are heated separately by two identical electric heaters at the same power. The graph below shows how the temperatures of X and Y change with time. Which of the following statements must be correct?",
+      "caption": "Fig · Imported: F3 Heat MC 3 2024-25"
+    }
   },
   {
     "id": "heat-mc3-2425-q07",
@@ -1756,12 +1674,7 @@ export const QUIZ_ITEMS = [
       }
     ],
     "answer": "A",
-    "hint": "Steam at 100 °C is mixed with ice at 0 °C.",
-    "image": {
-      "src": "./assets/f3-heat-mc3-2425-q10.png",
-      "alt": "Steam at 100 °C is mixed with ice at 0 °C. The mass of the ice is double that of the steam. What is…",
-      "caption": "Fig · Imported: F3 Heat MC 3 2024-25"
-    }
+    "hint": "Steam at 100 °C is mixed with ice at 0 °C."
   },
   {
     "id": "heat-mc3-2425-q11",
@@ -1886,7 +1799,7 @@ export const QUIZ_ITEMS = [
     "id": "heat-mc3-2425-q15",
     "section": "heat-internal-energy",
     "difficulty": "Foundation",
-    "stem": "Three tanks of water X, Y and Z of different temperatures and heat capacities are poured into a big well-\ninsulated container.\nwater in X\nwater in Y\nwater in Z\nheat capacity / kJ\n°C⁻¹\ntemperature / °C\nWhat is the final temperature of water after mixing? Ignore the heat capacity of the big container.",
+    "stem": "Three tanks of water X, Y and Z of different temperatures and heat capacities are poured into a big well-\ninsulated container.\nWhat is the final temperature of water after mixing? Ignore the heat capacity of the big container.",
     "options": [
       {
         "key": "A",
@@ -1906,7 +1819,12 @@ export const QUIZ_ITEMS = [
       }
     ],
     "answer": "A",
-    "hint": "Since there is more water in 10°C than in 30°C, the final temperature should be between 10°C…"
+    "hint": "Since there is more water in 10°C than in 30°C, the final temperature should be between 10°C…",
+    "image": {
+      "src": "./assets/f3-heat-mc-2425-q25.png",
+      "alt": "Three tanks of water X, Y and Z of different temperatures and heat capacities are poured into a big well-insulated container. What is the final temperature of water after mixing? Ignore the heat capacity of the big container.",
+      "caption": "Fig · Imported: F3 Heat MC 3 2024-25"
+    }
   },
   {
     "id": "heat-mc3-2425-q16",
@@ -2173,8 +2091,8 @@ export const QUIZ_ITEMS = [
     "answer": "A",
     "hint": "Which of the following is/are the precaution(s) for giving an accurate result?\n(1) Use ic…",
     "image": {
-      "src": "./assets/f3-heat-mc3-2425-q25.png",
-      "alt": "Which of the following is/are the precaution(s) for giving an accurate result? (1) Use ice of tempe…",
+      "src": "./assets/f3-heat-mc3-2425-q37.png",
+      "alt": "Which of the following is/are the precaution(s) for giving an accurate result? (1) Use ice of temperature well below 0 °C. (2) Insert the heating part of each immersion heater into the ice completely. (3) Cover the funnels with lids.",
       "caption": "Fig · Imported: F3 Heat MC 3 2024-25"
     }
   },
@@ -2204,7 +2122,7 @@ export const QUIZ_ITEMS = [
     "answer": "D",
     "hint": "(1): Measuring the temperature immediately without mixing the liquid allow uneven distrib…",
     "image": {
-      "src": "./assets/f3-heat-mc3-2425-q26.png",
+      "src": "./assets/f3-heat-mc-2425-q44.png",
       "alt": "The above apparatus is used to find the specific heat capacity of a liquid. Which of the following …",
       "caption": "Fig · Imported: F3 Heat MC 3 2024-25"
     }
@@ -2420,9 +2338,10 @@ export const QUIZ_ITEMS = [
           {
             "type": "blank",
             "accept": [
-              "The thermometer is wrongly calibrated. It reads 4 °C and 98 °C in melting ice and boiling water",
-              ". It",
-              ".It"
+              "T' = ((T-4)/94)*100",
+              "T' = ((T - 4)/94)*100",
+              "T' = ((T-4)/94) × 100",
+              "T' = ((T - 4) / 94) * 100"
             ]
           }
         ]

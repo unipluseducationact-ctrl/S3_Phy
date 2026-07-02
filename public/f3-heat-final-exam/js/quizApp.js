@@ -6,6 +6,7 @@ import {
   difficultyLevel,
   seededShuffle,
   escHtml,
+  escHtmlQuizText,
   modelAnswerText,
   resolveQuizLang,
   isChineseUI,
@@ -245,7 +246,7 @@ export function initQuiz() {
   if (!els.quizArea) return;
 
   function setStemText(el, text) {
-    el.textContent = formatQuizText(text);
+    el.innerHTML = escHtmlQuizText(formatQuizText(text));
   }
 
   function appendStem(wrap, q) {
@@ -724,7 +725,7 @@ export function initQuiz() {
 
           const text = document.createElement("span");
           text.className = "font-body-md text-on-surface flex-1 text-left";
-          text.innerHTML = `${escHtml(formatQuizText(opt.text))}${
+          text.innerHTML = `${escHtmlQuizText(formatQuizText(opt.text))}${
             opt.textZh ? `<span class="block text-body-sm text-on-surface-variant mt-1">${escHtml(opt.textZh)}</span>` : ""
           }`;
 

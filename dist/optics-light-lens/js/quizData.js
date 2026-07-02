@@ -186,7 +186,7 @@ const MCQ_ITEMS = [
     "id": "light-2024-q06",
     "section": "reflection",
     "difficulty": "Standard",
-    "stem": "In the figure below, what is the angle of reflection on mirror M2?",
+    "stem": "In the figure below, what is the angle of reflection on mirror M₂?",
     "options": [
       {
         "key": "A",
@@ -206,7 +206,7 @@ const MCQ_ITEMS = [
       }
     ],
     "answer": "A",
-    "hint": "In the figure below, what is the angle of reflection on mirror M2? 40° 45° 50° 55°",
+    "hint": "In the figure below, what is the angle of reflection on mirror M₂? 40° 45° 50° 55°",
     "image": {
       "src": "./assets/light-2024-q06-fig.png",
       "alt": "Diagram for light-2024-q06",
@@ -421,23 +421,23 @@ const MCQ_ITEMS = [
     "id": "light-2024-q14",
     "section": "reflection",
     "difficulty": "Applied",
-    "stem": "A girl stands in front of a plane mirror. When the mirror is moved towards the girl at a speed of 1 m s−1, her image moves",
+    "stem": "A girl stands in front of a plane mirror. When the mirror is moved towards the girl at a speed of 1 m s⁻¹, her image moves",
     "options": [
       {
         "key": "A",
-        "text": "towards the girl at a speed of 1 m s−1."
+        "text": "towards the girl at a speed of 1 m s⁻¹."
       },
       {
         "key": "B",
-        "text": "towards the girl at a speed of 2 m s−1."
+        "text": "towards the girl at a speed of 2 m s⁻¹."
       },
       {
         "key": "C",
-        "text": "away from the girl at a speed of 0.5 m s−1."
+        "text": "away from the girl at a speed of 0.5 m s⁻¹."
       },
       {
         "key": "D",
-        "text": "away from the girl at a speed of 2 m s−1."
+        "text": "away from the girl at a speed of 2 m s⁻¹."
       }
     ],
     "answer": "B"
@@ -596,11 +596,11 @@ const MCQ_ITEMS = [
     "id": "light-2024-q20",
     "section": "reflection",
     "difficulty": "Standard",
-    "stem": "John stands in front of a vertical plane mirror AB, where point A is 1.8 m above the ground (see the figure below). John’s eye is 1.6 m above the ground and 1 m from the mirror. Looking into the mirror, he can see a wall 3 m behind him.",
+    "stem": "John stands in front of a vertical plane mirror AB, where point A is 1.8 m above the ground (see the figure below). John’s eye is 1.6 m above the ground and 1 m from the mirror. Looking into the mirror, he can see a wall 3 m behind him. A spider is moving down on the wall. What is the maximum height h of the spider that John can see its image in the mirror?",
     "options": [
       {
         "key": "A",
-        "text": "spider is moving down on the wall. What is the maximum height h of the spider that John can see its image in the mirror?"
+        "text": "1.8 m"
       },
       {
         "key": "B",
@@ -662,19 +662,19 @@ const MCQ_ITEMS = [
     "options": [
       {
         "key": "A",
-        "text": "I2 only"
+        "text": "I₂ only"
       },
       {
         "key": "B",
-        "text": "I3 only"
+        "text": "I₃ only"
       },
       {
         "key": "C",
-        "text": "I2 and I4 only"
+        "text": "I₂ and I₄ only"
       },
       {
         "key": "D",
-        "text": "I2, I3 and I4 only"
+        "text": "I₂, I₃ and I₄ only"
       }
     ],
     "answer": "C",
@@ -976,7 +976,7 @@ const MCQ_ITEMS = [
     "id": "light-2024-q33",
     "section": "total-internal-reflection",
     "difficulty": "Applied",
-    "stem": "The speeds of light in medium 𝑋 and medium 𝑌 are 2 × 108 m s−1 and 1.5 × 108 m s−1 respectively What is the critical angle for the interface of the two media?",
+    "stem": "The speeds of light in medium 𝑋 and medium 𝑌 are 2 × 108 m s⁻¹ and 1.5 × 108 m s⁻¹ respectively What is the critical angle for the interface of the two media?",
     "options": [
       {
         "key": "A",
@@ -996,7 +996,7 @@ const MCQ_ITEMS = [
       }
     ],
     "answer": "D",
-    "hint": "The speeds of light in medium 𝑋 and medium 𝑌 are 2 × 108 m s−1 and 1.5 × 108 m s−1 respectively What is the critical angle for the interface of the two media? 19.5° 30° 41.8° 48.6° 14 警告: 不可翻印,販賣,違者必究 2025-26 Light revision (MC set 1) 薈進教育中心 Unit Education Tel: 98583618"
+    "hint": "The speeds of light in medium 𝑋 and medium 𝑌 are 2 × 108 m s⁻¹ and 1.5 × 108 m s⁻¹ respectively What is the critical angle for the interface of the two media? 19.5° 30° 41.8° 48.6° 14 警告: 不可翻印,販賣,違者必究 2025-26 Light revision (MC set 1) 薈進教育中心 Unit Education Tel: 98583618"
   },
   {
     "id": "light-2024-q34",
@@ -1084,7 +1084,7 @@ const MCQ_ITEMS = [
       }
     ],
     "answer": "C",
-    "hint": "When light travels from an optically denser medium to an optically less dense medium, (1) its speed increases. (2) its colour changes. (3) it bends away from the normal. 33. The speeds of light in medium 𝑋 and medium 𝑌 are 2 × 108 m s−1 and 1.5 × 108 m s−1 respectively What is the critical angle for the interface of the two media? 19.5° 30° 41.8° 48.6° 14 警告: 不可翻印,販賣,違者必究 2025-26 Light revision (MC set 1) 薈進教育中心 Unit Education Tel: 98583618"
+    "hint": "When light travels from an optically denser medium to an optically less dense medium, (1) its speed increases. (2) its colour changes. (3) it bends away from the normal. 33. The speeds of light in medium 𝑋 and medium 𝑌 are 2 × 108 m s⁻¹ and 1.5 × 108 m s⁻¹ respectively What is the critical angle for the interface of the two media? 19.5° 30° 41.8° 48.6° 14 警告: 不可翻印,販賣,違者必究 2025-26 Light revision (MC set 1) 薈進教育中心 Unit Education Tel: 98583618"
   },
   {
     "id": "light-2024-q37",
@@ -1758,27 +1758,27 @@ const MCQ_ITEMS = [
     "id": "light-2024b-q05",
     "section": "reflection",
     "difficulty": "Standard",
-    "stem": "Heidi is standing between two parallel mirrors, M1 and M2, with their reflective surfaces facing each other as shown below. When Heidi looks at M1, she sees multiple images in the mirror. Which of the following is/are the image(s) of Heidi seen in M1?",
+    "stem": "Heidi is standing between two parallel mirrors, M₁ and M₂, with their reflective surfaces facing each other as shown below. When Heidi looks at M₁, she sees multiple images in the mirror. Which of the following is/are the image(s) of Heidi seen in M₁?",
     "options": [
       {
         "key": "A",
-        "text": "I1 only"
+        "text": "I₁ only"
       },
       {
         "key": "B",
-        "text": "I1 and I2 only"
+        "text": "I₁ and I₂ only"
       },
       {
         "key": "C",
-        "text": "I1 and I3 only"
+        "text": "I₁ and I₃ only"
       },
       {
         "key": "D",
-        "text": "I1, I3 and I4 only"
+        "text": "I₁, I₃ and I₄ only"
       }
     ],
     "answer": "C",
-    "hint": "Heidi is standing between two parallel mirrors, M1 and M2, with their reflective surfaces facing each other as shown below. When Heidi looks at M1, she sees multiple images in the mirror. Which of the following is/are the image(s) of Heidi seen in M1? 3 警告: 不可翻印,販賣,違者必究 2024-25 Light revision 薈進教育中心 Unit Education Tel: 98583618",
+    "hint": "Heidi is standing between two parallel mirrors, M₁ and M₂, with their reflective surfaces facing each other as shown below. When Heidi looks at M₁, she sees multiple images in the mirror. Which of the following is/are the image(s) of Heidi seen in M₁? 3 警告: 不可翻印,販賣,違者必究 2024-25 Light revision 薈進教育中心 Unit Education Tel: 98583618",
     "image": {
       "src": "./assets/light-2024b-q05-fig.png",
       "alt": "Diagram for light-2024b-q05",
@@ -1789,7 +1789,7 @@ const MCQ_ITEMS = [
     "id": "light-2024b-q06",
     "section": "reflection",
     "difficulty": "Standard",
-    "stem": "In the figure below, what is the angle of reflection of the ray on mirror M2?",
+    "stem": "In the figure below, what is the angle of reflection of the ray on mirror M₂?",
     "options": [
       {
         "key": "A",
@@ -1809,7 +1809,7 @@ const MCQ_ITEMS = [
       }
     ],
     "answer": "A",
-    "hint": "In the figure below, what is the angle of reflection of the ray on mirror M2? 40° 45° 50° 55°",
+    "hint": "In the figure below, what is the angle of reflection of the ray on mirror M₂? 40° 45° 50° 55°",
     "image": {
       "src": "./assets/light-2024b-q06-fig.png",
       "alt": "Diagram for light-2024b-q06",
@@ -1820,27 +1820,27 @@ const MCQ_ITEMS = [
     "id": "light-2024b-q07",
     "section": "reflection",
     "difficulty": "Applied",
-    "stem": "John is in front of a plane mirror. If the mirror moves away from him at a speed of 2 m s−1, at what speed does his image move away from him?",
+    "stem": "John is in front of a plane mirror. If the mirror moves away from him at a speed of 2 m s⁻¹, at what speed does his image move away from him?",
     "options": [
       {
         "key": "A",
-        "text": "1 m s−1"
+        "text": "1 m s⁻¹"
       },
       {
         "key": "B",
-        "text": "2 m s−1"
+        "text": "2 m s⁻¹"
       },
       {
         "key": "C",
-        "text": "4 m s−1"
+        "text": "4 m s⁻¹"
       },
       {
         "key": "D",
-        "text": "8 m s−1"
+        "text": "8 m s⁻¹"
       }
     ],
     "answer": "C",
-    "hint": "John is in front of a plane mirror. If the mirror moves away from him at a speed of 2 m s−1, at what speed does his image move away from him? 1 m s−1 2 m s−1 4 m s−1 8 m s−1"
+    "hint": "John is in front of a plane mirror. If the mirror moves away from him at a speed of 2 m s⁻¹, at what speed does his image move away from him? 1 m s⁻¹ 2 m s⁻¹ 4 m s⁻¹ 8 m s⁻¹"
   },
   {
     "id": "light-2024b-q08",
@@ -1943,19 +1943,19 @@ const MCQ_ITEMS = [
     "options": [
       {
         "key": "A",
-        "text": "0.03 ms−1"
+        "text": "0.03 ms⁻¹"
       },
       {
         "key": "B",
-        "text": "0.06 ms−1"
+        "text": "0.06 ms⁻¹"
       },
       {
         "key": "C",
-        "text": "60 ms−1"
+        "text": "60 ms⁻¹"
       },
       {
         "key": "D",
-        "text": "150 ms−1"
+        "text": "150 ms⁻¹"
       }
     ],
     "answer": "C",
@@ -2179,7 +2179,7 @@ const MCQ_ITEMS = [
     "id": "light-2024b-q19",
     "section": "refraction-snells-law",
     "difficulty": "Applied",
-    "stem": "A ray of light travels from medium X to medium Y as shown. The speed of light in air and medium X are 3  108 m s−1 and 2.5  108 m s−1 respectively. Find the refractive index of medium Y.",
+    "stem": "A ray of light travels from medium X to medium Y as shown. The speed of light in air and medium X are 3  108 m s⁻¹ and 2.5  108 m s⁻¹ respectively. Find the refractive index of medium Y.",
     "options": [
       {
         "key": "A",

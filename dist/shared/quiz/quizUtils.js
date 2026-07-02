@@ -76,6 +76,21 @@ export function escHtml(s) {
     .replace(/"/g, "&quot;");
 }
 
+/** Escape HTML but preserve safe <sub>letter</sub> tags from formatPhysicsSymbols. */
+export function escHtmlQuizText(s) {
+  const placeholders = [];
+  const marked = String(s).replace(/<sub>([a-zA-Z0-9])<\/sub>/g, (_, ch) => {
+    const token = `\u0000SUB${placeholders.length}\u0000`;
+    placeholders.push(`<sub>${ch}</sub>`);
+    return token;
+  });
+  let out = escHtml(marked);
+  placeholders.forEach((tag, i) => {
+    out = out.replace(`\u0000SUB${i}\u0000`, tag);
+  });
+  return out;
+}
+
 const SUPERSCRIPT_DIGITS = "⁰¹²³⁴⁵⁶⁷⁸⁹";
 
 function toSuperscriptNumber(numStr) {
@@ -110,6 +125,9 @@ export function formatPhysicsSymbols(s) {
   let t = String(s);
   t = t.replace(/ℓ\s*v/gi, "lᵥ");
   t = t.replace(/(?<=[\s(=])lv(?=[\s=.,;?)])/gi, "lᵥ");
+  // No Unicode subscript z exists; modifier letter ᶻ renders as superscript.
+  t = t.replace(/cᶻ/g, "c<sub>z</sub>");
+  t = t.replace(/c_([a-z])/gi, (_, letter) => `c<sub>${letter.toLowerCase()}</sub>`);
   return t;
 }
 
