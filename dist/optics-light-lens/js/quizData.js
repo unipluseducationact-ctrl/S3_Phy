@@ -596,11 +596,11 @@ const MCQ_ITEMS = [
     "id": "light-2024-q20",
     "section": "reflection",
     "difficulty": "Standard",
-    "stem": "John stands in front of a vertical plane mirror AB, where point A is 1.8 m above the ground (see the figure below). John’s eye is 1.6 m above the ground and 1 m from the mirror. Looking into the mirror, he can see a wall 3 m behind him.",
+    "stem": "John stands in front of a vertical plane mirror AB, where point A is 1.8 m above the ground (see the figure below). John’s eye is 1.6 m above the ground and 1 m from the mirror. Looking into the mirror, he can see a wall 3 m behind him. A spider is moving down on the wall. What is the maximum height h of the spider that John can see its image in the mirror?",
     "options": [
       {
         "key": "A",
-        "text": "spider is moving down on the wall. What is the maximum height h of the spider that John can see its image in the mirror?"
+        "text": "1.8 m"
       },
       {
         "key": "B",
