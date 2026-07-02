@@ -2294,27 +2294,32 @@ const MCQ_ITEMS = [
     "id": "light-2024b-q25",
     "section": "total-internal-reflection",
     "difficulty": "Applied",
-    "stem": "Which of the following combinations of refractive indices gives the smallest critical angle for the interface between media X and Y? Refractive index of medium X Refractive index of medium Y",
+    "stem": "Which of the following combinations of refractive indices gives the smallest critical angle for the interface between media X and Y?",
     "options": [
       {
         "key": "A",
-        "text": "1.6 1.1"
+        "text": "A"
       },
       {
         "key": "B",
-        "text": "1.7 1.1"
+        "text": "B"
       },
       {
         "key": "C",
-        "text": "2.0 1.5"
+        "text": "C"
       },
       {
         "key": "D",
-        "text": "2.1 1.5"
+        "text": "D"
       }
     ],
     "answer": "C",
-    "hint": "Which of the following combinations of refractive indices gives the smallest critical angle for the interface between media X and Y? Refractive index of medium X Refractive index of medium Y 1.6 1.1 1.7 1.1 2.0 1.5 2.1 1.5 1.6 = 0.6875 𝐵: 1.1 1.7 = 0.647 𝐶: 1.5 2.0 = 0.75 𝐷: 1.5 2.1 = 0.714 24. A ray of light is incident from air to an equilateral triangular glass prism at an angle . Its consequent path is shown below. The refractive index of the glass is 1.6. What is ? 14.4° 21.3° 35.6° 42.0°"
+    "hint": "Which of the following combinations of refractive indices gives the smallest critical angle for the interface between media X and Y? Refractive index of medium X Refractive index of medium Y 1.6 1.1 1.7 1.1 2.0 1.5 2.1 1.5 1.6 = 0.6875 𝐵: 1.1 1.7 = 0.647 𝐶: 1.5 2.0 = 0.75 𝐷: 1.5 2.1 = 0.714 24. A ray of light is incident from air to an equilateral triangular glass prism at an angle . Its consequent path is shown below. The refractive index of the glass is 1.6. What is ? 14.4° 21.3° 35.6° 42.0°",
+    "image": {
+      "src": "./assets/light-2024b-q25-fig.png",
+      "alt": "Diagram for light-2024b-q25",
+      "caption": "Fig - Question 25"
+    }
   },
   {
     "id": "light-2024b-q26",
