@@ -448,9 +448,7 @@ export const QUIZ_EXERCISES = [
           {
             "type": "blank",
             "accept": [
-              "r",
-              "r.",
-              "angle of refraction"
+              "r"
             ]
           },
           {
@@ -460,7 +458,8 @@ export const QUIZ_EXERCISES = [
         ]
       }
     ],
-    "hint": "i = angle of incidence, r = angle of refraction."
+    "hint": "i = angle of incidence, r = angle of refraction.",
+    "answer": "r"
   },
   {
     "id": "optics-fill-08",
