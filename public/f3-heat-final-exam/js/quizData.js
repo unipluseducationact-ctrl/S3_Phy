@@ -229,12 +229,7 @@ export const QUIZ_ITEMS = [
       }
     ],
     "answer": "C",
-    "hint": "𝐸= (1)(4200)(∆𝑇𝑃) , ∆𝑇𝑃= 𝐸 𝐸= (2)(2300)(∆𝑇𝑄) , ∆𝑇𝑄= 𝐸 𝐸= (3)(2200)(∆𝑇𝑅) , ∆𝑇𝑅= 𝐸 𝐸= (4)(9…",
-    "image": {
-      "src": "./assets/f3-heat-mc-2425-q09.png",
-      "alt": "Table for equal energy supplied question showing substances P, Q, R, S with masses 1, 2, 3, 4 kg and specific heat capacities 4200, 2300, 2200, 900 J kg⁻¹ °C⁻¹.",
-      "caption": "Fig · Imported: F3 Heat MC 2024-25"
-    }
+    "hint": "𝐸= (1)(4200)(∆𝑇𝑃) , ∆𝑇𝑃= 𝐸 𝐸= (2)(2300)(∆𝑇𝑄) , ∆𝑇𝑄= 𝐸 𝐸= (3)(2200)(∆𝑇𝑅) , ∆𝑇𝑅= 𝐸 𝐸= (4)(9…"
   },
   {
     "id": "heat-mc-2425-q10",
