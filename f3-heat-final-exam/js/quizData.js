@@ -2198,7 +2198,8 @@ export const QUIZ_ITEMS = [
           {
             "type": "blank",
             "accept": [
-              "The specific heat capacity of water = 4200 J kg⁻¹ °C⁻¹",
+              "4200J kg⁻¹ °C⁻¹",
+              "4200 J kg⁻¹ °C⁻¹",
               "4200 J",
               "4200J"
             ]
