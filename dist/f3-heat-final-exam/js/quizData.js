@@ -1334,7 +1334,19 @@ export const QUIZ_ITEMS = [
       }
     ],
     "answer": "C",
-    "hint": "The figure below shows 3 identical metal cans containing the same amount of hot water at…"
+    "hint": "The figure below shows 3 identical metal cans containing the same amount of hot water at…",
+    "images": [
+      {
+        "src": "./assets/f3-heat-mc-2425-q49-1.png",
+        "alt": "The figure below shows 3 identical metal cans containing the same amount of hot water at the same temperature. The cans are covered by a black paper, a shiny aluminium foil and a green paper respectively. Which of the following graphs best shows how the temperature of the water varies with time?",
+        "caption": "Fig · Imported: F3 Heat MC 2024-25 (1/2)"
+      },
+      {
+        "src": "./assets/f3-heat-mc-2425-q49-2.png",
+        "alt": "The figure below shows 3 identical metal cans containing the same amount of hot water at the same temperature. The cans are covered by a black paper, a shiny aluminium foil and a green paper respectively. Which of the following graphs best shows how the temperature of the water varies with time?",
+        "caption": "Fig · Imported: F3 Heat MC 2024-25 (2/2)"
+      }
+    ]
   },
   {
     "id": "heat-mc-2425-q48",
