@@ -102,37 +102,6 @@ export const QUIZ_ITEMS = [
     "hint": "A faulty thermometer has a wrong calibration."
   },
   {
-    "id": "heat-mc-2425-q04",
-    "section": "thermometer",
-    "difficulty": "Foundation",
-    "stem": "Which of the following substances would be a liquid at a temperature of 800 °C?",
-    "options": [
-      {
-        "key": "A",
-        "text": "aluminium"
-      },
-      {
-        "key": "B",
-        "text": "mercury"
-      },
-      {
-        "key": "C",
-        "text": "potassium"
-      },
-      {
-        "key": "D",
-        "text": "silver"
-      }
-    ],
-    "answer": "A",
-    "hint": "The metal will be liquid at a temperature which is below its boiling point and higher tha…",
-    "image": {
-      "src": "./assets/f3-heat-mc-2425-q4.png",
-      "alt": "Which of the following substances would be a liquid at a temperature of 800 °C? Substance melting p…",
-      "caption": "Fig · Imported: F3 Heat MC 2024-25"
-    }
-  },
-  {
     "id": "heat-mc-2425-q05",
     "section": "heat-internal-energy",
     "difficulty": "Foundation",
