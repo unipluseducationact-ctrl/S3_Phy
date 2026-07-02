@@ -2980,30 +2980,5 @@ export const QUIZ_ITEMS = [
       "alt": "Mr. Chan is enjoying Japanese hot pot. Initially, the pot contains 3 kg of water at 20 °C. When the…",
       "caption": "Fig · Imported: F3 Heat LQ (Heat capacity) · Q12(d)"
     }
-  },
-  {
-    "id": "heat-lq-capacity-q17b",
-    "format": "fill",
-    "section": "heat-internal-energy",
-    "difficulty": "Applied",
-    "stem": "A secondary school is currently using an electrical hot water system to provide warm water to students for shower. A salesman is persuading this school to replace the old system with a new solar hot water system. He does a simple research to convince the school the advantage of the replacement. The following information about the current water heating system is extracted from his research: Average volume of water consumed for shower (per day) = 36 000 L Average volume of hot water heated for shower (per day) = 8000 L Temperature of the hot water that left the system = 80 °C Average temperature of tap water = 20 °C Average operation time of the system (per annum) = 220 days Cost of electricity = $1.08 per kW h\n\n(b) Calculate the average cost for the electricity in one year, assuming that all energy consumed by the\nelectrical hot water system is transferred to the water.\n\nThe information about the solar hot water system is as shown below:\nMass of hot water supplied by one unit (per day) = 120 L\nTemperature of the water heated by the system = 55 °C\nPrice of one unit = $12 000",
-    "lines": [
-      {
-        "segments": [
-          {
-            "type": "text",
-            "value": "Answer: "
-          },
-          {
-            "type": "blank",
-            "accept": [
-              "55 °C",
-              "55°C"
-            ]
-          }
-        ]
-      }
-    ],
-    "hint": "Calculate the average cost for the electricity in one year, assuming that all energy cons…"
   }
 ];
