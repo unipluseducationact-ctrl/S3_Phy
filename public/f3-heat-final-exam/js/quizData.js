@@ -390,12 +390,7 @@ export const QUIZ_ITEMS = [
       }
     ],
     "answer": "D",
-    "hint": "Energy loss from the water at 18°C= 2(4200)(18 −6) = 100800 𝐽 Energy gain by water at 2°C…",
-    "image": {
-      "src": "./assets/f3-heat-mc-2425-q15.png",
-      "alt": "A student mixes 5 kg of water at 2 °C with 2 kg water at 18 °C. The final temperature of the mixtur…",
-      "caption": "Fig · Imported: F3 Heat MC 2024-25"
-    }
+    "hint": "Energy loss from the water at 18°C= 2(4200)(18 −6) = 100800 𝐽 Energy gain by water at 2°C…"
   },
   {
     "id": "heat-mc-2425-q16",
@@ -1825,7 +1820,7 @@ export const QUIZ_ITEMS = [
     "id": "heat-mc3-2425-q15",
     "section": "heat-internal-energy",
     "difficulty": "Foundation",
-    "stem": "Three tanks of water X, Y and Z of different temperatures and heat capacities are poured into a big well-\ninsulated container.\nwater in X\nwater in Y\nwater in Z\nheat capacity / kJ\n°C⁻¹\ntemperature / °C\nWhat is the final temperature of water after mixing? Ignore the heat capacity of the big container.",
+    "stem": "Three tanks of water X, Y and Z of different temperatures and heat capacities are poured into a big well-\ninsulated container.\nWhat is the final temperature of water after mixing? Ignore the heat capacity of the big container.",
     "options": [
       {
         "key": "A",
@@ -1845,7 +1840,12 @@ export const QUIZ_ITEMS = [
       }
     ],
     "answer": "A",
-    "hint": "Since there is more water in 10°C than in 30°C, the final temperature should be between 10°C…"
+    "hint": "Since there is more water in 10°C than in 30°C, the final temperature should be between 10°C…",
+    "image": {
+      "src": "./assets/f3-heat-mc-2425-q25.png",
+      "alt": "Three tanks of water X, Y and Z of different temperatures and heat capacities are poured into a big well-insulated container. What is the final temperature of water after mixing? Ignore the heat capacity of the big container.",
+      "caption": "Fig · Imported: F3 Heat MC 3 2024-25"
+    }
   },
   {
     "id": "heat-mc3-2425-q16",
