@@ -2797,9 +2797,9 @@ export const QUIZ_ITEMS = [
           {
             "type": "blank",
             "accept": [
-              "If the temperature of the classroom drops from 33 °C to 25 °C, how much energy is removed from the",
-              "33 °C",
-              "33°C"
+              "1987000J",
+              "1987000 J",
+              "1987000"
             ]
           }
         ]
