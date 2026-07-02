@@ -2420,9 +2420,10 @@ export const QUIZ_ITEMS = [
           {
             "type": "blank",
             "accept": [
-              "The thermometer is wrongly calibrated. It reads 4 °C and 98 °C in melting ice and boiling water",
-              ". It",
-              ".It"
+              "T' = ((T-4)/94)*100",
+              "T' = ((T - 4)/94)*100",
+              "T' = ((T-4)/94) × 100",
+              "T' = ((T - 4) / 94) * 100"
             ]
           }
         ]
