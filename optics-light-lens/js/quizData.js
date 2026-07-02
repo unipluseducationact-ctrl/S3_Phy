@@ -774,7 +774,7 @@ const MCQ_ITEMS = [
     "id": "light-2024-q26",
     "section": "refraction-snells-law",
     "difficulty": "Standard",
-    "stem": "The figure below show a light ray entering medium Y from medium X. Which statement(s) is/are correct?\n\n(1) The light travels faster in medium X.\n\n(2)  is the angle of refraction.\n\n(3) Medium X can be water while medium Y is air.",
+    "stem": "The figure below show a light ray entering medium Y from medium X. Which statement(s) is/are correct?\n\n(1) The light travels faster in medium X.\n\n(2) φ is the angle of refraction.\n\n(3) Medium X can be water while medium Y is air.",
     "options": [
       {
         "key": "A",
@@ -794,7 +794,7 @@ const MCQ_ITEMS = [
       }
     ],
     "answer": "A",
-    "hint": "The figure below show a light ray entering medium Y from medium X. Which statement(s) is/are correct? (1) The light travels faster in medium X. (2)  is the angle of refraction. (3) Medium X can be water while medium Y is air.",
+    "hint": "The figure below show a light ray entering medium Y from medium X. Which statement(s) is/are correct? (1) The light travels faster in medium X. (2) φ is the angle of refraction. (3) Medium X can be water while medium Y is air.",
     "image": {
       "src": "./assets/light-2024-q26-fig.png",
       "alt": "Diagram for light-2024-q26",
