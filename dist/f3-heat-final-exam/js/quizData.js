@@ -1700,12 +1700,7 @@ export const QUIZ_ITEMS = [
       }
     ],
     "answer": "A",
-    "hint": "Steam at 100 °C is mixed with ice at 0 °C.",
-    "image": {
-      "src": "./assets/f3-heat-mc3-2425-q10.png",
-      "alt": "Steam at 100 °C is mixed with ice at 0 °C. The mass of the ice is double that of the steam. What is…",
-      "caption": "Fig · Imported: F3 Heat MC 3 2024-25"
-    }
+    "hint": "Steam at 100 °C is mixed with ice at 0 °C."
   },
   {
     "id": "heat-mc3-2425-q11",
