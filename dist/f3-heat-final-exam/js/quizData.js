@@ -1441,12 +1441,7 @@ export const QUIZ_ITEMS = [
       }
     ],
     "answer": "A",
-    "hint": "Which of the following methods can keep ice for a longer time in a metal container?\n(1) P…",
-    "image": {
-      "src": "./assets/f3-heat-mc-2425-q50.png",
-      "alt": "Which of the following methods can keep ice for a longer time in a metal container? (1) Paint the w…",
-      "caption": "Fig · Imported: F3 Heat MC 2024-25"
-    }
+    "hint": "Which of the following methods can keep ice for a longer time in a metal container?\n(1) P…"
   },
   {
     "id": "heat-mc-2425-q51",
@@ -2190,7 +2185,7 @@ export const QUIZ_ITEMS = [
     "answer": "D",
     "hint": "(1): Measuring the temperature immediately without mixing the liquid allow uneven distrib…",
     "image": {
-      "src": "./assets/f3-heat-mc3-2425-q26.png",
+      "src": "./assets/f3-heat-mc-2425-q44.png",
       "alt": "The above apparatus is used to find the specific heat capacity of a liquid. Which of the following …",
       "caption": "Fig · Imported: F3 Heat MC 3 2024-25"
     }
