@@ -2967,8 +2967,9 @@ export const QUIZ_ITEMS = [
           {
             "type": "blank",
             "accept": [
-              "98 °C",
-              "98°C"
+              "0.0818kg",
+              "0.0818 kg",
+              "0.0818"
             ]
           }
         ]
