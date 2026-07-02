@@ -2193,7 +2193,7 @@ const MCQ_ITEMS = [
     "id": "light-2024b-q19",
     "section": "refraction-snells-law",
     "difficulty": "Applied",
-    "stem": "A ray of light travels from medium X to medium Y as shown. The speed of light in air and medium X are 3  108 m s⁻¹ and 2.5  108 m s⁻¹ respectively. Find the refractive index of medium Y.",
+    "stem": "A ray of light travels from medium X to medium Y as shown. The speed of light in air and medium X are 3 × 10⁸ m s⁻¹ and 2.5 × 10⁸ m s⁻¹ respectively. Find the refractive index of medium Y.",
     "options": [
       {
         "key": "A",

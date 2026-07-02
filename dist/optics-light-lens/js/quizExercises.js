@@ -271,10 +271,7 @@ export const QUIZ_EXERCISES = [
           {
             "type": "blank",
             "accept": [
-              "2",
-              "2 m s⁻¹",
-              "2 m/s",
-              "2 ms⁻¹"
+              "2"
             ]
           },
           {
@@ -284,7 +281,8 @@ export const QUIZ_EXERCISES = [
         ]
       }
     ],
-    "hint": "Image distance changes at twice the mirror speed."
+    "hint": "Image distance changes at twice the mirror speed.",
+    "answer": "2"
   },
   {
     "id": "optics-fill-02",
