@@ -503,32 +503,39 @@ const MCQ_ITEMS = [
     "id": "light-2024-q17",
     "section": "reflection",
     "difficulty": "Applied",
-    "stem": "A man 1.8 m tall is standing in front of a plane mirror of length p cm. The distance between the bottom of the mirror and the ground is q cm. His eyes are 1.7 m above the ground. In which of the following situations can the man see his entire body in the mirror? p q",
+    "stem": "A man 1.8 m tall is standing in front of a plane mirror of length p cm. The distance between the bottom of the mirror and the ground is q cm. His eyes are 1.7 m above the ground. In which of the following situations can the man see his entire body in the mirror?",
     "options": [
       {
         "key": "A",
-        "text": "90"
+        "text": "A"
       },
       {
         "key": "B",
-        "text": "90"
+        "text": "B"
       },
       {
         "key": "C",
-        "text": "100"
+        "text": "C"
       },
       {
         "key": "D",
-        "text": "100"
+        "text": "D"
       }
     ],
     "answer": "B",
     "hint": "90 90 90 85 100 70 100 65",
-    "image": {
-      "src": "./assets/light-2024-q17-fig.png",
-      "alt": "Diagram for light-2024-q17",
-      "caption": "Fig - Question 17"
-    }
+    "images": [
+      {
+        "src": "./assets/light-2024-q17-fig.png",
+        "alt": "Diagram for light-2024-q17",
+        "caption": "Fig - Question 17"
+      },
+      {
+        "src": "./assets/light-2024-q17-fig-2.png",
+        "alt": "Options A–D for light-2024-q17",
+        "caption": "Options A–D"
+      }
+    ]
   },
   {
     "id": "light-2024-q18",
