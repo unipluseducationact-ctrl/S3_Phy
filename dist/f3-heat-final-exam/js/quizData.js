@@ -361,7 +361,7 @@ export const QUIZ_ITEMS = [
     "answer": "C",
     "hint": "𝑃𝑡= 𝐶𝑋(75 −25) , 𝐶𝑋= 𝑃𝑡 𝑃𝑡= 𝐶𝑌(50 −25) , 𝐶𝑌= 𝑃𝑡 𝐶𝑋∶𝐶𝑌= 1 ∶2",
     "image": {
-      "src": "./assets/f3-heat-mc-2425-q14.png",
+      "src": "./assets/f3-heat-mc-2425-q15.png",
       "alt": "Energy is transferred to two copper blocks X and Y at the same rate. The graph below shows how the …",
       "caption": "Fig · Imported: F3 Heat MC 2024-25"
     }
