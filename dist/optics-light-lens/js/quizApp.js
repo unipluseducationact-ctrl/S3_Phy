@@ -525,7 +525,15 @@ export function initQuiz() {
         q.difficulty.toUpperCase();
       wrap.appendChild(head);
 
-      if (q.image?.src) {
+      if (q.images?.length) {
+        q.images.forEach((fig) => {
+          const figure = document.createElement("figure");
+          figure.className = "quiz-fig mb-4";
+          figure.innerHTML = `<img src="${escHtml(fig.src)}" alt="${escHtml(fig.alt || "")}" loading="lazy" />
+            <figcaption class="text-body-sm text-on-surface-variant mt-2">${escHtml(fig.caption || "")}</figcaption>`;
+          wrap.appendChild(figure);
+        });
+      } else if (q.image?.src) {
         const fig = document.createElement("figure");
         fig.className = "quiz-fig mb-4";
         fig.innerHTML = `<img src="${escHtml(q.image.src)}" alt="${escHtml(q.image.alt || "")}" loading="lazy" />
@@ -554,7 +562,7 @@ export function initQuiz() {
         fmt === "mcq" &&
         q.options?.length === 4 &&
         q.options.every((o) => /^[A-D]$/.test(String(o.text || "").trim())) &&
-        q.image?.src;
+        (q.image?.src || q.images?.length);
 
       if (diagramLetterOptions) {
         const note = document.createElement("p");
