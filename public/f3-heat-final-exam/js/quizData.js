@@ -1586,7 +1586,12 @@ export const QUIZ_ITEMS = [
       }
     ],
     "answer": "A",
-    "hint": "Two insulated metal blocks X and Y are made of different materials with unknown mass."
+    "hint": "Two insulated metal blocks X and Y are made of different materials with unknown mass.",
+    "image": {
+      "src": "./assets/f3-heat-mc3-2425-q13.png",
+      "alt": "Two insulated metal blocks X and Y are made of different materials with unknown mass. They are heated separately by two identical electric heaters at the same power. The graph below shows how the temperatures of X and Y change with time. Which of the following statements must be correct?",
+      "caption": "Fig · Imported: F3 Heat MC 3 2024-25"
+    }
   },
   {
     "id": "heat-mc3-2425-q07",
