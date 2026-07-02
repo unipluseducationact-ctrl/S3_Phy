@@ -229,7 +229,12 @@ export const QUIZ_ITEMS = [
       }
     ],
     "answer": "C",
-    "hint": "𝐸= (1)(4200)(∆𝑇𝑃) , ∆𝑇𝑃= 𝐸 𝐸= (2)(2300)(∆𝑇𝑄) , ∆𝑇𝑄= 𝐸 𝐸= (3)(2200)(∆𝑇𝑅) , ∆𝑇𝑅= 𝐸 𝐸= (4)(9…"
+    "hint": "𝐸= (1)(4200)(∆𝑇𝑃) , ∆𝑇𝑃= 𝐸 𝐸= (2)(2300)(∆𝑇𝑄) , ∆𝑇𝑄= 𝐸 𝐸= (3)(2200)(∆𝑇𝑅) , ∆𝑇𝑅= 𝐸 𝐸= (4)(9…",
+    "image": {
+      "src": "./assets/f3-heat-mc-2425-q10.png",
+      "alt": "Equal amount of energy is supplied to each of the following substances. Which of them will have the smallest rise in temperature?",
+      "caption": "Fig · Imported: F3 Heat MC 2024-25"
+    }
   },
   {
     "id": "heat-mc-2425-q10",
