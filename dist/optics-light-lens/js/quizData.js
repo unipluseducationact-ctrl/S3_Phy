@@ -2071,7 +2071,7 @@ const MCQ_ITEMS = [
     "id": "light-2024b-q15",
     "section": "refraction-snells-law",
     "difficulty": "Applied",
-    "stem": "A light ray enters a semicircular glass block as shown.\n\nWhich of the following equations is/are correct?\n\n(1) i = r1\n\n(2) Refractive index of glass = sin r2 / sin i\n\n(3) r1 = r2",
+    "stem": "A light ray enters a semicircular glass block as shown.\n\nWhich of the following equations is/are correct?\n\n(1) i = r₁\n\n(2) Refractive index of glass = sin r₂ / sin i\n\n(3) r₁ = r₂",
     "options": [
       {
         "key": "A",
@@ -2091,7 +2091,7 @@ const MCQ_ITEMS = [
       }
     ],
     "answer": "A",
-    "hint": "By the law of reflection at the flat surface, i = r1. Snell's law gives n = sin r2 / sin i (glass to air). r1 and r2 are not equal in general.",
+    "hint": "By the law of reflection at the flat surface, i = r₁. Snell's law gives n = sin r₂ / sin i (glass to air). r₁ and r₂ are not equal in general.",
     "image": {
       "src": "./assets/light-2024b-q15-fig.png",
       "alt": "Diagram for light-2024b-q15",
