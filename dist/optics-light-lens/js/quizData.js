@@ -960,7 +960,7 @@ const MCQ_ITEMS = [
     "id": "light-2024-q33",
     "section": "total-internal-reflection",
     "difficulty": "Applied",
-    "stem": "The speeds of light in medium 𝑋 and medium 𝑌 are 2 × 108 m s⁻¹ and 1.5 × 108 m s⁻¹ respectively What is the critical angle for the interface of the two media?",
+    "stem": "The speeds of light in medium 𝑋 and medium 𝑌 are 2 × 10⁸ m s⁻¹ and 1.5 × 10⁸ m s⁻¹ respectively What is the critical angle for the interface of the two media?",
     "options": [
       {
         "key": "A",
@@ -980,7 +980,7 @@ const MCQ_ITEMS = [
       }
     ],
     "answer": "D",
-    "hint": "The speeds of light in medium 𝑋 and medium 𝑌 are 2 × 108 m s⁻¹ and 1.5 × 108 m s⁻¹ respectively What is the critical angle for the interface of the two media? 19.5° 30° 41.8° 48.6° 14 警告: 不可翻印,販賣,違者必究 2025-26 Light revision (MC set 1) 薈進教育中心 Unit Education Tel: 98583618"
+    "hint": "The speeds of light in medium 𝑋 and medium 𝑌 are 2 × 10⁸ m s⁻¹ and 1.5 × 10⁸ m s⁻¹ respectively What is the critical angle for the interface of the two media? 19.5° 30° 41.8° 48.6° 14 警告: 不可翻印,販賣,違者必究 2025-26 Light revision (MC set 1) 薈進教育中心 Unit Education Tel: 98583618"
   },
   {
     "id": "light-2024-q34",
@@ -1068,7 +1068,7 @@ const MCQ_ITEMS = [
       }
     ],
     "answer": "C",
-    "hint": "When light travels from an optically denser medium to an optically less dense medium, (1) its speed increases. (2) its colour changes. (3) it bends away from the normal. 33. The speeds of light in medium 𝑋 and medium 𝑌 are 2 × 108 m s⁻¹ and 1.5 × 108 m s⁻¹ respectively What is the critical angle for the interface of the two media? 19.5° 30° 41.8° 48.6° 14 警告: 不可翻印,販賣,違者必究 2025-26 Light revision (MC set 1) 薈進教育中心 Unit Education Tel: 98583618"
+    "hint": "When light travels from an optically denser medium to an optically less dense medium, (1) its speed increases. (2) its colour changes. (3) it bends away from the normal. 33. The speeds of light in medium 𝑋 and medium 𝑌 are 2 × 10⁸ m s⁻¹ and 1.5 × 10⁸ m s⁻¹ respectively What is the critical angle for the interface of the two media? 19.5° 30° 41.8° 48.6° 14 警告: 不可翻印,販賣,違者必究 2025-26 Light revision (MC set 1) 薈進教育中心 Unit Education Tel: 98583618"
   },
   {
     "id": "light-2024-q37",
