@@ -1618,27 +1618,27 @@ const MCQ_ITEMS = [
     "id": "light-2024b-q01",
     "section": "refraction-snells-law",
     "difficulty": "Standard",
-    "stem": "What types of light rays do figures (a), (b) and (c) represent? Figure (a) Figure (b) Figure (c)",
+    "stem": "What types of light rays do figures (a), (b) and (c) represent?\n\nFigure (a) Figure (b) Figure (c)",
     "options": [
       {
         "key": "A",
-        "text": "convergent divergent parallel"
+        "text": "convergent, divergent, parallel"
       },
       {
         "key": "B",
-        "text": "divergent parallel convergent"
+        "text": "divergent, parallel, convergent"
       },
       {
         "key": "C",
-        "text": "parallel divergent convergent"
+        "text": "parallel, divergent, convergent"
       },
       {
         "key": "D",
-        "text": "divergent convergent parallel"
+        "text": "divergent, convergent, parallel"
       }
     ],
     "answer": "D",
-    "hint": "What types of light rays do figures (a), (b) and (c) represent? Figure (a) Figure (b) Figure (c)",
+    "hint": "What types of light rays do figures (a), (b) and (c) represent?\n\nFigure (a) Figure (b) Figure (c)",
     "image": {
       "src": "./assets/light-2024b-q01-fig.png",
       "alt": "Diagram for light-2024b-q01",
