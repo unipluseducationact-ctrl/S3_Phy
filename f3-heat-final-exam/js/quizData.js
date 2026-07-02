@@ -2407,9 +2407,11 @@ export const QUIZ_ITEMS = [
           {
             "type": "blank",
             "accept": [
-              "The flow rate of the steam is 480 kg s–1. Find the energy lost by the steam every second.",
-              "480 kg",
-              "480kg"
+              "1220000000J",
+              "1220000000 J",
+              "1220000000",
+              "1.22 × 10^9 J",
+              "1.22e9 J"
             ]
           }
         ]
