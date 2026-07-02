@@ -898,7 +898,7 @@ const MCQ_ITEMS = [
     "id": "light-2024-q31",
     "section": "refraction-snells-law",
     "difficulty": "Applied",
-    "stem": "A ray of light is incident from air to an equilateral triangular glass prism at an angle . Its consequent path is shown below. The refractive index of the glass is 1.6. What is ?",
+    "stem": "A ray of light is incident from air to an equilateral triangular glass prism at an angle θ. Its consequent path is shown below. The refractive index of the glass is 1.6. What is θ?",
     "options": [
       {
         "key": "A",
