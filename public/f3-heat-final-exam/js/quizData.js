@@ -2840,7 +2840,7 @@ export const QUIZ_ITEMS = [
     "format": "fill",
     "section": "heat-internal-energy",
     "difficulty": "Applied",
-    "stem": "A hot water system provides warm water for shower. The system has an electric heater of power 8 kW. The temperature of the cold water flowing into the system is 15 °C. The specific heat capacity of water is 4200 J kg⁻¹ °C⁻¹.\n\n(b) Suppose you want to take a shower with water at 42 °C. This can be done by mixing the hot water in",
+    "stem": "A hot water system provides warm water for shower. The system has an electric heater of power 8 kW. The temperature of the cold water flowing into the system is 15 °C. The specific heat capacity of water is 4200 J kg⁻¹ °C⁻¹.\n\n(a) The flow rate of water through the heater is 2 kg min⁻¹. Find the temperature of the hot water leaving the heater.\n\n(b) Suppose you want to take a shower with water at 42 °C. This can be done by mixing the hot water in (a) with some cold water at 15 °C. Find the flow rate of the cold water to give you water of the desired temperature.",
     "lines": [
       {
         "segments": [
@@ -2859,10 +2859,10 @@ export const QUIZ_ITEMS = [
         ]
       }
     ],
-    "hint": "Suppose you want to take a shower with water at 42 °C.",
+    "hint": "Find the hot water temperature in (a), then apply energy balance when mixing hot and cold water to 42 °C.",
     "image": {
       "src": "./assets/f3-heat-lq-capacity-q10.png",
-      "alt": "A hot water system provides warm water for shower. The system has an electric heater of power 8 kW.…",
+      "alt": "A hot water system provides warm water for shower. The system has an electric heater of power 8 kW. The temperature of the cold water flowing into the system is 15 °C. The specific heat capacity of water is 4200 J kg⁻¹ °C⁻¹. (b) Mix hot water from (a) with cold water at 15 °C to obtain shower water at 42 °C.",
       "caption": "Fig · Imported: F3 Heat LQ (Heat capacity) · Q10(b)"
     }
   },
