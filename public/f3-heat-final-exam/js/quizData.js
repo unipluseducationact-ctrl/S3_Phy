@@ -1140,37 +1140,6 @@ export const QUIZ_ITEMS = [
     "hint": "(1): Measuring the temperature immediately without mixing the liquid allow uneven distrib…"
   },
   {
-    "id": "heat-mc-2425-q43",
-    "section": "heat-internal-energy",
-    "difficulty": "Foundation",
-    "stem": "Which of the following is/are the precaution(s) for giving an accurate result?\n(1) Use ice of temperature well below 0 °C.\n(2) Insert the heating part of each immersion heater into the ice completely.\n(3) Cover the funnels with lids.",
-    "options": [
-      {
-        "key": "A",
-        "text": "(1) only"
-      },
-      {
-        "key": "B",
-        "text": "(2) only"
-      },
-      {
-        "key": "C",
-        "text": "(1) and (3) only"
-      },
-      {
-        "key": "D",
-        "text": "(1), (2) and (3)"
-      }
-    ],
-    "answer": "A",
-    "hint": "Which of the following is/are the precaution(s) for giving an accurate result?\n(1) Use ic…",
-    "image": {
-      "src": "./assets/f3-heat-mc3-2425-q37.png",
-      "alt": "Which of the following is/are the precaution(s) for giving an accurate result? (1) Use ice of tempe…",
-      "caption": "Fig · Imported: F3 Heat MC 3 2024-25"
-    }
-  },
-  {
     "id": "heat-mc-2425-q44",
     "section": "change-of-state",
     "difficulty": "Applied",
