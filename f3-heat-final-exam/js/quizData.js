@@ -313,7 +313,7 @@ export const QUIZ_ITEMS = [
     "id": "heat-mc-2425-q13",
     "section": "heat-internal-energy",
     "difficulty": "Foundation",
-    "stem": "Liquids X, Y and Z of equal mass are heated separately by three identical heaters. The graph below shows\nthe variation of the temperatures of the liquids with time. Let cX, cY and cZ be the specific heat capacities of\nX, Y and Z respectively.\nWhich of the following relations is correct?",
+    "stem": "Three tanks of water X, Y and Z of different temperatures and heat capacities are poured into a big well-\ninsulated container.\nWhat is the final temperature of water after mixing? Ignore the heat capacity of the big container.",
     "options": [
       {
         "key": "A",
@@ -333,7 +333,12 @@ export const QUIZ_ITEMS = [
       }
     ],
     "answer": "A",
-    "hint": "Liquids X, Y and Z of equal mass are heated separately by three identical heaters."
+    "hint": "Three tanks of water X, Y and Z of different temperatures and heat capacities are poured into a big well-insulated container.",
+    "image": {
+      "src": "./assets/f3-heat-mc-2425-q25.png",
+      "alt": "Three tanks of water X, Y and Z of different temperatures and heat capacities are poured into a big well-insulated container. What is the final temperature of water after mixing? Ignore the heat capacity of the big container.",
+      "caption": "Fig · Imported: F3 Heat MC 3 2024-25"
+    }
   },
   {
     "id": "heat-mc-2425-q14",
