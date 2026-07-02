@@ -3005,30 +3005,5 @@ export const QUIZ_ITEMS = [
       }
     ],
     "hint": "Calculate the average cost for the electricity in one year, assuming that all energy cons…"
-  },
-  {
-    "id": "heat-lq-capacity-q17d",
-    "format": "fill",
-    "section": "heat-internal-energy",
-    "difficulty": "Standard",
-    "stem": "A secondary school is currently using an electrical hot water system to provide warm water to students for shower. A salesman is persuading this school to replace the old system with a new solar hot water system. He does a simple research to convince the school the advantage of the replacement. The following information about the current water heating system is extracted from his research: Average volume of water consumed for shower (per day) = 36 000 L Average volume of hot water heated for shower (per day) = 8000 L Temperature of the hot water that left the system = 80 °C Average temperature of tap water = 20 °C Average operation time of the system (per annum) = 220 days Cost of electricity = $1.08 per kW h\n\n(d) State one advantage and one disadvantage of the solar water heating system as compared with current\nsystem.                                                                      \n (The specific heat capacity of water is 4200 J kg⁻¹ °C⁻¹. One kilowatt-hour equals 3.6MJ. The density of water\nis 1 kg L⁻¹.)",
-    "lines": [
-      {
-        "segments": [
-          {
-            "type": "text",
-            "value": "Answer: "
-          },
-          {
-            "type": "blank",
-            "accept": [
-              "1 °C",
-              "1°C"
-            ]
-          }
-        ]
-      }
-    ],
-    "hint": "State one advantage and one disadvantage of the solar water heating system as compared wi…"
   }
 ];
