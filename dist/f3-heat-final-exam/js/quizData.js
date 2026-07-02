@@ -1170,9 +1170,9 @@ export const QUIZ_ITEMS = [
     "answer": "A",
     "hint": "Which of the following is/are the precaution(s) for giving an accurate result?\n(1) Use ic…",
     "image": {
-      "src": "./assets/f3-heat-mc-2425-q43.png",
+      "src": "./assets/f3-heat-mc3-2425-q37.png",
       "alt": "Which of the following is/are the precaution(s) for giving an accurate result? (1) Use ice of tempe…",
-      "caption": "Fig · Imported: F3 Heat MC 2024-25"
+      "caption": "Fig · Imported: F3 Heat MC 3 2024-25"
     }
   },
   {
@@ -2115,7 +2115,12 @@ export const QUIZ_ITEMS = [
       }
     ],
     "answer": "A",
-    "hint": "Which of the following is/are the precaution(s) for giving an accurate result?\n(1) Use ic…"
+    "hint": "Which of the following is/are the precaution(s) for giving an accurate result?\n(1) Use ic…",
+    "image": {
+      "src": "./assets/f3-heat-mc3-2425-q37.png",
+      "alt": "Which of the following is/are the precaution(s) for giving an accurate result? (1) Use ice of temperature well below 0 °C. (2) Insert the heating part of each immersion heater into the ice completely. (3) Cover the funnels with lids.",
+      "caption": "Fig · Imported: F3 Heat MC 3 2024-25"
+    }
   },
   {
     "id": "heat-mc3-2425-q26",
