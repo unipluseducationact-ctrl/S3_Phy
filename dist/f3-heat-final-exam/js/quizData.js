@@ -2933,8 +2933,9 @@ export const QUIZ_ITEMS = [
           {
             "type": "blank",
             "accept": [
-              "20 °C",
-              "20°C"
+              "840s",
+              "840 s",
+              "840"
             ]
           }
         ]
