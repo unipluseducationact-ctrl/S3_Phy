@@ -91,37 +91,6 @@
     }
   },
   {
-    "topic": "liquidThermometer",
-    "section": "Imported: F3 Heat MC 2024-25",
-    "source": "f3-heat-mc-2425",
-    "en": {
-      "q": "Which of the following substances would be a liquid at a temperature of 800 °C?\nSubstance        melting point / °C\n      boiling point / °C",
-      "choices": [
-        "aluminium",
-        "mercury −39 357",
-        "potassium 64 774",
-        "silver 962"
-      ],
-      "a": 0,
-      "exp": "The metal will be liquid at a temperature which is below its boiling point and higher than the melting point.",
-      "hint": "The metal will be liquid at a temperature which is below its boiling point and higher tha…",
-      "image": "./worksheet-images/f3-heat-mc-2425-q05.webp"
-    },
-    "zhHant": {
-      "q": "Which of the following substances would be a liquid at a temperature of 800 °C?\nSubstance        melting point / °C\n      boiling point / °C",
-      "choices": [
-        "aluminium",
-        "mercury −39 357",
-        "potassium 64 774",
-        "silver 962"
-      ],
-      "a": 0,
-      "exp": "The metal will be liquid at a temperature which is below its boiling point and higher than the melting point.",
-      "hint": "The metal will be liquid at a temperature which is below its boiling point and higher tha…",
-      "image": "./worksheet-images/f3-heat-mc-2425-q05.webp"
-    }
-  },
-  {
     "topic": "heatInternalEnergy",
     "section": "Imported: F3 Heat MC 2024-25",
     "source": "f3-heat-mc-2425",
