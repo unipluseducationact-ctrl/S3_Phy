@@ -2715,9 +2715,9 @@ export const QUIZ_ITEMS = [
           {
             "type": "blank",
             "accept": [
-              "(The specific heat capacity of water is 4200 J kg⁻¹ °C⁻¹. The density of water is 1 kg L⁻¹.)",
-              "4200 J",
-              "4200J"
+              "2100s",
+              "2100 s",
+              "2100"
             ]
           }
         ]
