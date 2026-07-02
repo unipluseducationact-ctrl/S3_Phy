@@ -131,34 +131,37 @@ function reflectAcrossLine(p, a, b) {
 function imagesInWedge(thetaRad, object, maxImages = 12) {
   const half = thetaRad / 2;
   const nFormula = Math.round(360 / rad2deg(thetaRad)) - 1;
-  const m1a = { x: 0, y: 0 };
-  const m1b = { x: Math.cos(half), y: Math.sin(half) };
-  const m2a = { x: 0, y: 0 };
-  const m2b = { x: Math.cos(-half), y: Math.sin(-half) };
-  const r1 = (p) => reflectPoint(p, m1a, m1b);
-  const r2 = (p) => reflectPoint(p, m2a, m2b);
   const labels = ['X', 'Z', 'Y', 'W', 'V', 'U', 'T', 'S', 'R', 'Q'];
+  const r = Math.hypot(object.x, object.y);
+  const alpha = Math.atan2(object.y, object.x);
   const images = [];
 
-  const xPt = r1(object);
-  const zPt = r2(object);
-  images.push({ pt: { ...xPt }, label: 'X', mirror: 'M1', parent: 'O' });
-  if (nFormula < 2) return { images, count: images.length, formula: nFormula };
+  for (let i = 0; i < nFormula && images.length < maxImages; i++) {
+    const k = Math.ceil((i + 1) / 2);
+    const sign = (i % 2 === 0) ? 1 : -1;
+    const imgAngle = alpha + sign * k * thetaRad;
+    const pt = { x: r * Math.cos(imgAngle), y: r * Math.sin(imgAngle) };
 
-  images.push({ pt: { ...zPt }, label: 'Z', mirror: 'M2', parent: 'O' });
+    const parentIdx = i < 2 ? -1 : i - 2;
+    const parentAngle = parentIdx < 0 ? alpha : images[parentIdx].angle;
+    const mirrorAngle = (parentAngle + imgAngle) / 2;
+    const mirrorOrder = Math.round(Math.abs(mirrorAngle) / half);
+    const isVirtual = mirrorOrder > 1;
 
-  let lastX = xPt;
-  let lastZ = zPt;
-  for (let i = 2; i < nFormula && images.length < maxImages; i++) {
-    if (i % 2 === 0) {
-      const pt = r1(lastZ);
-      images.push({ pt: { ...pt }, label: labels[i] || String(i + 1), mirror: 'M1', parent: images[i - 1].label });
-      lastZ = pt;
-    } else {
-      const pt = r2(lastX);
-      images.push({ pt: { ...pt }, label: labels[i] || String(i + 1), mirror: 'M2', parent: images[i - 1].label });
-      lastX = pt;
-    }
+    images.push({
+      pt: { ...pt },
+      label: labels[i] || String(i + 1),
+      angle: imgAngle,
+      parentIdx,
+      parentLabel: parentIdx < 0 ? 'O' : images[parentIdx].label,
+      mirrorAngle,
+      mirrorOrder,
+      isVirtual,
+      mirror: {
+        a: { x: 0, y: 0 },
+        b: { x: Math.cos(mirrorAngle), y: Math.sin(mirrorAngle) },
+      },
+    });
   }
 
   return { images, count: images.length, formula: nFormula };
@@ -1685,9 +1688,40 @@ function createSeeBackObjectScenario() {
 
 
 const MIRROR_LEN = 3.5;
-const STEPS_PER_IMAGE = 2;
 const HIT_PX = 18;
 const LINE_HIT_PX = 14;
+
+/** Total animation steps: X/Z use 2 each; Y+ use 3 each (mirror, image, ray). */
+function wedgeTotalSteps(n) {
+  return n >= 2 ? 3 * n - 2 : 2 * n;
+}
+
+/** Which mirrors / images / rays are visible at a given stepIndex. */
+function getVisibility(stepIndex, n, showAll) {
+  const mirrors = new Set();
+  const images = new Set();
+  const rays = new Set();
+  if (showAll) {
+    for (let i = 0; i < n; i++) {
+      if (i >= 2) mirrors.add(i);
+      images.add(i);
+      rays.add(i);
+    }
+    return { mirrors, images, rays };
+  }
+  let step = 0;
+  for (let i = 0; i < n; i++) {
+    if (i >= 2) {
+      step += 1;
+      if (stepIndex >= step) mirrors.add(i);
+    }
+    step += 1;
+    if (stepIndex >= step) images.add(i);
+    step += 1;
+    if (stepIndex >= step) rays.add(i);
+  }
+  return { mirrors, images, rays };
+}
 
 function defaultObjectInWedge(index, thetaDeg, orientationDeg) {
   const r = 1.1 + index * 0.2;
@@ -1726,11 +1760,11 @@ function createAngledMirrorsScenario() {
   let canvasRef = null;
   let placeMode = false;
   const animator = new RayAnimator();
-  animator.stepsPerRay = STEPS_PER_IMAGE;
+  animator.rayCount = 1;
 
   function syncAnimator(c) {
     const n = c.nFormula;
-    animator.rayCount = n;
+    animator.stepsPerRay = wedgeTotalSteps(n);
     if (animator.stepIndex > animator.totalSteps) {
       animator.stepIndex = animator.totalSteps;
     }
@@ -1767,7 +1801,23 @@ function createAngledMirrorsScenario() {
     const objectSets = objects.map((obj) => {
       const localObj = Vec2.rot(obj, -phi);
       const { images } = imagesInWedge(theta, localObj, 12);
-      const worldImages = images.map((im) => ({ ...im, pt: Vec2.rot(im.pt, phi) }));
+      const worldImages = images.map((im) => {
+        const parentLocal = im.parentIdx < 0
+          ? localObj
+          : images[im.parentIdx].pt;
+        return {
+          ...im,
+          pt: Vec2.rot(im.pt, phi),
+          parentPt: Vec2.rot(parentLocal, phi),
+          mirror: {
+            a: apex,
+            b: Vec2.rot({
+              x: MIRROR_LEN * Math.cos(im.mirrorAngle),
+              y: MIRROR_LEN * Math.sin(im.mirrorAngle),
+            }, phi),
+          },
+        };
+      });
       return { object: obj, images: worldImages };
     });
     const nFormula = Math.round(360 / params.theta) - 1;
@@ -1778,7 +1828,10 @@ function createAngledMirrorsScenario() {
     const pts = [{ x: 0, y: 0 }];
     c.objectSets.forEach((set) => {
       pts.push(set.object);
-      set.images.forEach((im) => pts.push(im.pt));
+      set.images.forEach((im) => {
+        pts.push(im.pt);
+        if (im.isVirtual) pts.push(im.mirror.b);
+      });
     });
     pts.push(c.m1.b, c.m2.b);
     let xMin = 0; let xMax = 1; let yMin = 0; let yMax = 1;
@@ -2073,6 +2126,24 @@ function createAngledMirrorsScenario() {
     animator.pause();
   }
 
+  function drawVirtualMirror(ctx, view, txf, a, b, mirrorOrder) {
+    const s0 = { x: txf.ox + a.x * txf.pxPerM, y: txf.oy - a.y * txf.pxPerM };
+    const s1 = { x: txf.ox + b.x * txf.pxPerM, y: txf.oy - b.y * txf.pxPerM };
+    ctx.save();
+    ctx.strokeStyle = 'rgba(255,204,0,0.75)';
+    ctx.lineWidth = 2;
+    ctx.setLineDash([6, 5]);
+    ctx.beginPath();
+    ctx.moveTo(s0.x, s0.y);
+    ctx.lineTo(s1.x, s1.y);
+    ctx.stroke();
+    ctx.setLineDash([]);
+    const prime = getLang() === 'zh' ? '′' : "'";
+    const side = mirrorOrder % 2 === 1 ? '₁' : '₂';
+    drawLabel(ctx, s1.x + 6, s1.y - 6, `M${side}${prime}`, COLORS.mirrorNeed);
+    ctx.restore();
+  }
+
   function drawMirror(ctx, view, txf, a, b, label, draggable = false, active = false) {
     ctx.strokeStyle = active ? COLORS.mirrorNeed : COLORS.mirror;
     ctx.lineWidth = active ? 4 : 3;
@@ -2153,21 +2224,23 @@ function createAngledMirrorsScenario() {
 
     const stepIndex = animator.stepIndex;
     const showAll = stepIndex >= animator.totalSteps;
+    const vis = getVisibility(stepIndex, c.nFormula, showAll);
 
     if (params.showImages) {
       c.objectSets.forEach((set) => {
         set.images.forEach((img, i) => {
-          const imageStep = i * STEPS_PER_IMAGE + 1;
-          const rayStep = i * STEPS_PER_IMAGE + 2;
-          const showImage = showAll || stepIndex >= imageStep;
-          const showRay = showAll || stepIndex >= rayStep;
-
-          if (showImage) {
+          if (vis.mirrors.has(i) && img.isVirtual) {
+            drawVirtualMirror(ctx, view, txf, img.mirror.a, img.mirror.b, img.mirrorOrder);
+          }
+        });
+        set.images.forEach((img, i) => {
+          if (vis.images.has(i)) {
             const lbl = objects.length > 1 ? `${set.object.label}→${img.label}` : img.label;
             drawPoint(ctx, view, txf, img.pt, 5, COLORS.image, lbl);
           }
-          if (params.showRays && showRay) {
-            drawArrow(ctx, view, txf, set.object, img.pt, { dashed: true, color: COLORS.rayVirtual, width: 1 });
+          if (params.showRays && vis.rays.has(i)) {
+            const from = img.parentIdx < 0 ? set.object : img.parentPt;
+            drawArrow(ctx, view, txf, from, img.pt, { dashed: true, color: COLORS.rayVirtual, width: 1 });
           }
         });
       });
