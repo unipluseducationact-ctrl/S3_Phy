@@ -1147,7 +1147,12 @@ export const QUIZ_ITEMS = [
       }
     ],
     "answer": "D",
-    "hint": "(1): Measuring the temperature immediately without mixing the liquid allow uneven distrib…"
+    "hint": "(1): Measuring the temperature immediately without mixing the liquid allow uneven distrib…",
+    "image": {
+      "src": "./assets/f3-heat-mc-2425-q44.png",
+      "alt": "The above apparatus is used to find the specific heat capacity of a liquid. Which of the following can improve the accuracy of the experiment? (1) Taking the final temperature immediately after switching off the power supply. (2) Covering the cup with a lid. (3) Stirring the liquid throughout the experiment.",
+      "caption": "Fig · Imported: F3 Heat MC 2024-25"
+    }
   },
   {
     "id": "heat-mc-2425-q44",
