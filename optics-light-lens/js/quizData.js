@@ -2106,19 +2106,19 @@ const MCQ_ITEMS = [
     "options": [
       {
         "key": "A",
-        "text": "Path"
+        "text": "path1"
       },
       {
         "key": "B",
-        "text": "Path"
+        "text": "path2"
       },
       {
         "key": "C",
-        "text": "Path"
+        "text": "path3"
       },
       {
         "key": "D",
-        "text": "Path"
+        "text": "path4"
       }
     ],
     "answer": "A",
