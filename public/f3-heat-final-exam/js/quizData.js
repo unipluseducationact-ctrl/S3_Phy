@@ -1821,7 +1821,7 @@ export const QUIZ_ITEMS = [
     "answer": "A",
     "hint": "Since there is more water in 10°C than in 30°C, the final temperature should be between 10°C…",
     "image": {
-      "src": "./assets/f3-heat-mc-2425-q25.png",
+      "src": "./assets/f3-heat-mc3-2425-q25.png",
       "alt": "Three tanks of water X, Y and Z of different temperatures and heat capacities are poured into a big well-insulated container. What is the final temperature of water after mixing? Ignore the heat capacity of the big container.",
       "caption": "Fig · Imported: F3 Heat MC 3 2024-25"
     }
