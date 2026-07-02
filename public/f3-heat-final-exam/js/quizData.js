@@ -2318,9 +2318,9 @@ export const QUIZ_ITEMS = [
           {
             "type": "blank",
             "accept": [
-              "If 300 kJ is required to cook the vegetable, how long will it take for the whole cooking process?",
-              "300 kJ",
-              "300kJ"
+              "153s",
+              "153 s",
+              "153"
             ]
           }
         ]
