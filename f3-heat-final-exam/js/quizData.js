@@ -1184,7 +1184,12 @@ export const QUIZ_ITEMS = [
       }
     ],
     "answer": "C",
-    "hint": "(1): Total internal energy (P.E.+K.E.) is used to describe the total energy in a body."
+    "hint": "(1): Total internal energy (P.E.+K.E.) is used to describe the total energy in a body.",
+    "image": {
+      "src": "./assets/f3-heat-mc-2425-q43.png",
+      "alt": "The specific heat capacity of aluminium is measured by the set-up as shown in the diagram below. Which of the following cannot reduce experimental error?",
+      "caption": "Fig · Imported: F3 Heat MC 2024-25"
+    }
   },
   {
     "id": "heat-mc-2425-q42",
