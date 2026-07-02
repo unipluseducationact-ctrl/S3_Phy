@@ -2115,12 +2115,7 @@ export const QUIZ_ITEMS = [
       }
     ],
     "answer": "A",
-    "hint": "Which of the following is/are the precaution(s) for giving an accurate result?\n(1) Use ic…",
-    "image": {
-      "src": "./assets/f3-heat-mc3-2425-q25.png",
-      "alt": "Which of the following is/are the precaution(s) for giving an accurate result? (1) Use ice of tempe…",
-      "caption": "Fig · Imported: F3 Heat MC 3 2024-25"
-    }
+    "hint": "Which of the following is/are the precaution(s) for giving an accurate result?\n(1) Use ic…"
   },
   {
     "id": "heat-mc3-2425-q26",
