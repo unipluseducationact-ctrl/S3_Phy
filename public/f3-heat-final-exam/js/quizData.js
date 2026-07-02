@@ -313,31 +313,31 @@ export const QUIZ_ITEMS = [
     "id": "heat-mc-2425-q13",
     "section": "heat-internal-energy",
     "difficulty": "Foundation",
-    "stem": "Three tanks of water X, Y and Z of different temperatures and heat capacities are poured into a big well-\ninsulated container.\nWhat is the final temperature of water after mixing? Ignore the heat capacity of the big container.",
+    "stem": "Liquids X, Y and Z of equal mass are heated separately by three identical heaters. The graph below shows\nthe variation of the temperatures of the liquids with time. Let cₓ, cᵧ and c_z be the specific heat capacities of\nX, Y and Z respectively.\nWhich of the following relations is correct?",
     "options": [
       {
         "key": "A",
-        "text": "cX = cY > cZ"
+        "text": "cₓ = cᵧ > c_z"
       },
       {
         "key": "B",
-        "text": "cX > cY > cZ"
+        "text": "cₓ > cᵧ > c_z"
       },
       {
         "key": "C",
-        "text": "cX > cY = cZ"
+        "text": "cₓ > cᵧ = c_z"
       },
       {
         "key": "D",
-        "text": "cX < cY = cZ"
+        "text": "cₓ < cᵧ = c_z"
       }
     ],
     "answer": "A",
-    "hint": "Three tanks of water X, Y and Z of different temperatures and heat capacities are poured into a big well-insulated container.",
+    "hint": "Liquids X, Y and Z of equal mass are heated separately by three identical heaters.",
     "image": {
-      "src": "./assets/f3-heat-mc-2425-q25.png",
-      "alt": "Three tanks of water X, Y and Z of different temperatures and heat capacities are poured into a big well-insulated container. What is the final temperature of water after mixing? Ignore the heat capacity of the big container.",
-      "caption": "Fig · Imported: F3 Heat MC 3 2024-25"
+      "src": "./assets/f3-heat-mc-2425-q14.png",
+      "alt": "Liquids X, Y and Z of equal mass are heated separately by three identical heaters. The graph below shows the variation of the temperatures of the liquids with time. Let cₓ, cᵧ and c_z be the specific heat capacities of X, Y and Z respectively. Which of the following relations is correct?",
+      "caption": "Fig · Imported: F3 Heat MC 2024-25"
     }
   },
   {
