@@ -1223,27 +1223,27 @@ const MCQ_ITEMS = [
     "id": "light-2024-q42",
     "section": "refraction-snells-law",
     "difficulty": "Applied",
-    "stem": "It is known that the refractive index of ice is lower than that of quartz, which is in turn lower than that of diamond. The figure below shows how a ray of light travels through the three materials. Which of the following combinations is the most appropriate? material A material B material C",
+    "stem": "It is known that the refractive index of ice is lower than that of quartz, which is in turn lower than that of diamond. The figure below shows how a ray of light travels through the three materials. Which of the following combinations is the most appropriate?\n\nmaterial A material B material C",
     "options": [
       {
         "key": "A",
-        "text": "ice quartz diamond"
+        "text": "ice, quartz, diamond"
       },
       {
         "key": "B",
-        "text": "quartz diamond ice"
+        "text": "quartz, diamond, ice"
       },
       {
         "key": "C",
-        "text": "ice diamond quartz"
+        "text": "ice, diamond, quartz"
       },
       {
         "key": "D",
-        "text": "diamond quartz ice"
+        "text": "diamond, quartz, ice"
       }
     ],
     "answer": "B",
-    "hint": "It is known that the refractive index of ice is lower than that of quartz, which is in turn lower than that of diamond. The figure below shows how a ray of light travels through the three materials. Which of the following combinations is the most appropriate? material A material B material C",
+    "hint": "It is known that the refractive index of ice is lower than that of quartz, which is in turn lower than that of diamond. The figure below shows how a ray of light travels through the three materials. Which of the following combinations is the most appropriate?\n\nmaterial A material B material C",
     "image": {
       "src": "./assets/light-2024-q42-fig.png",
       "alt": "Diagram for light-2024-q42",
