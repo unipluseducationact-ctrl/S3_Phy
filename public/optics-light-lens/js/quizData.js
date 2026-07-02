@@ -1717,11 +1717,18 @@ const MCQ_ITEMS = [
     ],
     "answer": "D",
     "hint": "The figure below shows a periscope (潛望鏡) which consists of two plane mirrors.",
-    "image": {
-      "src": "./assets/light-2024b-q03-fig.png",
-      "alt": "Diagram for light-2024b-q03",
-      "caption": "Fig - Question 3"
-    }
+    "images": [
+      {
+        "src": "./assets/light-2024b-q03-fig.png",
+        "alt": "Diagram for light-2024b-q03",
+        "caption": "Fig - Question 3"
+      },
+      {
+        "src": "./assets/light-2024b-q03-fig-2.png",
+        "alt": "Options A–D for light-2024b-q03",
+        "caption": "Options A–D"
+      }
+    ]
   },
   {
     "id": "light-2024b-q04",
