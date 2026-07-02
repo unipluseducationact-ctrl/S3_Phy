@@ -438,7 +438,7 @@ function drawArrow(ctx, view, t, from, to, opts = {}) {
   ctx.setLineDash([]);
   if (head && progress >= 0.95) {
     const ang = Math.atan2(s1.y - s0.y, s1.x - s0.x);
-    const hl = 15;
+    const hl = 9;
     ctx.fillStyle = color;
     ctx.beginPath();
     ctx.moveTo(s1.x, s1.y);
@@ -554,12 +554,14 @@ class RayAnimator {
     this.stepDelayMs = 550;
     this.onUpdate = null;
     this.rayCount = 2;
+    /** Steps per ray/image unit (default 5 for HKDSE sight rays; wedge mirrors use 2). */
+    this.stepsPerRay = STEPS_PER_RAY;
     /** Extra animation steps after all rays (e.g. similar-triangle construction). */
     this.extraSteps = 0;
   }
 
   get totalSteps() {
-    return (this.rayCount || 1) * STEPS_PER_RAY + (this.extraSteps || 0);
+    return (this.rayCount || 1) * (this.stepsPerRay || STEPS_PER_RAY) + (this.extraSteps || 0);
   }
 
   get progress() {
@@ -606,9 +608,6 @@ class RayAnimator {
 
   stepNext() {
     this.pause();
-    if (this.totalSteps > 0 && this.stepIndex >= this.totalSteps) {
-      this.stepIndex = 0;
-    }
     if (this.stepIndex < this.totalSteps) {
       this.stepIndex += 1;
       this.onUpdate?.();
@@ -1032,8 +1031,6 @@ function createImageFormationScenario() {
             const sy = txf.oy - params.H * txf.pxPerM;
             drawLabel(ctx, sx, sy, "A'B'", COLORS.image);
           }
-        } else if (rayIndex === 1 && pr > 0) {
-          drawPoint(ctx, view, txf, { x: imgX, y: 0 }, 5, COLORS.image, "B'");
         }
       },
       drawPoint: (p) => drawPoint(ctx, view, txf, p, 5, COLORS.object),
@@ -1154,7 +1151,6 @@ function createMinMirrorLengthScenario() {
       drawArrow: (from, to, opts) => drawArrow(ctx, view, txf, from, to, opts),
       drawImageLine: (_a, _b, pr) => {
         if (rayIndex === 0 && pr > 0) drawArrowBody(ctx, view, txf, 0, params.H, imgX, true);
-        else if (rayIndex === 1 && pr > 0) drawPoint(ctx, view, txf, { x: imgX, y: 0 }, 5, COLORS.image, "B'");
       },
       drawPoint: () => {},
     });
@@ -1687,7 +1683,9 @@ function createSeeBackObjectScenario() {
 
 
 
+
 const MIRROR_LEN = 3.5;
+const STEPS_PER_IMAGE = 2;
 const HIT_PX = 18;
 const LINE_HIT_PX = 14;
 
@@ -1727,6 +1725,20 @@ function createAngledMirrorsScenario() {
   let draggingObjectId = null;
   let canvasRef = null;
   let placeMode = false;
+  const animator = new RayAnimator();
+  animator.stepsPerRay = STEPS_PER_IMAGE;
+
+  function syncAnimator(c) {
+    const n = c.nFormula;
+    animator.rayCount = n;
+    if (animator.stepIndex > animator.totalSteps) {
+      animator.stepIndex = animator.totalSteps;
+    }
+  }
+
+  function resetAnimation() {
+    animator.reset();
+  }
 
   function makeObject(index) {
     const pt = defaultObjectInWedge(index, params.theta, params.orientation);
@@ -1795,6 +1807,7 @@ function createAngledMirrorsScenario() {
     params = { theta: 45, orientation: 0, showRays: true, showImages: true };
     placeMode = false;
     resetObjects();
+    resetAnimation();
   }
 
   function updateParams(id, v) {
@@ -1806,10 +1819,12 @@ function createAngledMirrorsScenario() {
         obj.x = p.x;
         obj.y = p.y;
       });
+      resetAnimation();
       return;
     }
     if (id === 'orientation') {
       params.orientation = v;
+      resetAnimation();
       return;
     }
     params[id] = v;
@@ -1818,11 +1833,13 @@ function createAngledMirrorsScenario() {
   function handleAction(id) {
     if (id === 'addObject') {
       objects.push(makeObject(objects.length));
+      resetAnimation();
       canvasRef && draw(canvasRef);
       return;
     }
     if (id === 'removeObject' && objects.length > 1) {
       objects.pop();
+      resetAnimation();
       canvasRef && draw(canvasRef);
       return;
     }
@@ -1986,6 +2003,7 @@ function createAngledMirrorsScenario() {
       if (placeMode && isInsideWedge(world, params.theta, deg2rad(params.orientation))) {
         const pt = constrainInWedge(world, params.theta, deg2rad(params.orientation));
         objects.push({ id: nextObjId++, label: `O${objects.length + 1}`, x: pt.x, y: pt.y });
+        resetAnimation();
         draw(canvas);
       }
     };
@@ -2005,8 +2023,10 @@ function createAngledMirrorsScenario() {
 
       if (dragTarget === 'apex') {
         setOrientationFromPointer(world);
+        resetAnimation();
       } else if (dragTarget === 'm1' || dragTarget === 'm2' || dragTarget === 'm1line' || dragTarget === 'm2line') {
         setThetaFromMirror(dragTarget, world);
+        resetAnimation();
       } else if (typeof dragTarget === 'number') {
         const obj = objects.find((o) => o.id === dragTarget);
         if (obj) {
@@ -2014,6 +2034,7 @@ function createAngledMirrorsScenario() {
           obj.x = p.x;
           obj.y = p.y;
         }
+        resetAnimation();
       }
       draw(canvas);
     };
@@ -2039,6 +2060,8 @@ function createAngledMirrorsScenario() {
     canvasRef = canvas;
     if (!objects.length) resetObjects();
     view = createWorldView(canvas, { worldBounds: { xMin: -1, xMax: 5, yMin: -0.5, yMax: 4.5 }, gridStep: 1 });
+    animator.onUpdate = () => draw(canvas);
+    resetAnimation();
     bindPointer(canvas);
   }
 
@@ -2046,6 +2069,8 @@ function createAngledMirrorsScenario() {
     canvasRef = null;
     dragTarget = null;
     draggingObjectId = null;
+    animator.onUpdate = null;
+    animator.pause();
   }
 
   function drawMirror(ctx, view, txf, a, b, label, draggable = false, active = false) {
@@ -2072,6 +2097,7 @@ function createAngledMirrorsScenario() {
   function draw(canvas) {
     const { w, h, ctx } = resizeCanvasToDisplay(canvas);
     const c = compute();
+    syncAnimator(c);
     fitBounds(c);
     const txf = computeTransform(view, w, h);
     const apexWorld = { x: 0, y: 0 };
@@ -2125,16 +2151,24 @@ function createAngledMirrorsScenario() {
     ctx.lineWidth = 2;
     ctx.stroke();
 
+    const stepIndex = animator.stepIndex;
+    const showAll = stepIndex >= animator.totalSteps;
+
     if (params.showImages) {
       c.objectSets.forEach((set) => {
-        if (params.showRays) {
-          set.images.forEach((img) => {
+        set.images.forEach((img, i) => {
+          const imageStep = i * STEPS_PER_IMAGE + 1;
+          const rayStep = i * STEPS_PER_IMAGE + 2;
+          const showImage = showAll || stepIndex >= imageStep;
+          const showRay = showAll || stepIndex >= rayStep;
+
+          if (showImage) {
+            const lbl = objects.length > 1 ? `${set.object.label}→${img.label}` : img.label;
+            drawPoint(ctx, view, txf, img.pt, 5, COLORS.image, lbl);
+          }
+          if (params.showRays && showRay) {
             drawArrow(ctx, view, txf, set.object, img.pt, { dashed: true, color: COLORS.rayVirtual, width: 1 });
-          });
-        }
-        set.images.forEach((img) => {
-          const lbl = objects.length > 1 ? `${set.object.label}→${img.label}` : img.label;
-          drawPoint(ctx, view, txf, img.pt, 5, COLORS.image, lbl);
+          }
         });
       });
     }
@@ -2165,6 +2199,7 @@ function createAngledMirrorsScenario() {
     id: 'angledMirrors', init, draw, compute, getControls, updateParams, preset, teardown,
     getDescription, getStats, getFormula,
     handleAction,
+    getAnimator: () => animator,
     extraToggles: [
       { id: 'showRays', labelKey: 'showRays' },
       { id: 'showImages', labelKey: 'showImages' },
