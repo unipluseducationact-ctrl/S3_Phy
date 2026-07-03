@@ -66,7 +66,7 @@ const CSS = `
   background: #0d0d10;
   border-radius: 12px;
   width: 100%;
-  max-width: 460px;
+  max-width: 520px;
   height: auto;
   aspect-ratio: 460 / 340;
   display: block;
@@ -76,11 +76,16 @@ const CSS = `
   background: #0d0d10;
   border-radius: 12px;
   width: 100%;
-  max-width: 800px;
+  max-width: 580px;
   height: auto;
-  aspect-ratio: 800 / 560;
+  aspect-ratio: 640 / 420;
   display: block;
   border: 1px solid rgba(255, 255, 255, 0.03);
+}
+.tl-wrap .tl-bath-bar--full-width {
+  grid-column: 1 / -1;
+  grid-row: 2;
+  margin-top: 0;
 }
 .tl-wrap .tl-bath-bar {
   display: flex;
@@ -278,9 +283,9 @@ const CSS = `
 @media (min-width: 1024px) {
   .tl-wrap .tl-dash {
     display: grid;
-    grid-template-columns: minmax(0, 460px) 1fr;
-    grid-template-rows: auto auto;
-    gap: 20px;
+    grid-template-columns: minmax(0, 1fr) minmax(0, 1.1fr);
+    grid-template-rows: auto auto auto;
+    gap: 16px;
     align-items: stretch;
     position: relative;
   }
@@ -291,8 +296,6 @@ const CSS = `
     display: flex;
     justify-content: center;
     align-items: center;
-    border: 2px solid #3b82f6;
-    box-shadow: 0 0 20px rgba(59, 130, 246, 0.2);
   }
   .tl-wrap .tl-viz-graph {
     grid-column: 2;
@@ -301,11 +304,9 @@ const CSS = `
     display: flex;
     justify-content: center;
     align-items: center;
-    border: 2px solid #10b981;
-    box-shadow: 0 0 20px rgba(16, 185, 129, 0.2);
   }
   .tl-wrap .tl-live-calculations {
-    grid-row: 2;
+    grid-row: 3;
     grid-column: 1 / -1;
     min-width: 0;
   }
@@ -327,7 +328,7 @@ const CSS = `
   }
   .tl-wrap .tl-worked-solution {
     padding: 14px 20px;
-    font-size: 0.9rem;
+    font-size: 1rem;
     border-radius: 10px;
     border-left-width: 6px;
     box-shadow: 0 4px 12px rgba(0,0,0,0.3);
@@ -381,7 +382,7 @@ const CSS = `
   background: var(--tl-panel);
   border: 1px solid var(--tl-border);
   border-radius: 16px;
-  padding: 16px;
+  padding: 20px;
   min-width: 0;
 }
 .tl-wrap .tl-live-tab {
@@ -638,10 +639,10 @@ const CSS = `
   align-items: center;
   justify-content: center;
   margin: 12px 0;
-  font-size: 1.1rem;
+  font-size: 1.35rem;
   color: #fff;
   background-color: rgba(0,0,0,0.25);
-  padding: 10px;
+  padding: 12px;
   border-radius: 8px;
   border: 1px solid rgba(255, 255, 255, 0.03);
 }
@@ -1024,29 +1025,29 @@ export function createThermometerLab(t, options = {}) {
 
       <!-- TOP ROW RIGHT: GRAPH -->
       <div class="tl-viz-graph" style="display:flex;flex-direction:column;gap:8px;align-items:stretch;width:100%">
-        <canvas class="tl-canvas-graph" id="tl-graphCanvas" width="800" height="560"></canvas>
-        
-        <!-- Interactive Temperature Slider aligned directly under the Graph -->
-        <div class="tl-bath-bar tl-bath-bar--under-graph">
-          <div class="tl-bath-bar-top">
-            <div class="tl-beaker-overlay">
-              <span>Liquid: <b id="tl-bath-state">Water</b></span>
-              <span><b class="tl-temp-badge" id="tl-bath-temp-display">25.0°C</b></span>
-            </div>
-            <div class="tl-bath-slider-wrap">
-              <div class="tl-lr">
-                <span>T<sub>bath</sub></span>
-                <span class="tl-badge tl-lr-value tl-val-bath-temp" id="tl-val-bath-temp">25.0 °C</span>
-              </div>
-              <input type="range" id="tl-bath-temp-slider" min="0" max="200" step="0.5" value="25.0">
-            </div>
+        <canvas class="tl-canvas-graph" id="tl-graphCanvas" width="640" height="420"></canvas>
+      </div>
+
+      <!-- BATH CONTROLS (full width row) -->
+      <div class="tl-bath-bar tl-bath-bar--full-width">
+        <div class="tl-bath-bar-top">
+          <div class="tl-beaker-overlay">
+            <span>Liquid: <b id="tl-bath-state">Water</b></span>
+            <span><b class="tl-temp-badge" id="tl-bath-temp-display">25.0°C</b></span>
           </div>
-          <div class="tl-btn-group">
-            <button class="tl-btn tl-preset-btn" id="tl-btn-preset-ice">Ice 0°C</button>
-            <button class="tl-btn tl-preset-btn" id="tl-btn-preset-room">Room 25°C</button>
-            <button class="tl-btn tl-preset-btn" id="tl-btn-preset-steam">Steam 100°C</button>
-            <button class="tl-btn tl-preset-btn" id="tl-btn-preset-oil">Oil 150°C</button>
+          <div class="tl-bath-slider-wrap">
+            <div class="tl-lr">
+              <span>T<sub>bath</sub></span>
+              <span class="tl-badge tl-lr-value tl-val-bath-temp" id="tl-val-bath-temp">25.0 °C</span>
+            </div>
+            <input type="range" id="tl-bath-temp-slider" min="0" max="200" step="0.5" value="25.0">
           </div>
+        </div>
+        <div class="tl-btn-group">
+          <button class="tl-btn tl-preset-btn" id="tl-btn-preset-ice">Ice 0°C</button>
+          <button class="tl-btn tl-preset-btn" id="tl-btn-preset-room">Room 25°C</button>
+          <button class="tl-btn tl-preset-btn" id="tl-btn-preset-steam">Steam 100°C</button>
+          <button class="tl-btn tl-preset-btn" id="tl-btn-preset-oil">Oil 150°C</button>
         </div>
       </div>
 
@@ -1058,14 +1059,14 @@ export function createThermometerLab(t, options = {}) {
             <div class="tl-worked-solution tl-dual-direction">
               <div class="tl-direction-col">
                 <div class="tl-info-label" style="font-size:0.75rem;color:var(--tl-cyan);margin-bottom:4px">Direction A: Length to Temperature (L<sub>T</sub> &rarr; T)</div>
-                <div id="tl-svg-formula-liquid" class="tl-math-formula" style="height:45px; margin:4px 0"></div>
-                <p style="margin:2px 0; font-size:0.85rem">Substitute current reading <b class="tl-live-value" id="tl-live-liquid-lt">5.50 cm</b>:</p>
-                <div id="tl-svg-formula-liquid-sub" class="tl-math-formula" style="height:100px; margin:4px 0"></div>
+                <div id="tl-svg-formula-liquid" class="tl-math-formula" style="min-height:55px; margin:4px 0"></div>
+                <p style="margin:2px 0; font-size:0.95rem">Substitute current reading <b class="tl-live-value" id="tl-live-liquid-lt">5.50 cm</b>:</p>
+                <div id="tl-svg-formula-liquid-sub" class="tl-math-formula" style="min-height:90px; margin:4px 0"></div>
               </div>
               <div class="tl-direction-col">
                 <div class="tl-info-label" style="font-size:0.75rem;color:var(--tl-cyan);margin-bottom:4px">Direction B: Temperature to Length (T &rarr; L<sub>T</sub>)</div>
-                <p style="margin:2px 0; font-size:0.85rem">Substitute current bath temperature <b class="tl-live-value" id="tl-live-liquid-t-sub">25.0°C</b>:</p>
-                <div id="tl-svg-formula-t-to-l" class="tl-math-formula" style="font-size:0.85rem;height:110px; margin:4px 0"></div>
+                <p style="margin:2px 0; font-size:0.95rem">Substitute current bath temperature <b class="tl-live-value" id="tl-live-liquid-t-sub">25.0°C</b>:</p>
+                <div id="tl-svg-formula-t-to-l" class="tl-math-formula" style="min-height:100px; margin:4px 0"></div>
               </div>
             </div>
           </div>
@@ -1076,14 +1077,14 @@ export function createThermometerLab(t, options = {}) {
             <div class="tl-worked-solution tl-dual-direction">
               <div class="tl-direction-col">
                 <div class="tl-info-label" style="font-size:0.75rem;color:var(--tl-cyan);margin-bottom:4px">Direction A: Resistance to Temperature (R<sub>T</sub> &rarr; T)</div>
-                <div id="tl-svg-formula-resistance" class="tl-math-formula" style="height:45px; margin:4px 0"></div>
-                <p style="margin:2px 0; font-size:0.85rem">Substitute current resistance <b class="tl-live-value" id="tl-live-resistance-rt">5.30 Ω</b>:</p>
-                <div id="tl-svg-formula-resistance-sub" class="tl-math-formula" style="height:100px; margin:4px 0"></div>
+                <div id="tl-svg-formula-resistance" class="tl-math-formula" style="min-height:55px; margin:4px 0"></div>
+                <p style="margin:2px 0; font-size:0.95rem">Substitute current resistance <b class="tl-live-value" id="tl-live-resistance-rt">5.30 Ω</b>:</p>
+                <div id="tl-svg-formula-resistance-sub" class="tl-math-formula" style="min-height:90px; margin:4px 0"></div>
               </div>
               <div class="tl-direction-col">
                 <div class="tl-info-label" style="font-size:0.75rem;color:var(--tl-cyan);margin-bottom:4px">Direction B: Temperature to Resistance (T &rarr; R<sub>T</sub>)</div>
-                <p style="margin:2px 0; font-size:0.85rem">Substitute current bath temperature <b class="tl-live-value" id="tl-live-resistance-t-sub">25.0°C</b>:</p>
-                <div id="tl-svg-formula-t-to-r" class="tl-math-formula" style="font-size:0.85rem;height:110px; margin:4px 0"></div>
+                <p style="margin:2px 0; font-size:0.95rem">Substitute current bath temperature <b class="tl-live-value" id="tl-live-resistance-t-sub">25.0°C</b>:</p>
+                <div id="tl-svg-formula-t-to-r" class="tl-math-formula" style="min-height:100px; margin:4px 0"></div>
               </div>
             </div>
           </div>
@@ -1092,9 +1093,9 @@ export function createThermometerLab(t, options = {}) {
           <div class="tl-controls-steps">
             <div class="tl-info-label" style="margin-top:0;font-size:0.8rem;color:var(--tl-green)">${t('tools.thermometerLab.thermistor.liveBetaLabel')}</div>
             <div class="tl-worked-solution" style="background-color:rgba(16,185,129,0.05);border-left-color:var(--tl-green)">
-              <div id="tl-svg-formula-thermistor" class="tl-math-formula" style="font-size:0.85rem"></div>
-              <p style="font-size:0.85rem">Substitute current resistance <b class="tl-live-value" id="tl-live-thermistor-rt">10.00 kΩ</b>:</p>
-              <div id="tl-svg-formula-thermistor-sub" class="tl-math-formula" style="font-size:0.85rem"></div>
+              <div id="tl-svg-formula-thermistor" class="tl-math-formula"></div>
+              <p style="font-size:0.95rem">Substitute current resistance <b class="tl-live-value" id="tl-live-thermistor-rt">10.00 kΩ</b>:</p>
+              <div id="tl-svg-formula-thermistor-sub" class="tl-math-formula"></div>
             </div>
           </div>
         </div>
@@ -1301,9 +1302,9 @@ export function createThermometerLab(t, options = {}) {
 
   const PHYS_WIDTH = 460;
   const PHYS_HEIGHT = 340;
-  const PHYS_SCENE_OFFSET_X = 80;
-  const GRAPH_WIDTH = 800;
-  const GRAPH_HEIGHT = 560;
+  const PHYS_SCENE_OFFSET_X = 40;
+  const GRAPH_WIDTH = 640;
+  const GRAPH_HEIGHT = 420;
 
   function getGraphLayout() {
     const margin = { left: 110, top: 48, right: 30, bottom: 65 };
@@ -2361,26 +2362,22 @@ export function createThermometerLab(t, options = {}) {
       const l100_l0 = state.liquidL100 - state.liquidL0;
       const lt_l0 = state.currentLength - state.liquidL0;
       liquidFormulaSub.innerHTML = `
-        <svg height="110" width="340" style="background:transparent; overflow:visible;">
-          <!-- Step 1: Slope Equivalence -->
-          <text x="10" y="22" fill="#fff" font-family="Cambria, Georgia, serif" font-size="13">Step 1: Equate Slopes</text>
-          <line x1="10" y1="47" x2="100" y2="47" stroke="#fff" stroke-width="1.2" />
-          <text x="55" y="38" fill="#a1a1aa" font-family="Cambria, Georgia, serif" font-size="11" text-anchor="middle">${state.liquidL100.toFixed(1)} - ${state.liquidL0.toFixed(1)}</text>
-          <text x="55" y="60" fill="#a1a1aa" font-family="Cambria, Georgia, serif" font-size="11" text-anchor="middle">100 - 0</text>
+        <svg height="90" width="340" style="background:transparent; overflow:visible;">
+          <line x1="10" y1="30" x2="100" y2="30" stroke="#fff" stroke-width="1.2" />
+          <text x="55" y="21" fill="#a1a1aa" font-family="Cambria, Georgia, serif" font-size="12" text-anchor="middle">${state.liquidL100.toFixed(1)} - ${state.liquidL0.toFixed(1)}</text>
+          <text x="55" y="43" fill="#a1a1aa" font-family="Cambria, Georgia, serif" font-size="12" text-anchor="middle">100 - 0</text>
           
-          <text x="110" y="52" fill="#fff" font-family="Cambria, Georgia, serif" font-size="14">=</text>
+          <text x="110" y="35" fill="#fff" font-family="Cambria, Georgia, serif" font-size="15">=</text>
           
-          <line x1="130" y1="47" x2="220" y2="47" stroke="#fff" stroke-width="1.2" />
-          <text x="175" y="38" fill="#06b6d4" font-family="Cambria, Georgia, serif" font-weight="bold" font-size="11" text-anchor="middle">${state.currentLength.toFixed(2)} - ${state.liquidL0.toFixed(1)}</text>
-          <text x="175" y="60" fill="#fff" font-family="Cambria, Georgia, serif" font-size="11" text-anchor="middle">T - 0</text>
+          <line x1="130" y1="30" x2="220" y2="30" stroke="#fff" stroke-width="1.2" />
+          <text x="175" y="21" fill="#06b6d4" font-family="Cambria, Georgia, serif" font-weight="bold" font-size="12" text-anchor="middle">${state.currentLength.toFixed(2)} - ${state.liquidL0.toFixed(1)}</text>
+          <text x="175" y="43" fill="#fff" font-family="Cambria, Georgia, serif" font-size="12" text-anchor="middle">T - 0</text>
 
-          <!-- Step 2: Simplify Ratio -->
-          <text x="10" y="85" fill="#fff" font-family="Cambria, Georgia, serif" font-size="13">Step 2: Solve for T</text>
-          <line x1="120" y1="80" x2="200" y2="80" stroke="#fff" stroke-width="1.2" />
-          <text x="160" y="72" fill="#06b6d4" font-family="Cambria, Georgia, serif" font-weight="bold" font-size="11" text-anchor="middle">${lt_l0.toFixed(2)} &times; 100</text>
-          <text x="160" y="94" fill="#a1a1aa" font-family="Cambria, Georgia, serif" font-size="11" text-anchor="middle">${l100_l0.toFixed(1)}</text>
+          <line x1="10" y1="68" x2="90" y2="68" stroke="#fff" stroke-width="1.2" />
+          <text x="50" y="60" fill="#06b6d4" font-family="Cambria, Georgia, serif" font-weight="bold" font-size="12" text-anchor="middle">${lt_l0.toFixed(2)} &times; 100</text>
+          <text x="50" y="82" fill="#a1a1aa" font-family="Cambria, Georgia, serif" font-size="12" text-anchor="middle">${l100_l0.toFixed(1)}</text>
           
-          <text x="215" y="85" fill="#10b981" font-family="system-ui, sans-serif" font-weight="900" font-size="15" class="tl-final-ans">&rArr; T = ${state.thermometerTemp.toFixed(1)}°C</text>
+          <text x="105" y="73" fill="#10b981" font-family="system-ui, sans-serif" font-weight="900" font-size="16" class="tl-final-ans">&rArr; T = ${state.thermometerTemp.toFixed(1)}°C</text>
         </svg>
       `;
     }
@@ -2408,26 +2405,22 @@ export function createThermometerLab(t, options = {}) {
       const r100_r0 = state.resistanceR100 - state.resistanceR0;
       const rt_r0 = state.currentResistance - state.resistanceR0;
       resistanceFormulaSub.innerHTML = `
-        <svg height="110" width="340" style="background:transparent; overflow:visible;">
-          <!-- Step 1: Slope Equivalence -->
-          <text x="10" y="22" fill="#fff" font-family="Cambria, Georgia, serif" font-size="13">Step 1: Equate Slopes</text>
-          <line x1="10" y1="47" x2="100" y2="47" stroke="#fff" stroke-width="1.2" />
-          <text x="55" y="38" fill="#a1a1aa" font-family="Cambria, Georgia, serif" font-size="11" text-anchor="middle">${state.resistanceR100.toFixed(1)} - ${state.resistanceR0.toFixed(1)}</text>
-          <text x="55" y="60" fill="#a1a1aa" font-family="Cambria, Georgia, serif" font-size="11" text-anchor="middle">100 - 0</text>
+        <svg height="90" width="340" style="background:transparent; overflow:visible;">
+          <line x1="10" y1="30" x2="100" y2="30" stroke="#fff" stroke-width="1.2" />
+          <text x="55" y="21" fill="#a1a1aa" font-family="Cambria, Georgia, serif" font-size="12" text-anchor="middle">${state.resistanceR100.toFixed(1)} - ${state.resistanceR0.toFixed(1)}</text>
+          <text x="55" y="43" fill="#a1a1aa" font-family="Cambria, Georgia, serif" font-size="12" text-anchor="middle">100 - 0</text>
           
-          <text x="110" y="52" fill="#fff" font-family="Cambria, Georgia, serif" font-size="14">=</text>
+          <text x="110" y="35" fill="#fff" font-family="Cambria, Georgia, serif" font-size="15">=</text>
           
-          <line x1="130" y1="47" x2="220" y2="47" stroke="#fff" stroke-width="1.2" />
-          <text x="175" y="38" fill="#6366f1" font-family="Cambria, Georgia, serif" font-weight="bold" font-size="11" text-anchor="middle">${state.currentResistance.toFixed(2)} - ${state.resistanceR0.toFixed(1)}</text>
-          <text x="175" y="60" fill="#fff" font-family="Cambria, Georgia, serif" font-size="11" text-anchor="middle">T - 0</text>
+          <line x1="130" y1="30" x2="220" y2="30" stroke="#fff" stroke-width="1.2" />
+          <text x="175" y="21" fill="#6366f1" font-family="Cambria, Georgia, serif" font-weight="bold" font-size="12" text-anchor="middle">${state.currentResistance.toFixed(2)} - ${state.resistanceR0.toFixed(1)}</text>
+          <text x="175" y="43" fill="#fff" font-family="Cambria, Georgia, serif" font-size="12" text-anchor="middle">T - 0</text>
 
-          <!-- Step 2: Simplify Ratio -->
-          <text x="10" y="85" fill="#fff" font-family="Cambria, Georgia, serif" font-size="13">Step 2: Solve for T</text>
-          <line x1="120" y1="80" x2="200" y2="80" stroke="#fff" stroke-width="1.2" />
-          <text x="160" y="72" fill="#6366f1" font-family="Cambria, Georgia, serif" font-weight="bold" font-size="11" text-anchor="middle">${rt_r0.toFixed(2)} &times; 100</text>
-          <text x="160" y="94" fill="#a1a1aa" font-family="Cambria, Georgia, serif" font-size="11" text-anchor="middle">${r100_r0.toFixed(1)}</text>
+          <line x1="10" y1="68" x2="90" y2="68" stroke="#fff" stroke-width="1.2" />
+          <text x="50" y="60" fill="#6366f1" font-family="Cambria, Georgia, serif" font-weight="bold" font-size="12" text-anchor="middle">${rt_r0.toFixed(2)} &times; 100</text>
+          <text x="50" y="82" fill="#a1a1aa" font-family="Cambria, Georgia, serif" font-size="12" text-anchor="middle">${r100_r0.toFixed(1)}</text>
           
-          <text x="215" y="85" fill="#10b981" font-family="system-ui, sans-serif" font-weight="900" font-size="15" class="tl-final-ans">&rArr; T = ${state.thermometerTemp.toFixed(1)}°C</text>
+          <text x="105" y="73" fill="#10b981" font-family="system-ui, sans-serif" font-weight="900" font-size="16" class="tl-final-ans">&rArr; T = ${state.thermometerTemp.toFixed(1)}°C</text>
         </svg>
       `;
     }
@@ -2704,22 +2697,18 @@ export function createThermometerLab(t, options = {}) {
     const formulaPane = wrap.querySelector('#tl-svg-formula-t-to-l');
     if (formulaPane) {
       formulaPane.innerHTML = `
-        <svg height="110" width="340" style="background:transparent; overflow:visible;">
-          <!-- Step 1: Slope Equivalence -->
-          <text x="10" y="22" fill="#fff" font-family="Cambria, Georgia, serif" font-size="13">Step 1: Equate Slopes</text>
-          <line x1="10" y1="47" x2="100" y2="47" stroke="#fff" stroke-width="1.2" />
-          <text x="55" y="38" fill="#a1a1aa" font-family="Cambria, Georgia, serif" font-size="11" text-anchor="middle">${state.liquidL100.toFixed(1)} - ${state.liquidL0.toFixed(1)}</text>
-          <text x="55" y="60" fill="#a1a1aa" font-family="Cambria, Georgia, serif" font-size="11" text-anchor="middle">100 - 0</text>
+        <svg height="90" width="340" style="background:transparent; overflow:visible;">
+          <line x1="10" y1="30" x2="100" y2="30" stroke="#fff" stroke-width="1.2" />
+          <text x="55" y="21" fill="#a1a1aa" font-family="Cambria, Georgia, serif" font-size="12" text-anchor="middle">${state.liquidL100.toFixed(1)} - ${state.liquidL0.toFixed(1)}</text>
+          <text x="55" y="43" fill="#a1a1aa" font-family="Cambria, Georgia, serif" font-size="12" text-anchor="middle">100 - 0</text>
           
-          <text x="110" y="52" fill="#fff" font-family="Cambria, Georgia, serif" font-size="14">=</text>
+          <text x="110" y="35" fill="#fff" font-family="Cambria, Georgia, serif" font-size="15">=</text>
           
-          <line x1="130" y1="47" x2="220" y2="47" stroke="#fff" stroke-width="1.2" />
-          <text x="175" y="38" fill="#06b6d4" font-family="Cambria, Georgia, serif" font-weight="bold" font-size="11" text-anchor="middle">L<tspan dy="2" font-size="8">T</tspan><tspan dy="-2"> - ${state.liquidL0.toFixed(1)}</tspan></text>
-          <text x="175" y="60" fill="#fff" font-family="Cambria, Georgia, serif" font-size="11" text-anchor="middle">${tInput.toFixed(1)} - 0</text>
+          <line x1="130" y1="30" x2="220" y2="30" stroke="#fff" stroke-width="1.2" />
+          <text x="175" y="21" fill="#06b6d4" font-family="Cambria, Georgia, serif" font-weight="bold" font-size="12" text-anchor="middle">L<tspan dy="2" font-size="8">T</tspan><tspan dy="-2"> - ${state.liquidL0.toFixed(1)}</tspan></text>
+          <text x="175" y="43" fill="#fff" font-family="Cambria, Georgia, serif" font-size="12" text-anchor="middle">${tInput.toFixed(1)} - 0</text>
 
-          <!-- Step 2: Solve for L_T -->
-          <text x="10" y="85" fill="#fff" font-family="Cambria, Georgia, serif" font-size="13">Step 2: Solve for L<tspan dy="2" font-size="8">T</tspan><tspan dy="-2"></tspan></text>
-          <text x="10" y="103" fill="#fff" font-family="Cambria, Georgia, serif" font-size="13">L<tspan dy="2" font-size="8">T</tspan><tspan dy="-2"> = ${state.liquidL0.toFixed(1)} + </tspan>
+          <text x="10" y="73" fill="#fff" font-family="Cambria, Georgia, serif" font-size="14">L<tspan dy="2" font-size="8">T</tspan><tspan dy="-2"> = ${state.liquidL0.toFixed(1)} + </tspan>
             <tspan fill="#a1a1aa">(${l100_l0.toFixed(1)} / 100)</tspan> &times; ${tInput.toFixed(1)} = <tspan fill="#10b981" font-family="system-ui, sans-serif" font-weight="900" class="tl-final-ans">${length.toFixed(2)} cm</tspan>
           </text>
         </svg>
@@ -2736,22 +2725,18 @@ export function createThermometerLab(t, options = {}) {
     const formulaPane = wrap.querySelector('#tl-svg-formula-t-to-r');
     if (formulaPane) {
       formulaPane.innerHTML = `
-        <svg height="110" width="340" style="background:transparent; overflow:visible;">
-          <!-- Step 1: Slope Equivalence -->
-          <text x="10" y="22" fill="#fff" font-family="Cambria, Georgia, serif" font-size="13">Step 1: Equate Slopes</text>
-          <line x1="10" y1="47" x2="100" y2="47" stroke="#fff" stroke-width="1.2" />
-          <text x="55" y="38" fill="#a1a1aa" font-family="Cambria, Georgia, serif" font-size="11" text-anchor="middle">${state.resistanceR100.toFixed(1)} - ${state.resistanceR0.toFixed(1)}</text>
-          <text x="55" y="60" fill="#a1a1aa" font-family="Cambria, Georgia, serif" font-size="11" text-anchor="middle">100 - 0</text>
+        <svg height="90" width="340" style="background:transparent; overflow:visible;">
+          <line x1="10" y1="30" x2="100" y2="30" stroke="#fff" stroke-width="1.2" />
+          <text x="55" y="21" fill="#a1a1aa" font-family="Cambria, Georgia, serif" font-size="12" text-anchor="middle">${state.resistanceR100.toFixed(1)} - ${state.resistanceR0.toFixed(1)}</text>
+          <text x="55" y="43" fill="#a1a1aa" font-family="Cambria, Georgia, serif" font-size="12" text-anchor="middle">100 - 0</text>
           
-          <text x="110" y="52" fill="#fff" font-family="Cambria, Georgia, serif" font-size="14">=</text>
+          <text x="110" y="35" fill="#fff" font-family="Cambria, Georgia, serif" font-size="15">=</text>
           
-          <line x1="130" y1="47" x2="220" y2="47" stroke="#fff" stroke-width="1.2" />
-          <text x="175" y="38" fill="#6366f1" font-family="Cambria, Georgia, serif" font-weight="bold" font-size="11" text-anchor="middle">R<tspan dy="2" font-size="8">T</tspan><tspan dy="-2"> - ${state.resistanceR0.toFixed(1)}</tspan></text>
-          <text x="175" y="60" fill="#fff" font-family="Cambria, Georgia, serif" font-size="11" text-anchor="middle">${tInput.toFixed(1)} - 0</text>
+          <line x1="130" y1="30" x2="220" y2="30" stroke="#fff" stroke-width="1.2" />
+          <text x="175" y="21" fill="#6366f1" font-family="Cambria, Georgia, serif" font-weight="bold" font-size="12" text-anchor="middle">R<tspan dy="2" font-size="8">T</tspan><tspan dy="-2"> - ${state.resistanceR0.toFixed(1)}</tspan></text>
+          <text x="175" y="43" fill="#fff" font-family="Cambria, Georgia, serif" font-size="12" text-anchor="middle">${tInput.toFixed(1)} - 0</text>
 
-          <!-- Step 2: Solve for R_T -->
-          <text x="10" y="85" fill="#fff" font-family="Cambria, Georgia, serif" font-size="13">Step 2: Solve for R<tspan dy="2" font-size="8">T</tspan><tspan dy="-2"></tspan></text>
-          <text x="10" y="103" fill="#fff" font-family="Cambria, Georgia, serif" font-size="13">R<tspan dy="2" font-size="8">T</tspan><tspan dy="-2"> = ${state.resistanceR0.toFixed(1)} + </tspan>
+          <text x="10" y="73" fill="#fff" font-family="Cambria, Georgia, serif" font-size="14">R<tspan dy="2" font-size="8">T</tspan><tspan dy="-2"> = ${state.resistanceR0.toFixed(1)} + </tspan>
             <tspan fill="#a1a1aa">(${r100_r0.toFixed(1)} / 100)</tspan> &times; ${tInput.toFixed(1)} = <tspan fill="#10b981" font-family="system-ui, sans-serif" font-weight="900" class="tl-final-ans">${resistance.toFixed(2)} Ω</tspan>
           </text>
         </svg>

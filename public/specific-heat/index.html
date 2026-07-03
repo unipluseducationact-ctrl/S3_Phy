@@ -12,6 +12,8 @@
   <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/katex@0.16.8/dist/katex.min.css">
   <script src="https://cdn.jsdelivr.net/npm/katex@0.16.8/dist/katex.min.js"></script>
   <link rel="stylesheet" href="../shared/s3phy-tokens.css">
+  <link rel="stylesheet" href="../shared/s3phy-embed.css">
+  <script src="../shared/s3phy-embed-init.js"></script>
   <style>
     body {
       font-family: var(--s3-font, 'Inter', sans-serif);
@@ -35,8 +37,8 @@
     }
     .lab-section { position: relative; min-height: min(640px, calc(100dvh - 48px)); }
     @media (min-width: 900px) {
-      .lab-section.controls-floating .lab-viz { grid-column: span 8 / span 8; }
-      .lab-section.controls-floating .lab-steps { grid-column: span 4 / span 4; }
+      .lab-section.controls-floating .lab-viz { grid-column: span 6 / span 6; }
+      .lab-section.controls-floating .lab-steps { grid-column: span 6 / span 6; }
     }
     .lab-controls.lab-controls-float {
       position: absolute;
@@ -90,8 +92,9 @@
     .lab-viz { display: flex; flex-direction: column; min-height: 0; }
     .lab-viz-canvas { aspect-ratio: 4 / 3; }
     @media (min-width: 900px) {
-      .lab-section.controls-floating .lab-viz-canvas { aspect-ratio: auto; flex: 1; min-height: 360px; }
+      .lab-section.controls-floating .lab-viz-canvas { aspect-ratio: auto; flex: 1; min-height: 240px; max-height: 320px; }
     }
+    .lab-steps .katex { font-size: 1.2em; }
   </style>
 </head>
 <body class="bg-slate-50 text-slate-800 min-h-screen flex flex-col p-1.5">
@@ -235,7 +238,7 @@
           <span data-i18n="calcSteps">Calculation Steps</span>
         </h3>
         <div id="heatingKeyResults" class="rounded-xl border border-slate-200 bg-slate-50 px-3 py-2 text-[11px] font-mono text-slate-700"></div>
-        <div id="heatingSteps" class="space-y-3 text-[13px] leading-snug">
+        <div id="heatingSteps" class="space-y-3 text-base leading-snug">
           <div class="text-slate-400 text-center py-10" data-i18n="clickStartToSee">Click "Start Lab" to see calculation steps.</div>
         </div>
       </div>
@@ -1042,22 +1045,17 @@
         card.className = `p-3 rounded-xl border transition-all duration-300 ${isActive ? 'bg-gradient-to-br from-blue-50/70 to-indigo-50/30 border-blue-200 ring-2 ring-blue-500/10' : 'bg-slate-50 border-slate-100'} space-y-1.5`;
         
         const titleDiv = document.createElement("div");
-        titleDiv.className = "font-bold text-slate-700 text-[13px]";
+        titleDiv.className = "font-bold text-slate-700 text-base";
         titleDiv.innerHTML = step.title;
         card.appendChild(titleDiv);
 
         const formulaDiv = document.createElement("div");
-        formulaDiv.className = "my-0.5 text-center";
+        formulaDiv.className = "my-1 text-center";
         card.appendChild(formulaDiv);
 
         const subDiv = document.createElement("div");
-        subDiv.className = "my-0.5 text-center text-[11px] text-blue-700 font-semibold";
+        subDiv.className = "my-1 text-center text-sm text-blue-700 font-semibold";
         card.appendChild(subDiv);
-
-        const descDiv = document.createElement("div");
-        descDiv.className = "text-[11px] leading-snug text-slate-600";
-        descDiv.innerHTML = step.desc;
-        card.appendChild(descDiv);
 
         stepsContainer.appendChild(card);
 

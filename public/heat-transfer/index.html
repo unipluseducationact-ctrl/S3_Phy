@@ -11,6 +11,7 @@
     <!-- Chart.js for real-time graphs -->
     <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
     <link rel="stylesheet" href="../shared/s3phy-tokens.css">
+    <link rel="stylesheet" href="../shared/s3phy-embed.css">
     <script src="../shared/s3phy-embed-init.js"></script>
     <style>
         @import url('https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@300;400;500;600;700;800&family=JetBrains+Mono:wght@400;700&display=swap');
@@ -163,9 +164,14 @@
         }
 
         /* Embedded in S3_Phy hub iframe */
+        html.s3phy-embed,
+        html.s3phy-embed body.embed-mode {
+            height: 100%;
+            min-height: 0;
+        }
         body.embed-mode {
             overflow: hidden;
-            min-height: 100% !important;
+            min-height: 0 !important;
             height: 100%;
         }
         body.embed-mode main {
@@ -174,6 +180,8 @@
             padding-top: 0.75rem;
             padding-bottom: 0.75rem;
             overflow: auto;
+            display: flex;
+            flex-direction: column;
         }
         body.embed-mode header {
             padding-top: 0.5rem;
@@ -181,17 +189,38 @@
             flex-shrink: 0;
         }
         body.embed-mode footer {
-            padding-top: 0.75rem;
-            padding-bottom: 0.75rem;
-            flex-shrink: 0;
+            display: none;
+        }
+        body.embed-mode .tab-content:not(.hidden) {
+            flex: 1 1 auto;
+            min-height: 0;
+            display: flex;
+            flex-direction: column;
+        }
+        body.embed-mode .main-grid {
+            flex: 1 1 auto;
+            min-height: 0;
+            align-items: stretch;
         }
         body.embed-mode .sim-main-col {
             flex: 1 1 auto;
             min-height: 0;
         }
+        body.embed-mode .sim-main-col > .glass-panel {
+            flex: 1 1 auto;
+            min-height: 0;
+            display: flex;
+            flex-direction: column;
+        }
         body.embed-mode .canvas-container {
             flex: 1 1 auto;
-            min-height: 0 !important;
+            min-height: min(240px, 28vh) !important;
+            height: auto !important;
+            max-height: none;
+        }
+        body.embed-mode .chart-panel {
+            flex: 1 1 auto;
+            min-height: 0;
             height: auto !important;
             max-height: none;
         }
@@ -361,7 +390,7 @@
                 </div>
 
                 <!-- Real-Time Analytical Graph placed elegantly under Concept Panel -->
-                <div class="glass-panel rounded-2xl p-5 flex flex-col h-80 lg:h-[390px] xl:h-[430px]">
+                <div class="glass-panel chart-panel rounded-2xl p-5 flex flex-col h-80 lg:h-[390px] xl:h-[430px]">
                     <div class="flex justify-between items-center mb-3">
                         <div>
                             <h4 class="font-bold text-sm text-slate-200" data-i18n="conduction.graphTitle">Real-time Conduction Comparison</h4>
@@ -552,7 +581,7 @@
                 </div>
 
                 <!-- Real-Time Analytical Graph placed elegantly under Concept Panel -->
-                <div class="glass-panel rounded-2xl p-5 flex flex-col h-80 lg:h-[390px] xl:h-[430px]">
+                <div class="glass-panel chart-panel rounded-2xl p-5 flex flex-col h-80 lg:h-[390px] xl:h-[430px]">
                     <div class="flex justify-between items-center mb-3">
                         <div>
                             <h4 class="font-bold text-sm text-slate-200" data-i18n="radiation.graphTitle">Real-time Radiation Comparison</h4>

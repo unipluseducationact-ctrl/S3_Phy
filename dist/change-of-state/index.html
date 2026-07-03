@@ -39,8 +39,8 @@
     }
     .lab-section { position: relative; min-height: min(640px, calc(100dvh - 48px)); }
     @media (min-width: 900px) {
-      .lab-section.controls-floating .lab-viz { grid-column: span 8 / span 8; }
-      .lab-section.controls-floating .lab-steps { grid-column: span 4 / span 4; }
+      .lab-section.controls-floating .lab-viz { grid-column: span 6 / span 6; }
+      .lab-section.controls-floating .lab-steps { grid-column: span 6 / span 6; }
     }
     .lab-controls.lab-controls-float {
       position: absolute;
@@ -108,12 +108,15 @@
       .lab-section.controls-floating .lab-viz-canvas {
         aspect-ratio: auto;
         flex: 1 1 auto;
-        min-height: 280px;
+        min-height: 180px;
+        max-height: 220px;
       }
       .lab-section.controls-floating .lab-viz-chart-wrap {
-        min-height: 280px;
+        flex: 1 1 auto;
+        min-height: 200px;
       }
     }
+    .lab-steps .katex { font-size: 1.2em; }
     .lab-viz-dual .lab-viz-panel {
       flex: none;
       flex-shrink: 0;
@@ -129,18 +132,17 @@
       aspect-ratio: 16 / 10;
       width: 100%;
       height: auto;
-      min-height: 200px;
-      max-height: 280px;
+      min-height: 180px;
+      max-height: 220px;
       flex: 1 1 auto;
       overflow: hidden;
     }
     .lab-viz-dual .lab-viz-chart-wrap {
       position: relative;
       width: 100%;
-      height: 280px;
-      min-height: 280px;
-      flex: none;
-      overflow: hidden;
+      flex: 1 1 auto;
+      min-height: 200px;
+      overflow: visible;
     }
     .lab-viz-dual .lab-viz-canvas canvas {
       display: block;
@@ -159,13 +161,14 @@
     html.s3phy-embed .lab-viz-dual .lab-viz-canvas {
       aspect-ratio: 16 / 10;
       height: auto;
-      min-height: min(280px, 38vh);
-      max-height: none;
+      min-height: min(220px, 30vh);
+      max-height: 220px;
       flex: none;
     }
     html.s3phy-embed .lab-viz-dual .lab-viz-chart-wrap {
-      height: min(320px, 42vh);
-      min-height: min(320px, 42vh);
+      flex: 1 1 auto;
+      min-height: 200px;
+      height: auto;
     }
     html.s3phy-embed .lab-controls.lab-controls-float {
       background: #ffffff;
@@ -325,7 +328,7 @@
           <span data-i18n="calcSteps">Calculation Steps</span>
         </h3>
         <div id="stateKeyResults" class="rounded-xl border border-slate-200 bg-slate-50 px-3 py-2 text-[11px] font-mono text-slate-700"></div>
-        <div id="stateSteps" class="space-y-3 text-[13px] leading-snug">
+        <div id="stateSteps" class="space-y-3 text-base leading-snug">
           <div class="text-slate-400 text-center py-10" data-i18n="clickStartToSee">Click "Start Heating" to see calculation steps.</div>
         </div>
       </div>
@@ -613,13 +616,15 @@
 
     function sizeChartContainer() {
       const wrap = document.querySelector('.lab-viz-chart-wrap');
+      const dual = document.querySelector('.lab-viz-dual');
       if (!wrap) return;
       const w = wrap.getBoundingClientRect().width;
       if (w <= 0) return;
       const embed = document.documentElement.classList.contains('s3phy-embed');
-      const h = embed
-        ? Math.max(280, Math.min(Math.round(window.innerHeight * 0.42), Math.round(w * 10 / 16)))
-        : Math.max(280, Math.round(w * 10 / 16));
+      const dualH = dual ? dual.clientHeight : 0;
+      const h = embed && dualH > 0
+        ? Math.max(200, Math.round(dualH * 0.38))
+        : Math.max(200, Math.round(w * 10 / 16));
       wrap.style.height = h + 'px';
       wrap.style.minHeight = h + 'px';
     }
@@ -1304,16 +1309,19 @@
     }
 
     function getChartYRange() {
-      let yMax = 120;
-      if (stateState.substance === 'water') {
-        yMax = stateState.isSealed ? 155 : 115;
-      } else {
-        yMax = 115;
+      const sub = stateState.substance;
+      const mode = stateState.mode;
+      const sealed = stateState.isSealed;
+      if (sub === 'water') {
+        if (mode === 'heating') {
+          return { yMin: -15, yMax: sealed ? 155 : 120 };
+        }
+        return { yMin: -25, yMax: 115 };
       }
-      const yMin = stateState.mode === 'heating'
-        ? (stateState.substance === 'water' ? -25 : 0)
-        : -25;
-      return { yMin, yMax };
+      if (mode === 'heating') {
+        return { yMin: 0, yMax: 230 };
+      }
+      return { yMin: 0, yMax: 120 };
     }
 
     function initChart() {
@@ -1375,13 +1383,14 @@
             y: {
               min: yMin,
               max: yMax,
+              grace: 0,
               title: {
                 display: true,
                 text: isEn ? "Temperature (°C)" : "溫度 (°C)",
                 font: { size: 10, weight: 'bold' }
               },
               grid: { color: 'rgba(148, 163, 184, 0.15)' },
-              ticks: { maxTicksLimit: 10 }
+              ticks: { autoSkip: true, maxTicksLimit: 12 }
             }
           },
           plugins: {
@@ -1560,23 +1569,18 @@
         const titleDiv = document.createElement("div");
         titleDiv.className = "flex justify-between items-center";
         titleDiv.innerHTML = `
-          <span class="font-bold text-slate-700 text-[13px]">${step.title}</span>
+          <span class="font-bold text-slate-700 text-base">${step.title}</span>
           ${step.active ? `<span class="text-[9px] bg-blue-500 text-white px-1.5 py-0.5 rounded-full font-bold uppercase tracking-wider animate-pulse flex items-center gap-1"><span class="w-1.5 h-1.5 rounded-full bg-white"></span>${currentLang === 'en' ? 'Active' : '進行中'}</span>` : ''}
         `;
         card.appendChild(titleDiv);
 
         const formulaDiv = document.createElement("div");
-        formulaDiv.className = "my-0.5 text-center";
+        formulaDiv.className = "my-1 text-center";
         card.appendChild(formulaDiv);
 
         const subDiv = document.createElement("div");
-        subDiv.className = "my-0.5 text-center text-[11px] text-blue-700 font-semibold";
+        subDiv.className = "my-1 text-center text-sm text-blue-700 font-semibold";
         card.appendChild(subDiv);
-
-        const descDiv = document.createElement("div");
-        descDiv.className = "text-[11px] leading-snug text-slate-600";
-        descDiv.innerHTML = step.desc;
-        card.appendChild(descDiv);
 
         stepsContainer.appendChild(card);
 
