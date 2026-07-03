@@ -2501,8 +2501,8 @@ function runAllValidations(state) {
 
 
 
-const HIT_PX = 14;
-const LINE_HIT_PX = 10;
+const SKETCH_HIT_PX = 14;
+const SKETCH_LINE_HIT_PX = 10;
 const MARQUEE_MIN_PX = 4;
 const PLACE_DRAG_MIN = 0.12;
 const SNAP = 0.5;
@@ -2767,16 +2767,16 @@ function createRaySketchScenario() {
       const tpt = toScreenPt(txf, r.to);
       const df = distPx(sx, sy, f.x, f.y);
       const dt = distPx(sx, sy, tpt.x, tpt.y);
-      if (df < HIT_PX) add('ray', r.id, 'from', df, 0);
-      if (dt < HIT_PX) add('ray', r.id, 'to', dt, 0);
+      if (df < SKETCH_HIT_PX) add('ray', r.id, 'from', df, 0);
+      if (dt < SKETCH_HIT_PX) add('ray', r.id, 'to', dt, 0);
       const ds = distSegPx(sx, sy, f.x, f.y, tpt.x, tpt.y);
-      if (ds < LINE_HIT_PX) add('ray', r.id, undefined, ds, 1);
+      if (ds < SKETCH_LINE_HIT_PX) add('ray', r.id, undefined, ds, 1);
     }
 
     for (const o of state.observers) {
       const s = toScreenPt(txf, o.pt);
       const d = distPx(sx, sy, s.x, s.y);
-      if (d < HIT_PX + 2) add('observer', o.id, 'pt', d, 0);
+      if (d < SKETCH_HIT_PX + 2) add('observer', o.id, 'pt', d, 0);
     }
 
     for (const o of state.objects) {
@@ -2784,10 +2784,10 @@ function createRaySketchScenario() {
       const sb = toScreenPt(txf, o.b);
       const da = distPx(sx, sy, sa.x, sa.y);
       const db = distPx(sx, sy, sb.x, sb.y);
-      if (da < HIT_PX) add('object', o.id, 'a', da, 0);
-      if (db < HIT_PX) add('object', o.id, 'b', db, 0);
+      if (da < SKETCH_HIT_PX) add('object', o.id, 'a', da, 0);
+      if (db < SKETCH_HIT_PX) add('object', o.id, 'b', db, 0);
       const ds = distSegPx(sx, sy, sa.x, sa.y, sb.x, sb.y);
-      if (ds < LINE_HIT_PX) add('object', o.id, undefined, ds, 2);
+      if (ds < SKETCH_LINE_HIT_PX) add('object', o.id, undefined, ds, 2);
     }
 
     for (const img of state.images) {
@@ -2795,10 +2795,10 @@ function createRaySketchScenario() {
       const sb = toScreenPt(txf, img.b);
       const da = distPx(sx, sy, sa.x, sa.y);
       const db = distPx(sx, sy, sb.x, sb.y);
-      if (da < HIT_PX) add('image', img.id, 'a', da, 0);
-      if (db < HIT_PX) add('image', img.id, 'b', db, 0);
+      if (da < SKETCH_HIT_PX) add('image', img.id, 'a', da, 0);
+      if (db < SKETCH_HIT_PX) add('image', img.id, 'b', db, 0);
       const ds = distSegPx(sx, sy, sa.x, sa.y, sb.x, sb.y);
-      if (ds < LINE_HIT_PX) add('image', img.id, undefined, ds, 2);
+      if (ds < SKETCH_LINE_HIT_PX) add('image', img.id, undefined, ds, 2);
     }
 
     for (const m of state.mirrors) {
@@ -2806,10 +2806,10 @@ function createRaySketchScenario() {
       const sb = toScreenPt(txf, m.b);
       const da = distPx(sx, sy, sa.x, sa.y);
       const db = distPx(sx, sy, sb.x, sb.y);
-      if (da < HIT_PX) add('mirror', m.id, 'a', da, 0);
-      if (db < HIT_PX) add('mirror', m.id, 'b', db, 0);
+      if (da < SKETCH_HIT_PX) add('mirror', m.id, 'a', da, 0);
+      if (db < SKETCH_HIT_PX) add('mirror', m.id, 'b', db, 0);
       const ds = distSegPx(sx, sy, sa.x, sa.y, sb.x, sb.y);
-      if (ds < LINE_HIT_PX) add('mirror', m.id, undefined, ds, 2);
+      if (ds < SKETCH_LINE_HIT_PX) add('mirror', m.id, undefined, ds, 2);
     }
 
     if (!hits.length) return null;
