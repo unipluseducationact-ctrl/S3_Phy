@@ -145,6 +145,18 @@ function wedgeMirrorDrawAngle(mirrorSide, useCount, half) {
   return sign * (2 * k - 1) * half;
 }
 
+/** Pick apex→tip direction along sector j that points toward towardPt (for virtual mirror extension). */
+function wedgeMirrorDrawAngleToward(j, towardPt, half, thetaRad) {
+  const lineAngle = wedgeMirrorLineAngle(j, half, thetaRad);
+  const c1 = Math.cos(lineAngle);
+  const s1 = Math.sin(lineAngle);
+  const c2 = Math.cos(lineAngle + Math.PI);
+  const s2 = Math.sin(lineAngle + Math.PI);
+  const dot1 = towardPt.x * c1 + towardPt.y * s1;
+  const dot2 = towardPt.x * c2 + towardPt.y * s2;
+  return dot1 >= dot2 ? lineAngle : lineAngle + Math.PI;
+}
+
 /** Find mirror j that reflects altParent to imagePt; draw extension toward image. */
 function findAltMirror(altParent, imagePt, apex, half, thetaRad, nWedges, primaryMirrorOrder) {
   const matches = [];
@@ -163,9 +175,7 @@ function findAltMirror(altParent, imagePt, apex, half, thetaRad, nWedges, primar
   let bestDot = -Infinity;
   for (const j of matches) {
     if (Math.floor(j / 2) + 1 !== preferredOrder) continue;
-    const mirrorSide = j % 2 === 0 ? 2 : 1;
-    const mirrorOrder = Math.floor(j / 2) + 1;
-    const drawAngle = wedgeMirrorDrawAngle(mirrorSide, mirrorOrder, half);
+    const drawAngle = wedgeMirrorDrawAngleToward(j, imagePt, half, thetaRad);
     const towardImage = imagePt.x * Math.cos(drawAngle) + imagePt.y * Math.sin(drawAngle);
     if (towardImage > bestDot) {
       bestDot = towardImage;
@@ -174,7 +184,7 @@ function findAltMirror(altParent, imagePt, apex, half, thetaRad, nWedges, primar
   }
   const mirrorSide = bestJ % 2 === 0 ? 2 : 1;
   const mirrorOrder = Math.floor(bestJ / 2) + 1;
-  const mirrorAngle = wedgeMirrorDrawAngle(mirrorSide, mirrorOrder, half);
+  const mirrorAngle = wedgeMirrorDrawAngleToward(bestJ, imagePt, half, thetaRad);
   return {
     mirrorSide,
     mirrorOrder,
@@ -231,7 +241,7 @@ function imagesInWedge(thetaRad, object, maxImages = 12) {
     const pt = reflectPoint(parent, apex, tip);
     const mirrorSide = mirrorLineIndex % 2 === 0 ? 2 : 1;
     const mirrorOrder = Math.floor(mirrorLineIndex / 2) + 1;
-    const mirrorAngle = wedgeMirrorDrawAngle(mirrorSide, mirrorOrder, half);
+    const mirrorAngle = wedgeMirrorDrawAngleToward(mirrorLineIndex, pt, half, thetaRad);
     const isVirtual = mirrorOrder >= 2;
 
     const entry = {
@@ -871,6 +881,8 @@ const STRINGS = {
     time: '時間',
     angle: '夾角 θ',
     wedgeOrientation: '旋轉 φ',
+    wedgeHintObject: '拖曳物件移動',
+    wedgeClearSketch: '清除作圖',
     showRays: '顯示光線',
     showImages: '顯示虛像',
     addObject: '新增物件',
@@ -985,6 +997,8 @@ const STRINGS = {
     time: 'Time',
     angle: 'Angle θ',
     wedgeOrientation: 'Rotation φ',
+    wedgeHintObject: 'Drag object to move',
+    wedgeClearSketch: 'Clear sketches',
     showRays: 'Show rays',
     showImages: 'Show virtual images',
     addObject: 'Add object',
@@ -1822,7 +1836,15 @@ function createSeeBackObjectScenario() {
 
 const MIRROR_LEN = 3.5;
 const HIT_PX = 18;
-const LINE_HIT_PX = 14;
+const THETA_VALUES = [30, 36, 40, 45, 60, 72, 90];
+
+const SKETCH_TOOLS = ['object', 'observer', 'realRay', 'virtualRay'];
+const SKETCH_TOOL_META = {
+  object: { icon: '▮', hintKey: 'wedgeHintObject', labelKey: 'toolObject' },
+  observer: { icon: '◎', hintKey: 'sketchHintObserver', labelKey: 'toolObserver' },
+  realRay: { icon: '→', hintKey: 'sketchHintRealRay', labelKey: 'toolRealRay', cls: 'tool-ray' },
+  virtualRay: { icon: '⇢', hintKey: 'sketchHintVirtualRay', labelKey: 'toolVirtualRay', cls: 'tool-virtual' },
+};
 
 /** Total animation steps: X/Z use 2 each; i≥2 uses 5 (primary 3 + alt 2). */
 function wedgeTotalSteps(n) {
@@ -1879,10 +1901,9 @@ function getVisibility(stepIndex, n, showAll) {
   return { mirrors, altMirrors, images, rays, altRays };
 }
 
-function defaultObjectInWedge(index, thetaDeg, orientationDeg) {
+function defaultObjectInWedge(index) {
   const r = 1.1 + index * 0.2;
-  const phi = deg2rad(orientationDeg);
-  return { x: r * Math.cos(phi), y: r * Math.sin(phi) };
+  return { x: r, y: 0 };
 }
 
 /** Keep object inside the wedge (2D polar clamp in local frame). */
@@ -1907,7 +1928,7 @@ function isInsideWedge(pt, thetaDeg, phiRad, minR = 0.2) {
 }
 
 function createAngledMirrorsScenario() {
-  let params = { theta: 45, orientation: 0, showRays: true, showImages: true };
+  let params = { theta: 45, showRays: true, showImages: true };
   let view = null;
   let objects = [];
   let nextObjId = 1;
@@ -1915,8 +1936,23 @@ function createAngledMirrorsScenario() {
   let draggingObjectId = null;
   let canvasRef = null;
   let placeMode = false;
+  let sketchTool = 'object';
+  let observers = [];
+  let sketchRays = [];
+  let rayPending = null;
+  let nextSketchId = 1;
+  let cursorWorld = null;
+  let refreshToolbarRef = null;
   const animator = new RayAnimator();
   animator.rayCount = 1;
+
+  function nid() { return nextSketchId++; }
+
+  function clearSketch() {
+    observers = [];
+    sketchRays = [];
+    rayPending = null;
+  }
 
   function syncAnimator(c) {
     const n = c.nFormula;
@@ -1931,7 +1967,7 @@ function createAngledMirrorsScenario() {
   }
 
   function makeObject(index) {
-    const pt = defaultObjectInWedge(index, params.theta, params.orientation);
+    const pt = defaultObjectInWedge(index);
     const label = index === 0 ? 'O' : `O${index + 1}`;
     return { id: nextObjId++, label, x: pt.x, y: pt.y };
   }
@@ -1944,7 +1980,7 @@ function createAngledMirrorsScenario() {
   function compute() {
     const theta = deg2rad(params.theta);
     const half = theta / 2;
-    const phi = deg2rad(params.orientation);
+    const phi = 0;
     const apex = { x: 0, y: 0 };
     const m1 = {
       a: apex,
@@ -2005,6 +2041,8 @@ function createAngledMirrorsScenario() {
         if (im.altConstruction) pts.push(im.altConstruction.mirror.b);
       });
     });
+    observers.forEach((o) => pts.push(o.pt));
+    sketchRays.forEach((r) => { pts.push(r.from, r.to); });
     pts.push(c.m1.b, c.m2.b);
     let xMin = 0; let xMax = 1; let yMin = 0; let yMax = 1;
     pts.forEach((p) => {
@@ -2023,32 +2061,31 @@ function createAngledMirrorsScenario() {
 
   function getControls() {
     return [
-      { id: 'theta', labelKey: 'angle', min: 30, max: 120, step: 5, value: params.theta, unit: '°' },
-      { id: 'orientation', labelKey: 'wedgeOrientation', min: -180, max: 180, step: 5, value: params.orientation, unit: '°' },
+      { id: 'theta', labelKey: 'angle', options: THETA_VALUES, value: params.theta, unit: '°' },
     ];
   }
 
   function preset() {
-    params = { theta: 45, orientation: 0, showRays: true, showImages: true };
+    params = { theta: 45, showRays: true, showImages: true };
     placeMode = false;
+    sketchTool = 'object';
+    clearSketch();
+    nextSketchId = 1;
     resetObjects();
     resetAnimation();
+    refreshToolbarRef?.();
   }
 
   function updateParams(id, v) {
     if (id === 'theta') {
-      params.theta = v;
-      const phi = deg2rad(params.orientation);
+      const n = Number(v);
+      if (!THETA_VALUES.includes(n)) return;
+      params.theta = n;
       objects.forEach((obj) => {
-        const p = constrainInWedge(obj, params.theta, phi);
+        const p = constrainInWedge(obj, params.theta, 0);
         obj.x = p.x;
         obj.y = p.y;
       });
-      resetAnimation();
-      return;
-    }
-    if (id === 'orientation') {
-      params.orientation = v;
       resetAnimation();
       return;
     }
@@ -2071,13 +2108,18 @@ function createAngledMirrorsScenario() {
     if (id === 'placeMode') {
       placeMode = !placeMode;
       if (canvasRef) canvasRef.style.cursor = placeMode ? 'crosshair' : 'default';
+      return;
+    }
+    if (id === 'clearSketch') {
+      clearSketch();
+      canvasRef && draw(canvasRef);
     }
   }
 
   function getDescription() {
     return getLang() === 'zh'
-      ? '拖曳頂點旋轉鏡組；拖曳鏡面線／鏡端調整 θ；物件可於楔角內自由移動。'
-      : 'Drag apex to rotate mirrors; drag mirror line/tip for θ; object moves freely in wedge.';
+      ? '拖曳物件；用控制面板選 θ；作圖工具可放置觀察者 E 同手繪光線。'
+      : 'Drag objects; choose θ in the panel; use sketch tools for observer E and manual rays.';
   }
 
   function getStats(c) {
@@ -2093,18 +2135,10 @@ function createAngledMirrorsScenario() {
   }
 
   function syncControl(id, value, unit = '°') {
-    const slider = document.getElementById(`ctrl-${id}`);
+    const el = document.getElementById(`ctrl-${id}`);
     const badge = document.getElementById(`ctrl-${id}-val`);
-    if (slider) slider.value = String(value);
+    if (el) el.value = String(value);
     if (badge) badge.textContent = `${value}${unit}`;
-  }
-
-  function syncThetaControl() {
-    syncControl('theta', params.theta);
-  }
-
-  function syncOrientationControl() {
-    syncControl('orientation', params.orientation);
   }
 
   function getWorld(canvas, clientX, clientY) {
@@ -2127,106 +2161,96 @@ function createAngledMirrorsScenario() {
     return Math.hypot(ax - bx, ay - by);
   }
 
-  function distSegPx(px, py, ax, ay, bx, by) {
-    const abx = bx - ax;
-    const aby = by - ay;
-    const len2 = abx * abx + aby * aby;
-    if (len2 < 1) return Math.hypot(px - ax, py - ay);
-    let t = ((px - ax) * abx + (py - ay) * aby) / len2;
-    t = Math.max(0, Math.min(1, t));
-    const cx = ax + t * abx;
-    const cy = ay + t * aby;
-    return Math.hypot(px - cx, py - cy);
-  }
-
-  function setThetaFromMirror(dragId, world) {
-    const phi = deg2rad(params.orientation);
-    const local = Vec2.rot(world, -phi);
-    const ang = Math.atan2(local.y, local.x);
-    if (dragId === 'm1' || dragId === 'm1line') {
-      if (local.y < 0.01) return;
-      params.theta = clamp(Math.round(rad2deg(2 * ang) / 5) * 5, 30, 120);
-    } else if (dragId === 'm2' || dragId === 'm2line') {
-      if (local.y > -0.01) return;
-      params.theta = clamp(Math.round(rad2deg(-2 * ang) / 5) * 5, 30, 120);
+  function placeSketchClick(world) {
+    const p = { x: world.x, y: world.y };
+    if (sketchTool === 'observer') {
+      observers.push({ id: nid(), pt: p });
+      rayPending = null;
+      return;
     }
-    const newPhi = deg2rad(params.orientation);
-    objects.forEach((obj) => {
-      const p = constrainInWedge(obj, params.theta, newPhi);
-      obj.x = p.x;
-      obj.y = p.y;
-    });
-    syncThetaControl();
+    if (sketchTool === 'realRay' || sketchTool === 'virtualRay') {
+      if (!rayPending || rayPending.kind !== sketchTool) {
+        rayPending = { kind: sketchTool, clicks: [p] };
+        return;
+      }
+      sketchRays.push({
+        id: nid(),
+        kind: sketchTool === 'realRay' ? 'real' : 'virtual',
+        from: rayPending.clicks[0],
+        to: p,
+      });
+      rayPending = null;
+    }
   }
 
-  function setOrientationFromPointer(world) {
-    params.orientation = Math.round(rad2deg(Math.atan2(world.y, world.x)) / 5) * 5;
-    syncOrientationControl();
+  function pickSketchTarget(world) {
+    const { sx, sy, txf } = world;
+    let best = null;
+    let bestD = Infinity;
+
+    observers.forEach((o) => {
+      const s = toScreen(txf, o.pt);
+      const d = distPx(sx, sy, s.x, s.y);
+      if (d < HIT_PX && d < bestD) { bestD = d; best = { type: 'observer', id: o.id }; }
+    });
+
+    sketchRays.forEach((r) => {
+      const sf = toScreen(txf, r.from);
+      const st = toScreen(txf, r.to);
+      const df = distPx(sx, sy, sf.x, sf.y);
+      const dt = distPx(sx, sy, st.x, st.y);
+      if (df < HIT_PX && df < bestD) { bestD = df; best = { type: 'ray', id: r.id, part: 'from' }; }
+      if (dt < HIT_PX && dt < bestD) { bestD = dt; best = { type: 'ray', id: r.id, part: 'to' }; }
+    });
+
+    return best;
+  }
+
+  function pickObjectTarget(world) {
+    const { sx, sy, txf } = world;
+    let best = null;
+    let bestD = Infinity;
+    objects.forEach((o) => {
+      const s = toScreen(txf, o);
+      const d = distPx(sx, sy, s.x, s.y);
+      if (d < HIT_PX && d < bestD) { bestD = d; best = o.id; }
+    });
+    return best;
   }
 
   function bindPointer(canvas) {
-    const pickTarget = (world) => {
-      const { sx, sy, txf } = world;
-      const c = compute();
-      const apex = toScreen(txf, c.m1.a);
-      const m1b = toScreen(txf, c.m1.b);
-      const m2b = toScreen(txf, c.m2.b);
-
-      let best = null;
-      let bestD = Infinity;
-
-      objects.forEach((o) => {
-        const s = toScreen(txf, o);
-        const d = distPx(sx, sy, s.x, s.y);
-        if (d < HIT_PX && d < bestD) { bestD = d; best = o.id; }
-      });
-
-      const dApex = distPx(sx, sy, apex.x, apex.y);
-      if (dApex < HIT_PX + 6 && dApex < bestD) { bestD = dApex; best = 'apex'; }
-
-      const tips = [
-        { id: 'm1', s: m1b },
-        { id: 'm2', s: m2b },
-      ];
-      tips.forEach(({ id, s }) => {
-        const d = distPx(sx, sy, s.x, s.y);
-        if (d < HIT_PX + 4 && d < bestD) { bestD = d; best = id; }
-      });
-
-      const lines = [
-        { id: 'm1line', a: apex, b: m1b },
-        { id: 'm2line', a: apex, b: m2b },
-      ];
-      lines.forEach(({ id, a, b }) => {
-        const d = distSegPx(sx, sy, a.x, a.y, b.x, b.y);
-        if (d < LINE_HIT_PX && d < bestD) { bestD = d; best = id; }
-      });
-
-      return best;
-    };
-
     const onDown = (e) => {
       e.preventDefault();
       const world = getWorld(canvas, e.clientX, e.clientY);
+      cursorWorld = world;
+
+      if (sketchTool === 'observer' || sketchTool === 'realRay' || sketchTool === 'virtualRay') {
+        placeSketchClick(world);
+        draw(canvas);
+        return;
+      }
 
       if (!placeMode) {
-        const hit = pickTarget(world);
-        if (hit !== null) {
-          if (typeof hit === 'number') {
-            dragTarget = hit;
-            draggingObjectId = hit;
-          } else {
-            dragTarget = hit;
-            draggingObjectId = null;
-          }
+        const objHit = pickObjectTarget(world);
+        if (objHit !== null) {
+          dragTarget = { type: 'object', id: objHit };
+          draggingObjectId = objHit;
+          canvas.setPointerCapture?.(e.pointerId);
+          canvas.style.cursor = 'grabbing';
+          return;
+        }
+        const sketchHit = pickSketchTarget(world);
+        if (sketchHit) {
+          dragTarget = sketchHit;
+          draggingObjectId = null;
           canvas.setPointerCapture?.(e.pointerId);
           canvas.style.cursor = 'grabbing';
           return;
         }
       }
 
-      if (placeMode && isInsideWedge(world, params.theta, deg2rad(params.orientation))) {
-        const pt = constrainInWedge(world, params.theta, deg2rad(params.orientation));
+      if (placeMode && isInsideWedge(world, params.theta, 0)) {
+        const pt = constrainInWedge(world, params.theta, 0);
         objects.push({ id: nextObjId++, label: `O${objects.length + 1}`, x: pt.x, y: pt.y });
         resetAnimation();
         draw(canvas);
@@ -2235,31 +2259,40 @@ function createAngledMirrorsScenario() {
 
     const onMove = (e) => {
       const world = getWorld(canvas, e.clientX, e.clientY);
+      cursorWorld = world;
 
       if (!dragTarget) {
-        if (!placeMode) {
-          const hover = pickTarget(world);
-          canvas.style.cursor = hover !== null ? 'grab' : 'default';
+        if (!placeMode && sketchTool === 'object') {
+          const hoverObj = pickObjectTarget(world);
+          const hoverSketch = pickSketchTarget(world);
+          canvas.style.cursor = (hoverObj !== null || hoverSketch) ? 'grab' : 'default';
+        } else if (sketchTool !== 'object') {
+          canvas.style.cursor = 'crosshair';
         }
+        if (sketchTool === 'realRay' || sketchTool === 'virtualRay') draw(canvas);
         return;
       }
 
       e.preventDefault();
+      const p = { x: world.x, y: world.y };
 
-      if (dragTarget === 'apex') {
-        setOrientationFromPointer(world);
-        resetAnimation();
-      } else if (dragTarget === 'm1' || dragTarget === 'm2' || dragTarget === 'm1line' || dragTarget === 'm2line') {
-        setThetaFromMirror(dragTarget, world);
-        resetAnimation();
-      } else if (typeof dragTarget === 'number') {
-        const obj = objects.find((o) => o.id === dragTarget);
+      if (dragTarget.type === 'object') {
+        const obj = objects.find((o) => o.id === dragTarget.id);
         if (obj) {
-          const p = constrainInWedge(world, params.theta, deg2rad(params.orientation));
-          obj.x = p.x;
-          obj.y = p.y;
+          const c = constrainInWedge(p, params.theta, 0);
+          obj.x = c.x;
+          obj.y = c.y;
         }
         resetAnimation();
+      } else if (dragTarget.type === 'observer') {
+        const o = observers.find((x) => x.id === dragTarget.id);
+        if (o) o.pt = p;
+      } else if (dragTarget.type === 'ray') {
+        const r = sketchRays.find((x) => x.id === dragTarget.id);
+        if (r) {
+          if (dragTarget.part === 'from') r.from = p;
+          else r.to = p;
+        }
       }
       draw(canvas);
     };
@@ -2267,7 +2300,7 @@ function createAngledMirrorsScenario() {
     const onUp = (e) => {
       dragTarget = null;
       draggingObjectId = null;
-      canvas.style.cursor = placeMode ? 'crosshair' : 'default';
+      canvas.style.cursor = placeMode ? 'crosshair' : (sketchTool === 'object' ? 'default' : 'crosshair');
       if (canvas.releasePointerCapture) {
         try { canvas.releasePointerCapture(e.pointerId); } catch (_) { /* ignore */ }
       }
@@ -2316,25 +2349,87 @@ function createAngledMirrorsScenario() {
     ctx.restore();
   }
 
-  function drawMirror(ctx, view, txf, a, b, label, draggable = false, active = false) {
-    ctx.strokeStyle = active ? COLORS.mirrorNeed : COLORS.mirror;
-    ctx.lineWidth = active ? 4 : 3;
+  function drawMirror(ctx, view, txf, a, b, label) {
+    ctx.strokeStyle = COLORS.mirror;
+    ctx.lineWidth = 3;
     const s0 = { x: txf.ox + a.x * txf.pxPerM, y: txf.oy - a.y * txf.pxPerM };
     const s1 = { x: txf.ox + b.x * txf.pxPerM, y: txf.oy - b.y * txf.pxPerM };
     ctx.beginPath();
     ctx.moveTo(s0.x, s0.y);
     ctx.lineTo(s1.x, s1.y);
     ctx.stroke();
-    drawLabel(ctx, s1.x + 6, s1.y - 6, label, active ? COLORS.mirrorNeed : COLORS.mirror);
-    if (draggable) {
-      ctx.fillStyle = active ? 'rgba(255,204,0,0.5)' : 'rgba(34,211,238,0.4)';
-      ctx.beginPath();
-      ctx.arc(s1.x, s1.y, 12, 0, Math.PI * 2);
-      ctx.fill();
-      ctx.strokeStyle = active ? COLORS.mirrorNeed : COLORS.mirror;
-      ctx.lineWidth = 2;
-      ctx.stroke();
+    drawLabel(ctx, s1.x + 6, s1.y - 6, label, COLORS.mirror);
+  }
+
+  function drawSketchPreview(ctx, view, txf) {
+    if (!cursorWorld || !rayPending) return;
+    const p = { x: cursorWorld.x, y: cursorWorld.y };
+    const clicks = rayPending.clicks;
+    ctx.globalAlpha = 0.45;
+    if (rayPending.kind === 'realRay') {
+      drawArrow(ctx, view, txf, clicks[0], p, { color: COLORS.rayReal, width: 2 });
+    } else if (rayPending.kind === 'virtualRay') {
+      drawArrow(ctx, view, txf, clicks[0], p, { color: COLORS.rayVirtual, width: 2, dashed: true });
     }
+    ctx.globalAlpha = 1;
+  }
+
+  function buildToolbar(container, onChange) {
+    container.innerHTML = '';
+    const root = document.createElement('div');
+    root.className = 'sketch-toolbar';
+
+    const hintEl = document.createElement('div');
+    hintEl.className = 'sketch-hint';
+    root.appendChild(hintEl);
+
+    const grid = document.createElement('div');
+    grid.className = 'sketch-tool-grid';
+    const toolBtns = {};
+
+    SKETCH_TOOLS.forEach((id) => {
+      const meta = SKETCH_TOOL_META[id];
+      const btn = document.createElement('button');
+      btn.type = 'button';
+      btn.className = 'btn-sketch-tool' + (meta.cls ? ` ${meta.cls}` : '');
+      btn.innerHTML = `<span class="tool-icon">${meta.icon}</span><span data-i18n="${meta.labelKey}"></span>`;
+      btn.addEventListener('click', () => {
+        sketchTool = id;
+        rayPending = null;
+        if (canvasRef) {
+          canvasRef.style.cursor = id === 'object' ? 'default' : 'crosshair';
+        }
+        refreshToolbar();
+        onChange?.();
+      });
+      toolBtns[id] = btn;
+      grid.appendChild(btn);
+    });
+    root.appendChild(grid);
+
+    const clearBtn = document.createElement('button');
+    clearBtn.type = 'button';
+    clearBtn.className = 'btn btn-accent';
+    clearBtn.style.marginTop = '8px';
+    clearBtn.dataset.i18n = 'wedgeClearSketch';
+    clearBtn.addEventListener('click', () => {
+      handleAction('clearSketch');
+      onChange?.();
+    });
+    root.appendChild(clearBtn);
+
+    container.appendChild(root);
+    applyI18n(root);
+
+    function refreshToolbar() {
+      const meta = SKETCH_TOOL_META[sketchTool];
+      hintEl.textContent = t(meta?.hintKey || 'wedgeHintObject');
+      Object.entries(toolBtns).forEach(([id, btn]) => {
+        btn.classList.toggle('active', sketchTool === id);
+      });
+    }
+    refreshToolbarRef = refreshToolbar;
+    return refreshToolbar;
   }
 
   function draw(canvas) {
@@ -2376,23 +2471,13 @@ function createAngledMirrorsScenario() {
     ctx.stroke();
     ctx.setLineDash([]);
 
-    const m1Active = dragTarget === 'm1' || dragTarget === 'm1line';
-    const m2Active = dragTarget === 'm2' || dragTarget === 'm2line';
-    const apexActive = dragTarget === 'apex';
-    drawMirror(ctx, view, txf, c.m1.a, c.m1.b, 'M₁', true, m1Active);
-    drawMirror(ctx, view, txf, c.m2.a, c.m2.b, 'M₂', true, m2Active);
+    drawMirror(ctx, view, txf, c.m1.a, c.m1.b, 'M₁');
+    drawMirror(ctx, view, txf, c.m2.a, c.m2.b, 'M₂');
 
-    if (apexActive) {
-      ctx.fillStyle = 'rgba(255,204,0,0.55)';
-    } else {
-      ctx.fillStyle = 'rgba(255,204,0,0.3)';
-    }
+    ctx.fillStyle = 'rgba(255,204,0,0.25)';
     ctx.beginPath();
-    ctx.arc(ax0.x, ax0.y, 14, 0, Math.PI * 2);
+    ctx.arc(ax0.x, ax0.y, 8, 0, Math.PI * 2);
     ctx.fill();
-    ctx.strokeStyle = COLORS.mirrorNeed;
-    ctx.lineWidth = 2;
-    ctx.stroke();
 
     const stepIndex = animator.stepIndex;
     const showAll = stepIndex >= animator.totalSteps;
@@ -2428,9 +2513,27 @@ function createAngledMirrorsScenario() {
     }
 
     c.objectSets.forEach((set) => {
-      const active = draggingObjectId === set.object.id || dragTarget === set.object.id;
+      const active = draggingObjectId === set.object.id
+        || (dragTarget?.type === 'object' && dragTarget.id === set.object.id);
       drawPoint(ctx, view, txf, set.object, active ? 10 : 8, active ? COLORS.mirrorNeed : COLORS.object, set.object.label);
     });
+
+    observers.forEach((o) => {
+      const active = dragTarget?.type === 'observer' && dragTarget.id === o.id;
+      drawPoint(ctx, view, txf, o.pt, 7, active ? COLORS.mirrorNeed : COLORS.eye, 'E');
+    });
+
+    sketchRays.forEach((r) => {
+      const active = dragTarget?.type === 'ray' && dragTarget.id === r.id;
+      const color = r.kind === 'real' ? COLORS.rayReal : COLORS.rayVirtual;
+      drawArrow(ctx, view, txf, r.from, r.to, {
+        color: active ? COLORS.mirrorNeed : color,
+        width: active ? 3 : 2,
+        dashed: r.kind === 'virtual',
+      });
+    });
+
+    drawSketchPreview(ctx, view, txf);
 
     const angM1 = Math.atan2(-c.m1.b.y, c.m1.b.x);
     const angM2 = Math.atan2(-c.m2.b.y, c.m2.b.x);
@@ -2444,14 +2547,17 @@ function createAngledMirrorsScenario() {
 
     if (placeMode) {
       drawLabel(ctx, 12, 22, getLang() === 'zh' ? '點擊楔角內放置物件' : 'Click inside wedge to place', COLORS.mirrorNeed);
+    } else if (sketchTool !== 'object') {
+      const hintKey = SKETCH_TOOL_META[sketchTool]?.hintKey || 'wedgeHintObject';
+      drawLabel(ctx, 12, 22, t(hintKey), COLORS.mirrorNeed);
     } else {
-      drawLabel(ctx, 12, 22, getLang() === 'zh' ? '拖曳頂點旋轉／物件移動' : 'Drag apex to rotate / move object', COLORS.mirrorNeed);
+      drawLabel(ctx, 12, 22, t('wedgeHintObject'), COLORS.mirrorNeed);
     }
   }
 
   return {
     id: 'angledMirrors', init, draw, compute, getControls, updateParams, preset, teardown,
-    getDescription, getStats, getFormula,
+    getDescription, getStats, getFormula, buildToolbar,
     handleAction,
     getAnimator: () => animator,
     extraToggles: [
@@ -3841,17 +3947,40 @@ function rebuildControls() {
         <span data-i18n="${ctrl.labelKey}"></span>
         <span class="badge" id="${id}-val">${ctrl.value}${ctrl.unit || ''}</span>
       </div>
-      <input type="range" id="${id}" min="${ctrl.min}" max="${ctrl.max}" step="${ctrl.step}" value="${ctrl.value}">
     `;
+    if (ctrl.options) {
+      const select = document.createElement('select');
+      select.id = id;
+      select.className = 'control-select';
+      ctrl.options.forEach((opt) => {
+        const o = document.createElement('option');
+        o.value = String(opt);
+        o.textContent = `${opt}${ctrl.unit || ''}`;
+        if (opt === ctrl.value) o.selected = true;
+        select.appendChild(o);
+      });
+      g.appendChild(select);
+      select.addEventListener('change', () => {
+        const v = parseFloat(select.value);
+        sc.updateParams(ctrl.id, v);
+        g.querySelector('.badge').textContent = `${v}${ctrl.unit || ''}`;
+        updateResults();
+        render();
+      });
+    } else {
+      g.innerHTML += `
+        <input type="range" id="${id}" min="${ctrl.min}" max="${ctrl.max}" step="${ctrl.step}" value="${ctrl.value}">
+      `;
+      const slider = g.querySelector('input');
+      slider.addEventListener('input', () => {
+        const v = parseFloat(slider.value);
+        sc.updateParams(ctrl.id, v);
+        g.querySelector('.badge').textContent = `${v}${ctrl.unit || ''}`;
+        updateResults();
+        render();
+      });
+    }
     els.controls.appendChild(g);
-    const slider = g.querySelector('input');
-    slider.addEventListener('input', () => {
-      const v = parseFloat(slider.value);
-      sc.updateParams(ctrl.id, v);
-      g.querySelector('.badge').textContent = `${v}${ctrl.unit || ''}`;
-      updateResults();
-      render();
-    });
   });
 
   if (sc.buildToolbar) {
