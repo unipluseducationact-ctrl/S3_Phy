@@ -716,10 +716,13 @@ class RayAnimator {
     this.stepsPerRay = STEPS_PER_RAY;
     /** Extra animation steps after all rays (e.g. similar-triangle construction). */
     this.extraSteps = 0;
+    /** When set, bypasses rayCount/stepsPerRay formula (e.g. Image Formation uses 7). */
+    this.overrideTotalSteps = null;
   }
 
   get totalSteps() {
-    return (this.rayCount || 1) * (this.stepsPerRay || STEPS_PER_RAY) + (this.extraSteps || 0);
+    if (this.overrideTotalSteps != null) return this.overrideTotalSteps;
+    return (this.rayCount || 1) * (this.stepsPerRay || STEPS_PER_RAY) + (this.extraSteps ?? 0);
   }
 
   get progress() {
@@ -1104,17 +1107,45 @@ const defaults = () => ({
   moved: false,
 });
 
-const FOOT_RAY_START = 5;
-/** Skip redundant object-point / duplicate image-line steps (7 steps total). */
-const STEP_OFFSET_TOP = 1;
-const STEP_OFFSET_FOOT = 3;
+const IMAGE_FORMATION_STEPS = 7;
+
+function drawImageFormationRays(ctx, view, txf, c, imgX, stepIndex) {
+  if (stepIndex <= 0) return;
+
+  if (stepIndex >= 1) {
+    drawArrowBody(ctx, view, txf, 0, c.top.y, imgX, true);
+    const sx = txf.ox + (imgX + 0.12) * txf.pxPerM;
+    const sy = txf.oy - c.top.y * txf.pxPerM;
+    drawLabel(ctx, sx, sy, "A'B'", COLORS.image);
+  }
+
+  const { eye, top, foot, imgTop, imgFoot, rayTop, rayFoot } = c;
+
+  if (stepIndex >= 2 && rayTop.reflectPt) {
+    drawArrow(ctx, view, txf, imgTop, eye, { dashed: true, progress: 1 });
+  }
+  if (stepIndex >= 3 && rayTop.reflectPt) {
+    drawArrow(ctx, view, txf, top, rayTop.reflectPt, { progress: 1 });
+  }
+  if (stepIndex >= 4 && rayTop.reflectPt) {
+    drawArrow(ctx, view, txf, rayTop.reflectPt, eye, { progress: 1 });
+  }
+  if (stepIndex >= 5 && rayFoot.reflectPt) {
+    drawArrow(ctx, view, txf, imgFoot, eye, { dashed: true, progress: 1 });
+  }
+  if (stepIndex >= 6 && rayFoot.reflectPt) {
+    drawArrow(ctx, view, txf, foot, rayFoot.reflectPt, { progress: 1 });
+  }
+  if (stepIndex >= 7 && rayFoot.reflectPt) {
+    drawArrow(ctx, view, txf, rayFoot.reflectPt, eye, { progress: 1 });
+  }
+}
 
 function createImageFormationScenario() {
   let params = defaults();
   let view = null;
   let animator = new RayAnimator();
-  animator.rayCount = 2;
-  animator.extraSteps = -3;
+  animator.overrideTotalSteps = IMAGE_FORMATION_STEPS;
 
   function compute() {
     const u = params.moved ? params.u - 0.1 : params.u;
@@ -1188,36 +1219,8 @@ function createImageFormationScenario() {
     drawVerticalMirror(ctx, view, txf, c.mirrorX, 0, 3, COLORS.mirror, 3);
     drawPerson(ctx, view, txf, c.objX, params.H, params.hEye);
 
-    const stepIndex = animator.stepIndex;
     const imgX = c.mirrorX + c.v;
-
-    const makeHelpers = (rayIndex) => ({
-      drawArrow: (from, to, opts) => drawArrow(ctx, view, txf, from, to, opts),
-      drawImageLine: (_a, _b, pr) => {
-        if (rayIndex === 0 && pr > 0) {
-          drawArrowBody(ctx, view, txf, 0, params.H, imgX, true);
-          if (pr >= 0.5) {
-            const sx = txf.ox + (imgX + 0.12) * txf.pxPerM;
-            const sy = txf.oy - params.H * txf.pxPerM;
-            drawLabel(ctx, sx, sy, "A'B'", COLORS.image);
-          }
-        }
-      },
-      drawPoint: () => {},
-    });
-
-    const rays = [
-      { objectPt: c.top, eye: c.eye, image: c.imgTop, reflectPt: c.rayTop.reflectPt },
-      { objectPt: c.foot, eye: c.eye, image: c.imgFoot, reflectPt: c.rayFoot.reflectPt },
-    ];
-    rays.forEach((ray, i) => {
-      if (ray.reflectPt) {
-        let effStep = stepIndex;
-        if (i === 0) effStep = stepIndex + STEP_OFFSET_TOP;
-        else if (stepIndex >= FOOT_RAY_START) effStep = stepIndex + STEP_OFFSET_FOOT;
-        RayAnimator.drawSightRay(ctx, view, txf, makeHelpers(i), ray, effStep, i, 2);
-      }
-    });
+    drawImageFormationRays(ctx, view, txf, c, imgX, animator.stepIndex);
 
     drawLegend(ctx, 12, 12, [
       { color: COLORS.rayReal, text: t('legendReal') },
