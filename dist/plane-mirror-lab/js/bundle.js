@@ -157,8 +157,30 @@ function wedgeMirrorDrawAngleToward(j, towardPt, half, thetaRad) {
   return dot1 >= dot2 ? lineAngle : lineAngle + Math.PI;
 }
 
+/** Real-sector j for M1 (j=1) or M2 (j=0). */
+function realMirrorLineJ(mirrorSide) {
+  return mirrorSide === 1 ? 1 : 0;
+}
+
+function buildAltMirrorResult(j, imagePt, half, thetaRad) {
+  const mirrorSide = j % 2 === 0 ? 2 : 1;
+  const mirrorOrder = Math.floor(j / 2) + 1;
+  const mirrorAngle = wedgeMirrorDrawAngleToward(j, imagePt, half, thetaRad);
+  return {
+    mirrorSide,
+    mirrorOrder,
+    mirrorAngle,
+    mirrorLineIndex: j,
+    isVirtual: mirrorOrder >= 2,
+    mirror: {
+      a: { x: 0, y: 0 },
+      b: { x: Math.cos(mirrorAngle), y: Math.sin(mirrorAngle) },
+    },
+  };
+}
+
 /** Find mirror j that reflects altParent to imagePt; draw extension toward image. */
-function findAltMirror(altParent, imagePt, apex, half, thetaRad, nWedges, primaryMirrorOrder) {
+function findAltMirror(altParent, imagePt, apex, half, thetaRad, nWedges, altParentMirrorSide) {
   const matches = [];
   for (let j = 0; j < nWedges; j++) {
     const lineAngle = wedgeMirrorLineAngle(j, half, thetaRad);
@@ -166,15 +188,20 @@ function findAltMirror(altParent, imagePt, apex, half, thetaRad, nWedges, primar
     const reflected = reflectPoint(altParent, apex, tip);
     if (Vec2.dist(reflected, imagePt) < 1e-5) matches.push(j);
   }
-  if (!matches.length) return null;
-  const orders = matches.map((j) => Math.floor(j / 2) + 1);
-  const minOrder = Math.min(...orders);
-  let preferredOrder = minOrder;
-  if (primaryMirrorOrder >= 2 && orders.includes(2)) preferredOrder = 2;
-  let bestJ = matches.find((j) => Math.floor(j / 2) + 1 === preferredOrder) ?? matches[0];
+
+  if (!matches.length) {
+    const j = realMirrorLineJ(altParentMirrorSide);
+    return buildAltMirrorResult(j, imagePt, half, thetaRad);
+  }
+
+  const sideMatches = matches.filter((j) => (j % 2 === 0 ? 2 : 1) === altParentMirrorSide);
+  const candidates = sideMatches.length ? sideMatches : matches;
+
+  const minOrder = Math.min(...candidates.map((j) => Math.floor(j / 2) + 1));
+  let bestJ = candidates[0];
   let bestDot = -Infinity;
-  for (const j of matches) {
-    if (Math.floor(j / 2) + 1 !== preferredOrder) continue;
+  for (const j of candidates) {
+    if (Math.floor(j / 2) + 1 !== minOrder) continue;
     const drawAngle = wedgeMirrorDrawAngleToward(j, imagePt, half, thetaRad);
     const towardImage = imagePt.x * Math.cos(drawAngle) + imagePt.y * Math.sin(drawAngle);
     if (towardImage > bestDot) {
@@ -182,20 +209,7 @@ function findAltMirror(altParent, imagePt, apex, half, thetaRad, nWedges, primar
       bestJ = j;
     }
   }
-  const mirrorSide = bestJ % 2 === 0 ? 2 : 1;
-  const mirrorOrder = Math.floor(bestJ / 2) + 1;
-  const mirrorAngle = wedgeMirrorDrawAngleToward(bestJ, imagePt, half, thetaRad);
-  return {
-    mirrorSide,
-    mirrorOrder,
-    mirrorAngle,
-    mirrorLineIndex: bestJ,
-    isVirtual: mirrorOrder >= 2,
-    mirror: {
-      a: { x: 0, y: 0 },
-      b: { x: Math.cos(mirrorAngle), y: Math.sin(mirrorAngle) },
-    },
-  };
+  return buildAltMirrorResult(bestJ, imagePt, half, thetaRad);
 }
 
 function angleDiff(a, b) {
@@ -270,7 +284,7 @@ function imagesInWedge(thetaRad, object, maxImages = 12) {
           half,
           thetaRad,
           nWedges,
-          mirrorOrder,
+          images[altParentIdx].mirrorSide,
         );
         if (alt) {
           entry.altConstruction = { ...alt, parentIdx: altParentIdx };
@@ -2041,9 +2055,9 @@ function createAngledMirrorsScenario() {
     const pts = [{ x: 0, y: 0 }];
     c.objectSets.forEach((set) => {
       pts.push(set.object);
-      set.images.forEach((im) => {
+      set.images.forEach((im, idx) => {
         pts.push(im.pt);
-        if (im.isVirtual) pts.push(im.mirror.b);
+        if (idx >= 2) pts.push(im.mirror.b);
         if (im.altConstruction) pts.push(im.altConstruction.mirror.b);
       });
     });
@@ -2312,7 +2326,6 @@ function createAngledMirrorsScenario() {
           obj.x = c.x;
           obj.y = c.y;
         }
-        resetAnimation();
       } else if (dragTarget.type === 'observer') {
         const o = observers.find((x) => x.id === dragTarget.id);
         if (o) o.pt = p;
@@ -2327,11 +2340,18 @@ function createAngledMirrorsScenario() {
     };
 
     const onUp = (e) => {
+      const wasObjectDrag = dragTarget?.type === 'object';
       dragTarget = null;
       draggingObjectId = null;
       canvas.style.cursor = placeMode ? 'crosshair' : (sketchTool === 'object' ? 'default' : 'crosshair');
       if (canvas.releasePointerCapture) {
         try { canvas.releasePointerCapture(e.pointerId); } catch (_) { /* ignore */ }
+      }
+      if (wasObjectDrag && canvasRef) {
+        resetAnimation();
+        const c = compute();
+        fitBounds(c);
+        draw(canvasRef);
       }
     };
 
@@ -2464,7 +2484,7 @@ function createAngledMirrorsScenario() {
     const { w, h, ctx } = resizeCanvasToDisplay(canvas);
     const c = compute();
     syncAnimator(c);
-    fitBounds(c);
+    if (dragTarget?.type !== 'object') fitBounds(c);
     const txf = computeTransform(view, w, h);
     const apexWorld = { x: 0, y: 0 };
     clear(ctx, w, h);
@@ -2514,7 +2534,7 @@ function createAngledMirrorsScenario() {
     if (params.showImages) {
       c.objectSets.forEach((set) => {
         set.images.forEach((img, i) => {
-          if (vis.mirrors.has(i) && img.isVirtual) {
+          if (vis.mirrors.has(i) && i >= 2) {
             drawVirtualMirror(ctx, view, txf, img.mirror.a, img.mirror.b, img.mirrorSide);
           }
           if (vis.altMirrors.has(i) && img.altConstruction) {
