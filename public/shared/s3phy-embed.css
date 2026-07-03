@@ -96,11 +96,14 @@ html.s3phy-embed .lab-viz-dual {
   align-content: start;
 }
 
-html.s3phy-embed .lab-viz-dual .lab-viz-canvas,
-html.s3phy-embed .lab-viz-dual .lab-viz-chart-wrap {
+html.s3phy-embed .lab-viz-dual .lab-viz-canvas {
   height: auto;
   aspect-ratio: 16 / 10;
   min-height: min(220px, 34vh);
+}
+
+html.s3phy-embed .lab-viz-dual .lab-viz-chart-wrap {
+  aspect-ratio: unset;
 }
 
 html.s3phy-embed header,

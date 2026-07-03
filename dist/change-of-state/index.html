@@ -7,7 +7,7 @@
   <!-- Tailwind CSS CDN -->
   <script src="https://cdn.tailwindcss.com"></script>
   <!-- Chart.js CDN -->
-  <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+  <script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.7/dist/chart.umd.min.js"></script>
   <!-- Lucide Icons CDN -->
   <script src="https://unpkg.com/lucide@latest"></script>
   <!-- KaTeX CDN -->
@@ -135,20 +135,23 @@
       overflow: hidden;
     }
     .lab-viz-dual .lab-viz-chart-wrap {
-      aspect-ratio: 16 / 10;
-      width: 100%;
-      height: auto;
-      min-height: 240px;
-      max-height: none;
-      overflow: visible;
       position: relative;
+      width: 100%;
+      height: 280px;
+      min-height: 280px;
+      flex: none;
+      overflow: hidden;
     }
-    .lab-viz-dual .lab-viz-canvas canvas,
-    .lab-viz-dual .lab-viz-chart-wrap canvas {
+    .lab-viz-dual .lab-viz-canvas canvas {
       display: block;
       width: 100% !important;
       height: 100% !important;
       max-height: 100%;
+    }
+    .lab-viz-dual .lab-viz-chart-wrap canvas {
+      display: block;
+      width: 100%;
+      height: 100%;
     }
     html.s3phy-embed .lab-viz-dual {
       grid-template-rows: auto auto;
@@ -163,10 +166,8 @@
       flex: none;
     }
     html.s3phy-embed .lab-viz-dual .lab-viz-chart-wrap {
-      aspect-ratio: 16 / 10;
-      height: auto;
-      min-height: min(300px, 40vh);
-      max-height: none;
+      height: min(320px, 42vh);
+      min-height: min(320px, 42vh);
     }
     html.s3phy-embed .lab-controls.lab-controls-float {
       background: #ffffff;
@@ -612,11 +613,26 @@
       ctx.scale(window.devicePixelRatio, window.devicePixelRatio);
     }
 
+    function sizeChartContainer() {
+      const wrap = document.querySelector('.lab-viz-chart-wrap');
+      if (!wrap) return;
+      const w = wrap.getBoundingClientRect().width;
+      if (w <= 0) return;
+      const embed = document.documentElement.classList.contains('s3phy-embed');
+      const h = embed
+        ? Math.max(280, Math.min(Math.round(window.innerHeight * 0.42), Math.round(w * 10 / 16)))
+        : Math.max(280, Math.round(w * 10 / 16));
+      wrap.style.height = h + 'px';
+      wrap.style.minHeight = h + 'px';
+    }
+
     function layoutLabCanvases() {
       resizeCanvas(stateCanvas);
       drawStateLab();
+      sizeChartContainer();
       if (stateChart) {
         stateChart.resize();
+        updateChart();
       } else {
         initChart();
       }
@@ -1283,6 +1299,12 @@
       }));
     }
 
+    function getChartXMax() {
+      const t = Math.max(stateState.timeElapsed || 0, 1);
+      // Full water heating ~ several minutes; keep headroom so early segment stays visible
+      return Math.max(120, Math.ceil(t * 1.25));
+    }
+
     function getChartYRange() {
       let yMax = 120;
       if (stateState.substance === 'water') {
@@ -1297,6 +1319,7 @@
     }
 
     function initChart() {
+      sizeChartContainer();
       const ctx = document.getElementById("stateChartCanvas").getContext("2d");
       
       if (stateChart) {
@@ -1305,6 +1328,7 @@
 
       const isEn = currentLang === "en";
       const { yMin, yMax } = getChartYRange();
+      const xMax = getChartXMax();
 
       stateChart = new Chart(ctx, {
         type: 'line',
@@ -1312,11 +1336,12 @@
           datasets: [{
             label: stateState.substance === "water" ? (isEn ? "Water Temp (°C)" : "水溫 (°C)") : (isEn ? "Naphthalene Temp (°C)" : "萘溫 (°C)"),
             data: chartXYData(),
-            borderColor: '#3b82f6',
-            backgroundColor: 'rgba(59, 130, 246, 0.05)',
+            parsing: false,
+            borderColor: '#2563eb',
+            backgroundColor: 'rgba(37, 99, 235, 0.08)',
             borderWidth: 2.5,
             pointRadius: 0,
-            pointHoverRadius: 5,
+            pointHoverRadius: 4,
             tension: 0,
             fill: true
           }]
@@ -1326,19 +1351,21 @@
           maintainAspectRatio: false,
           animation: false,
           layout: {
-            padding: { top: 8, right: 12, bottom: 8, left: 4 },
+            padding: { top: 6, right: 10, bottom: 4, left: 2 },
           },
           scales: {
             x: {
               type: 'linear',
               position: 'bottom',
               min: 0,
+              max: xMax,
               title: {
                 display: true,
                 text: isEn ? "Time (s)" : "時間 (秒)",
                 font: { size: 10, weight: 'bold' }
               },
-              grid: { color: 'rgba(148, 163, 184, 0.1)' }
+              grid: { color: 'rgba(148, 163, 184, 0.15)' },
+              ticks: { maxTicksLimit: 8 }
             },
             y: {
               min: yMin,
@@ -1348,7 +1375,8 @@
                 text: isEn ? "Temperature (°C)" : "溫度 (°C)",
                 font: { size: 10, weight: 'bold' }
               },
-              grid: { color: 'rgba(148, 163, 184, 0.1)' }
+              grid: { color: 'rgba(148, 163, 184, 0.15)' },
+              ticks: { maxTicksLimit: 10 }
             }
           },
           plugins: {
@@ -1362,9 +1390,10 @@
       if (stateChart) {
         const { yMin, yMax } = getChartYRange();
         stateChart.data.datasets[0].data = chartXYData();
+        stateChart.options.scales.x.max = getChartXMax();
         stateChart.options.scales.y.min = yMin;
         stateChart.options.scales.y.max = yMax;
-        stateChart.update();
+        stateChart.update('none');
       }
     }
 
