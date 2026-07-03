@@ -1071,6 +1071,7 @@ a {
 .tool-plane-mirror-lab,
 .tool-em-spectrum,
 .tool-optics-light-lens-quiz,
+.tool-optics-ch3-quiz,
 .tool-heat-final-exam-quiz,
 .tool-heat-ch1-quiz,
 .tool-specific-heat,
@@ -1197,7 +1198,8 @@ iframe.note-preview {
 
 .panel--worksheets-embed .tool-optics-light-lens-quiz,
 .panel--worksheets-embed .tool-heat-final-exam-quiz,
-.panel--quiz-embed .tool-heat-ch1-quiz {
+.panel--quiz-embed .tool-heat-ch1-quiz,
+.panel--quiz-embed .tool-optics-ch3-quiz {
   width: 100%;
   height: var(--tool-viewport-min-h);
   min-height: var(--tool-viewport-min-h);

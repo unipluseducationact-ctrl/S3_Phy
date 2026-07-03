@@ -120,6 +120,7 @@ export const en = {
   'tools.em.pick': 'Explore wavelength, frequency, and simulation labs',
   'worksheets.practiceTitle': 'On-screen practice',
   'quiz.practiceTitle': 'S3 Heat Ch.1 quiz',
+  'quiz.opticsCh3Title': 'S3 Optics Ch.3 · Light & Lens quiz',
   'quiz.comingSoon': 'Interactive quizzes for this strand are coming soon.',
   'flashcards.title': 'Flashcards',
   'flashcards.intro': 'Study with spaced repetition — cards you find harder appear more often in later rounds. Picture decks for reflection, refraction, and TIR.',

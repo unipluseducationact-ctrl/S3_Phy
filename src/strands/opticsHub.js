@@ -3,6 +3,7 @@ import { langKey, hydrateNoteCards, hydrateSummaryCards } from './hubHelpers.js'
 import { mountHubShell } from '../hubShell.js';
 import { renderToolsShell, hydrateToolsShell } from '../tools/toolsShell.js';
 import { createOpticsLightLensWorksheet } from '../worksheets/opticsLightLensWorksheet.js';
+import { createOpticsCh3Quiz } from '../worksheets/opticsCh3Quiz.js';
 import { mountFlashcardStudy } from '../flashcards/flashcardStudy.js';
 import { buildOpticsDeck } from '../flashcards/flashcardDeck.js';
 
@@ -81,7 +82,11 @@ export function mountOpticsHub(root) {
       destroyWorksheet = node._opticsLightLensWorksheetCleanup || null;
     }
     else if (section === 'quiz') {
-      el.main.innerHTML = `<section class="panel panel--quiz-placeholder"><p class="quiz-placeholder-text">${t('quiz.comingSoon')}</p></section>`;
+      el.main.innerHTML = '<section class="panel panel--quiz-embed"></section>';
+      const panel = el.main.querySelector('.panel--quiz-embed');
+      const node = createOpticsCh3Quiz(t);
+      panel.appendChild(node);
+      destroyWorksheet = node._opticsCh3QuizCleanup || null;
     }
     else if (section === 'flashcards') {
       destroyFlashcards = mountFlashcardStudy(el.main, {
