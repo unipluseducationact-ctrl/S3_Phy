@@ -145,29 +145,94 @@ function wedgeMirrorDrawAngle(mirrorSide, useCount, half) {
   return sign * (2 * k - 1) * half;
 }
 
+/** Find mirror j that reflects altParent to imagePt; draw extension toward image. */
+function findAltMirror(altParent, imagePt, apex, half, thetaRad, nWedges, primaryMirrorOrder) {
+  const matches = [];
+  for (let j = 0; j < nWedges; j++) {
+    const lineAngle = wedgeMirrorLineAngle(j, half, thetaRad);
+    const tip = { x: Math.cos(lineAngle), y: Math.sin(lineAngle) };
+    const reflected = reflectPoint(altParent, apex, tip);
+    if (Vec2.dist(reflected, imagePt) < 1e-5) matches.push(j);
+  }
+  if (!matches.length) return null;
+  const orders = matches.map((j) => Math.floor(j / 2) + 1);
+  const minOrder = Math.min(...orders);
+  let preferredOrder = minOrder;
+  if (primaryMirrorOrder >= 2 && orders.includes(2)) preferredOrder = 2;
+  let bestJ = matches.find((j) => Math.floor(j / 2) + 1 === preferredOrder) ?? matches[0];
+  let bestDot = -Infinity;
+  for (const j of matches) {
+    if (Math.floor(j / 2) + 1 !== preferredOrder) continue;
+    const mirrorSide = j % 2 === 0 ? 2 : 1;
+    const mirrorOrder = Math.floor(j / 2) + 1;
+    const drawAngle = wedgeMirrorDrawAngle(mirrorSide, mirrorOrder, half);
+    const towardImage = imagePt.x * Math.cos(drawAngle) + imagePt.y * Math.sin(drawAngle);
+    if (towardImage > bestDot) {
+      bestDot = towardImage;
+      bestJ = j;
+    }
+  }
+  const mirrorSide = bestJ % 2 === 0 ? 2 : 1;
+  const mirrorOrder = Math.floor(bestJ / 2) + 1;
+  const mirrorAngle = wedgeMirrorDrawAngle(mirrorSide, mirrorOrder, half);
+  return {
+    mirrorSide,
+    mirrorOrder,
+    mirrorAngle,
+    mirrorLineIndex: bestJ,
+    isVirtual: mirrorOrder >= 2,
+    mirror: {
+      a: { x: 0, y: 0 },
+      b: { x: Math.cos(mirrorAngle), y: Math.sin(mirrorAngle) },
+    },
+  };
+}
+
+function angleDiff(a, b) {
+  return Math.abs(Math.atan2(Math.sin(a - b), Math.cos(a - b)));
+}
+
+/** Pick sector boundary j whose reflection from parent matches the unfolded target angle. */
+function findPrimaryMirrorJ(parent, objectAngle, i, half, thetaRad, nWedges) {
+  const k = Math.ceil((i + 1) / 2);
+  const sign = i % 2 === 0 ? 1 : -1;
+  const targetAngle = objectAngle + sign * k * thetaRad;
+  let bestJ = 0;
+  let bestErr = Infinity;
+  for (let j = 0; j < nWedges; j++) {
+    const lineAngle = wedgeMirrorLineAngle(j, half, thetaRad);
+    const tip = { x: Math.cos(lineAngle), y: Math.sin(lineAngle) };
+    const candidate = reflectPoint(parent, { x: 0, y: 0 }, tip);
+    const err = angleDiff(Math.atan2(candidate.y, candidate.x), targetAngle);
+    if (err < bestErr) {
+      bestErr = err;
+      bestJ = j;
+    }
+  }
+  return bestJ;
+}
+
 /** Generate images in wedge between two mirrors meeting at origin, angle theta (rad). */
 function imagesInWedge(thetaRad, object, maxImages = 12) {
   const half = thetaRad / 2;
   const nFormula = Math.round(360 / rad2deg(thetaRad)) - 1;
+  const nWedges = Math.round(360 / rad2deg(thetaRad));
   const labels = ['X', 'Z', 'Y', 'W', 'V', 'U', 'T', 'S', 'R', 'Q'];
-  const MIRROR_CYCLE = ['m1', 'm2', 'm2', 'm1'];
   const apex = { x: 0, y: 0 };
-  const useCount = { m1: 0, m2: 0 };
+  const objectAngle = Math.atan2(object.y, object.x);
   const images = [];
 
   for (let i = 0; i < nFormula && images.length < maxImages; i++) {
-    const mirrorKey = MIRROR_CYCLE[i % 4];
     const parentIdx = i < 2 ? -1 : i - 2;
     const parent = parentIdx < 0 ? object : images[parentIdx].pt;
-    useCount[mirrorKey] += 1;
-    const mirrorSide = mirrorKey === 'm1' ? 1 : 2;
-    const k = useCount[mirrorKey];
-    const mirrorLineIndex = wedgeMirrorLineIndex(mirrorSide, k);
+    const mirrorLineIndex = findPrimaryMirrorJ(parent, objectAngle, i, half, thetaRad, nWedges);
     const lineAngle = wedgeMirrorLineAngle(mirrorLineIndex, half, thetaRad);
     const tip = { x: Math.cos(lineAngle), y: Math.sin(lineAngle) };
     const pt = reflectPoint(parent, apex, tip);
-    const mirrorAngle = wedgeMirrorDrawAngle(mirrorSide, k, half);
-    const isVirtual = k >= 2;
+    const mirrorSide = mirrorLineIndex % 2 === 0 ? 2 : 1;
+    const mirrorOrder = Math.floor(mirrorLineIndex / 2) + 1;
+    const mirrorAngle = wedgeMirrorDrawAngle(mirrorSide, mirrorOrder, half);
+    const isVirtual = mirrorOrder >= 2;
 
     const entry = {
       pt: { ...pt },
@@ -178,27 +243,29 @@ function imagesInWedge(thetaRad, object, maxImages = 12) {
       mirrorLineIndex,
       mirrorAngle,
       mirrorSide,
-      mirrorOrder: k,
+      mirrorOrder,
       isVirtual,
       mirror: {
         a: { x: 0, y: 0 },
         b: { x: Math.cos(mirrorAngle), y: Math.sin(mirrorAngle) },
       },
     };
-    if (i === 2 && images.length >= 2) {
-      const altMirrorSide = 1;
-      const altK = 2;
-      const altMirrorAngle = wedgeMirrorDrawAngle(altMirrorSide, altK, half);
-      entry.altConstruction = {
-        parentIdx: 1,
-        mirrorSide: altMirrorSide,
-        mirrorOrder: altK,
-        mirrorAngle: altMirrorAngle,
-        mirror: {
-          a: { x: 0, y: 0 },
-          b: { x: Math.cos(altMirrorAngle), y: Math.sin(altMirrorAngle) },
-        },
-      };
+    if (i >= 2) {
+      const altParentIdx = i % 2 === 0 ? i - 1 : i - 3;
+      if (altParentIdx >= 0) {
+        const alt = findAltMirror(
+          images[altParentIdx].pt,
+          pt,
+          apex,
+          half,
+          thetaRad,
+          nWedges,
+          mirrorOrder,
+        );
+        if (alt) {
+          entry.altConstruction = { ...alt, parentIdx: altParentIdx };
+        }
+      }
     }
     images.push(entry);
   }
@@ -1757,11 +1824,11 @@ const MIRROR_LEN = 3.5;
 const HIT_PX = 18;
 const LINE_HIT_PX = 14;
 
-/** Total animation steps: X/Z use 2 each; Y uses 5 (incl. alt M1′ + Z→Y); later images use 3. */
+/** Total animation steps: X/Z use 2 each; i≥2 uses 5 (primary 3 + alt 2). */
 function wedgeTotalSteps(n) {
   if (n < 2) return 2 * n;
   if (n === 2) return 4;
-  return 3 * n;
+  return 4 + 5 * (n - 2);
 }
 
 function buildWedgeSchedule(n) {
@@ -1770,7 +1837,7 @@ function buildWedgeSchedule(n) {
     if (i >= 2) steps.push({ type: 'mirror', imageIdx: i, alt: false });
     steps.push({ type: 'image', imageIdx: i });
     steps.push({ type: 'ray', imageIdx: i, alt: false });
-    if (i === 2 && n >= 3) {
+    if (i >= 2) {
       steps.push({ type: 'mirror', imageIdx: i, alt: true });
       steps.push({ type: 'ray', imageIdx: i, alt: true });
     }
@@ -1789,10 +1856,10 @@ function getVisibility(stepIndex, n, showAll) {
   if (showAll) {
     for (let i = 0; i < n; i++) {
       if (i >= 2) mirrors.add(i);
-      if (i === 2 && n >= 3) altMirrors.add(i);
+      if (i >= 2) altMirrors.add(i);
       images.add(i);
       rays.add(i);
-      if (i === 2 && n >= 3) altRays.add(i);
+      if (i >= 2) altRays.add(i);
     }
     return { mirrors, altMirrors, images, rays, altRays };
   }
