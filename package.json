@@ -5,7 +5,7 @@
   "type": "module",
   "scripts": {
     "dev": "vite",
-    "build": "vite build",
+    "build": "node scripts/build-plane-mirror-lab.cjs && vite build",
     "preview": "vite preview",
     "export:heat-flashcards": "node scripts/export-heat-ch1-flashcards.js",
     "export:light-flashcards": "node scripts/export-light-ch3-flashcards.js"

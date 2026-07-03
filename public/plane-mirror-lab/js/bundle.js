@@ -817,10 +817,9 @@ const PLANE_MIRROR_SIGHT_STEPS = 7;
 /** Virtual image line with A' (top), E' (eye), B' (foot) labels on the right. */
 function drawVirtualImageWithLabels(ctx, view, txf, imgX, h, hEye) {
   drawArrowBody(ctx, view, txf, 0, h, imgX, true);
-  const lx = txf.ox + (imgX + 0.12) * txf.pxPerM;
-  drawLabel(ctx, lx, txf.oy - h * txf.pxPerM, "A'", COLORS.image);
-  drawLabel(ctx, lx, txf.oy - hEye * txf.pxPerM, "E'", COLORS.image);
-  drawLabel(ctx, lx, txf.oy + 12, "B'", COLORS.image);
+  drawPoint(ctx, view, txf, { x: imgX, y: h }, 5, COLORS.image, "A'");
+  drawPoint(ctx, view, txf, { x: imgX, y: hEye }, 5, COLORS.image, "E'");
+  drawPoint(ctx, view, txf, { x: imgX, y: 0 }, 5, COLORS.image, "B'");
 }
 
 /** Cumulative 7-step plane-mirror sight-ray animation (Image Formation, Min. Length). */
