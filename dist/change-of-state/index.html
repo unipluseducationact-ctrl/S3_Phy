@@ -111,20 +111,20 @@
         min-height: 280px;
       }
       .lab-section.controls-floating .lab-viz-chart-wrap {
-        min-height: 200px;
+        min-height: 280px;
       }
     }
     .lab-viz-dual .lab-viz-panel {
       flex: none;
       flex-shrink: 0;
       min-height: 0;
-      overflow: hidden;
+      overflow: visible;
       position: relative;
       z-index: 1;
       display: flex;
       flex-direction: column;
     }
-    .lab-viz-dual .lab-viz-panel-chart { z-index: 2; }
+    .lab-viz-dual .lab-viz-panel-chart { z-index: 2; overflow: visible; }
     .lab-viz-dual .lab-viz-canvas {
       aspect-ratio: 16 / 10;
       width: 100%;
@@ -138,9 +138,9 @@
       aspect-ratio: 16 / 10;
       width: 100%;
       height: auto;
-      min-height: 180px;
-      max-height: 240px;
-      overflow: hidden;
+      min-height: 240px;
+      max-height: none;
+      overflow: visible;
       position: relative;
     }
     .lab-viz-dual .lab-viz-canvas canvas,
@@ -165,19 +165,15 @@
     html.s3phy-embed .lab-viz-dual .lab-viz-chart-wrap {
       aspect-ratio: 16 / 10;
       height: auto;
-      min-height: min(220px, 32vh);
+      min-height: min(300px, 40vh);
       max-height: none;
     }
-    html.s3phy-embed .lab-section.controls-floating > .lab-controls {
-      grid-column: 1 / -1;
-      height: 0;
-      min-height: 0;
-      padding: 0;
-      margin: 0;
-      border: none;
-      overflow: visible;
-      background: transparent;
-      box-shadow: none;
+    html.s3phy-embed .lab-controls.lab-controls-float {
+      background: #ffffff;
+      border: 1px solid #e2e8f0;
+      box-shadow: 0 8px 24px rgba(15, 23, 42, 0.12);
+      padding: 0.875rem;
+      border-radius: 1rem;
     }
   </style>
 </head>
@@ -1280,6 +1276,26 @@
       }
     }
 
+    function chartXYData() {
+      return stateState.chartData.labels.map((t, i) => ({
+        x: t,
+        y: stateState.chartData.temps[i],
+      }));
+    }
+
+    function getChartYRange() {
+      let yMax = 120;
+      if (stateState.substance === 'water') {
+        yMax = stateState.isSealed ? 155 : 115;
+      } else {
+        yMax = 115;
+      }
+      const yMin = stateState.mode === 'heating'
+        ? (stateState.substance === 'water' ? -25 : 0)
+        : -25;
+      return { yMin, yMax };
+    }
+
     function initChart() {
       const ctx = document.getElementById("stateChartCanvas").getContext("2d");
       
@@ -1287,28 +1303,21 @@
         stateChart.destroy();
       }
 
-      // Automatically adjust Chart Y Axis limit based on substance heating parameters
-      let isEn = currentLang === "en";
-      let yMax = 120;
-      if (stateState.substance === "water") {
-        yMax = stateState.isSealed ? 155 : 115;
-      } else {
-        yMax = 115;
-      }
+      const isEn = currentLang === "en";
+      const { yMin, yMax } = getChartYRange();
 
       stateChart = new Chart(ctx, {
         type: 'line',
         data: {
-          labels: stateState.chartData.labels,
           datasets: [{
             label: stateState.substance === "water" ? (isEn ? "Water Temp (°C)" : "水溫 (°C)") : (isEn ? "Naphthalene Temp (°C)" : "萘溫 (°C)"),
-            data: stateState.chartData.temps,
+            data: chartXYData(),
             borderColor: '#3b82f6',
             backgroundColor: 'rgba(59, 130, 246, 0.05)',
             borderWidth: 2.5,
             pointRadius: 0,
             pointHoverRadius: 5,
-            tension: 0, // perfect straight lines for change of state curve
+            tension: 0,
             fill: true
           }]
         },
@@ -1316,10 +1325,14 @@
           responsive: true,
           maintainAspectRatio: false,
           animation: false,
+          layout: {
+            padding: { top: 8, right: 12, bottom: 8, left: 4 },
+          },
           scales: {
             x: {
               type: 'linear',
               position: 'bottom',
+              min: 0,
               title: {
                 display: true,
                 text: isEn ? "Time (s)" : "時間 (秒)",
@@ -1328,7 +1341,7 @@
               grid: { color: 'rgba(148, 163, 184, 0.1)' }
             },
             y: {
-              min: stateState.mode === "heating" ? (stateState.substance === "water" ? -25 : 0) : -25,
+              min: yMin,
               max: yMax,
               title: {
                 display: true,
@@ -1347,8 +1360,10 @@
 
     function updateChart() {
       if (stateChart) {
-        stateChart.data.labels = stateState.chartData.labels;
-        stateChart.data.datasets[0].data = stateState.chartData.temps;
+        const { yMin, yMax } = getChartYRange();
+        stateChart.data.datasets[0].data = chartXYData();
+        stateChart.options.scales.y.min = yMin;
+        stateChart.options.scales.y.max = yMax;
         stateChart.update();
       }
     }
