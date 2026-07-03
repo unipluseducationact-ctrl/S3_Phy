@@ -810,6 +810,50 @@ class RayAnimator {
 }
 
 
+/* --- planeMirrorSight.js --- */
+
+const PLANE_MIRROR_SIGHT_STEPS = 7;
+
+/** Virtual image line with A' (top), E' (eye), B' (foot) labels on the right. */
+function drawVirtualImageWithLabels(ctx, view, txf, imgX, h, hEye) {
+  drawArrowBody(ctx, view, txf, 0, h, imgX, true);
+  const lx = txf.ox + (imgX + 0.12) * txf.pxPerM;
+  drawLabel(ctx, lx, txf.oy - h * txf.pxPerM, "A'", COLORS.image);
+  drawLabel(ctx, lx, txf.oy - hEye * txf.pxPerM, "E'", COLORS.image);
+  drawLabel(ctx, lx, txf.oy + 12, "B'", COLORS.image);
+}
+
+/** Cumulative 7-step plane-mirror sight-ray animation (Image Formation, Min. Length). */
+function drawPlaneMirrorSightRays(ctx, view, txf, c, imgX, h, hEye, stepIndex) {
+  if (stepIndex <= 0) return;
+
+  if (stepIndex >= 1) {
+    drawVirtualImageWithLabels(ctx, view, txf, imgX, h, hEye);
+  }
+
+  const { eye, top, foot, imgTop, imgFoot, rayTop, rayFoot } = c;
+
+  if (stepIndex >= 2 && rayTop.reflectPt) {
+    drawArrow(ctx, view, txf, imgTop, eye, { dashed: true, progress: 1 });
+  }
+  if (stepIndex >= 3 && rayTop.reflectPt) {
+    drawArrow(ctx, view, txf, top, rayTop.reflectPt, { progress: 1 });
+  }
+  if (stepIndex >= 4 && rayTop.reflectPt) {
+    drawArrow(ctx, view, txf, rayTop.reflectPt, eye, { progress: 1 });
+  }
+  if (stepIndex >= 5 && rayFoot.reflectPt) {
+    drawArrow(ctx, view, txf, imgFoot, eye, { dashed: true, progress: 1 });
+  }
+  if (stepIndex >= 6 && rayFoot.reflectPt) {
+    drawArrow(ctx, view, txf, foot, rayFoot.reflectPt, { progress: 1 });
+  }
+  if (stepIndex >= 7 && rayFoot.reflectPt) {
+    drawArrow(ctx, view, txf, rayFoot.reflectPt, eye, { progress: 1 });
+  }
+}
+
+
 /* --- i18n.js --- */
 /** @file Bilingual strings — one language visible at a time. */
 
@@ -1100,6 +1144,7 @@ function toggleLang() {
 
 
 
+
 const defaults = () => ({
   u: 2.0,
   H: 1.6,
@@ -1107,45 +1152,11 @@ const defaults = () => ({
   moved: false,
 });
 
-const IMAGE_FORMATION_STEPS = 7;
-
-function drawImageFormationRays(ctx, view, txf, c, imgX, stepIndex) {
-  if (stepIndex <= 0) return;
-
-  if (stepIndex >= 1) {
-    drawArrowBody(ctx, view, txf, 0, c.top.y, imgX, true);
-    const sx = txf.ox + (imgX + 0.12) * txf.pxPerM;
-    const sy = txf.oy - c.top.y * txf.pxPerM;
-    drawLabel(ctx, sx, sy, "A'B'", COLORS.image);
-  }
-
-  const { eye, top, foot, imgTop, imgFoot, rayTop, rayFoot } = c;
-
-  if (stepIndex >= 2 && rayTop.reflectPt) {
-    drawArrow(ctx, view, txf, imgTop, eye, { dashed: true, progress: 1 });
-  }
-  if (stepIndex >= 3 && rayTop.reflectPt) {
-    drawArrow(ctx, view, txf, top, rayTop.reflectPt, { progress: 1 });
-  }
-  if (stepIndex >= 4 && rayTop.reflectPt) {
-    drawArrow(ctx, view, txf, rayTop.reflectPt, eye, { progress: 1 });
-  }
-  if (stepIndex >= 5 && rayFoot.reflectPt) {
-    drawArrow(ctx, view, txf, imgFoot, eye, { dashed: true, progress: 1 });
-  }
-  if (stepIndex >= 6 && rayFoot.reflectPt) {
-    drawArrow(ctx, view, txf, foot, rayFoot.reflectPt, { progress: 1 });
-  }
-  if (stepIndex >= 7 && rayFoot.reflectPt) {
-    drawArrow(ctx, view, txf, rayFoot.reflectPt, eye, { progress: 1 });
-  }
-}
-
 function createImageFormationScenario() {
   let params = defaults();
   let view = null;
   let animator = new RayAnimator();
-  animator.overrideTotalSteps = IMAGE_FORMATION_STEPS;
+  animator.overrideTotalSteps = PLANE_MIRROR_SIGHT_STEPS;
 
   function compute() {
     const u = params.moved ? params.u - 0.1 : params.u;
@@ -1220,7 +1231,7 @@ function createImageFormationScenario() {
     drawPerson(ctx, view, txf, c.objX, params.H, params.hEye);
 
     const imgX = c.mirrorX + c.v;
-    drawImageFormationRays(ctx, view, txf, c, imgX, animator.stepIndex);
+    drawPlaneMirrorSightRays(ctx, view, txf, c, imgX, params.H, params.hEye, animator.stepIndex);
 
     drawLegend(ctx, 12, 12, [
       { color: COLORS.rayReal, text: t('legendReal') },
@@ -1242,11 +1253,12 @@ function createImageFormationScenario() {
 
 
 
+
 function createMinMirrorLengthScenario() {
   let params = { H: 1.6, hEye: 1.5, d: 2.0 };
   let view = null;
   let animator = new RayAnimator();
-  animator.rayCount = 2;
+  animator.overrideTotalSteps = PLANE_MIRROR_SIGHT_STEPS;
 
   function compute() {
     const mirrorX = params.d;
@@ -1259,7 +1271,9 @@ function createMinMirrorLengthScenario() {
     const rayFoot = sightRayVertical(foot, eye, mirrorX, 0, 3);
     const yTop = rayTop.reflectPt?.y ?? req.top;
     const yBot = rayFoot.reflectPt?.y ?? req.bottom;
-    return { mirrorX, objX, top, foot, eye, req, yTop, yBot, rayTop, rayFoot };
+    const imgTop = rayTop.image;
+    const imgFoot = rayFoot.image;
+    return { mirrorX, objX, top, foot, eye, req, yTop, yBot, rayTop, rayFoot, imgTop, imgFoot };
   }
 
   function getControls() {
@@ -1318,21 +1332,7 @@ function createMinMirrorLengthScenario() {
     drawVerticalMirror(ctx, view, txf, c.mirrorX, 0, 3, '#3f3f46', 2);
     drawVerticalMirror(ctx, view, txf, c.mirrorX, c.yBot, c.yTop, COLORS.mirrorNeed, 5);
 
-    const stepIndex = animator.stepIndex;
-    const rays = [
-      { objectPt: c.top, eye: c.eye, image: c.rayTop.image, reflectPt: c.rayTop.reflectPt },
-      { objectPt: c.foot, eye: c.eye, image: c.rayFoot.image, reflectPt: c.rayFoot.reflectPt },
-    ];
-    const makeHelpers = (rayIndex) => ({
-      drawArrow: (from, to, opts) => drawArrow(ctx, view, txf, from, to, opts),
-      drawImageLine: (_a, _b, pr) => {
-        if (rayIndex === 0 && pr > 0) drawArrowBody(ctx, view, txf, 0, params.H, imgX, true);
-      },
-      drawPoint: () => {},
-    });
-    rays.forEach((ray, i) => {
-      if (ray.reflectPt) RayAnimator.drawSightRay(ctx, view, txf, makeHelpers(i), ray, stepIndex, i, 2);
-    });
+    drawPlaneMirrorSightRays(ctx, view, txf, c, imgX, params.H, params.hEye, animator.stepIndex);
   }
 
   return {
