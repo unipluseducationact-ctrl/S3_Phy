@@ -223,21 +223,46 @@ function createWorldView(canvas, opts = {}) {
   };
 }
 
+/** Actual displayed canvas size after layout (matches pointer coordinates). */
+function getCanvasLayout(canvas) {
+  const rect = canvas.getBoundingClientRect();
+  return { w: rect.width, h: rect.height, rect };
+}
+
 function resizeCanvasToDisplay(canvas) {
   const parent = canvas.parentElement;
-  const rect = parent
+  const parentRect = parent
     ? parent.getBoundingClientRect()
     : { width: canvas.clientWidth || 600, height: canvas.clientHeight || 400 };
-  const w = Math.max(600, Math.floor(rect.width - 20));
+  const w = Math.max(600, Math.floor(parentRect.width - 20));
   const h = Math.max(400, Math.min(520, Math.floor(w * 0.62)));
   const dpr = window.devicePixelRatio || 1;
+  canvas.style.flex = 'none';
   canvas.style.width = `${w}px`;
   canvas.style.height = `${h}px`;
+  canvas.style.maxWidth = '100%';
   canvas.width = Math.floor(w * dpr);
   canvas.height = Math.floor(h * dpr);
   const ctx = canvas.getContext('2d');
   ctx.setTransform(dpr, 0, 0, dpr, 0, 0);
-  return { w, h, ctx };
+  const layout = getCanvasLayout(canvas);
+  return { w: layout.w, h: layout.h, ctx, layout };
+}
+
+/** Pointer client coords → world coords using the same layout as draw(). */
+function clientToWorld(view, layout, clientX, clientY) {
+  const rect = layout?.rect ?? layout;
+  const sx = clientX - rect.left;
+  const sy = clientY - rect.top;
+  const txf = computeTransform(view, layout.w, layout.h);
+  return {
+    x: (sx - txf.ox) / txf.pxPerM,
+    y: (txf.oy - sy) / txf.pxPerM,
+    sx,
+    sy,
+    txf,
+    layout,
+  };
 }
 
 function computeTransform(view, canvasW, canvasH) {
@@ -760,6 +785,7 @@ const STRINGS = {
     sketchGroupRays: '繪製光線',
     sketchGroupActions: '操作',
     sketchHintSelect: '點選線段或端點；拖曳移動；按刪除或 Delete 鍵移除',
+    sketchHintMarquee: '拖曳框選多個元素；Shift 加選；Delete 刪除',
     sketchHintMirror: '在畫布上點擊兩點，畫出鏡面線段',
     sketchHintObject: '點擊兩點，畫出物件棒（A、B）',
     sketchHintImage: '點擊兩點，畫出虛像棒（A′、B′）',
@@ -873,6 +899,7 @@ const STRINGS = {
     sketchGroupRays: 'Draw rays',
     sketchGroupActions: 'Actions',
     sketchHintSelect: 'Click a line or endpoint; drag to move; Delete key or button to remove',
+    sketchHintMarquee: 'Drag to box-select; Shift to add; Delete to remove',
     sketchHintMirror: 'Click two points on the canvas to draw the mirror',
     sketchHintObject: 'Click two points for the object bar (A, B)',
     sketchHintImage: 'Click two points for the virtual image bar (A′, B′)',
@@ -2354,7 +2381,6 @@ function otherEndpoint(ray, pt) {
   return null;
 }
 
-/** Pairs of real segments meeting on mirror → reflection check. */
 function bouncePairs(realRays, mirrors) {
   const pairs = [];
   for (let i = 0; i < realRays.length; i++) {
@@ -2372,7 +2398,6 @@ function bouncePairs(realRays, mirrors) {
   return pairs;
 }
 
-/** Validate reflection at each mirror bounce formed by two real segments. */
 function validateReflections(state) {
   const realRays = state.rays.filter((r) => r.kind === 'real');
   if (!realRays.length) {
@@ -2410,15 +2435,6 @@ function validateImagePosition(state) {
   const expB = reflectPoint(obj.b, mirror.a, mirror.b);
   const err = barEndpointDistance(expA, expB, img.a, img.b);
   return { ok: err <= POS_TOL * 2, err, expA, expB };
-}
-
-function collinear(a, b, c) {
-  const cross = (b.x - a.x) * (c.y - a.y) - (b.y - a.y) * (c.x - a.x);
-  return Math.abs(cross) < 0.08;
-}
-
-function segmentTouchesPoint(ray, pt) {
-  return nearPt(ray.from, pt) || nearPt(ray.to, pt);
 }
 
 function findSightPath(objPt, eyePt, imgPt, realRays, virtRays, mirrors) {
@@ -2485,10 +2501,13 @@ function runAllValidations(state) {
 
 
 
-const SKETCH_HIT_R = 0.32;
-const SEG_HIT_R = 0.22;
+const HIT_PX = 14;
+const LINE_HIT_PX = 10;
+const MARQUEE_MIN_PX = 4;
+const PLACE_DRAG_MIN = 0.12;
 const SNAP = 0.5;
 const TOOLS = ['select', 'mirror', 'object', 'image', 'observer', 'realRay', 'virtualRay'];
+const BAR_TOOLS = ['mirror', 'object', 'image'];
 
 const TOOL_META = {
   select: { icon: '↖', hintKey: 'sketchHintSelect', group: 'nav', labelKey: 'toolSelect', cls: 'tool-select' },
@@ -2509,67 +2528,108 @@ function emptyState() {
     rays: [],
     tool: 'select',
     pending: null,
-    selected: null,
+    selected: new Set(),
     gridSnap: true,
     nextId: 1,
   };
 }
 
 function snap(p, on) {
-  if (!on) return { ...p };
+  if (!on) return { x: p.x, y: p.y };
   return { x: Math.round(p.x / SNAP) * SNAP, y: Math.round(p.y / SNAP) * SNAP };
 }
 
-function distToSegment(p, a, b) {
-  const abx = b.x - a.x;
-  const aby = b.y - a.y;
-  const len2 = abx * abx + aby * aby;
-  if (len2 < 1e-12) return Math.hypot(p.x - a.x, p.y - a.y);
-  const t = Math.max(0, Math.min(1, ((p.x - a.x) * abx + (p.y - a.y) * aby) / len2));
-  const cx = a.x + t * abx;
-  const cy = a.y + t * aby;
-  return Math.hypot(p.x - cx, p.y - cy);
+function clonePt(p) { return { x: p.x, y: p.y }; }
+
+function selKey(type, id) { return `${type}:${id}`; }
+
+function parseSelKey(key) {
+  const i = key.indexOf(':');
+  return { type: key.slice(0, i), id: Number(key.slice(i + 1)) };
 }
 
-function clonePt(p) { return { x: p.x, y: p.y }; }
+function distPx(ax, ay, bx, by) {
+  return Math.hypot(ax - bx, ay - by);
+}
+
+function distSegPx(px, py, ax, ay, bx, by) {
+  const abx = bx - ax;
+  const aby = by - ay;
+  const len2 = abx * abx + aby * aby;
+  if (len2 < 1) return Math.hypot(px - ax, py - ay);
+  let u = ((px - ax) * abx + (py - ay) * aby) / len2;
+  u = Math.max(0, Math.min(1, u));
+  const cx = ax + u * abx;
+  const cy = ay + u * aby;
+  return Math.hypot(px - cx, py - cy);
+}
+
+function toScreenPt(txf, p) {
+  return { x: txf.ox + p.x * txf.pxPerM, y: txf.oy - p.y * txf.pxPerM };
+}
+
+function rectsOverlap(a, b) {
+  return a.x0 <= b.x1 && a.x1 >= b.x0 && a.y0 <= b.y1 && a.y1 >= b.y0;
+}
+
+function normalizeScreenRect(x0, y0, x1, y1) {
+  return {
+    x0: Math.min(x0, x1),
+    y0: Math.min(y0, y1),
+    x1: Math.max(x0, x1),
+    y1: Math.max(y0, y1),
+  };
+}
 
 function createRaySketchScenario() {
   let state = emptyState();
   let view = null;
   let canvasRef = null;
+  let lastLayout = null;
   let dragTarget = null;
-  let dragWhole = null;
+  let dragGroup = null;
+  let placeDrag = null;
+  let pointerStart = null;
+  let marquee = null;
   let cursorWorld = null;
   let refreshToolbarRef = null;
+  let keyHandler = null;
 
   function nid() { return state.nextId++; }
 
   function preset() { state = emptyState(); }
+
+  function isSelected(type, id) {
+    return state.selected.has(selKey(type, id));
+  }
 
   function updateParams(id, v) {
     if (id === 'gridSnap') state.gridSnap = v;
     else if (TOOLS.includes(id)) state.tool = id;
   }
 
-  function selectionName() {
-    if (!state.selected) return null;
-    const { type, id, part } = state.selected;
+  function selectionSummary() {
+    const n = state.selected.size;
+    if (!n) return null;
     const lang = getLang();
-    if (type === 'ray') {
-      const r = state.rays.find((x) => x.id === id);
-      const kind = r?.kind === 'virtual'
-        ? (lang === 'zh' ? '虛線' : 'virtual')
-        : (lang === 'zh' ? '實線' : 'real');
-      return `${kind} #${id}`;
+    if (n === 1) {
+      const { type, id } = parseSelKey([...state.selected][0]);
+      if (type === 'ray') {
+        const r = state.rays.find((x) => x.id === id);
+        const kind = r?.kind === 'virtual'
+          ? (lang === 'zh' ? '虛線' : 'virtual')
+          : (lang === 'zh' ? '實線' : 'real');
+        return `${kind} #${id}`;
+      }
+      const names = {
+        mirror: lang === 'zh' ? '鏡面' : 'mirror',
+        object: lang === 'zh' ? '物件' : 'object',
+        image: lang === 'zh' ? '虛像' : 'image',
+        observer: lang === 'zh' ? '觀察者' : 'observer',
+      };
+      return names[type] || type;
     }
-    const names = {
-      mirror: lang === 'zh' ? '鏡面' : 'mirror',
-      object: lang === 'zh' ? '物件' : 'object',
-      image: lang === 'zh' ? '虛像' : 'image',
-      observer: lang === 'zh' ? '觀察者' : 'observer',
-    };
-    if (part && part !== 'pt') return `${names[type] || type} (${part})`;
-    return names[type] || type;
+    return lang === 'zh' ? `已選 ${n} 項` : `${n} selected`;
   }
 
   function notifyChange() {
@@ -2586,6 +2646,7 @@ function createRaySketchScenario() {
     if (TOOLS.includes(id)) {
       state.tool = id;
       state.pending = null;
+      placeDrag = null;
       if (canvasRef) {
         canvasRef.style.cursor = id === 'select' ? 'default' : 'crosshair';
       }
@@ -2594,15 +2655,16 @@ function createRaySketchScenario() {
   }
 
   function deleteSelected() {
-    const s = state.selected;
-    if (!s) return;
-    const { type, id } = s;
-    if (type === 'mirror') state.mirrors = state.mirrors.filter((m) => m.id !== id);
-    else if (type === 'object') state.objects = state.objects.filter((o) => o.id !== id);
-    else if (type === 'image') state.images = state.images.filter((i) => i.id !== id);
-    else if (type === 'observer') state.observers = state.observers.filter((o) => o.id !== id);
-    else if (type === 'ray') state.rays = state.rays.filter((r) => r.id !== id);
-    state.selected = null;
+    if (!state.selected.size) return;
+    for (const key of [...state.selected]) {
+      const { type, id } = parseSelKey(key);
+      if (type === 'mirror') state.mirrors = state.mirrors.filter((m) => m.id !== id);
+      else if (type === 'object') state.objects = state.objects.filter((o) => o.id !== id);
+      else if (type === 'image') state.images = state.images.filter((i) => i.id !== id);
+      else if (type === 'observer') state.observers = state.observers.filter((o) => o.id !== id);
+      else if (type === 'ray') state.rays = state.rays.filter((r) => r.id !== id);
+    }
+    state.selected.clear();
   }
 
   function compute() {
@@ -2688,45 +2750,66 @@ function createRaySketchScenario() {
     return lines.join('\n');
   }
 
-  function hitTest(world) {
+  function getPointerWorld(canvas, clientX, clientY) {
+    const layout = lastLayout || getCanvasLayout(canvas);
+    return clientToWorld(view, layout, clientX, clientY);
+  }
+
+  function hitTestPixel(sx, sy, txf) {
     const hits = [];
 
+    const add = (type, id, part, dist, priority) => {
+      hits.push({ type, id, part, dist, priority });
+    };
+
     for (const r of state.rays) {
-      const df = Math.hypot(world.x - r.from.x, world.y - r.from.y);
-      const dt = Math.hypot(world.x - r.to.x, world.y - r.to.y);
-      if (df < SKETCH_HIT_R) hits.push({ type: 'ray', id: r.id, part: 'from', dist: df, priority: 0 });
-      if (dt < SKETCH_HIT_R) hits.push({ type: 'ray', id: r.id, part: 'to', dist: dt, priority: 0 });
-      const d = distToSegment(world, r.from, r.to);
-      if (d < SEG_HIT_R) hits.push({ type: 'ray', id: r.id, dist: d, priority: 1 });
+      const f = toScreenPt(txf, r.from);
+      const tpt = toScreenPt(txf, r.to);
+      const df = distPx(sx, sy, f.x, f.y);
+      const dt = distPx(sx, sy, tpt.x, tpt.y);
+      if (df < HIT_PX) add('ray', r.id, 'from', df, 0);
+      if (dt < HIT_PX) add('ray', r.id, 'to', dt, 0);
+      const ds = distSegPx(sx, sy, f.x, f.y, tpt.x, tpt.y);
+      if (ds < LINE_HIT_PX) add('ray', r.id, undefined, ds, 1);
     }
 
     for (const o of state.observers) {
-      const d = Math.hypot(world.x - o.pt.x, world.y - o.pt.y);
-      if (d < SKETCH_HIT_R) hits.push({ type: 'observer', id: o.id, part: 'pt', dist: d, priority: 0 });
+      const s = toScreenPt(txf, o.pt);
+      const d = distPx(sx, sy, s.x, s.y);
+      if (d < HIT_PX + 2) add('observer', o.id, 'pt', d, 0);
     }
+
     for (const o of state.objects) {
-      const da = Math.hypot(world.x - o.a.x, world.y - o.a.y);
-      const db = Math.hypot(world.x - o.b.x, world.y - o.b.y);
-      if (da < SKETCH_HIT_R) hits.push({ type: 'object', id: o.id, part: 'a', dist: da, priority: 0 });
-      if (db < SKETCH_HIT_R) hits.push({ type: 'object', id: o.id, part: 'b', dist: db, priority: 0 });
-      const ds = distToSegment(world, o.a, o.b);
-      if (ds < SEG_HIT_R) hits.push({ type: 'object', id: o.id, dist: ds, priority: 2 });
+      const sa = toScreenPt(txf, o.a);
+      const sb = toScreenPt(txf, o.b);
+      const da = distPx(sx, sy, sa.x, sa.y);
+      const db = distPx(sx, sy, sb.x, sb.y);
+      if (da < HIT_PX) add('object', o.id, 'a', da, 0);
+      if (db < HIT_PX) add('object', o.id, 'b', db, 0);
+      const ds = distSegPx(sx, sy, sa.x, sa.y, sb.x, sb.y);
+      if (ds < LINE_HIT_PX) add('object', o.id, undefined, ds, 2);
     }
-    for (const i of state.images) {
-      const da = Math.hypot(world.x - i.a.x, world.y - i.a.y);
-      const db = Math.hypot(world.x - i.b.x, world.y - i.b.y);
-      if (da < SKETCH_HIT_R) hits.push({ type: 'image', id: i.id, part: 'a', dist: da, priority: 0 });
-      if (db < SKETCH_HIT_R) hits.push({ type: 'image', id: i.id, part: 'b', dist: db, priority: 0 });
-      const ds = distToSegment(world, i.a, i.b);
-      if (ds < SEG_HIT_R) hits.push({ type: 'image', id: i.id, dist: ds, priority: 2 });
+
+    for (const img of state.images) {
+      const sa = toScreenPt(txf, img.a);
+      const sb = toScreenPt(txf, img.b);
+      const da = distPx(sx, sy, sa.x, sa.y);
+      const db = distPx(sx, sy, sb.x, sb.y);
+      if (da < HIT_PX) add('image', img.id, 'a', da, 0);
+      if (db < HIT_PX) add('image', img.id, 'b', db, 0);
+      const ds = distSegPx(sx, sy, sa.x, sa.y, sb.x, sb.y);
+      if (ds < LINE_HIT_PX) add('image', img.id, undefined, ds, 2);
     }
+
     for (const m of state.mirrors) {
-      const da = Math.hypot(world.x - m.a.x, world.y - m.a.y);
-      const db = Math.hypot(world.x - m.b.x, world.y - m.b.y);
-      if (da < SKETCH_HIT_R) hits.push({ type: 'mirror', id: m.id, part: 'a', dist: da, priority: 0 });
-      if (db < SKETCH_HIT_R) hits.push({ type: 'mirror', id: m.id, part: 'b', dist: db, priority: 0 });
-      const ds = distToSegment(world, m.a, m.b);
-      if (ds < SEG_HIT_R) hits.push({ type: 'mirror', id: m.id, dist: ds, priority: 2 });
+      const sa = toScreenPt(txf, m.a);
+      const sb = toScreenPt(txf, m.b);
+      const da = distPx(sx, sy, sa.x, sa.y);
+      const db = distPx(sx, sy, sb.x, sb.y);
+      if (da < HIT_PX) add('mirror', m.id, 'a', da, 0);
+      if (db < HIT_PX) add('mirror', m.id, 'b', db, 0);
+      const ds = distSegPx(sx, sy, sa.x, sa.y, sb.x, sb.y);
+      if (ds < LINE_HIT_PX) add('mirror', m.id, undefined, ds, 2);
     }
 
     if (!hits.length) return null;
@@ -2735,23 +2818,71 @@ function createRaySketchScenario() {
     return { type: h.type, id: h.id, part: h.part };
   }
 
-  function snapshotElement(hit) {
-    const { type, id } = hit;
+  function screenBoundsForElement(type, id, txf, pad = 6) {
+    const pts = [];
     if (type === 'observer') {
       const o = state.observers.find((x) => x.id === id);
-      return { type, id, pt: clonePt(o.pt) };
+      if (!o) return null;
+      pts.push(toScreenPt(txf, o.pt));
+    } else if (type === 'ray') {
+      const r = state.rays.find((x) => x.id === id);
+      if (!r) return null;
+      pts.push(toScreenPt(txf, r.from), toScreenPt(txf, r.to));
+    } else {
+      const el = type === 'mirror'
+        ? state.mirrors.find((x) => x.id === id)
+        : state[`${type}s`]?.find?.((x) => x.id === id);
+      if (!el) return null;
+      pts.push(toScreenPt(txf, el.a), toScreenPt(txf, el.b));
+    }
+    let x0 = Infinity; let y0 = Infinity; let x1 = -Infinity; let y1 = -Infinity;
+    pts.forEach((p) => {
+      x0 = Math.min(x0, p.x); y0 = Math.min(y0, p.y);
+      x1 = Math.max(x1, p.x); y1 = Math.max(y1, p.y);
+    });
+    return { x0: x0 - pad, y0: y0 - pad, x1: x1 + pad, y1: y1 + pad };
+  }
+
+  function hitTestBox(box, txf) {
+    const keys = new Set();
+    const all = [
+      ...state.mirrors.map((m) => ['mirror', m.id]),
+      ...state.objects.map((o) => ['object', o.id]),
+      ...state.images.map((i) => ['image', i.id]),
+      ...state.observers.map((o) => ['observer', o.id]),
+      ...state.rays.map((r) => ['ray', r.id]),
+    ];
+    for (const [type, id] of all) {
+      const bounds = screenBoundsForElement(type, id, txf);
+      if (bounds && rectsOverlap(box, bounds)) keys.add(selKey(type, id));
+    }
+    return keys;
+  }
+
+  function snapshotElement(type, id) {
+    if (type === 'observer') {
+      const o = state.observers.find((x) => x.id === id);
+      return o ? { type, id, pt: clonePt(o.pt) } : null;
     }
     if (type === 'ray') {
       const r = state.rays.find((x) => x.id === id);
-      return { type, id, from: clonePt(r.from), to: clonePt(r.to) };
+      return r ? { type, id, from: clonePt(r.from), to: clonePt(r.to) } : null;
     }
-    const el = state[`${type}s`]?.find?.((x) => x.id === id)
-      || (type === 'mirror' ? state.mirrors.find((x) => x.id === id) : null);
+    const el = type === 'mirror'
+      ? state.mirrors.find((x) => x.id === id)
+      : state[`${type}s`]?.find?.((x) => x.id === id);
     if (!el) return null;
     return { type, id, a: clonePt(el.a), b: clonePt(el.b) };
   }
 
-  function applyWholeDrag(snapshot, dx, dy) {
+  function snapshotSelection() {
+    return [...state.selected].map((key) => {
+      const { type, id } = parseSelKey(key);
+      return snapshotElement(type, id);
+    }).filter(Boolean);
+  }
+
+  function applySnapshotAtDelta(snapshot, dx, dy) {
     const { type, id } = snapshot;
     if (type === 'observer') {
       const o = state.observers.find((x) => x.id === id);
@@ -2775,12 +2906,46 @@ function createRaySketchScenario() {
         o.b = snap({ x: snapshot.b.x + dx, y: snapshot.b.y + dy }, state.gridSnap);
       }
     } else if (type === 'image') {
-      const i = state.images.find((x) => x.id === id);
-      if (i) {
-        i.a = snap({ x: snapshot.a.x + dx, y: snapshot.a.y + dy }, state.gridSnap);
-        i.b = snap({ x: snapshot.b.x + dx, y: snapshot.b.y + dy }, state.gridSnap);
+      const img = state.images.find((x) => x.id === id);
+      if (img) {
+        img.a = snap({ x: snapshot.a.x + dx, y: snapshot.a.y + dy }, state.gridSnap);
+        img.b = snap({ x: snapshot.b.x + dx, y: snapshot.b.y + dy }, state.gridSnap);
       }
     }
+  }
+
+  function applyGroupDrag(dx, dy) {
+    dragGroup?.orig?.forEach((orig) => applySnapshotAtDelta(orig, dx, dy));
+  }
+
+  function applyEndpointDrag(hit, p) {
+    const { type, id, part } = hit;
+    if (type === 'observer') {
+      const o = state.observers.find((x) => x.id === id);
+      if (o) o.pt = p;
+    } else if (type === 'ray') {
+      const r = state.rays.find((x) => x.id === id);
+      if (r) {
+        if (part === 'from') r.from = p;
+        else if (part === 'to') r.to = p;
+      }
+    } else if (type === 'mirror') {
+      const m = state.mirrors.find((x) => x.id === id);
+      if (m && part) m[part] = p;
+    } else if (type === 'object') {
+      const o = state.objects.find((x) => x.id === id);
+      if (o && part) o[part] = p;
+    } else if (type === 'image') {
+      const img = state.images.find((x) => x.id === id);
+      if (img && part) img[part] = p;
+    }
+  }
+
+  function createBar(tool, a, b) {
+    const id = nid();
+    if (tool === 'mirror') state.mirrors.push({ id, a, b });
+    else if (tool === 'object') state.objects.push({ id, a, b });
+    else state.images.push({ id, a, b });
   }
 
   function placeClick(world) {
@@ -2789,21 +2954,6 @@ function createRaySketchScenario() {
 
     if (tool === 'observer') {
       state.observers.push({ id: nid(), pt: p });
-      state.pending = null;
-      return;
-    }
-
-    if (tool === 'mirror' || tool === 'object' || tool === 'image') {
-      if (!state.pending || state.pending.kind !== tool) {
-        state.pending = { kind: tool, clicks: [p] };
-        return;
-      }
-      const a = state.pending.clicks[0];
-      const b = p;
-      const id = nid();
-      if (tool === 'mirror') state.mirrors.push({ id, a, b });
-      else if (tool === 'object') state.objects.push({ id, a, b });
-      else state.images.push({ id, a, b });
       state.pending = null;
       return;
     }
@@ -2824,89 +2974,144 @@ function createRaySketchScenario() {
     }
   }
 
-  let keyHandler = null;
+  function toggleSelection(hit, additive) {
+    const key = selKey(hit.type, hit.id);
+    if (additive) {
+      if (state.selected.has(key)) state.selected.delete(key);
+      else state.selected.add(key);
+    } else if (state.selected.size === 1 && state.selected.has(key)) {
+      state.selected.delete(key);
+    } else {
+      state.selected.clear();
+      state.selected.add(key);
+    }
+  }
 
   function bindPointer(canvas) {
-    const getWorld = (clientX, clientY) => {
-      const rect = canvas.getBoundingClientRect();
-      const txf = computeTransform(view, rect.width, rect.height);
-      return { ...toWorld(view, txf, clientX - rect.left, clientY - rect.top), txf };
-    };
-
     const onDown = (e) => {
       e.preventDefault();
-      const world = getWorld(e.clientX, e.clientY);
-      cursorWorld = world;
+      const ptr = getPointerWorld(canvas, e.clientX, e.clientY);
+      cursorWorld = ptr;
+      pointerStart = { sx: ptr.sx, sy: ptr.sy, shift: e.shiftKey };
+      marquee = null;
+      dragTarget = null;
+      dragGroup = null;
 
       if (state.tool === 'select') {
-        const hit = hitTest(world);
-        state.selected = hit;
-        if (hit) {
-          if (hit.part) {
-            dragTarget = hit;
-            dragWhole = null;
-          } else {
-            dragTarget = null;
-            dragWhole = { start: clonePt(world), snap: snapshotElement(hit) };
+        const hit = hitTestPixel(ptr.sx, ptr.sy, ptr.txf);
+        pointerStart.hit = hit;
+
+        if (hit?.part && isSelected(hit.type, hit.id)) {
+          dragTarget = hit;
+        } else if (hit && isSelected(hit.type, hit.id)) {
+          dragGroup = { start: clonePt(ptr), orig: snapshotSelection() };
+        } else if (hit?.part) {
+          dragTarget = hit;
+          if (!e.shiftKey) {
+            state.selected.clear();
+            state.selected.add(selKey(hit.type, hit.id));
           }
-        } else {
-          dragTarget = null;
-          dragWhole = null;
         }
-        notifyChange();
-      } else {
-        placeClick(world);
-        draw(canvas);
+
+        if ((dragTarget || dragGroup) && canvas.setPointerCapture) {
+          canvas.setPointerCapture(e.pointerId);
+        }
+        return;
       }
-      if ((dragTarget || dragWhole) && canvas.setPointerCapture) canvas.setPointerCapture(e.pointerId);
-    };
 
-    const onMove = (e) => {
-      const world = getWorld(e.clientX, e.clientY);
-      cursorWorld = world;
-
-      if (dragWhole?.snap) {
-        e.preventDefault();
-        const dx = world.x - dragWhole.start.x;
-        const dy = world.y - dragWhole.start.y;
-        applyWholeDrag(dragWhole.snap, dx, dy);
+      if (BAR_TOOLS.includes(state.tool)) {
+        placeDrag = { kind: state.tool, start: snap(ptr, state.gridSnap) };
+        if (canvas.setPointerCapture) canvas.setPointerCapture(e.pointerId);
         draw(canvas);
         return;
       }
 
-      if (!dragTarget) {
-        if (state.pending) draw(canvas);
-        return;
-      }
-      e.preventDefault();
-      const p = snap(world, state.gridSnap);
-      const { type, id, part } = dragTarget;
-
-      if (type === 'observer') {
-        const o = state.observers.find((x) => x.id === id);
-        if (o) o.pt = p;
-      } else if (type === 'ray') {
-        const r = state.rays.find((x) => x.id === id);
-        if (r) {
-          if (part === 'from') r.from = p;
-          else if (part === 'to') r.to = p;
-        }
-      } else if (type === 'mirror') {
-        const m = state.mirrors.find((x) => x.id === id);
-        if (m) m[part] = p;
-      } else if (type === 'object') {
-        const o = state.objects.find((x) => x.id === id);
-        if (o) o[part] = p;
-      } else if (type === 'image') {
-        const i = state.images.find((x) => x.id === id);
-        if (i) i[part] = p;
-      }
+      placeClick(ptr);
       draw(canvas);
     };
 
-    const onUp = () => {
+    const onMove = (e) => {
+      const ptr = getPointerWorld(canvas, e.clientX, e.clientY);
+      cursorWorld = ptr;
+
+      if (state.tool === 'select' && pointerStart && !dragTarget && !dragGroup) {
+        const dx = ptr.sx - pointerStart.sx;
+        const dy = ptr.sy - pointerStart.sy;
+        if (Math.hypot(dx, dy) >= MARQUEE_MIN_PX) {
+          marquee = normalizeScreenRect(pointerStart.sx, pointerStart.sy, ptr.sx, ptr.sy);
+          draw(canvas);
+          return;
+        }
+      }
+
+      if (dragGroup?.orig) {
+        e.preventDefault();
+        const dx = ptr.x - dragGroup.start.x;
+        const dy = ptr.y - dragGroup.start.y;
+        applyGroupDrag(dx, dy);
+        draw(canvas);
+        return;
+      }
+
+      if (dragTarget) {
+        e.preventDefault();
+        applyEndpointDrag(dragTarget, snap(ptr, state.gridSnap));
+        draw(canvas);
+        return;
+      }
+
+      if (placeDrag) {
+        draw(canvas);
+        return;
+      }
+
+      if (state.pending) draw(canvas);
+    };
+
+    const onUp = (e) => {
+      const ptr = getPointerWorld(canvas, e.clientX, e.clientY);
+
+      if (state.tool === 'select' && pointerStart) {
+        if (marquee) {
+          const keys = hitTestBox(marquee, ptr.txf);
+          if (!pointerStart.shift) state.selected.clear();
+          keys.forEach((k) => state.selected.add(k));
+          notifyChange();
+        } else if (!dragTarget && !dragGroup) {
+          const hit = pointerStart.hit;
+          if (hit) {
+            toggleSelection(hit, pointerStart.shift);
+            notifyChange();
+          } else if (!pointerStart.shift) {
+            state.selected.clear();
+            notifyChange();
+          }
+        } else {
+          notifyChange();
+        }
+      }
+
+      if (placeDrag) {
+        const start = placeDrag.start;
+        const end = snap(ptr, state.gridSnap);
+        const dist = Math.hypot(end.x - start.x, end.y - start.y);
+        if (dist >= PLACE_DRAG_MIN) {
+          createBar(placeDrag.kind, start, end);
+          state.pending = null;
+        } else if (!state.pending || state.pending.kind !== placeDrag.kind) {
+          state.pending = { kind: placeDrag.kind, clicks: [start] };
+        } else {
+          createBar(placeDrag.kind, state.pending.clicks[0], start);
+          state.pending = null;
+        }
+        placeDrag = null;
+        draw(canvas);
+      }
+
       dragTarget = null;
-      dragWhole = null;
+      dragGroup = null;
+      pointerStart = null;
+      marquee = null;
     };
 
     const onKey = (e) => {
@@ -2940,67 +3145,93 @@ function createRaySketchScenario() {
     bindPointer(canvas);
   }
 
-  function drawPreview(ctx, view, txf) {
-    if (!state.pending || !cursorWorld) return;
-    const clicks = state.pending.clicks;
+  function drawPreview(ctx, viewRef, txf) {
+    if (!cursorWorld) return;
     const p = snap(cursorWorld, state.gridSnap);
+
+    if (placeDrag) {
+      ctx.globalAlpha = 0.45;
+      drawArrow(ctx, viewRef, txf, placeDrag.start, p, {
+        color: COLORS.mirrorNeed,
+        dashed: placeDrag.kind !== 'mirror',
+        width: 2,
+        head: placeDrag.kind !== 'mirror',
+      });
+      ctx.globalAlpha = 1;
+      return;
+    }
+
+    if (!state.pending) return;
+    const clicks = state.pending.clicks;
     ctx.globalAlpha = 0.45;
-    if (state.pending.kind === 'mirror' || state.pending.kind === 'object' || state.pending.kind === 'image') {
-      drawArrow(ctx, view, txf, clicks[0], p, {
+    if (BAR_TOOLS.includes(state.pending.kind)) {
+      drawArrow(ctx, viewRef, txf, clicks[0], p, {
         color: COLORS.mirrorNeed,
         dashed: state.pending.kind !== 'mirror',
         width: 2,
         head: state.pending.kind !== 'mirror',
       });
     } else if (state.pending.kind === 'realRay') {
-      drawArrow(ctx, view, txf, clicks[0], p, { color: COLORS.rayReal, width: 2 });
+      drawArrow(ctx, viewRef, txf, clicks[0], p, { color: COLORS.rayReal, width: 2 });
     } else if (state.pending.kind === 'virtualRay') {
-      drawArrow(ctx, view, txf, clicks[0], p, { color: COLORS.rayVirtual, width: 2, dashed: true });
+      drawArrow(ctx, viewRef, txf, clicks[0], p, { color: COLORS.rayVirtual, width: 2, dashed: true });
     }
     ctx.globalAlpha = 1;
   }
 
+  function drawMarquee(ctx) {
+    if (!marquee) return;
+    ctx.save();
+    ctx.strokeStyle = COLORS.mirrorNeed;
+    ctx.fillStyle = 'rgba(255,204,0,0.12)';
+    ctx.lineWidth = 1.5;
+    ctx.setLineDash([4, 3]);
+    const w = marquee.x1 - marquee.x0;
+    const h = marquee.y1 - marquee.y0;
+    ctx.fillRect(marquee.x0, marquee.y0, w, h);
+    ctx.strokeRect(marquee.x0, marquee.y0, w, h);
+    ctx.restore();
+  }
+
   function draw(canvas) {
-    const { w, h, ctx } = resizeCanvasToDisplay(canvas);
+    const { w, h, ctx, layout } = resizeCanvasToDisplay(canvas);
+    lastLayout = layout;
     const txf = computeTransform(view, w, h);
     clear(ctx, w, h);
     drawGrid(ctx, view, txf, w, h);
 
     state.mirrors.forEach((m) => {
-      const sel = state.selected?.type === 'mirror' && state.selected.id === m.id;
-      drawMirrorSegment(ctx, view, txf, m.a, m.b, COLORS.mirror, 4, sel);
+      drawMirrorSegment(ctx, view, txf, m.a, m.b, COLORS.mirror, 4, isSelected('mirror', m.id));
     });
 
     state.objects.forEach((o, i) => {
-      const sel = state.selected?.type === 'object' && state.selected.id === o.id;
       drawBar(ctx, view, txf, o.a, o.b, {
         color: COLORS.object,
         width: 4,
         labelA: i === 0 ? 'A' : '',
         labelB: i === 0 ? 'B' : '',
-        selected: sel,
+        selected: isSelected('object', o.id),
       });
     });
 
     state.images.forEach((img, i) => {
-      const sel = state.selected?.type === 'image' && state.selected.id === img.id;
       drawBar(ctx, view, txf, img.a, img.b, {
         color: COLORS.image,
         width: 3,
         dashed: true,
         labelA: i === 0 ? "A'" : '',
         labelB: i === 0 ? "B'" : '',
-        selected: sel,
+        selected: isSelected('image', img.id),
       });
     });
 
     state.observers.forEach((o) => {
-      const sel = state.selected?.type === 'observer' && state.selected.id === o.id;
+      const sel = isSelected('observer', o.id);
       drawPoint(ctx, view, txf, o.pt, 7, sel ? COLORS.mirrorNeed : COLORS.eye, 'E');
     });
 
     state.rays.forEach((r) => {
-      const sel = state.selected?.type === 'ray' && state.selected.id === r.id;
+      const sel = isSelected('ray', r.id);
       const color = r.kind === 'real' ? COLORS.rayReal : COLORS.rayVirtual;
       drawArrow(ctx, view, txf, r.from, r.to, {
         color: sel ? COLORS.mirrorNeed : color,
@@ -3014,6 +3245,7 @@ function createRaySketchScenario() {
     });
 
     drawPreview(ctx, view, txf);
+    drawMarquee(ctx);
   }
 
   function buildToolbar(container, onChange) {
@@ -3082,9 +3314,9 @@ function createRaySketchScenario() {
     const delBtn = document.createElement('button');
     delBtn.type = 'button';
     delBtn.className = 'btn-sketch-delete';
-    delBtn.innerHTML = `<span data-i18n="deleteSelected"></span>`;
+    delBtn.innerHTML = '<span data-i18n="deleteSelected"></span>';
     delBtn.addEventListener('click', () => {
-      if (!state.selected) return;
+      if (!state.selected.size) return;
       handleAction('deleteSelected');
       onChange?.();
     });
@@ -3114,15 +3346,16 @@ function createRaySketchScenario() {
     applyI18n(root);
 
     function refreshToolbar() {
-      hintEl.textContent = t(TOOL_META[state.tool]?.hintKey || 'sketchHintSelect');
+      const hintKey = state.tool === 'select' ? 'sketchHintMarquee' : TOOL_META[state.tool]?.hintKey;
+      hintEl.textContent = t(hintKey || 'sketchHintSelect');
       Object.entries(toolBtns).forEach(([id, btn]) => {
         btn.classList.toggle('active', state.tool === id);
       });
       snapToggle.classList.toggle('on', state.gridSnap);
 
-      const name = selectionName();
-      if (name) {
-        selValue.textContent = name;
+      const summary = selectionSummary();
+      if (summary) {
+        selValue.textContent = summary;
         selBox.classList.add('has-selection');
         delBtn.disabled = false;
         delBtn.classList.remove('disabled');
@@ -3145,7 +3378,11 @@ function createRaySketchScenario() {
     }
     canvasRef = null;
     dragTarget = null;
-    dragWhole = null;
+    dragGroup = null;
+    placeDrag = null;
+    pointerStart = null;
+    marquee = null;
+    lastLayout = null;
   }
 
   return {

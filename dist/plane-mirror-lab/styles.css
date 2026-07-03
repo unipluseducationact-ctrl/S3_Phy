@@ -24,7 +24,7 @@
 * { box-sizing: border-box; }
 
 body {
-  font-family: var(--s3-font, 'Inter', system-ui, -apple-system, sans-serif);
+  font-family: 'Segoe UI', system-ui, -apple-system, sans-serif;
   background: var(--bg-color);
   background-image:
     radial-gradient(ellipse 80% 50% at 50% -20%, rgba(77, 184, 255, 0.08), transparent),
@@ -154,7 +154,7 @@ h1 {
   flex-wrap: wrap;
   gap: 18px;
   width: 95%;
-  max-width: var(--s3-content-max, 1200px);
+  max-width: 1240px;
   margin: 0 auto 40px;
   align-items: flex-start;
   justify-content: center;
@@ -212,7 +212,7 @@ canvas {
 .controls-panel {
   flex: 1;
   min-width: 300px;
-  max-width: var(--s3-float-panel-w, min(360px, calc(100% - 24px)));
+  max-width: 420px;
   max-height: calc(100vh - 140px);
   overflow-y: auto;
   background: var(--panel-bg);
@@ -390,7 +390,8 @@ input[type=range]::-webkit-slider-thumb {
 
 .viz-canvas-wrap canvas,
 .viz-canvas-wrap .dual-canvas {
-  width: 100%;
+  width: auto;
+  max-width: 100%;
 }
 
 /* 圖例：畫布正下方，分組 flex 佈局 */
@@ -786,9 +787,11 @@ html.s3phy-embed .viz-canvas-wrap {
   min-height: 0;
   display: flex;
   flex-direction: column;
+  align-items: center;
+  justify-content: center;
 }
 
 html.s3phy-embed canvas {
-  flex: 1;
+  flex: none;
   min-height: 200px;
 }
