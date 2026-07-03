@@ -150,8 +150,6 @@
     }
     .lab-viz-dual .lab-viz-chart-wrap canvas {
       display: block;
-      width: 100%;
-      height: 100%;
     }
     html.s3phy-embed .lab-viz-dual {
       grid-template-rows: auto auto;
@@ -1320,7 +1318,14 @@
 
     function initChart() {
       sizeChartContainer();
-      const ctx = document.getElementById("stateChartCanvas").getContext("2d");
+      const wrap = document.querySelector('.lab-viz-chart-wrap');
+      if (!wrap || wrap.clientHeight <= 0) {
+        requestAnimationFrame(initChart);
+        return;
+      }
+      const canvas = document.getElementById("stateChartCanvas");
+      if (!canvas) return;
+      const ctx = canvas.getContext("2d");
       
       if (stateChart) {
         stateChart.destroy();
@@ -1331,12 +1336,12 @@
       const xMax = getChartXMax();
 
       stateChart = new Chart(ctx, {
-        type: 'line',
+        type: 'scatter',
         data: {
           datasets: [{
             label: stateState.substance === "water" ? (isEn ? "Water Temp (°C)" : "水溫 (°C)") : (isEn ? "Naphthalene Temp (°C)" : "萘溫 (°C)"),
             data: chartXYData(),
-            parsing: false,
+            showLine: true,
             borderColor: '#2563eb',
             backgroundColor: 'rgba(37, 99, 235, 0.08)',
             borderWidth: 2.5,
