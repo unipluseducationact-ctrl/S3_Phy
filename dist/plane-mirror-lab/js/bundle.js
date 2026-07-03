@@ -1901,9 +1901,15 @@ function getVisibility(stepIndex, n, showAll) {
   return { mirrors, altMirrors, images, rays, altRays };
 }
 
-function defaultObjectInWedge(index) {
+function defaultObjectInWedge(index, orientationDeg) {
   const r = 1.1 + index * 0.2;
-  return { x: r, y: 0 };
+  const phi = deg2rad(orientationDeg);
+  return { x: r * Math.cos(phi), y: r * Math.sin(phi) };
+}
+
+function thetaIndex(theta) {
+  const i = THETA_VALUES.indexOf(theta);
+  return i >= 0 ? i : THETA_VALUES.indexOf(45);
 }
 
 /** Keep object inside the wedge (2D polar clamp in local frame). */
@@ -1928,7 +1934,7 @@ function isInsideWedge(pt, thetaDeg, phiRad, minR = 0.2) {
 }
 
 function createAngledMirrorsScenario() {
-  let params = { theta: 45, showRays: true, showImages: true };
+  let params = { theta: 45, orientation: 0, showRays: true, showImages: true };
   let view = null;
   let objects = [];
   let nextObjId = 1;
@@ -1967,7 +1973,7 @@ function createAngledMirrorsScenario() {
   }
 
   function makeObject(index) {
-    const pt = defaultObjectInWedge(index);
+    const pt = defaultObjectInWedge(index, params.orientation);
     const label = index === 0 ? 'O' : `O${index + 1}`;
     return { id: nextObjId++, label, x: pt.x, y: pt.y };
   }
@@ -1980,7 +1986,7 @@ function createAngledMirrorsScenario() {
   function compute() {
     const theta = deg2rad(params.theta);
     const half = theta / 2;
-    const phi = 0;
+    const phi = deg2rad(params.orientation);
     const apex = { x: 0, y: 0 };
     const m1 = {
       a: apex,
@@ -2061,12 +2067,30 @@ function createAngledMirrorsScenario() {
 
   function getControls() {
     return [
-      { id: 'theta', labelKey: 'angle', options: THETA_VALUES, value: params.theta, unit: '°' },
+      {
+        id: 'theta',
+        labelKey: 'angle',
+        min: 0,
+        max: THETA_VALUES.length - 1,
+        step: 1,
+        value: thetaIndex(params.theta),
+        unit: '°',
+        valueMap: THETA_VALUES,
+      },
+      {
+        id: 'orientation',
+        labelKey: 'wedgeOrientation',
+        min: -180,
+        max: 180,
+        step: 5,
+        value: params.orientation,
+        unit: '°',
+      },
     ];
   }
 
   function preset() {
-    params = { theta: 45, showRays: true, showImages: true };
+    params = { theta: 45, orientation: 0, showRays: true, showImages: true };
     placeMode = false;
     sketchTool = 'object';
     clearSketch();
@@ -2078,14 +2102,19 @@ function createAngledMirrorsScenario() {
 
   function updateParams(id, v) {
     if (id === 'theta') {
-      const n = Number(v);
-      if (!THETA_VALUES.includes(n)) return;
-      params.theta = n;
+      const idx = clamp(Math.round(Number(v)), 0, THETA_VALUES.length - 1);
+      params.theta = THETA_VALUES[idx];
+      const phi = deg2rad(params.orientation);
       objects.forEach((obj) => {
-        const p = constrainInWedge(obj, params.theta, 0);
+        const p = constrainInWedge(obj, params.theta, phi);
         obj.x = p.x;
         obj.y = p.y;
       });
+      resetAnimation();
+      return;
+    }
+    if (id === 'orientation') {
+      params.orientation = v;
       resetAnimation();
       return;
     }
@@ -2118,8 +2147,8 @@ function createAngledMirrorsScenario() {
 
   function getDescription() {
     return getLang() === 'zh'
-      ? '拖曳物件；用控制面板選 θ；作圖工具可放置觀察者 E 同手繪光線。'
-      : 'Drag objects; choose θ in the panel; use sketch tools for observer E and manual rays.';
+      ? '拖曳物件；用控制面板調 θ 同 φ；作圖工具可放置觀察者 E 同手繪光線。'
+      : 'Drag objects; adjust θ and φ in the panel; use sketch tools for observer E and manual rays.';
   }
 
   function getStats(c) {
@@ -2249,8 +2278,8 @@ function createAngledMirrorsScenario() {
         }
       }
 
-      if (placeMode && isInsideWedge(world, params.theta, 0)) {
-        const pt = constrainInWedge(world, params.theta, 0);
+      if (placeMode && isInsideWedge(world, params.theta, deg2rad(params.orientation))) {
+        const pt = constrainInWedge(world, params.theta, deg2rad(params.orientation));
         objects.push({ id: nextObjId++, label: `O${objects.length + 1}`, x: pt.x, y: pt.y });
         resetAnimation();
         draw(canvas);
@@ -2279,7 +2308,7 @@ function createAngledMirrorsScenario() {
       if (dragTarget.type === 'object') {
         const obj = objects.find((o) => o.id === dragTarget.id);
         if (obj) {
-          const c = constrainInWedge(p, params.theta, 0);
+          const c = constrainInWedge(p, params.theta, deg2rad(params.orientation));
           obj.x = c.x;
           obj.y = c.y;
         }
@@ -2375,7 +2404,6 @@ function createAngledMirrorsScenario() {
   }
 
   function buildToolbar(container, onChange) {
-    container.innerHTML = '';
     const root = document.createElement('div');
     root.className = 'sketch-toolbar';
 
@@ -3942,10 +3970,13 @@ function rebuildControls() {
     const g = document.createElement('div');
     g.className = 'control-group';
     const id = `ctrl-${ctrl.id}`;
+    const displayValue = ctrl.valueMap
+      ? ctrl.valueMap[Math.round(ctrl.value)]
+      : ctrl.value;
     g.innerHTML = `
       <div class="label-row">
         <span data-i18n="${ctrl.labelKey}"></span>
-        <span class="badge" id="${id}-val">${ctrl.value}${ctrl.unit || ''}</span>
+        <span class="badge" id="${id}-val">${displayValue}${ctrl.unit || ''}</span>
       </div>
     `;
     if (ctrl.options) {
@@ -3975,7 +4006,8 @@ function rebuildControls() {
       slider.addEventListener('input', () => {
         const v = parseFloat(slider.value);
         sc.updateParams(ctrl.id, v);
-        g.querySelector('.badge').textContent = `${v}${ctrl.unit || ''}`;
+        const shown = ctrl.valueMap ? ctrl.valueMap[Math.round(v)] : v;
+        g.querySelector('.badge').textContent = `${shown}${ctrl.unit || ''}`;
         updateResults();
         render();
       });
