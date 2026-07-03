@@ -3,8 +3,9 @@
 
 :root {
   /* Layout */
-  --s3-content-max: 1200px;
-  --s3-tool-min-h: clamp(640px, calc(100dvh - 120px), 1400px);
+  --s3-content-max: min(1600px, calc(100dvw - var(--s3-vp-pad) * 2));
+  --s3-tool-min-h: clamp(560px, calc(100dvh - var(--s3-nav-offset, 96px) - 48px), 1600px);
+  --s3-nav-offset: calc(var(--s3-vp-pad) + 72px + 12px);
   --s3-panel-pad: 18px;
   --s3-radius: 14px;
   --s3-vp-pad: clamp(12px, 2vw, 24px);

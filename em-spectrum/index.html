@@ -26,6 +26,19 @@
       min-height: 100vh;
     }
     .wrap { max-width: var(--s3-content-max, 1200px); margin: 0 auto; padding: 1.25rem; }
+    html.s3phy-embed .wrap {
+      max-width: none;
+      width: 100%;
+      margin: 0;
+      padding: 0.75rem;
+      min-height: 100%;
+      box-sizing: border-box;
+    }
+    html.s3phy-embed body {
+      min-height: 100%;
+      display: flex;
+      flex-direction: column;
+    }
     .workspace {
       display: grid;
       grid-template-columns: 1fr minmax(300px, 360px);
