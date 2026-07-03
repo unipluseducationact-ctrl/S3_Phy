@@ -317,9 +317,9 @@ a {
 
 /* Hub strand pages — single-row header with inline nav (Chem-style) */
 .site-header--hub {
-  display: grid;
-  grid-template-columns: minmax(0, auto) minmax(0, 1fr) auto;
+  display: flex;
   align-items: center;
+  justify-content: space-between;
   gap: 12px;
   margin-bottom: 12px;
   flex-wrap: nowrap;
@@ -327,6 +327,8 @@ a {
 
 .site-header--hub .site-header__brand {
   gap: 10px;
+  flex: 0 1 auto;
+  min-width: 0;
 }
 
 .site-header--hub .brand-logo-img {
@@ -344,13 +346,13 @@ a {
 }
 
 .site-header--hub .main-nav {
-  justify-self: center;
-  width: 100%;
+  width: fit-content;
   max-width: 100%;
   margin-bottom: 0;
   margin-left: 0;
   margin-right: 0;
   transform: none;
+  flex: 0 0 auto;
   flex-wrap: nowrap;
   overflow-x: auto;
   overflow-y: hidden;
@@ -364,7 +366,7 @@ a {
 }
 
 .site-header--hub .site-header__actions {
-  justify-self: end;
+  flex: 0 0 auto;
 }
 
 .panel--strand-hub {
@@ -1611,25 +1613,26 @@ iframe.note-preview {
   }
 
   .site-header--hub {
-    grid-template-columns: minmax(0, 1fr) auto;
-    grid-template-rows: auto auto;
+    flex-wrap: wrap;
+    justify-content: flex-start;
     gap: 8px 10px;
   }
 
   .site-header--hub .site-header__brand {
-    grid-column: 1;
-    grid-row: 1;
+    flex: 1 1 auto;
+    min-width: 0;
   }
 
   .site-header--hub .site-header__actions {
-    grid-column: 2;
-    grid-row: 1;
+    flex: 0 0 auto;
+    margin-left: auto;
   }
 
   .site-header--hub .main-nav {
-    grid-column: 1 / -1;
-    grid-row: 2;
-    justify-self: stretch;
+    order: 3;
+    width: fit-content;
+    max-width: 100%;
+    flex: 0 1 auto;
   }
 
   .main-nav button {
