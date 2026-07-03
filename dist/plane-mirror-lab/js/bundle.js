@@ -1104,11 +1104,17 @@ const defaults = () => ({
   moved: false,
 });
 
+const FOOT_RAY_START = 5;
+/** Skip redundant object-point / duplicate image-line steps (7 steps total). */
+const STEP_OFFSET_TOP = 1;
+const STEP_OFFSET_FOOT = 3;
+
 function createImageFormationScenario() {
   let params = defaults();
   let view = null;
   let animator = new RayAnimator();
   animator.rayCount = 2;
+  animator.extraSteps = -3;
 
   function compute() {
     const u = params.moved ? params.u - 0.1 : params.u;
@@ -1197,7 +1203,7 @@ function createImageFormationScenario() {
           }
         }
       },
-      drawPoint: (p) => drawPoint(ctx, view, txf, p, 5, COLORS.object),
+      drawPoint: () => {},
     });
 
     const rays = [
@@ -1206,7 +1212,10 @@ function createImageFormationScenario() {
     ];
     rays.forEach((ray, i) => {
       if (ray.reflectPt) {
-        RayAnimator.drawSightRay(ctx, view, txf, makeHelpers(i), ray, stepIndex, i, 2);
+        let effStep = stepIndex;
+        if (i === 0) effStep = stepIndex + STEP_OFFSET_TOP;
+        else if (stepIndex >= FOOT_RAY_START) effStep = stepIndex + STEP_OFFSET_FOOT;
+        RayAnimator.drawSightRay(ctx, view, txf, makeHelpers(i), ray, effStep, i, 2);
       }
     });
 
@@ -1961,22 +1970,44 @@ function resolveHighlightMirror(step, set, c) {
 function drawMirrorHighlight(ctx, txf, a, b, { virtual, pulse }) {
   const s0 = { x: txf.ox + a.x * txf.pxPerM, y: txf.oy - a.y * txf.pxPerM };
   const s1 = { x: txf.ox + b.x * txf.pxPerM, y: txf.oy - b.y * txf.pxPerM };
+  const glowW = 16 + 10 * pulse;
+  const coreW = 5 + 5 * pulse;
   ctx.save();
-  ctx.strokeStyle = `rgba(255,204,0,${0.15 + 0.25 * pulse})`;
-  ctx.lineWidth = 10 + 4 * pulse;
+  ctx.lineCap = 'round';
+  ctx.shadowColor = 'rgba(255,220,80,0.95)';
+  ctx.shadowBlur = 8 + 14 * pulse;
+  ctx.strokeStyle = `rgba(255,255,255,${0.35 + 0.45 * pulse})`;
+  ctx.lineWidth = glowW + 6;
   ctx.setLineDash([]);
   ctx.beginPath();
   ctx.moveTo(s0.x, s0.y);
   ctx.lineTo(s1.x, s1.y);
   ctx.stroke();
-  ctx.strokeStyle = COLORS.mirrorNeed;
-  ctx.lineWidth = 4 + 3 * pulse;
+  ctx.shadowBlur = 0;
+  ctx.strokeStyle = `rgba(255,204,0,${0.55 + 0.45 * pulse})`;
+  ctx.lineWidth = glowW;
+  if (virtual) ctx.setLineDash([8, 6]);
+  ctx.beginPath();
+  ctx.moveTo(s0.x, s0.y);
+  ctx.lineTo(s1.x, s1.y);
+  ctx.stroke();
+  ctx.setLineDash([]);
+  ctx.strokeStyle = '#fff';
+  ctx.lineWidth = coreW;
   if (virtual) ctx.setLineDash([6, 5]);
   ctx.beginPath();
   ctx.moveTo(s0.x, s0.y);
   ctx.lineTo(s1.x, s1.y);
   ctx.stroke();
   ctx.setLineDash([]);
+  const tipR = 6 + 5 * pulse;
+  ctx.fillStyle = `rgba(255,204,0,${0.5 + 0.5 * pulse})`;
+  ctx.beginPath();
+  ctx.arc(s1.x, s1.y, tipR, 0, Math.PI * 2);
+  ctx.fill();
+  ctx.strokeStyle = '#fff';
+  ctx.lineWidth = 2;
+  ctx.stroke();
   ctx.restore();
 }
 
@@ -2040,8 +2071,11 @@ function createAngledMirrorsScenario() {
   }
 
   function scheduleHighlightPulse(canvas) {
-    cancelHighlightRaf();
-    highlightRaf = requestAnimationFrame(() => draw(canvas));
+    if (highlightRaf !== null) return;
+    highlightRaf = requestAnimationFrame(() => {
+      highlightRaf = null;
+      if (canvasRef === canvas) draw(canvas);
+    });
   }
 
   function nid() { return nextSketchId++; }
@@ -2063,6 +2097,12 @@ function createAngledMirrorsScenario() {
   function resetAnimation() {
     cancelHighlightRaf();
     animator.reset();
+  }
+
+  function replayAnimation() {
+    cancelHighlightRaf();
+    animator.reset();
+    animator.play();
   }
 
   function makeObject(index) {
@@ -2630,13 +2670,7 @@ function createAngledMirrorsScenario() {
     const highlight = primarySet
       ? resolveHighlightMirror(activeStep, primarySet, c)
       : null;
-    if (highlight) {
-      const pulse = 0.5 + 0.5 * Math.sin(performance.now() / 280);
-      drawMirrorHighlight(ctx, txf, highlight.a, highlight.b, {
-        virtual: highlight.virtual,
-        pulse,
-      });
-    }
+    const pulse = highlight ? 0.5 + 0.5 * Math.sin(performance.now() / 180) : 0;
 
     if (params.showImages) {
       c.objectSets.forEach((set) => {
@@ -2681,6 +2715,13 @@ function createAngledMirrorsScenario() {
 
     drawSketchPreview(ctx, view, txf);
 
+    if (highlight) {
+      drawMirrorHighlight(ctx, txf, highlight.a, highlight.b, {
+        virtual: highlight.virtual,
+        pulse,
+      });
+    }
+
     const angM1 = Math.atan2(-c.m1.b.y, c.m1.b.x);
     const angM2 = Math.atan2(-c.m2.b.y, c.m2.b.x);
     ctx.strokeStyle = 'rgba(255,204,0,0.3)';
@@ -2712,6 +2753,7 @@ function createAngledMirrorsScenario() {
     getDescription, getStats, getFormula, buildToolbar,
     handleAction,
     getAnimator: () => animator,
+    replayAnimation,
     extraToggles: [
       { id: 'showRays', labelKey: 'showRays' },
       { id: 'showImages', labelKey: 'showImages' },
@@ -4261,9 +4303,15 @@ function bindAnim() {
     render();
   });
   document.getElementById('btnReplay').addEventListener('click', () => {
-    const anim = getScenario().getAnimator?.();
-    anim?.reset?.();
-    anim?.play?.();
+    const sc = getScenario();
+    if (sc.replayAnimation) {
+      sc.replayAnimation();
+    } else {
+      const anim = sc.getAnimator?.();
+      anim?.reset?.();
+      anim?.play?.();
+    }
+    render();
   });
 }
 
