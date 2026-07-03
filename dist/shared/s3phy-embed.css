@@ -13,6 +13,85 @@ html.s3phy-embed body {
   line-height: var(--s3-line-height);
 }
 
+html.s3phy-embed {
+  height: 100%;
+}
+
+html.s3phy-embed body {
+  height: 100%;
+  min-height: 100% !important;
+  margin: 0;
+  display: flex;
+  flex-direction: column;
+  overflow: hidden;
+}
+
+html.s3phy-embed body.min-h-screen,
+html.s3phy-embed body.embed-mode {
+  min-height: 100% !important;
+  height: 100%;
+}
+
+html.s3phy-embed body > main,
+html.s3phy-embed main.flex-grow {
+  flex: 1 1 auto;
+  min-height: 0;
+  display: flex;
+  flex-direction: column;
+  width: 100%;
+  overflow: auto;
+}
+
+html.s3phy-embed .lab-section {
+  flex: 1 1 auto;
+  min-height: 0 !important;
+  height: 100%;
+  align-content: stretch;
+}
+
+html.s3phy-embed .lab-steps {
+  max-height: none !important;
+  height: auto;
+  min-height: 0;
+}
+
+html.s3phy-embed .lab-viz-dual {
+  max-height: none !important;
+  flex: 1 1 auto;
+  height: 100%;
+  grid-template-rows: minmax(0, 1fr) minmax(0, 1fr);
+}
+
+html.s3phy-embed .lab-viz-dual .lab-viz-canvas,
+html.s3phy-embed .lab-viz-dual .lab-viz-chart-wrap {
+  max-height: none;
+  height: 100%;
+  aspect-ratio: auto;
+}
+
+html.s3phy-embed header,
+html.s3phy-embed footer {
+  flex-shrink: 0;
+}
+
+html.s3phy-embed .max-w-7xl {
+  max-width: none;
+  width: 100%;
+}
+
+html.s3phy-embed .sim-main-col,
+html.s3phy-embed .glass-panel.flex-grow {
+  flex: 1 1 auto;
+  min-height: 0;
+}
+
+html.s3phy-embed .canvas-container {
+  flex: 1 1 auto;
+  min-height: 0 !important;
+  height: auto !important;
+  max-height: none;
+}
+
 html.s3phy-embed .main-container,
 html.s3phy-embed .lab-wrap,
 html.s3phy-embed .dashboard,

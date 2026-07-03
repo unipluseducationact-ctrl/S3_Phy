@@ -164,21 +164,36 @@
 
         /* Embedded in S3_Phy hub iframe */
         body.embed-mode {
-            overflow: auto;
-            min-height: 0;
+            overflow: hidden;
+            min-height: 100% !important;
+            height: 100%;
         }
         body.embed-mode main {
+            flex: 1 1 auto;
             min-height: 0;
             padding-top: 0.75rem;
             padding-bottom: 0.75rem;
+            overflow: auto;
         }
         body.embed-mode header {
             padding-top: 0.5rem;
             padding-bottom: 0.5rem;
+            flex-shrink: 0;
         }
         body.embed-mode footer {
             padding-top: 0.75rem;
             padding-bottom: 0.75rem;
+            flex-shrink: 0;
+        }
+        body.embed-mode .sim-main-col {
+            flex: 1 1 auto;
+            min-height: 0;
+        }
+        body.embed-mode .canvas-container {
+            flex: 1 1 auto;
+            min-height: 0 !important;
+            height: auto !important;
+            max-height: none;
         }
     </style>
 </head>

@@ -15,6 +15,17 @@ function isFullscreenActive(stage) {
   return fsEl === stage;
 }
 
+function notifyLabResize(stage) {
+  window.dispatchEvent(new Event('resize'));
+  stage?.querySelectorAll('iframe').forEach((frame) => {
+    try {
+      frame.contentWindow?.dispatchEvent(new Event('resize'));
+    } catch {
+      /* cross-origin */
+    }
+  });
+}
+
 export function initLabFullscreen({ app, stage, button, t, setCollapsed, getCollapsed }) {
   let overlayMode = false;
   let pickerWasCollapsed = false;
@@ -80,6 +91,7 @@ export function initLabFullscreen({ app, stage, button, t, setCollapsed, getColl
 
     overlayMode = true;
     updateButton(true);
+    requestAnimationFrame(() => notifyLabResize(stage));
 
     overlayBackdrop.addEventListener('click', () => {
       exitFullscreen();
@@ -104,6 +116,7 @@ export function initLabFullscreen({ app, stage, button, t, setCollapsed, getColl
         return;
       }
       updateButton(true);
+      requestAnimationFrame(() => notifyLabResize(stage));
     } catch {
       app?.classList.remove('is-lab-fullscreen');
       setCollapsed(pickerWasCollapsed);
@@ -125,6 +138,9 @@ export function initLabFullscreen({ app, stage, button, t, setCollapsed, getColl
       stage.style.margin = '';
     }
     updateButton(active);
+    if (active) {
+      requestAnimationFrame(() => notifyLabResize(stage));
+    }
   };
 
   button.addEventListener('click', () => {

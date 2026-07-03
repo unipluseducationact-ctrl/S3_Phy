@@ -769,12 +769,26 @@ a {
   border: none;
   border-radius: 0;
   background: var(--surface-inset);
+  display: flex;
+  flex-direction: column;
 }
 
 .tool-stage:fullscreen > *,
 .tool-stage.tool-stage--overlay-fullscreen > * {
-  min-height: 100%;
-  height: 100%;
+  min-height: 0 !important;
+  height: 100% !important;
+  max-height: none;
+  flex: 1 1 auto;
+  width: 100%;
+  display: flex;
+  flex-direction: column;
+  box-sizing: border-box;
+}
+
+#app.is-lab-fullscreen {
+  padding: 0;
+  height: 100dvh;
+  overflow: hidden;
 }
 
 #app.is-lab-fullscreen .site-header,
@@ -789,14 +803,254 @@ a {
   border: none;
   box-shadow: none;
   background: transparent;
+  height: 100%;
+  min-height: 0;
+  display: flex;
+  flex-direction: column;
+}
+
+#app.is-lab-fullscreen .tools-layout {
+  flex: 1;
+  min-height: 0;
+  height: 100%;
+  grid-template-columns: 1fr;
 }
 
 #app.is-lab-fullscreen .tool-stage {
-  min-height: calc(100dvh - var(--vp-pad) * 2);
+  flex: 1;
+  min-height: 0 !important;
+  height: 100% !important;
+  max-height: none;
+  border-radius: 0;
+  padding: 0;
+}
+
+#app.is-lab-fullscreen .tool-stage > * {
+  min-height: 0 !important;
+  height: 100% !important;
+  max-height: none;
+  flex: 1 1 auto;
+  width: 100%;
+  display: flex;
+  flex-direction: column;
+  box-sizing: border-box;
 }
 
 .tool-fullscreen-btn .material-symbols-outlined {
   font-size: 1.1rem;
+}
+
+/* Fullscreen — iframe lab wrappers */
+.tool-stage:fullscreen .tool-lens-simulator,
+.tool-stage:fullscreen .tool-tir-escape,
+.tool-stage:fullscreen .tool-plane-mirror-lab,
+.tool-stage:fullscreen .tool-em-spectrum,
+.tool-stage:fullscreen .tool-specific-heat,
+.tool-stage:fullscreen .tool-thermal-mixing,
+.tool-stage:fullscreen .tool-change-of-state,
+.tool-stage:fullscreen .tool-heat-transfer,
+.tool-stage.tool-stage--overlay-fullscreen .tool-change-of-state,
+.tool-stage.tool-stage--overlay-fullscreen .tool-heat-transfer,
+#app.is-lab-fullscreen .tool-change-of-state,
+#app.is-lab-fullscreen .tool-heat-transfer,
+#app.is-lab-fullscreen .tool-specific-heat,
+#app.is-lab-fullscreen .tool-thermal-mixing {
+  min-height: 0 !important;
+  height: 100% !important;
+}
+
+.tool-stage:fullscreen iframe,
+.tool-stage.tool-stage--overlay-fullscreen iframe,
+#app.is-lab-fullscreen .tool-stage iframe {
+  flex: 1 1 auto;
+  min-height: 0 !important;
+  height: 100% !important;
+  max-height: none;
+  border-radius: 0;
+}
+
+/* Fullscreen — RGB mixer */
+.tool-stage:fullscreen .rgb-mixer,
+.tool-stage.tool-stage--overlay-fullscreen .rgb-mixer,
+#app.is-lab-fullscreen .rgb-mixer {
+  display: flex;
+  flex-direction: column;
+  min-height: 0;
+  height: 100%;
+  overflow: hidden;
+}
+
+.tool-stage:fullscreen .rgb-mixer-lead,
+.tool-stage.tool-stage--overlay-fullscreen .rgb-mixer-lead,
+#app.is-lab-fullscreen .rgb-mixer-lead {
+  flex-shrink: 0;
+  margin: 8px 12px 0;
+}
+
+.tool-stage:fullscreen .rgb-mixer-body,
+.tool-stage.tool-stage--overlay-fullscreen .rgb-mixer-body,
+#app.is-lab-fullscreen .rgb-mixer-body {
+  flex: 1 1 auto;
+  min-height: 0 !important;
+  height: auto;
+  max-height: none;
+  align-items: stretch;
+}
+
+.tool-stage:fullscreen .rgb-mixer-stage,
+.tool-stage.tool-stage--overlay-fullscreen .rgb-mixer-stage,
+#app.is-lab-fullscreen .rgb-mixer-stage {
+  min-height: 0 !important;
+  height: 100%;
+}
+
+.tool-stage:fullscreen .rgb-mixer-canvas,
+.tool-stage.tool-stage--overlay-fullscreen .rgb-mixer-canvas,
+#app.is-lab-fullscreen .rgb-mixer-canvas {
+  width: 100%;
+  height: 100%;
+}
+
+.tool-stage:fullscreen .rgb-mixer-controls,
+.tool-stage.tool-stage--overlay-fullscreen .rgb-mixer-controls,
+#app.is-lab-fullscreen .rgb-mixer-controls {
+  overflow-y: auto;
+  max-height: 100%;
+}
+
+/* Fullscreen — rotating mirror */
+.tool-stage:fullscreen .rml,
+.tool-stage.tool-stage--overlay-fullscreen .rml,
+#app.is-lab-fullscreen .rml {
+  display: flex;
+  flex-direction: column;
+  height: 100%;
+  min-height: 0;
+  flex: 1;
+  border-radius: 0;
+  padding: 10px 12px;
+}
+
+.tool-stage:fullscreen .rml .rml-head,
+.tool-stage.tool-stage--overlay-fullscreen .rml .rml-head,
+#app.is-lab-fullscreen .rml .rml-head {
+  flex-shrink: 0;
+}
+
+.tool-stage:fullscreen .rml .rml-dash,
+.tool-stage.tool-stage--overlay-fullscreen .rml .rml-dash,
+#app.is-lab-fullscreen .rml .rml-dash {
+  flex: 1 1 auto;
+  min-height: 0;
+  align-items: stretch;
+  flex-wrap: nowrap;
+  max-width: none;
+  width: 100%;
+  margin: 0;
+}
+
+.tool-stage:fullscreen .rml .rml-viz,
+.tool-stage.tool-stage--overlay-fullscreen .rml .rml-viz,
+#app.is-lab-fullscreen .rml .rml-viz {
+  flex: 1 1 auto;
+  min-height: 0;
+  min-width: 0;
+  display: flex;
+  align-items: stretch;
+}
+
+.tool-stage:fullscreen .rml .rml-canvas,
+.tool-stage.tool-stage--overlay-fullscreen .rml .rml-canvas,
+#app.is-lab-fullscreen .rml .rml-canvas {
+  width: 100%;
+  height: 100%;
+  max-width: none;
+  flex: 1;
+  object-fit: contain;
+}
+
+.tool-stage:fullscreen .rml .rml-controls,
+.tool-stage.tool-stage--overlay-fullscreen .rml .rml-controls,
+#app.is-lab-fullscreen .rml .rml-controls {
+  flex: 0 0 auto;
+  max-height: 100%;
+  overflow-y: auto;
+}
+
+/* Fullscreen — thermometer labs (incl. faulty calibration) */
+.tool-stage:fullscreen .tl-wrap,
+.tool-stage.tool-stage--overlay-fullscreen .tl-wrap,
+#app.is-lab-fullscreen .tl-wrap {
+  display: flex;
+  flex-direction: column;
+  height: 100%;
+  min-height: 0;
+  flex: 1;
+  border-radius: 0;
+  padding: 10px 12px;
+}
+
+.tool-stage:fullscreen .tl-wrap .tl-head,
+.tool-stage.tool-stage--overlay-fullscreen .tl-wrap .tl-head,
+#app.is-lab-fullscreen .tl-wrap .tl-head {
+  flex-shrink: 0;
+}
+
+.tool-stage:fullscreen .tl-wrap .tl-dash,
+.tool-stage:fullscreen .tl-wrap .tl-dash--faulty,
+.tool-stage.tool-stage--overlay-fullscreen .tl-wrap .tl-dash,
+.tool-stage.tool-stage--overlay-fullscreen .tl-wrap .tl-dash--faulty,
+#app.is-lab-fullscreen .tl-wrap .tl-dash,
+#app.is-lab-fullscreen .tl-wrap .tl-dash--faulty {
+  flex: 1 1 auto;
+  min-height: 0 !important;
+  height: 100%;
+}
+
+.tool-stage:fullscreen .tl-wrap--faulty-cal .tl-faulty-hero,
+.tool-stage.tool-stage--overlay-fullscreen .tl-wrap--faulty-cal .tl-faulty-hero,
+#app.is-lab-fullscreen .tl-wrap--faulty-cal .tl-faulty-hero {
+  flex: 1 1 auto;
+  min-height: 0 !important;
+}
+
+.tool-stage:fullscreen .tl-wrap--faulty-cal .tl-faulty-hero-viz,
+.tool-stage.tool-stage--overlay-fullscreen .tl-wrap--faulty-cal .tl-faulty-hero-viz,
+#app.is-lab-fullscreen .tl-wrap--faulty-cal .tl-faulty-hero-viz {
+  flex: 1 1 auto;
+  min-height: 0;
+}
+
+.tool-stage:fullscreen .tl-wrap--faulty-cal .tl-dash--faulty,
+.tool-stage.tool-stage--overlay-fullscreen .tl-wrap--faulty-cal .tl-dash--faulty,
+#app.is-lab-fullscreen .tl-wrap--faulty-cal .tl-dash--faulty {
+  display: grid;
+  grid-template-columns: 1fr minmax(260px, 360px);
+  grid-template-rows: 1fr;
+  align-items: stretch;
+  gap: 14px;
+}
+
+.tool-stage:fullscreen .tl-wrap--faulty-cal .tl-faulty-hero,
+.tool-stage.tool-stage--overlay-fullscreen .tl-wrap--faulty-cal .tl-faulty-hero,
+#app.is-lab-fullscreen .tl-wrap--faulty-cal .tl-faulty-hero {
+  grid-column: 1;
+  grid-row: 1;
+}
+
+.tool-stage:fullscreen .tl-wrap--faulty-cal .tl-faulty-live,
+.tool-stage.tool-stage--overlay-fullscreen .tl-wrap--faulty-cal .tl-faulty-live,
+#app.is-lab-fullscreen .tl-wrap--faulty-cal .tl-faulty-live {
+  grid-column: 2;
+  grid-row: 1;
+  overflow-y: auto;
+  min-height: 0;
+}
+
+.tool-stage:fullscreen .tl-wrap--faulty-cal .tl-controls,
+.tool-stage.tool-stage--overlay-fullscreen .tl-wrap--faulty-cal .tl-controls,
+#app.is-lab-fullscreen .tl-wrap--faulty-cal .tl-controls {
+  grid-column: 1 / -1;
 }
 
 .tool-stage > * {
