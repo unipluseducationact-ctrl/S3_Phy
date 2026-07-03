@@ -516,6 +516,9 @@
         html.s3phy-embed .tir-physics-panel .bg-slate-900 {
             padding: 0.5rem 0.625rem;
         }
+        html.s3phy-embed #lang-toggle-btn {
+            display: none;
+        }
     </style>
     <script>
     (function () {
@@ -671,83 +674,108 @@
         const i18n = {
             zh: {
                 title: "🔥 逃獄遊戲",
-                subtitle: "The Prison Break: 全反射模擬",
-                incidentLabel: "入射角 (Incident Angle) <span class=\"math-inline\">\\(\\theta_1\\)</span>",
+                subtitle: "全反射模擬",
+                incidentLabel: "入射角 <span class=\"math-inline\">\\(\\theta_1\\)</span>",
                 setCritical: "設為 \\(\\theta_c\\)",
                 set0deg: "設為 0°",
                 set90deg: "設為 90°",
-                glassLabel: "監獄 (玻璃) <span class=\"math-inline\">\\(n_1\\)</span>",
-                airLabel: "自由 (空氣) <span class=\"math-inline\">\\(n_2\\)</span>",
+                glassLabel: "監獄 (光密介質) <span class=\"math-inline\">\\(n_1\\)</span>",
+                airLabel: "自由 (光疏介質) <span class=\"math-inline\">\\(n_2\\)</span>",
                 showRefractRay: "顯示折射光線",
                 hideRefractRay: "隱藏折射光線",
                 showReflectRay: "顯示反射光線",
                 hideReflectRay: "隱藏反射光線",
-                dirFromGlass: "入射方向：由 玻璃(n₁) 射向 空氣(n₂)",
-                dirFromAir: "入射方向：由 空氣(n₂) 射向 玻璃(n₁)",
+                dirFromGlass: "入射方向：由 光密介質(n₁) 射向 光疏介質(n₂)",
+                dirFromAir: "入射方向：由 光疏介質(n₂) 射向 光密介質(n₁)",
                 physicsCore: "🧮 物理核心運算",
-                theoryDenseRare: "<strong>【越獄理論】</strong> 光想從光密介質 (Denser, <span class=\"math-inline\">\\(n=N_I\\)</span>) 逃到光疏介質 (Rarer, <span class=\"math-inline\">\\(n=N_R\\)</span>)。",
-                theoryDenseRareL1: "<strong>角度 &lt; <span class=\"math-inline\">\\(C\\)</span></strong>：成功越獄 (折射)",
-                theoryDenseRareL2: "<strong>角度 = <span class=\"math-inline\">\\(C\\)</span></strong>：卡在圍牆上 (沿界面跑)",
-                theoryDenseRareL3: "<strong>角度 &gt; <span class=\"math-inline\">\\(C\\)</span></strong>：越獄失敗，被彈回來 (全內反射)",
-                theoryRareDense: "<strong>【入獄理論】</strong> 光從光疏介質 (Rarer, <span class=\"math-inline\">\\(n=N_I\\)</span>) 進入光密介質 (Denser, <span class=\"math-inline\">\\(n=N_R\\)</span>)。",
+                theoryDenseRare: "<strong>【越獄理論】</strong> 光想從光密介質 (<span class=\"math-inline\">\\(n=N_I\\)</span>) 逃到光疏介質 (<span class=\"math-inline\">\\(n=N_R\\)</span>)。",
+                theoryDenseRareL1: "<strong>角度 &lt; <span class=\"math-inline\">\\(C\\)</span></strong>：成功越獄（折射）",
+                theoryDenseRareL2: "<strong>角度 = <span class=\"math-inline\">\\(C\\)</span></strong>：卡在圍牆上（沿界面跑）",
+                theoryDenseRareL3: "<strong>角度 &gt; <span class=\"math-inline\">\\(C\\)</span></strong>：越獄失敗，被彈回來（全內反射）",
+                theoryRareDense: "<strong>【入獄理論】</strong> 光從光疏介質 (<span class=\"math-inline\">\\(n=N_I\\)</span>) 進入光密介質 (<span class=\"math-inline\">\\(n=N_R\\)</span>)。",
                 theoryRareDenseL1: "<strong>任何角度</strong>：皆會發生折射穿透",
                 theoryRareDenseL2: "<strong>光線偏折</strong>：永遠偏向法線，<strong>不會</strong>發生全內反射！",
-                tirBadge: "Total Internal Reflection · 完全內反射",
-                criticalAngleLabel: "臨界角 (Critical Angle):",
-                snellLabel: "斯涅爾定律 (Snell's Law):",
-                canvasAir: "空氣 (自由世界)",
-                canvasGlass: "玻璃 (監獄)",
-                statusFailed: "🚨 越獄失敗！ (全內反射)",
-                statusStuck: "🧱 卡在圍牆上！ (沿界面跑)",
-                statusEscaped: "✨ 成功越獄！ (折射)",
-                statusEntered: "✨ 成功進入！ (折射)",
+                tirBadge: "完全內反射",
+                criticalAngleLabel: "臨界角：",
+                snellLabel: "斯涅爾定律：",
+                canvasAir: "光疏介質 (自由世界)",
+                canvasGlass: "光密介質 (監獄)",
+                statusFailed: "🚨 越獄失敗！（全內反射）",
+                statusStuck: "🧱 卡在圍牆上！（沿界面跑）",
+                statusEscaped: "✨ 成功越獄！（折射）",
+                statusEntered: "✨ 成功進入！（折射）",
                 noTIR: "光從光疏到光密，不會發生全內反射",
-                noSolution: "無解 (全內反射)",
+                noSolution: "無解（全內反射）",
                 reflectRayTip: "切換反射光線的顯示",
                 reflectRayTipDisabled: "此情況不顯示反射（θ₁=0° 或由低 n→高 n）",
                 calcCritical: "\\[\\theta_2 = \\sin^{-1}(1.00) = 90.0^{\\circ}\\]",
-                calcTir: "\\[\\sin(\\theta_2) > 1 \\rightarrow \\text{無解 (全內反射)}\\]"
+                calcTir: "\\[\\sin(\\theta_2) > 1 \\rightarrow \\text{無解（全內反射）}\\]"
             },
             en: {
                 title: "🔥 Prison Break",
-                subtitle: "The Prison Break: TIR Simulation",
+                subtitle: "TIR Simulation",
                 incidentLabel: "Incident Angle <span class=\"math-inline\">\\(\\theta_1\\)</span>",
                 setCritical: "Set to \\(\\theta_c\\)",
                 set0deg: "Set to 0°",
                 set90deg: "Set to 90°",
-                glassLabel: "Prison (Glass) <span class=\"math-inline\">\\(n_1\\)</span>",
-                airLabel: "Free (Air) <span class=\"math-inline\">\\(n_2\\)</span>",
+                glassLabel: "Prison (Dense medium) <span class=\"math-inline\">\\(n_1\\)</span>",
+                airLabel: "Free (Less dense medium) <span class=\"math-inline\">\\(n_2\\)</span>",
                 showRefractRay: "Show Refracted Ray",
                 hideRefractRay: "Hide Refracted Ray",
                 showReflectRay: "Show Reflected Ray",
                 hideReflectRay: "Hide Reflected Ray",
-                dirFromGlass: "Direction: Glass(n₁) to Air(n₂)",
-                dirFromAir: "Direction: Air(n₂) to Glass(n₁)",
+                dirFromGlass: "Direction: Dense medium(n₁) to Less dense medium(n₂)",
+                dirFromAir: "Direction: Less dense medium(n₂) to Dense medium(n₁)",
                 physicsCore: "🧮 Physics Core",
-                theoryDenseRare: "<strong>【Prison Break】</strong> Light escapes from Denser (<span class=\"math-inline\">\\(n=N_I\\)</span>) to Rarer (<span class=\"math-inline\">\\(n=N_R\\)</span>).",
+                theoryDenseRare: "<strong>【Prison Break】</strong> Light escapes from dense medium (<span class=\"math-inline\">\\(n=N_I\\)</span>) to less dense medium (<span class=\"math-inline\">\\(n=N_R\\)</span>).",
                 theoryDenseRareL1: "<strong>Angle &lt; <span class=\"math-inline\">\\(C\\)</span></strong>: Escape Successful (Refraction)",
                 theoryDenseRareL2: "<strong>Angle = <span class=\"math-inline\">\\(C\\)</span></strong>: Stuck on Wall (Runs along interface)",
                 theoryDenseRareL3: "<strong>Angle &gt; <span class=\"math-inline\">\\(C\\)</span></strong>: Escape Failed, Bounced Back (TIR)",
-                theoryRareDense: "<strong>【Prison Entry】</strong> Light enters Denser (<span class=\"math-inline\">\\(n=N_R\\)</span>) from Rarer (<span class=\"math-inline\">\\(n=N_I\\)</span>).",
+                theoryRareDense: "<strong>【Prison Entry】</strong> Light enters dense medium (<span class=\"math-inline\">\\(n=N_R\\)</span>) from less dense medium (<span class=\"math-inline\">\\(n=N_I\\)</span>).",
                 theoryRareDenseL1: "<strong>Any angle</strong>: Refraction occurs",
                 theoryRareDenseL2: "<strong>Bending</strong>: Bends towards normal, <strong>NO</strong> TIR occurs!",
                 tirBadge: "Total Internal Reflection",
                 criticalAngleLabel: "Critical Angle:",
                 snellLabel: "Snell's Law:",
-                canvasAir: "Air (Free World)",
-                canvasGlass: "Glass (Prison)",
+                canvasAir: "Less dense medium (Free World)",
+                canvasGlass: "Dense medium (Prison)",
                 statusFailed: "🚨 Escape Failed! (TIR)",
                 statusStuck: "🧱 Stuck on Wall! (Grazing)",
                 statusEscaped: "✨ Escape Successful! (Refraction)",
                 statusEntered: "✨ Successfully Entered! (Refraction)",
-                noTIR: "Light from rarer to denser, no TIR.",
+                noTIR: "Light from less dense to dense medium, no TIR.",
                 noSolution: "No solution (TIR)",
                 reflectRayTip: "Toggle reflected ray visibility",
-                reflectRayTipDisabled: "No reflected ray for θ₁≈0° or rare→dense incidence",
+                reflectRayTipDisabled: "No reflected ray for θ₁≈0° or less dense→dense incidence",
                 calcCritical: "\\[\\theta_2 = \\sin^{-1}(1.00) = 90.0^{\\circ}\\]",
                 calcTir: "\\[\\sin(\\theta_2) > 1 \\rightarrow \\text{No solution (TIR)}\\]"
             }
         };
+
+        function hubLangToLocal(hubLang) {
+            if (hubLang === 'zh-Hant' || hubLang === 'zh') return 'zh';
+            return 'en';
+        }
+
+        function setLang(lang) {
+            currentLang = lang === 'en' ? 'en' : 'zh';
+            document.documentElement.lang = currentLang === 'zh' ? 'zh-Hant' : 'en';
+        }
+
+        function initLangFromLocation() {
+            const lang = new URLSearchParams(location.search).get('lang');
+            if (lang) setLang(hubLangToLocal(lang));
+        }
+
+        function bindHubLangSync() {
+            window.addEventListener('message', (ev) => {
+                if (ev.data?.type !== 's3phy:lang') return;
+                const next = hubLangToLocal(ev.data.lang);
+                if (next === currentLang) return;
+                setLang(next);
+                updateTexts();
+            });
+        }
 
         function t(key) {
             return i18n[currentLang][key];
@@ -820,10 +848,13 @@
         }
 
         document.getElementById('lang-toggle-btn').addEventListener('click', function () {
-            currentLang = currentLang === 'zh' ? 'en' : 'zh';
+            setLang(currentLang === 'zh' ? 'en' : 'zh');
             this.textContent = currentLang === 'zh' ? 'EN / 中文' : '中文 / EN';
             updateTexts();
         });
+
+        initLangFromLocation();
+        bindHubLangSync();
 
         function getCriticalAngleDeg() {
             const n_i = incidentFromBottom ? n1 : n2;

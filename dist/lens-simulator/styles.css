@@ -29,6 +29,21 @@
     --shadow-lg: 0 10px 15px rgba(0,0,0,0.1);
 }
 
+.instruction-box .zh,
+.instruction-box .en {
+    display: block;
+}
+
+html[lang="en"] .zh,
+html[lang="en"] .title-zh {
+    display: none !important;
+}
+
+html[lang="zh-Hant"] .en,
+html[lang="zh-Hant"] .title-en {
+    display: none !important;
+}
+
 body {
     font-family: var(--s3-font, 'Inter', sans-serif);
     margin: 0;

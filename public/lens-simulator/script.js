@@ -7,6 +7,98 @@ function isS3phyEmbed() {
     return document.documentElement.classList.contains('s3phy-embed');
 }
 
+let currentLang = 'zh';
+
+const STRINGS = {
+    zh: {
+        title: '透鏡光學模擬器',
+        titleConvex: '凸透鏡光學模擬器',
+        titleConcave: '凹透鏡光學模擬器',
+        convexLens: '⛶ 凸透鏡',
+        concaveLens: '⫽ 凹透鏡',
+        drag: '拖動',
+        objectDistanceLabel: '物距',
+        imageDistanceLabel: '像距',
+        screenLabel: '屏幕',
+        realImage: '實像',
+        virtualImage: '虛像',
+        infinity: '無窮遠',
+        erect: '正立',
+        inverted: '倒立',
+        sameSize: '等大',
+        magnified: '放大',
+        diminished: '縮小',
+        noImageParallel: '不成像 (光線平行)',
+    },
+    en: {
+        title: 'Lens Simulator',
+        titleConvex: 'Convex Lens Simulator',
+        titleConcave: 'Concave Lens Simulator',
+        convexLens: '⛶ Convex lens',
+        concaveLens: '⫽ Concave lens',
+        drag: 'Drag',
+        objectDistanceLabel: 'Object Distance',
+        imageDistanceLabel: 'Image Distance',
+        screenLabel: 'Screen',
+        realImage: 'Real Image',
+        virtualImage: 'Virtual Image',
+        infinity: 'Infinity',
+        erect: 'Erect',
+        inverted: 'Inverted',
+        sameSize: 'Same Size',
+        magnified: 'Magnified',
+        diminished: 'Diminished',
+        noImageParallel: 'No Image (Parallel Rays)',
+    },
+};
+
+function hubLangToLocal(hubLang) {
+    if (hubLang === 'zh-Hant' || hubLang === 'zh') return 'zh';
+    return 'en';
+}
+
+function setLang(lang) {
+    currentLang = lang === 'en' ? 'en' : 'zh';
+    document.documentElement.lang = currentLang === 'zh' ? 'zh-Hant' : 'en';
+}
+
+function initLangFromLocation() {
+    const lang = new URLSearchParams(location.search).get('lang');
+    if (lang) setLang(hubLangToLocal(lang));
+}
+
+function bindHubLangSync() {
+    window.addEventListener('message', (ev) => {
+        if (ev.data?.type !== 's3phy:lang') return;
+        const next = hubLangToLocal(ev.data.lang);
+        if (next === currentLang) return;
+        setLang(next);
+        refreshLangUi();
+    });
+}
+
+function t(key) {
+    return STRINGS[currentLang][key] ?? key;
+}
+
+function applyDocumentTitle() {
+    const key = state.lensType === 'concave' ? 'titleConcave' : 'titleConvex';
+    document.title = t(key);
+}
+
+function updateLensTypeText() {
+    const el = document.getElementById('lensTypeText');
+    if (!el) return;
+    el.textContent = state.lensType === 'concave' ? t('concaveLens') : t('convexLens');
+}
+
+function refreshLangUi() {
+    applyDocumentTitle();
+    updateLensTypeText();
+    updateMeasurements();
+    draw();
+}
+
 // 定义全局变量
 // Define global variables — pixelsPerCm is rescaled in embed mode to fit the canvas
 let pixelsPerCm = 10; // 每厘米对应的像素数 // Pixels per centimeter
@@ -176,58 +268,47 @@ function determineImageType(imageDistance, magnification) {
     
     // 物距為0（物體在透鏡上）或物距等於焦距時，像距為無窮大
     if (!isFinite(imageDistance) || state.objectDistance === 0) {
-        type.push('實像 (Real Image)');
-        type.push('無窮遠 (Infinity)');
+        type.push(t('realImage'));
+        type.push(t('infinity'));
         return type.join(', ');
     }
     
     // 實像/虛像判斷
     if (state.lensType === 'concave') {
-        // 凹透鏡始終形成虛像
-        type.push('虛像 (Virtual Image)');
-        
-        // 凹透镜始终形成正立像
-        type.push('正立 (Erect)');
-        
-        // 凹透镜始终形成缩小像
-        type.push('縮小 (Diminished)');
-        
+        type.push(t('virtualImage'));
+        type.push(t('erect'));
+        type.push(t('diminished'));
         return type.join(', ');
     } else {
-        // 凸透鏡的判斷邏輯
-        if (state.objectDistance < 0) { // 物體在右側
+        if (state.objectDistance < 0) {
             if (Math.abs(state.objectDistance) < Math.abs(state.focalLength)) {
-                type.push('虛像 (Virtual Image)');
+                type.push(t('virtualImage'));
             } else {
-                type.push('實像 (Real Image)');
+                type.push(t('realImage'));
             }
-        } else { // 物體在左側
+        } else {
             if (imageDistance < 0) {
-                type.push('虛像 (Virtual Image)');
+                type.push(t('virtualImage'));
             } else {
-                type.push('實像 (Real Image)');
+                type.push(t('realImage'));
             }
         }
     }
     
-    // 只有凸透鏡需要根據放大率來判斷放大/縮小和正立/倒立
     if (state.lensType === 'convex') {
-        // 放大/縮小判斷 - 使用放大率絕對值
-        const epsilon = 0.01; // 允許1%的誤差，原來是5%
+        const epsilon = 0.01;
         if (Math.abs(Math.abs(magnification) - 1) < epsilon) {
-            type.push('等大 (Same Size)');
+            type.push(t('sameSize'));
         } else if (Math.abs(magnification) > 1) {
-            type.push('放大 (Magnified)');
+            type.push(t('magnified'));
         } else {
-            type.push('縮小 (Diminished)');
+            type.push(t('diminished'));
         }
         
-        // 正立/倒立判斷 - 通過放大率符號判斷
-        // 放大率為正表示正立，為負表示倒立
         if (magnification > 0) {
-            type.push('正立 (Erect)');
+            type.push(t('erect'));
         } else {
-            type.push('倒立 (Inverted)');
+            type.push(t('inverted'));
         }
     }
     
@@ -438,18 +519,13 @@ function updateMeasurements() {
     
     // 凹透镜的情况单独处理
     if (state.lensType === 'concave') {
-        // 凹透镜始终形成正立、缩小的虚像
-        imageNature = '<span class="zh">正立</span><span class="en">Erect</span>, ' + 
-                     '<span class="zh">縮小</span><span class="en">Diminished</span>, ' + 
-                     '<span class="zh">虛像</span><span class="en">Virtual Image</span>';
-        
-        document.getElementById('imageType').innerHTML = imageNature;
-        return; // 凹透镜处理完毕，直接返回
+        imageNature = [t('erect'), t('diminished'), t('virtualImage')].join(', ');
+        document.getElementById('imageType').textContent = imageNature;
+        return;
     }
     
-    // 物体在焦点上（不成像 / 成像于无穷远）
     if (!isFinite(imageDistance) || Math.abs(Math.abs(state.objectDistance) - Math.abs(state.focalLength)) < 0.01) {
-        document.getElementById('imageType').innerHTML = '<span class="zh">不成像 (光線平行)</span><span class="en">No Image (Parallel Rays)</span>';
+        document.getElementById('imageType').textContent = t('noImageParallel');
         
         // 隱藏虛像實像的標示點
         document.getElementById('virtualImageIndicator').style.display = 'none';
@@ -464,37 +540,35 @@ function updateMeasurements() {
     
     // 正立/倒立判断 - 通过放大率符号判断
     if (magnification > 0) {
-        imageNature += '<span class="zh">正立</span><span class="en">Erect</span>';
+        imageNature += t('erect');
     } else {
-        imageNature += '<span class="zh">倒立</span><span class="en">Inverted</span>';
+        imageNature += t('inverted');
     }
     
-    // 放大/缩小判断 - 使用放大率绝对值
-    const epsilon = 0.01; // 允許1%的誤差
+    const epsilon = 0.01;
     if (Math.abs(Math.abs(magnification) - 1) < epsilon) {
-        imageNature += ', <span class="zh">等大</span><span class="en">Same Size</span>';
+        imageNature += ', ' + t('sameSize');
     } else if (Math.abs(magnification) > 1) {
-        imageNature += ', <span class="zh">放大</span><span class="en">Magnified</span>';
+        imageNature += ', ' + t('magnified');
     } else {
-        imageNature += ', <span class="zh">縮小</span><span class="en">Diminished</span>';
+        imageNature += ', ' + t('diminished');
     }
     
-    // 实像/虚像判断
-    if (state.objectDistance < 0) { // 物体在右侧
+    if (state.objectDistance < 0) {
         if (Math.abs(state.objectDistance) < Math.abs(state.focalLength)) {
-            imageNature += ', <span class="zh">虛像</span><span class="en">Virtual Image</span>';
+            imageNature += ', ' + t('virtualImage');
         } else {
-            imageNature += ', <span class="zh">實像</span><span class="en">Real Image</span>';
+            imageNature += ', ' + t('realImage');
         }
-    } else { // 物体在左侧
+    } else {
         if (imageDistance < 0) {
-            imageNature += ', <span class="zh">虛像</span><span class="en">Virtual Image</span>';
+            imageNature += ', ' + t('virtualImage');
         } else {
-            imageNature += ', <span class="zh">實像</span><span class="en">Real Image</span>';
+            imageNature += ', ' + t('realImage');
         }
     }
     
-    document.getElementById('imageType').innerHTML = imageNature;
+    document.getElementById('imageType').textContent = imageNature;
     
     // 更新v-u图表
     drawUVGraph();
@@ -835,7 +909,7 @@ function drawLens() {
     // 添加拖动文本提示
     ctx.font = '9px Arial';
     ctx.fillStyle = 'rgba(74, 105, 189, 0.8)';
-    ctx.fillText("拖动", lensX, axisY + 15);
+    ctx.fillText(t('drag'), lensX, axisY + 15);
 }
 
 // 繪製焦點標記
@@ -929,7 +1003,7 @@ function drawFocalPoints() {
         // 添加拖动文本提示
         ctx.font = '9px Arial';
         ctx.fillStyle = 'rgba(229, 62, 62, 0.8)';
-        ctx.fillText("拖动", leftFocalX, canvas.height / 2 + 20);
+        ctx.fillText(t('drag'), leftFocalX, canvas.height / 2 + 20);
     }
     
     // 繪製左側焦點標籤，并根據透鏡類型選擇標籤名稱
@@ -1023,7 +1097,7 @@ function drawFocalPoints() {
         // 添加拖动文本提示
         ctx.font = '9px Arial';
         ctx.fillStyle = 'rgba(99, 179, 237, 0.8)';
-        ctx.fillText("拖动", rightFocalX, canvas.height / 2 + 20);
+        ctx.fillText(t('drag'), rightFocalX, canvas.height / 2 + 20);
     }
     
     // 绘制2F点(左侧)
@@ -1214,7 +1288,7 @@ function drawObject() {
     // 添加拖动文本提示
     ctx.font = '9px Arial';
     ctx.fillStyle = 'rgba(46, 204, 113, 0.8)';
-    ctx.fillText("拖动", objectX, axisY + 15);
+    ctx.fillText(t('drag'), objectX, axisY + 15);
     
     // 標記物體高度
     ctx.setLineDash([]);  // 再次確保使用實線
@@ -1261,7 +1335,7 @@ function drawObject() {
     
     // 添加小標籤說明
     ctx.font = '12px Arial';
-    ctx.fillText('物距/Object Distance', textX, textY + 16);
+    ctx.fillText(t('objectDistanceLabel'), textX, textY + 16);
 }
 
 // 繪製像
@@ -1390,7 +1464,7 @@ function drawImage(imageDistance, magnification) {
         
         // 繪製背景使文字更清晰
         const textWidth = ctx.measureText(displayText).width;
-        const labelText = '像距/Image Distance';
+        const labelText = t('imageDistanceLabel');
         const labelWidth = ctx.measureText(labelText).width;
         const maxWidth = Math.max(textWidth, labelWidth);
         
@@ -1588,7 +1662,7 @@ function drawImage(imageDistance, magnification) {
     
     // 繪製背景使文字更清晰
     const textWidth = ctx.measureText(displayText).width;
-    const labelText = '像距/Image Distance';
+    const labelText = t('imageDistanceLabel');
     const labelWidth = ctx.measureText(labelText).width;
     const maxWidth = Math.max(textWidth, labelWidth);
     
@@ -2907,30 +2981,22 @@ function setupUIInteractions() {
         // 更新按钮样式和文本
         if (state.lensType === 'concave') {
             lensTypeToggle.classList.add('concave');
-            lensTypeText.innerHTML = '⫽ 凹透鏡'; // 更新为凹透镜符号和文本
-            
-            // 凹透镜始终使用负焦距
             state.focalLength = -Math.abs(state.focalLength);
-            
-            // 隐藏uv图表
             syncMeasurementsGraphVisibility(document.querySelector('.data-card'), document.querySelector('.expand-card'));
         } else {
             lensTypeToggle.classList.remove('concave');
-            lensTypeText.innerHTML = '⛶ 凸透鏡'; // 更新为凸透镜符号和文本
-            
-            // 凸透镜始终使用正焦距
             state.focalLength = Math.abs(state.focalLength);
-            
             syncMeasurementsGraphVisibility(document.querySelector('.data-card'), document.querySelector('.expand-card'));
         }
+        
+        updateLensTypeText();
         
         // 更新焦距显示
         const absF = Math.abs(state.focalLength);
         focalLengthValue.textContent = state.lensType === 'concave' ? `-${absF.toFixed(1)} cm` : `${absF.toFixed(1)} cm`;
         document.getElementById('currentFocalLength').textContent = state.lensType === 'concave' ? `-${absF.toFixed(1)} cm` : `${absF.toFixed(1)} cm`;
         
-        // 更新标题
-        document.title = state.lensType === 'concave' ? '凹透鏡光學模擬器 | Concave Lens Simulator' : '凸透鏡光學模擬器 | Convex Lens Simulator';
+        applyDocumentTitle();
         
         // 在类型切换后强制更新测量
         updateMeasurements();
@@ -3683,15 +3749,14 @@ function applyDefaultLensFromEmbed() {
     state.lensType = dl;
     if (dl === 'concave') {
         lensTypeToggle.classList.add('concave');
-        lensTypeText.innerHTML = '⫽ 凹透鏡';
         state.focalLength = -Math.abs(state.focalLength);
         syncMeasurementsGraphVisibility(document.querySelector('.data-card'), document.querySelector('.expand-card'));
     } else {
         lensTypeToggle.classList.remove('concave');
-        lensTypeText.innerHTML = '⛶ 凸透鏡';
         state.focalLength = Math.abs(state.focalLength);
         syncMeasurementsGraphVisibility(document.querySelector('.data-card'), document.querySelector('.expand-card'));
     }
+    updateLensTypeText();
     const absF = Math.abs(state.focalLength);
     if (focalLengthValue) {
         focalLengthValue.textContent = dl === 'concave' ? `-${absF.toFixed(1)} cm` : `${absF.toFixed(1)} cm`;
@@ -3700,14 +3765,13 @@ function applyDefaultLensFromEmbed() {
     if (cfl) {
         cfl.textContent = dl === 'concave' ? `-${absF.toFixed(1)} cm` : `${absF.toFixed(1)} cm`;
     }
-    document.title =
-        dl === 'concave'
-            ? '凹透鏡光學模擬器 | Concave Lens Simulator'
-            : '凸透鏡光學模擬器 | Convex Lens Simulator';
+    applyDocumentTitle();
 }
 
 // 修改init函数，添加透镜拖动功能初始化
 function init() {
+    initLangFromLocation();
+    bindHubLangSync();
     applyDefaultLensFromEmbed();
 
     // 设置事件监听器
@@ -3805,6 +3869,9 @@ function init() {
             radio.checked = true;
         }
     });
+    
+    applyDocumentTitle();
+    updateLensTypeText();
     
     // 初始更新测量数据
     updateMeasurements();
@@ -4130,12 +4197,12 @@ function drawScreen() {
     ctx.font = '9px Arial';
     ctx.fillStyle = 'rgba(50, 50, 50, 0.8)';
     ctx.textAlign = 'center';
-    ctx.fillText("拖动", screenX, axisY + 20);
+    ctx.fillText(t('drag'), screenX, axisY + 20);
     
     // 显示屏幕位置，只显示文本，不显示数值和单位
     ctx.font = 'bold 12px Arial';
     ctx.fillStyle = 'rgba(50, 50, 50, 0.9)';
-    ctx.fillText(`屏幕/Screen`, screenX, axisY - screenHeight - 10);
+    ctx.fillText(t('screenLabel'), screenX, axisY - screenHeight - 10);
 }
 
 // 添加屏幕拖动功能

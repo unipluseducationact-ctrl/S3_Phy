@@ -1,1 +1,0 @@
-function c(i){const t=document.createElement("div");t.className="tool-tir-escape";const e=document.createElement("iframe"),r="./",o=r.endsWith("/")?r:`${r}/`;return e.src=`${o}tir-escape/index.html?embed=1`,e.title=i("tools.refractionTir.title"),e.setAttribute("loading","lazy"),e.referrerPolicy="strict-origin-when-cross-origin",t.appendChild(e),t}export{c as createTirEscapeLab};
