@@ -3,12 +3,19 @@ import { langKey, hydrateNoteCards, hydrateSummaryCards } from './hubHelpers.js'
 import { mountHubShell } from '../hubShell.js';
 import { renderToolsShell, hydrateToolsShell } from '../tools/toolsShell.js';
 import { createOpticsLightLensWorksheet } from '../worksheets/opticsLightLensWorksheet.js';
+import { createOpticsCh4EmWorksheet } from '../worksheets/opticsCh4EmWorksheet.js';
 import { createOpticsCh3Quiz } from '../worksheets/opticsCh3Quiz.js';
 import { mountFlashcardStudy } from '../flashcards/flashcardStudy.js';
 import { buildOpticsDeck } from '../flashcards/flashcardDeck.js';
 
 const TOOL_ORDER = ['rotatingMirror', 'planeMirrorLab', 'refractionTir', 'lens', 'rgbMixer', 'em'];
+const WORKSHEET_ORDER = ['lightLens', 'emWave'];
 const SUMMARY_ASSET_VERSION = '20260627-em-v2';
+
+const WORKSHEET_FACTORIES = {
+  lightLens: createOpticsLightLensWorksheet,
+  emWave: createOpticsCh4EmWorksheet,
+};
 
 const TOOL_LOADERS = {
   rotatingMirror: () => import('../tools/rotatingMirrorLab.js').then((m) => m.createRotatingMirrorLab),
@@ -31,9 +38,18 @@ function toolLabel(id) {
   return t(map[id] || id);
 }
 
+function worksheetLabel(id) {
+  const map = {
+    lightLens: 'worksheets.opticsLightLensTitle',
+    emWave: 'worksheets.opticsEmWaveTitle',
+  };
+  return t(map[id] || id);
+}
+
 export function mountOpticsHub(root) {
   let section = 'topics';
   let toolId = 'rotatingMirror';
+  let worksheetId = 'lightLens';
   let lensDefaultKind = 'convex';
 
   let shell = null;
@@ -59,6 +75,36 @@ export function mountOpticsHub(root) {
     stage.appendChild(node);
   }
 
+  function mountActiveWorksheet(stage) {
+    if (!stage) return;
+    destroyWorksheet?.();
+    destroyWorksheet = null;
+    stage.innerHTML = '';
+    const factory = WORKSHEET_FACTORIES[worksheetId];
+    if (!factory) return;
+    const node = factory(t);
+    stage.appendChild(node);
+    destroyWorksheet =
+      node._opticsLightLensWorksheetCleanup ||
+      node._opticsCh4EmWorksheetCleanup ||
+      null;
+  }
+
+  function renderWorksheets() {
+    const buttons = WORKSHEET_ORDER.map(
+      (id) =>
+        `<button type="button" data-worksheet="${id}" class="${worksheetId === id ? 'active' : ''}">${worksheetLabel(id)}</button>`,
+    ).join('');
+    return `
+      <section class="panel panel--worksheets-embed">
+        <div class="worksheet-picker">
+          <p class="lead">${t('worksheets.pick')}</p>
+          <div class="tool-list" data-worksheet-list>${buttons}</div>
+        </div>
+        <div class="worksheet-stage" data-worksheet-stage></div>
+      </section>`;
+  }
+
   function renderMain() {
     if (!el.main) return;
 
@@ -78,11 +124,8 @@ export function mountOpticsHub(root) {
       });
     }
     else if (section === 'worksheets') {
-      el.main.innerHTML = '<section class="panel panel--worksheets-embed"></section>';
-      const panel = el.main.querySelector('.panel--worksheets-embed');
-      const node = createOpticsLightLensWorksheet(t);
-      panel.appendChild(node);
-      destroyWorksheet = node._opticsLightLensWorksheetCleanup || null;
+      el.main.innerHTML = renderWorksheets();
+      mountActiveWorksheet(el.main.querySelector('[data-worksheet-stage]'));
     }
     else if (section === 'quiz') {
       el.main.innerHTML = '<section class="panel panel--quiz-embed"></section>';
@@ -173,6 +216,16 @@ export function mountOpticsHub(root) {
   }
 
   function onMainClick(ev) {
+    const ws = ev.target.closest('[data-worksheet]');
+    if (ws && section === 'worksheets') {
+      const id = ws.getAttribute('data-worksheet');
+      if (id && id !== worksheetId && WORKSHEET_FACTORIES[id]) {
+        worksheetId = id;
+        renderMain();
+      }
+      return;
+    }
+
     const b = ev.target.closest('[data-go-tool]');
     if (!b) return;
     section = 'tools';

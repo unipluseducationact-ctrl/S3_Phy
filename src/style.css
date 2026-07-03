@@ -1072,6 +1072,7 @@ a {
 .tool-em-spectrum,
 .tool-optics-light-lens-quiz,
 .tool-optics-ch3-quiz,
+.tool-optics-ch4-em-quiz,
 .tool-heat-final-exam-quiz,
 .tool-heat-ch1-quiz,
 .tool-specific-heat,
@@ -1196,7 +1197,26 @@ iframe.note-preview {
   width: 100%;
 }
 
-.panel--worksheets-embed .tool-optics-light-lens-quiz,
+.panel--worksheets-embed {
+  display: flex;
+  flex-direction: column;
+  min-height: var(--tool-viewport-min-h);
+}
+
+.worksheet-picker {
+  flex-shrink: 0;
+  padding: var(--vp-pad) var(--vp-pad) 0;
+}
+
+.worksheet-stage {
+  flex: 1 1 auto;
+  min-height: 0;
+  display: flex;
+  flex-direction: column;
+}
+
+.panel--worksheets-embed .worksheet-stage .tool-optics-light-lens-quiz,
+.panel--worksheets-embed .worksheet-stage .tool-optics-ch4-em-quiz,
 .panel--worksheets-embed .tool-heat-final-exam-quiz,
 .panel--quiz-embed .tool-heat-ch1-quiz,
 .panel--quiz-embed .tool-optics-ch3-quiz {
