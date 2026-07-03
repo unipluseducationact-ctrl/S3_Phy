@@ -1187,26 +1187,31 @@ iframe.note-preview {
   object-fit: contain;
 }
 
-/* ===== Worksheet generator (Biology-style) ===== */
-.panel--worksheets-embed {
-  padding: 0;
-  overflow: hidden;
-}
-
-.panel--worksheets-embed .tool-optics-light-lens-quiz,
-.panel--worksheets-embed .tool-heat-final-exam-quiz {
-  height: var(--tool-viewport-min-h);
-  min-height: var(--tool-viewport-min-h);
-}
-
+/* ===== Worksheet / Quiz embed ===== */
+.panel--worksheets-embed,
 .panel--quiz-embed {
   padding: 0;
   overflow: hidden;
+  width: 100%;
 }
 
+.panel--worksheets-embed .tool-optics-light-lens-quiz,
+.panel--worksheets-embed .tool-heat-final-exam-quiz,
 .panel--quiz-embed .tool-heat-ch1-quiz {
+  width: 100%;
   height: var(--tool-viewport-min-h);
   min-height: var(--tool-viewport-min-h);
+  display: block;
+}
+
+.panel--worksheets-embed iframe,
+.panel--quiz-embed iframe {
+  display: block;
+  width: 100%;
+  height: 100%;
+  min-height: var(--tool-viewport-min-h);
+  border: 0;
+  background: var(--surface2);
 }
 
 .panel--quiz-placeholder {

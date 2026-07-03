@@ -11,35 +11,67 @@ html.s3phy-embed body {
   font-family: var(--s3-font);
   font-size: max(var(--s3-font-min), 1rem);
   line-height: var(--s3-line-height);
+  margin: 0;
 }
 
-html.s3phy-embed {
-  height: 100%;
-}
-
-html.s3phy-embed body {
+/* Interactive lab iframe — flex fill (not quiz/worksheet) */
+html.s3phy-embed body:has(.lab-section),
+html.s3phy-embed body.embed-mode:has(.sim-main-col),
+html.s3phy-embed body:has(.sim-main-col):not(:has(#quiz-layout)) {
   height: 100%;
   min-height: 100% !important;
-  margin: 0;
   display: flex;
   flex-direction: column;
   overflow: hidden;
 }
 
-html.s3phy-embed body.min-h-screen,
-html.s3phy-embed body.embed-mode {
-  min-height: 100% !important;
-  height: 100%;
-}
-
-html.s3phy-embed body > main,
-html.s3phy-embed main.flex-grow {
+html.s3phy-embed body:has(.lab-section) > main,
+html.s3phy-embed body.embed-mode main.flex-grow,
+html.s3phy-embed body:has(.sim-main-col):not(:has(#quiz-layout)) > main {
   flex: 1 1 auto;
   min-height: 0;
   display: flex;
   flex-direction: column;
   width: 100%;
   overflow: auto;
+}
+
+/* Quiz / worksheet iframe — preserve two-column grid */
+html.s3phy-embed body:has(#quiz-layout) {
+  height: auto;
+  min-height: 100%;
+  display: block;
+  overflow: auto;
+}
+
+html.s3phy-embed #quiz-layout {
+  display: grid !important;
+  grid-template-columns: 1fr;
+  gap: 1.5rem;
+  max-width: none !important;
+  width: 100%;
+  margin: 0;
+  align-items: start;
+  box-sizing: border-box;
+}
+
+@media (min-width: 1024px) {
+  html.s3phy-embed #quiz-layout {
+    grid-template-columns: minmax(280px, 360px) minmax(0, 1fr);
+  }
+}
+
+html.s3phy-embed #quiz-layout > aside#settings-panel {
+  position: sticky;
+  top: 0.5rem;
+  align-self: start;
+  max-height: calc(100dvh - 1rem);
+  overflow-y: auto;
+}
+
+html.s3phy-embed #quiz-layout > .min-w-0 {
+  min-width: 0;
+  width: 100%;
 }
 
 html.s3phy-embed .lab-section {
