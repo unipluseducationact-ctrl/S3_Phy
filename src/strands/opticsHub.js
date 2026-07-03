@@ -45,7 +45,6 @@ export function mountOpticsHub(root) {
     { value: 'all', labelKey: 'flashcards.all' },
     { value: 'reflection', labelKey: 'topic.reflection' },
     { value: 'refractionTir', labelKey: 'flashcards.deck.refractionTir' },
-    { value: 'definitions', labelKey: 'flashcards.deck.definitions' },
     { value: 'convex', labelKey: 'topic.convex' },
     { value: 'concave', labelKey: 'topic.concave' },
     { value: 'em', labelKey: 'topic.em' },
