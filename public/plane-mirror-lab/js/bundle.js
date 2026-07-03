@@ -127,6 +127,13 @@ function reflectAcrossLine(p, a, b) {
   return reflectPoint(p, a, b);
 }
 
+/** Apex-to-tip direction for drawing wedge mirror k (1 = real M1/M2 segment). */
+function wedgeMirrorDrawAngle(mirrorSide, useCount, half) {
+  const k = useCount;
+  const sign = mirrorSide === 1 ? (-1) ** (k + 1) : (-1) ** k;
+  return sign * (2 * k - 1) * half;
+}
+
 /** Generate images in wedge between two mirrors meeting at origin, angle theta (rad). */
 function imagesInWedge(thetaRad, object, maxImages = 12) {
   const half = thetaRad / 2;
@@ -147,8 +154,9 @@ function imagesInWedge(thetaRad, object, maxImages = 12) {
     const pt = reflectPoint(parent, apex, tip);
     useCount[mirrorKey] += 1;
     const mirrorSide = mirrorKey === 'm1' ? 1 : 2;
-    const mirrorAngle = mirrorKey === 'm1' ? half : -half;
-    const isVirtual = useCount[mirrorKey] >= 2;
+    const k = useCount[mirrorKey];
+    const mirrorAngle = wedgeMirrorDrawAngle(mirrorSide, k, half);
+    const isVirtual = k >= 2;
 
     images.push({
       pt: { ...pt },
@@ -158,7 +166,7 @@ function imagesInWedge(thetaRad, object, maxImages = 12) {
       parentLabel: parentIdx < 0 ? 'O' : images[parentIdx].label,
       mirrorAngle,
       mirrorSide,
-      mirrorOrder: useCount[mirrorKey],
+      mirrorOrder: k,
       isVirtual,
       mirror: {
         a: { x: 0, y: 0 },
