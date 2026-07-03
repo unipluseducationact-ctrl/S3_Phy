@@ -19,7 +19,7 @@ html.s3phy-embed body:has(.lab-section),
 html.s3phy-embed body.embed-mode:has(.sim-main-col),
 html.s3phy-embed body:has(.sim-main-col):not(:has(#quiz-layout)) {
   height: 100%;
-  min-height: 100% !important;
+  min-height: 0 !important;
   display: flex;
   flex-direction: column;
   overflow: hidden;
@@ -33,7 +33,7 @@ html.s3phy-embed body:has(.sim-main-col):not(:has(#quiz-layout)) > main {
   display: flex;
   flex-direction: column;
   width: 100%;
-  overflow: auto;
+  overflow: hidden;
 }
 
 /* Quiz / worksheet iframe — preserve two-column grid */
@@ -79,31 +79,55 @@ html.s3phy-embed .lab-section {
   min-height: 0 !important;
   height: 100%;
   align-content: stretch;
+  align-items: stretch;
+}
+
+html.s3phy-embed .lab-viz,
+html.s3phy-embed .lab-steps {
+  height: 100% !important;
+  min-height: 0;
+  max-height: none !important;
+}
+
+html.s3phy-embed .lab-viz {
+  display: flex;
+  flex-direction: column;
+}
+
+html.s3phy-embed .lab-viz-canvas {
+  flex: 1 1 auto;
+  min-height: 200px;
+  max-height: none !important;
 }
 
 html.s3phy-embed .lab-steps {
-  max-height: none !important;
-  height: auto;
-  min-height: 0;
+  overflow-y: auto;
 }
 
 html.s3phy-embed .lab-viz-dual {
   max-height: none !important;
   flex: 1 1 auto;
   min-height: 0;
-  height: auto;
-  grid-template-rows: auto auto;
-  align-content: start;
+  height: 100%;
+  grid-template-rows: minmax(0, 1fr) minmax(0, 1fr);
+  align-content: stretch;
+  overflow: hidden;
 }
 
-html.s3phy-embed .lab-viz-dual .lab-viz-canvas {
-  height: auto;
-  aspect-ratio: 16 / 10;
-  min-height: min(220px, 34vh);
-}
-
+html.s3phy-embed .lab-viz-dual .lab-viz-canvas,
 html.s3phy-embed .lab-viz-dual .lab-viz-chart-wrap {
+  max-height: none;
+  min-height: 0;
+  flex: 1 1 auto;
+  height: auto;
   aspect-ratio: unset;
+}
+
+html.s3phy-embed .lab-viz-dual .lab-viz-panel {
+  flex: 1 1 auto;
+  min-height: 0;
+  display: flex;
+  flex-direction: column;
 }
 
 html.s3phy-embed header,
