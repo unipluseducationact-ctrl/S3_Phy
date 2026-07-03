@@ -127,7 +127,18 @@ function reflectAcrossLine(p, a, b) {
   return reflectPoint(p, a, b);
 }
 
-/** Apex-to-tip direction for drawing wedge mirror k (1 = real M1/M2 segment). */
+/** j-th mirror boundary: evenly divides 360° into 360/θ sectors (j = 0 .. nWedges-1). */
+function wedgeMirrorLineAngle(j, half, thetaRad) {
+  return -half + j * thetaRad;
+}
+
+/** k-th use of M1/M2 maps to sector boundary index j. */
+function wedgeMirrorLineIndex(mirrorSide, useCount) {
+  const k = useCount;
+  return mirrorSide === 1 ? 2 * (k - 1) + 1 : 2 * (k - 1);
+}
+
+/** Ray from apex toward the virtual-image sector (opposite side of real segment when k >= 2). */
 function wedgeMirrorDrawAngle(mirrorSide, useCount, half) {
   const k = useCount;
   const sign = mirrorSide === 1 ? (-1) ** (k + 1) : (-1) ** k;
@@ -141,8 +152,6 @@ function imagesInWedge(thetaRad, object, maxImages = 12) {
   const labels = ['X', 'Z', 'Y', 'W', 'V', 'U', 'T', 'S', 'R', 'Q'];
   const MIRROR_CYCLE = ['m1', 'm2', 'm2', 'm1'];
   const apex = { x: 0, y: 0 };
-  const m1Tip = { x: Math.cos(half), y: Math.sin(half) };
-  const m2Tip = { x: Math.cos(-half), y: Math.sin(-half) };
   const useCount = { m1: 0, m2: 0 };
   const images = [];
 
@@ -150,11 +159,13 @@ function imagesInWedge(thetaRad, object, maxImages = 12) {
     const mirrorKey = MIRROR_CYCLE[i % 4];
     const parentIdx = i < 2 ? -1 : i - 2;
     const parent = parentIdx < 0 ? object : images[parentIdx].pt;
-    const tip = mirrorKey === 'm1' ? m1Tip : m2Tip;
-    const pt = reflectPoint(parent, apex, tip);
     useCount[mirrorKey] += 1;
     const mirrorSide = mirrorKey === 'm1' ? 1 : 2;
     const k = useCount[mirrorKey];
+    const mirrorLineIndex = wedgeMirrorLineIndex(mirrorSide, k);
+    const lineAngle = wedgeMirrorLineAngle(mirrorLineIndex, half, thetaRad);
+    const tip = { x: Math.cos(lineAngle), y: Math.sin(lineAngle) };
+    const pt = reflectPoint(parent, apex, tip);
     const mirrorAngle = wedgeMirrorDrawAngle(mirrorSide, k, half);
     const isVirtual = k >= 2;
 
@@ -164,6 +175,7 @@ function imagesInWedge(thetaRad, object, maxImages = 12) {
       angle: Math.atan2(pt.y, pt.x),
       parentIdx,
       parentLabel: parentIdx < 0 ? 'O' : images[parentIdx].label,
+      mirrorLineIndex,
       mirrorAngle,
       mirrorSide,
       mirrorOrder: k,
