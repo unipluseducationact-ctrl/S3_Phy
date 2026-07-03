@@ -2817,7 +2817,7 @@ function emptyState() {
     tool: 'select',
     pending: null,
     selected: new Set(),
-    gridSnap: true,
+    gridSnap: false,
     nextId: 1,
   };
 }
