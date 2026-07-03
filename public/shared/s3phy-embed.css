@@ -90,15 +90,17 @@ html.s3phy-embed .lab-steps {
 html.s3phy-embed .lab-viz-dual {
   max-height: none !important;
   flex: 1 1 auto;
-  height: 100%;
-  grid-template-rows: minmax(0, 1fr) minmax(0, 1fr);
+  min-height: 0;
+  height: auto;
+  grid-template-rows: auto auto;
+  align-content: start;
 }
 
 html.s3phy-embed .lab-viz-dual .lab-viz-canvas,
 html.s3phy-embed .lab-viz-dual .lab-viz-chart-wrap {
-  max-height: none;
-  height: 100%;
-  aspect-ratio: auto;
+  height: auto;
+  aspect-ratio: 16 / 10;
+  min-height: min(220px, 34vh);
 }
 
 html.s3phy-embed header,

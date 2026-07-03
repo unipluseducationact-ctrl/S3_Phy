@@ -8,7 +8,8 @@
     "build": "node scripts/build-plane-mirror-lab.cjs && vite build",
     "preview": "vite preview",
     "export:heat-flashcards": "node scripts/export-heat-ch1-flashcards.js",
-    "export:light-flashcards": "node scripts/export-light-ch3-flashcards.js"
+    "export:light-flashcards": "node scripts/export-light-ch3-flashcards.js",
+    "export:optics-definitions-flashcards": "python scripts/export-optics-definitions-flashcards.py"
   },
   "devDependencies": {
     "vite": "^6.3.5"

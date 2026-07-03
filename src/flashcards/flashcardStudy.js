@@ -14,6 +14,9 @@ const SUBTOPIC_LABEL_KEYS = {
   reflection: 'topic.reflection',
   refraction: 'topic.refraction',
   tir: 'topic.tir',
+  convex: 'topic.convex',
+  concave: 'topic.concave',
+  em: 'topic.em',
   rotatingMirror: 'topic.reflection',
 };
 
@@ -240,7 +243,12 @@ export function mountFlashcardStudy(container, { deckOptions, buildDeck, initial
       els.cardWrap.classList.remove('fc-card-container--image');
       els.flipPrompt.hidden = flipped;
       els.frontBody.innerHTML = card.front;
-      els.backBody.innerHTML = card.back;
+      if (card.backImage) {
+        const alt = card.imageAlt || '';
+        els.backBody.innerHTML = `${card.back}<img class="fc-card-back-img" src="${card.backImage}" alt="${alt}" />`;
+      } else {
+        els.backBody.innerHTML = card.back;
+      }
       applyTextCardSize(els.frontBody, card.front, card.compactFront);
       applyTextCardSize(els.backBody, card.back, card.compactBack);
     }

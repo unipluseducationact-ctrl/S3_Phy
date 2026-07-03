@@ -3,6 +3,8 @@ import { assetUrl } from '../assetUrl.js';
 /** @type {Promise<object[]> | null} */
 let lightCardsPromise = null;
 /** @type {Promise<object[]> | null} */
+let definitionsCardsPromise = null;
+/** @type {Promise<object[]> | null} */
 let heatCardsPromise = null;
 
 function loadLightCards() {
@@ -10,6 +12,15 @@ function loadLightCards() {
     lightCardsPromise = import('../data/flashcards-light-ch3.json').then((m) => m.default);
   }
   return lightCardsPromise;
+}
+
+function loadDefinitionsCards() {
+  if (!definitionsCardsPromise) {
+    definitionsCardsPromise = import('../data/flashcards-optics-definitions.json').then(
+      (m) => m.default,
+    );
+  }
+  return definitionsCardsPromise;
 }
 
 function loadHeatCards() {
@@ -72,7 +83,7 @@ function normalizeCard(card, lang, id, subtopic) {
   }
 
   const pack = card[lk] || card.en;
-  return {
+  const normalized = {
     id,
     subtopic: card.topic || subtopic,
     front: pack?.q || '',
@@ -81,6 +92,11 @@ function normalizeCard(card, lang, id, subtopic) {
     compactFront: Boolean(card.compactFront),
     compactBack: Boolean(card.compactBack),
   };
+  if (card.backImage) {
+    normalized.backImage = flashImageUrl(card.backImage);
+    normalized.imageAlt = card.imageAlt || '';
+  }
+  return normalized;
 }
 
 /**
@@ -97,15 +113,24 @@ function normalizeDeck(rawCards, lang, defaultSubtopic = 'General') {
   });
 }
 
+function definitionsByTopic(cards, topic) {
+  return cards.filter((card) => card.topic === topic);
+}
+
 async function opticsRawDeck(deckKey) {
   const lightCh3Cards = await loadLightCards();
+  const definitionCards = await loadDefinitionsCards();
   const deck = deckKey === 'rotatingMirror' ? 'reflection' : deckKey;
 
-  if (deck === 'all') return lightCh3Cards.slice();
+  if (deck === 'all') return [...lightCh3Cards, ...definitionCards];
   if (deck === 'reflection') return lightByTopic(lightCh3Cards, 'reflection');
   if (deck === 'refractionTir') {
     return [...lightByTopic(lightCh3Cards, 'refraction'), ...lightByTopic(lightCh3Cards, 'tir')];
   }
+  if (deck === 'definitions') return definitionCards.slice();
+  if (deck === 'convex') return definitionsByTopic(definitionCards, 'convex');
+  if (deck === 'concave') return definitionsByTopic(definitionCards, 'concave');
+  if (deck === 'em') return definitionsByTopic(definitionCards, 'em');
   return lightCh3Cards.slice();
 }
 

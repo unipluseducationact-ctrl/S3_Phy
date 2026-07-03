@@ -105,6 +105,14 @@
     }
     @media (min-width: 900px) {
       .lab-viz-dual { max-height: calc(100dvh - 44px); }
+      .lab-section.controls-floating .lab-viz-canvas {
+        aspect-ratio: auto;
+        flex: 1 1 auto;
+        min-height: 280px;
+      }
+      .lab-section.controls-floating .lab-viz-chart-wrap {
+        min-height: 200px;
+      }
     }
     .lab-viz-dual .lab-viz-panel {
       flex: none;
@@ -113,23 +121,27 @@
       overflow: hidden;
       position: relative;
       z-index: 1;
+      display: flex;
+      flex-direction: column;
     }
     .lab-viz-dual .lab-viz-panel-chart { z-index: 2; }
     .lab-viz-dual .lab-viz-canvas {
       aspect-ratio: 16 / 10;
       width: 100%;
       height: auto;
-      max-height: 240px;
-      flex: none !important;
-      min-height: 0 !important;
+      min-height: 200px;
+      max-height: 280px;
+      flex: 1 1 auto;
       overflow: hidden;
     }
     .lab-viz-dual .lab-viz-chart-wrap {
       aspect-ratio: 16 / 10;
       width: 100%;
       height: auto;
-      max-height: 220px;
+      min-height: 180px;
+      max-height: 240px;
       overflow: hidden;
+      position: relative;
     }
     .lab-viz-dual .lab-viz-canvas canvas,
     .lab-viz-dual .lab-viz-chart-wrap canvas {
@@ -137,6 +149,35 @@
       width: 100% !important;
       height: 100% !important;
       max-height: 100%;
+    }
+    html.s3phy-embed .lab-viz-dual {
+      grid-template-rows: auto auto;
+      max-height: none;
+      overflow-y: auto;
+    }
+    html.s3phy-embed .lab-viz-dual .lab-viz-canvas {
+      aspect-ratio: 16 / 10;
+      height: auto;
+      min-height: min(280px, 38vh);
+      max-height: none;
+      flex: none;
+    }
+    html.s3phy-embed .lab-viz-dual .lab-viz-chart-wrap {
+      aspect-ratio: 16 / 10;
+      height: auto;
+      min-height: min(220px, 32vh);
+      max-height: none;
+    }
+    html.s3phy-embed .lab-section.controls-floating > .lab-controls {
+      grid-column: 1 / -1;
+      height: 0;
+      min-height: 0;
+      padding: 0;
+      margin: 0;
+      border: none;
+      overflow: visible;
+      background: transparent;
+      box-shadow: none;
     }
   </style>
 </head>
@@ -560,11 +601,16 @@
       const parent = canvas.parentNode;
       if (!parent) return;
       const rect = parent.getBoundingClientRect();
-      if (rect.width <= 0 || rect.height <= 0) return;
-      canvas.width = rect.width * window.devicePixelRatio;
-      canvas.height = rect.height * window.devicePixelRatio;
-      canvas.style.width = rect.width + "px";
-      canvas.style.height = rect.height + "px";
+      let w = rect.width;
+      let h = rect.height;
+      if (h <= 0 && w > 0) {
+        h = w * (10 / 16);
+      }
+      if (w <= 0 || h <= 0) return;
+      canvas.width = w * window.devicePixelRatio;
+      canvas.height = h * window.devicePixelRatio;
+      canvas.style.width = w + "px";
+      canvas.style.height = h + "px";
       const ctx = canvas.getContext("2d");
       ctx.setTransform(1, 0, 0, 1, 0, 0);
       ctx.scale(window.devicePixelRatio, window.devicePixelRatio);
@@ -573,7 +619,21 @@
     function layoutLabCanvases() {
       resizeCanvas(stateCanvas);
       drawStateLab();
-      if (stateChart) stateChart.resize();
+      if (stateChart) {
+        stateChart.resize();
+      } else {
+        initChart();
+      }
+    }
+
+    let layoutObserver = null;
+    function bindLayoutObserver() {
+      const dual = document.querySelector('.lab-viz-dual');
+      if (!dual || layoutObserver || typeof ResizeObserver === 'undefined') return;
+      layoutObserver = new ResizeObserver(() => {
+        requestAnimationFrame(layoutLabCanvases);
+      });
+      layoutObserver.observe(dual);
     }
 
     window.addEventListener("resize", () => {
@@ -1482,11 +1542,15 @@
     }
 
     initLabControlsCollapse();
+    bindLayoutObserver();
+    lucide.createIcons();
+    updateLanguage();
 
     requestAnimationFrame(() => {
       layoutLabCanvases();
       updateStateDefaults();
       setTimeout(layoutLabCanvases, 150);
+      setTimeout(layoutLabCanvases, 400);
     });
 
   </script>

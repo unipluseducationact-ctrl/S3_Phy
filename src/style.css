@@ -1465,6 +1465,14 @@ iframe.note-preview {
   line-height: 1.35;
 }
 
+.fc-card-back-img {
+  display: block;
+  max-width: min(100%, 28rem);
+  max-height: 40vh;
+  margin: 0.75rem auto 0;
+  object-fit: contain;
+}
+
 .fc-flip-prompt {
   margin: 0;
   text-align: center;
