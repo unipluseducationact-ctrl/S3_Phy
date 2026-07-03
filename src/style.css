@@ -27,7 +27,7 @@
   --vp-pad: clamp(12px, 2vw, 24px);
   --s3-content-max: min(1600px, calc(100dvw - var(--vp-pad) * 2));
   --content-max-w: var(--s3-content-max);
-  --nav-offset: calc(var(--vp-pad) + 72px + 12px);
+  --nav-offset: calc(var(--vp-pad) + 56px + 8px);
   --hub-scale: 1;
   --s3-tool-min-h: clamp(560px, calc(100dvh - var(--nav-offset) - 48px), 1600px);
   --tool-viewport-min-h: var(--s3-tool-min-h);
@@ -313,6 +313,58 @@ a {
 
 .site-header--strand-picker .site-header__actions {
   margin-left: auto;
+}
+
+/* Hub strand pages — single-row header with inline nav (Chem-style) */
+.site-header--hub {
+  display: grid;
+  grid-template-columns: minmax(0, auto) minmax(0, 1fr) auto;
+  align-items: center;
+  gap: 12px;
+  margin-bottom: 12px;
+  flex-wrap: nowrap;
+}
+
+.site-header--hub .site-header__brand {
+  gap: 10px;
+}
+
+.site-header--hub .brand-logo-img {
+  height: 40px;
+  max-width: min(160px, 28vw);
+}
+
+.site-header--hub .site-title {
+  font-size: clamp(0.95rem, 1.8vw, 1.15rem);
+  white-space: nowrap;
+}
+
+.site-header--hub .site-subtitle {
+  display: none;
+}
+
+.site-header--hub .main-nav {
+  justify-self: center;
+  width: 100%;
+  max-width: 100%;
+  margin-bottom: 0;
+  margin-left: 0;
+  margin-right: 0;
+  transform: none;
+  flex-wrap: nowrap;
+  overflow-x: auto;
+  overflow-y: hidden;
+  -webkit-overflow-scrolling: touch;
+  scrollbar-width: thin;
+}
+
+.site-header--hub .main-nav button {
+  white-space: nowrap;
+  flex-shrink: 0;
+}
+
+.site-header--hub .site-header__actions {
+  justify-self: end;
 }
 
 .panel--strand-hub {
@@ -1546,9 +1598,38 @@ iframe.note-preview {
 }
 
 /* Responsive — width, height, aspect-ratio (Chem-inspired) */
+@media (max-width: 1099px) {
+  .site-header--hub .main-nav button {
+    padding: 8px 11px;
+    font-size: 0.82rem;
+  }
+}
+
 @media (max-width: 900px) {
   .site-header {
     gap: 10px;
+  }
+
+  .site-header--hub {
+    grid-template-columns: minmax(0, 1fr) auto;
+    grid-template-rows: auto auto;
+    gap: 8px 10px;
+  }
+
+  .site-header--hub .site-header__brand {
+    grid-column: 1;
+    grid-row: 1;
+  }
+
+  .site-header--hub .site-header__actions {
+    grid-column: 2;
+    grid-row: 1;
+  }
+
+  .site-header--hub .main-nav {
+    grid-column: 1 / -1;
+    grid-row: 2;
+    justify-self: stretch;
   }
 
   .main-nav button {
@@ -1598,8 +1679,8 @@ iframe.note-preview {
     font-size: 0.8rem;
   }
 
-  .main-nav {
-    margin-bottom: 12px;
+  .site-header--hub .main-nav {
+    margin-bottom: 0;
   }
 
   .main-nav button {

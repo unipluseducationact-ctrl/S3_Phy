@@ -18,7 +18,7 @@ const NAV_LABELS = {
  */
 export function mountHubShell(root, { subtitleKey, activeSection, onSection, onLang }) {
   root.innerHTML = `
-    <header class="site-header">
+    <header class="site-header site-header--hub">
       <div class="site-header__brand">
         <div class="brand-logo-wrap" aria-hidden="true">
           <img class="brand-logo-img" src="${import.meta.env.BASE_URL}images/uniplus-logo.png" alt="" width="220" height="52" decoding="async" />
@@ -28,12 +28,12 @@ export function mountHubShell(root, { subtitleKey, activeSection, onSection, onL
           <p class="site-subtitle" data-hub-subtitle>${t(subtitleKey)}</p>
         </div>
       </div>
+      <nav class="main-nav" data-nav aria-label="${t('app.title')}"></nav>
       <div class="site-header__actions">
         <button type="button" class="strand-back-btn" data-strand-back>${t('strand.back')}</button>
         <div class="lang-toggle" data-lang></div>
       </div>
     </header>
-    <nav class="main-nav" data-nav></nav>
     <main data-main></main>
     <footer class="site-footer no-print" data-hub-footer>${t('footer.conventions')}</footer>
   `;
@@ -47,9 +47,10 @@ export function mountHubShell(root, { subtitleKey, activeSection, onSection, onL
 
   function paintNav(sec) {
     currentSection = sec;
-    nav.innerHTML = HUB_SECTIONS.map((id) => {
+    nav.innerHTML = HUB_SECTIONS.map((id, i) => {
       const active = sec === id ? 'active' : '';
-      return `<button type="button" class="${active}" data-sec="${id}">${t(NAV_LABELS[id])}</button>`;
+      const label = `${i + 1}. ${t(NAV_LABELS[id])}`;
+      return `<button type="button" class="${active}" data-sec="${id}">${label}</button>`;
     }).join('');
     nav.querySelectorAll('button').forEach((btn) => {
       btn.addEventListener('click', () => onSection(btn.getAttribute('data-sec')));
