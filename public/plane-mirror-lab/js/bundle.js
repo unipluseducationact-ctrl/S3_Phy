@@ -1915,6 +1915,71 @@ function getVisibility(stepIndex, n, showAll) {
   return { mirrors, altMirrors, images, rays, altRays };
 }
 
+/** Step just revealed at stepIndex (1-based completed count). */
+function getActiveStep(stepIndex, n, showAll) {
+  if (showAll || stepIndex <= 0) return null;
+  const schedule = buildWedgeSchedule(n);
+  if (stepIndex > schedule.length) return schedule[schedule.length - 1] ?? null;
+  return schedule[stepIndex - 1] ?? null;
+}
+
+/** Mirror segment to pulse-highlight for the current animation step. */
+function resolveHighlightMirror(step, set, c) {
+  if (!step) return null;
+  const i = step.imageIdx;
+  const img = set.images[i];
+  if (!img) return null;
+
+  if (step.alt) {
+    if (!img.altConstruction) return null;
+    const m = img.altConstruction.mirror;
+    return {
+      a: m.a,
+      b: m.b,
+      virtual: true,
+      mirrorSide: img.altConstruction.mirrorSide,
+    };
+  }
+
+  if (i < 2) {
+    const side = img.mirrorSide;
+    const real = side === 1 ? c.m1 : c.m2;
+    return { a: real.a, b: real.b, virtual: false, mirrorSide: side };
+  }
+
+  if (step.type === 'mirror' || step.type === 'ray' || step.type === 'image') {
+    return {
+      a: img.mirror.a,
+      b: img.mirror.b,
+      virtual: true,
+      mirrorSide: img.mirrorSide,
+    };
+  }
+  return null;
+}
+
+function drawMirrorHighlight(ctx, txf, a, b, { virtual, pulse }) {
+  const s0 = { x: txf.ox + a.x * txf.pxPerM, y: txf.oy - a.y * txf.pxPerM };
+  const s1 = { x: txf.ox + b.x * txf.pxPerM, y: txf.oy - b.y * txf.pxPerM };
+  ctx.save();
+  ctx.strokeStyle = `rgba(255,204,0,${0.15 + 0.25 * pulse})`;
+  ctx.lineWidth = 10 + 4 * pulse;
+  ctx.setLineDash([]);
+  ctx.beginPath();
+  ctx.moveTo(s0.x, s0.y);
+  ctx.lineTo(s1.x, s1.y);
+  ctx.stroke();
+  ctx.strokeStyle = COLORS.mirrorNeed;
+  ctx.lineWidth = 4 + 3 * pulse;
+  if (virtual) ctx.setLineDash([6, 5]);
+  ctx.beginPath();
+  ctx.moveTo(s0.x, s0.y);
+  ctx.lineTo(s1.x, s1.y);
+  ctx.stroke();
+  ctx.setLineDash([]);
+  ctx.restore();
+}
+
 function defaultObjectInWedge(index, orientationDeg) {
   const r = 1.1 + index * 0.2;
   const phi = deg2rad(orientationDeg);
@@ -1963,8 +2028,21 @@ function createAngledMirrorsScenario() {
   let nextSketchId = 1;
   let cursorWorld = null;
   let refreshToolbarRef = null;
+  let highlightRaf = null;
   const animator = new RayAnimator();
   animator.rayCount = 1;
+
+  function cancelHighlightRaf() {
+    if (highlightRaf !== null) {
+      cancelAnimationFrame(highlightRaf);
+      highlightRaf = null;
+    }
+  }
+
+  function scheduleHighlightPulse(canvas) {
+    cancelHighlightRaf();
+    highlightRaf = requestAnimationFrame(() => draw(canvas));
+  }
 
   function nid() { return nextSketchId++; }
 
@@ -1983,6 +2061,7 @@ function createAngledMirrorsScenario() {
   }
 
   function resetAnimation() {
+    cancelHighlightRaf();
     animator.reset();
   }
 
@@ -2373,6 +2452,7 @@ function createAngledMirrorsScenario() {
   }
 
   function teardown() {
+    cancelHighlightRaf();
     canvasRef = null;
     dragTarget = null;
     draggingObjectId = null;
@@ -2542,6 +2622,24 @@ function createAngledMirrorsScenario() {
             drawVirtualMirror(ctx, view, txf, alt.mirror.a, alt.mirror.b, alt.mirrorSide);
           }
         });
+      });
+    }
+
+    const activeStep = getActiveStep(stepIndex, c.nFormula, showAll);
+    const primarySet = c.objectSets[0];
+    const highlight = primarySet
+      ? resolveHighlightMirror(activeStep, primarySet, c)
+      : null;
+    if (highlight) {
+      const pulse = 0.5 + 0.5 * Math.sin(performance.now() / 280);
+      drawMirrorHighlight(ctx, txf, highlight.a, highlight.b, {
+        virtual: highlight.virtual,
+        pulse,
+      });
+    }
+
+    if (params.showImages) {
+      c.objectSets.forEach((set) => {
         set.images.forEach((img, i) => {
           if (vis.images.has(i)) {
             const lbl = objects.length > 1 ? `${set.object.label}→${img.label}` : img.label;
@@ -2600,6 +2698,12 @@ function createAngledMirrorsScenario() {
       drawLabel(ctx, 12, 22, t(hintKey), COLORS.mirrorNeed);
     } else {
       drawLabel(ctx, 12, 22, t('wedgeHintObject'), COLORS.mirrorNeed);
+    }
+
+    if (highlight && !showAll && canvasRef) {
+      scheduleHighlightPulse(canvas);
+    } else {
+      cancelHighlightRaf();
     }
   }
 
