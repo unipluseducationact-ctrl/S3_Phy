@@ -51,6 +51,8 @@ export const en = {
   'tools.pick': 'Select a lab',
   'tools.hideLabList': 'Hide lab list',
   'tools.showLabList': 'Show lab list',
+  'tools.fullscreen': 'Fullscreen',
+  'tools.exitFullscreen': 'Exit fullscreen',
   'tools.rotatingMirror.title': 'Rotating plane mirror',
   'tools.rotatingMirror.subtitle': 'Ray shift when the mirror turns (?θ_ray = 2θ_mirror).',
   'tools.planeMirror.title': 'Plane mirror lab',

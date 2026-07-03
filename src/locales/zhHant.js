@@ -51,6 +51,8 @@ export const zhHant = {
   'tools.pick': '\u9078\u64c7\u5be6\u9a57',
   'tools.hideLabList': '\u6536\u5408\u5be6\u9a57\u5217\u8868',
   'tools.showLabList': '\u986f\u793a\u5be6\u9a57\u5217\u8868',
+  'tools.fullscreen': '\u5168\u87fb\u5e55',
+  'tools.exitFullscreen': '\u9000\u51fa\u5168\u87fb\u5e55',
   'tools.rotatingMirror.title': '\u65cb\u8f49\u5e73\u9762\u93e1',
   'tools.rotatingMirror.subtitle': '\u93e1\u9762\u8f49\u52d5\u6642\u53cd\u5c04\u5149\u7dda\u7684\u504f\u79fb\uff08\u5149\u7dda\u504f\u89d2 = 2 \u00d7 \u93e1\u89d2\uff09\u3002',
   'tools.planeMirror.title': '\u5e73\u9762\u93e1\u53cd\u5c04\u5be6\u9a57\u5ba4',

@@ -1,3 +1,5 @@
+import { initLabFullscreen } from './labFullscreen.js';
+
 const STORAGE_KEY = 's3phy:tool-picker-collapsed';
 const MOBILE_BREAKPOINT = 820;
 
@@ -19,10 +21,16 @@ export function renderToolsShell({ toolOrder, toolId, getLabel, t }) {
             <h2>${t('tools.title')}</h2>
             <p class="tools-active-lab" data-tool-active-label hidden>${getLabel(toolId)}</p>
           </div>
-          <button type="button" class="tool-picker-toggle" data-tool-picker-toggle aria-expanded="true">
-            <span data-tool-picker-chevron aria-hidden="true">&#9650;</span>
-            <span data-tool-picker-toggle-label>${t('tools.hideLabList')}</span>
-          </button>
+          <div class="tools-panel-head__actions">
+            <button type="button" class="tool-picker-toggle tool-fullscreen-btn" data-tool-fullscreen aria-pressed="false">
+              <span class="material-symbols-outlined" aria-hidden="true">fullscreen</span>
+              <span data-tool-fullscreen-label>${t('tools.fullscreen')}</span>
+            </button>
+            <button type="button" class="tool-picker-toggle" data-tool-picker-toggle aria-expanded="true">
+              <span data-tool-picker-chevron aria-hidden="true">&#9650;</span>
+              <span data-tool-picker-toggle-label>${t('tools.hideLabList')}</span>
+            </button>
+          </div>
         </div>
         <div class="tools-layout">
           <aside class="tool-picker" data-tool-picker>
@@ -50,11 +58,12 @@ export function hydrateToolsShell(root, { getLabel, t, onSelectTool, mountTool, 
   const list = root.querySelector('[data-tool-list]');
   const stage = root.querySelector('[data-tool-stage]');
   const toggleBtn = root.querySelector('[data-tool-picker-toggle]');
+  const fullscreenBtn = root.querySelector('[data-tool-fullscreen]');
   const toggleLabel = root.querySelector('[data-tool-picker-toggle-label]');
   const chevron = root.querySelector('[data-tool-picker-chevron]');
   const activeLabel = root.querySelector('[data-tool-active-label]');
 
-  if (!panel || !picker || !list || !stage || !toggleBtn) return;
+  if (!panel || !picker || !list || !stage || !toggleBtn || !fullscreenBtn) return;
 
   let collapsed = sessionStorage.getItem(STORAGE_KEY) === 'true';
 
@@ -108,4 +117,13 @@ export function hydrateToolsShell(root, { getLabel, t, onSelectTool, mountTool, 
   });
 
   mountTool(stage);
+
+  initLabFullscreen({
+    app: document.getElementById('app'),
+    stage,
+    button: fullscreenBtn,
+    t,
+    setCollapsed,
+    getCollapsed: () => collapsed,
+  });
 }

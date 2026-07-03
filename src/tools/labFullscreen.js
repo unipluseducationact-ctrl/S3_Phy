@@ -1,0 +1,145 @@
+﻿const OVERLAY_Z = 100000;
+
+function supportsFullscreen() {
+  const el = document.createElement('div');
+  return Boolean(
+    el.requestFullscreen ||
+      el.webkitRequestFullscreen ||
+      document.fullscreenEnabled ||
+      document.webkitFullscreenEnabled,
+  );
+}
+
+function isFullscreenActive(stage) {
+  const fsEl = document.fullscreenElement || document.webkitFullscreenElement;
+  return fsEl === stage;
+}
+
+export function initLabFullscreen({ app, stage, button, t, setCollapsed, getCollapsed }) {
+  let overlayMode = false;
+  let pickerWasCollapsed = false;
+  let overlayBackdrop = null;
+
+  const icon = button.querySelector('.material-symbols-outlined');
+  const label = button.querySelector('[data-tool-fullscreen-label]');
+
+  const updateButton = (active) => {
+    button.setAttribute('aria-pressed', active ? 'true' : 'false');
+    if (icon) icon.textContent = active ? 'fullscreen_exit' : 'fullscreen';
+    if (label) label.textContent = active ? t('tools.exitFullscreen') : t('tools.fullscreen');
+    button.title = label?.textContent || '';
+  };
+
+  const clearOverlay = () => {
+    if (overlayBackdrop) {
+      overlayBackdrop.remove();
+      overlayBackdrop = null;
+    }
+    stage.classList.remove('tool-stage--overlay-fullscreen');
+    document.body.style.overflow = '';
+    overlayMode = false;
+  };
+
+  const exitFullscreen = async () => {
+    if (overlayMode) {
+      clearOverlay();
+      app?.classList.remove('is-lab-fullscreen');
+      setCollapsed(pickerWasCollapsed);
+      updateButton(false);
+      return;
+    }
+
+    if (isFullscreenActive(stage)) {
+      try {
+        if (document.exitFullscreen) await document.exitFullscreen();
+        else if (document.webkitExitFullscreen) await document.webkitExitFullscreen();
+      } catch {
+        /* ignore */
+      }
+    }
+  };
+
+  const enterOverlay = () => {
+    pickerWasCollapsed = getCollapsed();
+    setCollapsed(true);
+    app?.classList.add('is-lab-fullscreen');
+
+    overlayBackdrop = document.createElement('div');
+    overlayBackdrop.className = 'tool-stage-overlay-backdrop';
+    overlayBackdrop.style.cssText = 'position:fixed;inset:0;z-index:' + OVERLAY_Z + ';background:rgba(15,23,42,0.45);';
+    document.body.appendChild(overlayBackdrop);
+    document.body.style.overflow = 'hidden';
+
+    stage.classList.add('tool-stage--overlay-fullscreen');
+    stage.style.position = 'fixed';
+    stage.style.inset = '0';
+    stage.style.zIndex = String(OVERLAY_Z + 1);
+    stage.style.width = '100dvw';
+    stage.style.height = '100dvh';
+    stage.style.margin = '0';
+
+    overlayMode = true;
+    updateButton(true);
+
+    overlayBackdrop.addEventListener('click', () => {
+      exitFullscreen();
+    });
+  };
+
+  const enterFullscreen = async () => {
+    pickerWasCollapsed = getCollapsed();
+    setCollapsed(true);
+    app?.classList.add('is-lab-fullscreen');
+
+    if (!supportsFullscreen()) {
+      enterOverlay();
+      return;
+    }
+
+    try {
+      if (stage.requestFullscreen) await stage.requestFullscreen();
+      else if (stage.webkitRequestFullscreen) await stage.webkitRequestFullscreen();
+      else {
+        enterOverlay();
+        return;
+      }
+      updateButton(true);
+    } catch {
+      app?.classList.remove('is-lab-fullscreen');
+      setCollapsed(pickerWasCollapsed);
+      enterOverlay();
+    }
+  };
+
+  const onFullscreenChange = () => {
+    const active = isFullscreenActive(stage) || overlayMode;
+    if (!active) {
+      app?.classList.remove('is-lab-fullscreen');
+      if (overlayMode) clearOverlay();
+      setCollapsed(pickerWasCollapsed);
+      stage.style.position = '';
+      stage.style.inset = '';
+      stage.style.zIndex = '';
+      stage.style.width = '';
+      stage.style.height = '';
+      stage.style.margin = '';
+    }
+    updateButton(active);
+  };
+
+  button.addEventListener('click', () => {
+    if (isFullscreenActive(stage) || overlayMode) exitFullscreen();
+    else enterFullscreen();
+  });
+
+  document.addEventListener('fullscreenchange', onFullscreenChange);
+  document.addEventListener('webkitfullscreenchange', onFullscreenChange);
+
+  updateButton(false);
+
+  return () => {
+    document.removeEventListener('fullscreenchange', onFullscreenChange);
+    document.removeEventListener('webkitfullscreenchange', onFullscreenChange);
+    exitFullscreen();
+  };
+}

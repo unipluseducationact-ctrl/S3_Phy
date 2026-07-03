@@ -25,10 +25,11 @@
   --font-display: "Montserrat", "Inter", system-ui, sans-serif;
   --mono: ui-monospace, "Cascadia Code", monospace;
   --vp-pad: clamp(12px, 2vw, 24px);
-  --s3-content-max: 1200px;
-  --content-max-w: min(var(--s3-content-max), calc(100dvw - var(--vp-pad) * 2));
+  --s3-content-max: min(1600px, calc(100dvw - var(--vp-pad) * 2));
+  --content-max-w: var(--s3-content-max);
+  --nav-offset: calc(var(--vp-pad) + 72px + 12px);
   --hub-scale: 1;
-  --s3-tool-min-h: clamp(640px, calc(100dvh - 120px), 1400px);
+  --s3-tool-min-h: clamp(560px, calc(100dvh - var(--nav-offset) - 48px), 1600px);
   --tool-viewport-min-h: var(--s3-tool-min-h);
   --tool-stage-pad: 6px;
   --s3-float-panel-w: min(360px, calc(100% - 24px));
@@ -55,16 +56,11 @@ a {
 }
 
 #app {
-  max-width: var(--content-max-w);
-  margin: 0 auto;
+  width: 100%;
+  max-width: none;
+  margin: 0;
   padding: var(--vp-pad);
   padding-bottom: 48px;
-}
-
-#app:has(.panel--tools),
-#app:has(.panel--worksheets-embed),
-#app:has(.panel--quiz-embed) {
-  max-width: min(var(--s3-content-max), calc(100dvw - var(--vp-pad) * 2));
 }
 
 @media (min-width: 1200px) {
@@ -453,9 +449,7 @@ a {
 
 /* Topic map �X centered block (matches splash branding density) */
 .panel--topic-hub {
-  max-width: var(--s3-content-max);
-  margin-left: auto;
-  margin-right: auto;
+  width: 100%;
 }
 
 .panel--topic-hub > h2,
@@ -470,10 +464,12 @@ a {
 }
 
 .panel--topic-hub .topic-hub-grid {
-  max-width: var(--s3-content-max);
-  margin-left: auto;
-  margin-right: auto;
+  width: 100%;
   justify-items: stretch;
+}
+
+.panel--topic-hub .grid.cols-2 {
+  grid-template-columns: repeat(auto-fit, minmax(min(100%, 260px), 1fr));
 }
 
 .panel--topic-hub .card {
@@ -588,6 +584,14 @@ a {
   min-width: 0;
 }
 
+.tools-panel-head__actions {
+  display: flex;
+  flex-shrink: 0;
+  align-items: center;
+  gap: 8px;
+  flex-wrap: wrap;
+}
+
 .tools-panel-head h2 {
   margin: 0;
 }
@@ -700,6 +704,45 @@ a {
   border: 1px solid var(--border);
   border-radius: var(--radius);
   padding: var(--tool-stage-pad);
+}
+
+.tool-stage:fullscreen,
+.tool-stage.tool-stage--overlay-fullscreen {
+  width: 100vw;
+  height: 100dvh;
+  max-width: none;
+  padding: 0;
+  border: none;
+  border-radius: 0;
+  background: var(--surface-inset);
+}
+
+.tool-stage:fullscreen > *,
+.tool-stage.tool-stage--overlay-fullscreen > * {
+  min-height: 100%;
+  height: 100%;
+}
+
+#app.is-lab-fullscreen .site-header,
+#app.is-lab-fullscreen .main-nav,
+#app.is-lab-fullscreen .site-footer,
+#app.is-lab-fullscreen .tools-panel-head {
+  display: none;
+}
+
+#app.is-lab-fullscreen .panel--tools {
+  padding: 0;
+  border: none;
+  box-shadow: none;
+  background: transparent;
+}
+
+#app.is-lab-fullscreen .tool-stage {
+  min-height: calc(100dvh - var(--vp-pad) * 2);
+}
+
+.tool-fullscreen-btn .material-symbols-outlined {
+  font-size: 1.1rem;
 }
 
 .tool-stage > * {
@@ -999,7 +1042,7 @@ iframe.note-preview {
 .fc-card-container {
   position: relative;
   width: 100%;
-  max-width: 42rem;
+  max-width: min(48rem, 100%);
   height: min(400px, 65vh);
   cursor: pointer;
   z-index: 1;

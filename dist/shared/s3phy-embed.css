@@ -17,9 +17,9 @@ html.s3phy-embed .main-container,
 html.s3phy-embed .lab-wrap,
 html.s3phy-embed .dashboard,
 html.s3phy-embed .app-root {
-  max-width: var(--s3-content-max);
-  margin-left: auto;
-  margin-right: auto;
+  max-width: none;
+  width: 100%;
+  margin: 0;
 }
 
 /* Floating controls panel (heat labs + shared script) */
