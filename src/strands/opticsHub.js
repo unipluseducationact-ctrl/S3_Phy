@@ -80,6 +80,9 @@ export function mountOpticsHub(root) {
       panel.appendChild(node);
       destroyWorksheet = node._opticsLightLensWorksheetCleanup || null;
     }
+    else if (section === 'quiz') {
+      el.main.innerHTML = `<section class="panel panel--quiz-placeholder"><p class="quiz-placeholder-text">${t('quiz.comingSoon')}</p></section>`;
+    }
     else if (section === 'flashcards') {
       destroyFlashcards = mountFlashcardStudy(el.main, {
         deckOptions: OPTICS_DECK_OPTIONS.map((o) => ({

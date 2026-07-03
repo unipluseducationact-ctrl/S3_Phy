@@ -62,7 +62,8 @@ a {
 }
 
 #app:has(.panel--tools),
-#app:has(.panel--worksheets-embed) {
+#app:has(.panel--worksheets-embed),
+#app:has(.panel--quiz-embed) {
   max-width: min(var(--s3-content-max), calc(100dvw - var(--vp-pad) * 2));
 }
 
@@ -720,6 +721,7 @@ a {
 .tool-em-spectrum,
 .tool-optics-light-lens-quiz,
 .tool-heat-final-exam-quiz,
+.tool-heat-ch1-quiz,
 .tool-specific-heat,
 .tool-thermal-mixing,
 .tool-change-of-state,
@@ -737,6 +739,7 @@ a {
 .tool-em-spectrum iframe,
 .tool-optics-light-lens-quiz iframe,
 .tool-heat-final-exam-quiz iframe,
+.tool-heat-ch1-quiz iframe,
 .tool-specific-heat iframe,
 .tool-thermal-mixing iframe,
 .tool-change-of-state iframe,
@@ -843,6 +846,28 @@ iframe.note-preview {
 .panel--worksheets-embed .tool-heat-final-exam-quiz {
   height: var(--tool-viewport-min-h);
   min-height: var(--tool-viewport-min-h);
+}
+
+.panel--quiz-embed {
+  padding: 0;
+  overflow: hidden;
+}
+
+.panel--quiz-embed .tool-heat-ch1-quiz {
+  height: var(--tool-viewport-min-h);
+  min-height: var(--tool-viewport-min-h);
+}
+
+.panel--quiz-placeholder {
+  padding: 2rem 1.5rem;
+  text-align: center;
+}
+
+.quiz-placeholder-text {
+  margin: 0;
+  color: var(--muted);
+  font-size: 1.05rem;
+  line-height: 1.6;
 }
 
 .material-symbols-outlined {

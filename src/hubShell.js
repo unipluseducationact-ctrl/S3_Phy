@@ -1,12 +1,13 @@
 import { t, getLang, setLang } from './i18n.js';
 
-export const HUB_SECTIONS = ['topics', 'notes', 'tools', 'worksheets', 'flashcards', 'summary'];
+export const HUB_SECTIONS = ['topics', 'notes', 'tools', 'worksheets', 'quiz', 'flashcards', 'summary'];
 
 const NAV_LABELS = {
   topics: 'nav.topics',
   notes: 'nav.notes',
   tools: 'nav.tools',
   worksheets: 'nav.worksheets',
+  quiz: 'nav.quiz',
   flashcards: 'nav.flashcards',
   summary: 'nav.summary',
 };

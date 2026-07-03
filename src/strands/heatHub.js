@@ -3,6 +3,7 @@ import { langKey, assetExists, noteExists, hydrateNoteCards, renderPdfPreviewBlo
 import { mountHubShell } from '../hubShell.js';
 import { renderToolsShell, hydrateToolsShell } from '../tools/toolsShell.js';
 import { createHeatFinalExamWorksheet } from '../worksheets/heatFinalExamWorksheet.js';
+import { createHeatCh1Quiz } from '../worksheets/heatCh1Quiz.js';
 import { mountFlashcardStudy } from '../flashcards/flashcardStudy.js';
 import { buildHeatDeck } from '../flashcards/flashcardDeck.js';
 
@@ -132,6 +133,12 @@ export function mountHeatHub(root) {
       const node = createHeatFinalExamWorksheet(t);
       panel.appendChild(node);
       destroyWorksheet = node._heatFinalExamWorksheetCleanup || null;
+    } else if (section === 'quiz') {
+      el.main.innerHTML = '<section class="panel panel--quiz-embed"></section>';
+      const panel = el.main.querySelector('.panel--quiz-embed');
+      const node = createHeatCh1Quiz(t);
+      panel.appendChild(node);
+      destroyWorksheet = node._heatCh1QuizCleanup || null;
     } else if (section === 'flashcards') {
       destroyFlashcards = mountFlashcardStudy(el.main, {
         deckOptions: HEAT_DECK_OPTIONS.map((o) => ({
