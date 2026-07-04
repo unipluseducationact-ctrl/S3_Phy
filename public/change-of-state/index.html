@@ -14,7 +14,7 @@
   <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/katex@0.16.8/dist/katex.min.css">
   <script src="https://cdn.jsdelivr.net/npm/katex@0.16.8/dist/katex.min.js"></script>
   <link rel="stylesheet" href="../shared/s3phy-tokens.css">
-  <link rel="stylesheet" href="../shared/s3phy-embed.css">
+  <link rel="stylesheet" href="../shared/s3phy-embed.css?v=11">
   <script src="../shared/s3phy-embed-init.js"></script>
   <style>
     body {
@@ -95,7 +95,7 @@
     .lab-viz-canvas { aspect-ratio: 4 / 3; width: 100%; }
     /* Dual-panel viz (animation + chart): grid stack, bounded heights, no flex-grow overlap */
     .lab-viz-dual {
-      display: grid;
+      display: grid !important;
       grid-template-rows: auto minmax(180px, 1fr);
       gap: 0.75rem;
       align-content: stretch;
@@ -608,10 +608,9 @@
       const headerH = header ? header.getBoundingClientRect().height + 8 : 0;
       const panelPad = 28;
       const fromPanel = Math.max(180, chartPanel.clientHeight - headerH - panelPad);
-      const fromAspect = Math.round(w * 10 / 16);
       const absoluteMax = Math.min(480, Math.round(window.innerHeight * 0.52));
 
-      return Math.max(180, Math.min(fromPanel, fromAspect, absoluteMax));
+      return Math.max(180, Math.min(fromPanel, absoluteMax));
     }
 
     function sizeChartContainer() {

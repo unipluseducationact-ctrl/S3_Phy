@@ -7,6 +7,10 @@ html.s3phy-embed {
   -webkit-font-smoothing: antialiased;
 }
 
+html.s3phy-embed:has(.lab-section) {
+  height: 100%;
+}
+
 html.s3phy-embed body {
   font-family: var(--s3-font);
   font-size: max(var(--s3-font-min), 1rem);
@@ -102,6 +106,11 @@ html.s3phy-embed .lab-viz-canvas {
 
 html.s3phy-embed .lab-steps {
   overflow-y: auto;
+}
+
+html.s3phy-embed .lab-viz.lab-viz-dual {
+  display: grid !important;
+  height: 100% !important;
 }
 
 html.s3phy-embed .lab-viz-dual {
