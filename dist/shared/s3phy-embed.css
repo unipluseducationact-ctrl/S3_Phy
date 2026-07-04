@@ -104,12 +104,18 @@ html.s3phy-embed .lab-steps {
   overflow-y: auto;
 }
 
+html.s3phy-embed .lab-viz.lab-viz-dual {
+  height: auto !important;
+  max-height: 100%;
+  align-self: start;
+}
+
 html.s3phy-embed .lab-viz-dual {
   max-height: none !important;
-  flex: 1 1 auto;
+  flex: 0 1 auto;
   min-height: 0;
-  height: 100%;
-  grid-template-rows: minmax(0, auto) minmax(0, 1fr);
+  height: auto;
+  grid-template-rows: auto minmax(180px, min(320px, 36vh));
   align-content: stretch;
   overflow: hidden;
 }
@@ -122,6 +128,7 @@ html.s3phy-embed .lab-viz-dual .lab-viz-panel:first-child {
 html.s3phy-embed .lab-viz-dual .lab-viz-panel-chart {
   flex: 1 1 auto;
   min-height: 0;
+  max-height: min(360px, 38vh);
   overflow: hidden;
 }
 
@@ -136,8 +143,8 @@ html.s3phy-embed .lab-viz-dual .lab-viz-canvas {
 html.s3phy-embed .lab-viz-dual .lab-viz-chart-wrap {
   flex: 1 1 auto;
   min-height: 180px;
-  height: 100%;
-  max-height: none;
+  max-height: min(300px, 34vh);
+  height: auto !important;
   aspect-ratio: unset;
 }
 
