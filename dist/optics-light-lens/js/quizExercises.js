@@ -50,7 +50,7 @@ export const QUIZ_EXERCISES = [
     "format": "tf",
     "section": "reflection",
     "difficulty": "Standard",
-    "stem": "When a plane mirror moves towards an observer at 1 m s⁻¹, the image moves towards the observer at 2 m s⁻¹.",
+    "stem": "When a plane mirror moves towards an observer at 1 m s−1, the image moves towards the observer at 2 m s−1.",
     "options": [
       {
         "key": "T",
@@ -266,23 +266,25 @@ export const QUIZ_EXERCISES = [
         "segments": [
           {
             "type": "text",
-            "value": "When a plane mirror moves towards a girl at 1 m s⁻¹, her image moves towards her at "
+            "value": "When a plane mirror moves towards a girl at 1 m s−1, her image moves towards her at "
           },
           {
             "type": "blank",
             "accept": [
-              "2"
+              "2",
+              "2 m s-1",
+              "2 m/s",
+              "2 ms-1"
             ]
           },
           {
             "type": "text",
-            "value": " m s⁻¹."
+            "value": " m s−1."
           }
         ]
       }
     ],
-    "hint": "Image distance changes at twice the mirror speed.",
-    "answer": "2"
+    "hint": "Image distance changes at twice the mirror speed."
   },
   {
     "id": "optics-fill-02",
@@ -448,7 +450,9 @@ export const QUIZ_EXERCISES = [
           {
             "type": "blank",
             "accept": [
-              "r"
+              "r",
+              "r.",
+              "angle of refraction"
             ]
           },
           {
@@ -458,8 +462,7 @@ export const QUIZ_EXERCISES = [
         ]
       }
     ],
-    "hint": "i = angle of incidence, r = angle of refraction.",
-    "answer": "r"
+    "hint": "i = angle of incidence, r = angle of refraction."
   },
   {
     "id": "optics-fill-08",

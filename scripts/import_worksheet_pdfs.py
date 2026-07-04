@@ -205,7 +205,43 @@ def is_noise_line(line: str) -> bool:
 
 def clean_text(text: str) -> str:
     lines = [line.rstrip() for line in text.split("\n") if not is_noise_line(line)]
-    return "\n".join(lines)
+    return repair_pdf_line_breaks("\n".join(lines))
+
+
+def repair_pdf_line_breaks(text: str) -> str:
+    """Join PDF column-wrap breaks; keep (1)(2), (a), Given: blocks."""
+    if not text:
+        return text
+    t = re.sub(r"([A-Za-z0-9])([−–-])\n(?=[a-z])", r"\1\2", text)
+    lines = t.split("\n")
+    out: list[str] = []
+    i = 0
+    while i < len(lines):
+        line = lines[i]
+        while i + 1 < len(lines):
+            cur = line.rstrip()
+            nxt = lines[i + 1].strip()
+            if not nxt:
+                break
+            if re.match(r"^\(\d+\)", nxt):
+                break
+            if re.match(r"^\([a-d]\)", nxt, re.I):
+                break
+            if re.match(r"^Given:", nxt, re.I):
+                break
+            if re.match(r"^Substance\b", nxt):
+                break
+            if re.search(r"[.?!:]$", cur):
+                break
+            if re.match(r"^[a-z(]", nxt):
+                joiner = "" if re.search(r"[−–-]$", cur) else " "
+                line = cur + joiner + nxt
+                i += 1
+                continue
+            break
+        out.append(line)
+        i += 1
+    return "\n".join(out)
 
 
 def is_mc_page(text: str) -> bool:

@@ -186,7 +186,7 @@ const MCQ_ITEMS = [
     "id": "light-2024-q06",
     "section": "reflection",
     "difficulty": "Standard",
-    "stem": "In the figure below, what is the angle of reflection on mirror M₂?",
+    "stem": "In the figure below, what is the angle of reflection on mirror M2?",
     "options": [
       {
         "key": "A",
@@ -206,7 +206,7 @@ const MCQ_ITEMS = [
       }
     ],
     "answer": "A",
-    "hint": "In the figure below, what is the angle of reflection on mirror M₂? 40° 45° 50° 55°",
+    "hint": "In the figure below, what is the angle of reflection on mirror M2? 40° 45° 50° 55°",
     "image": {
       "src": "./assets/light-2024-q06-fig.png",
       "alt": "Diagram for light-2024-q06",
@@ -421,23 +421,23 @@ const MCQ_ITEMS = [
     "id": "light-2024-q14",
     "section": "reflection",
     "difficulty": "Applied",
-    "stem": "A girl stands in front of a plane mirror. When the mirror is moved towards the girl at a speed of 1 m s⁻¹, her image moves",
+    "stem": "A girl stands in front of a plane mirror. When the mirror is moved towards the girl at a speed of 1 m s−1, her image moves",
     "options": [
       {
         "key": "A",
-        "text": "towards the girl at a speed of 1 m s⁻¹."
+        "text": "towards the girl at a speed of 1 m s−1."
       },
       {
         "key": "B",
-        "text": "towards the girl at a speed of 2 m s⁻¹."
+        "text": "towards the girl at a speed of 2 m s−1."
       },
       {
         "key": "C",
-        "text": "away from the girl at a speed of 0.5 m s⁻¹."
+        "text": "away from the girl at a speed of 0.5 m s−1."
       },
       {
         "key": "D",
-        "text": "away from the girl at a speed of 2 m s⁻¹."
+        "text": "away from the girl at a speed of 2 m s−1."
       }
     ],
     "answer": "B"
@@ -503,39 +503,32 @@ const MCQ_ITEMS = [
     "id": "light-2024-q17",
     "section": "reflection",
     "difficulty": "Applied",
-    "stem": "A man 1.8 m tall is standing in front of a plane mirror of length p cm. The distance between the bottom of the mirror and the ground is q cm. His eyes are 1.7 m above the ground. In which of the following situations can the man see his entire body in the mirror?",
+    "stem": "A man 1.8 m tall is standing in front of a plane mirror of length p cm. The distance between the bottom of the mirror and the ground is q cm. His eyes are 1.7 m above the ground. In which of the following situations can the man see his entire body in the mirror? p q",
     "options": [
       {
         "key": "A",
-        "text": "A"
+        "text": "90"
       },
       {
         "key": "B",
-        "text": "B"
+        "text": "90"
       },
       {
         "key": "C",
-        "text": "C"
+        "text": "100"
       },
       {
         "key": "D",
-        "text": "D"
+        "text": "100"
       }
     ],
     "answer": "B",
     "hint": "90 90 90 85 100 70 100 65",
-    "images": [
-      {
-        "src": "./assets/light-2024-q17-fig.png",
-        "alt": "Diagram for light-2024-q17",
-        "caption": "Fig - Question 17"
-      },
-      {
-        "src": "./assets/light-2024-q17-fig-2.png",
-        "alt": "Options A–D for light-2024-q17",
-        "caption": "Options A–D"
-      }
-    ]
+    "image": {
+      "src": "./assets/light-2024-q17-fig.png",
+      "alt": "Diagram for light-2024-q17",
+      "caption": "Fig - Question 17"
+    }
   },
   {
     "id": "light-2024-q18",
@@ -603,11 +596,11 @@ const MCQ_ITEMS = [
     "id": "light-2024-q20",
     "section": "reflection",
     "difficulty": "Standard",
-    "stem": "John stands in front of a vertical plane mirror AB, where point A is 1.8 m above the ground (see the figure below). John’s eye is 1.6 m above the ground and 1 m from the mirror. Looking into the mirror, he can see a wall 3 m behind him. A spider is moving down on the wall. What is the maximum height h of the spider that John can see its image in the mirror?",
+    "stem": "John stands in front of a vertical plane mirror AB, where point A is 1.8 m above the ground (see the figure below). John’s eye is 1.6 m above the ground and 1 m from the mirror. Looking into the mirror, he can see a wall 3 m behind him.",
     "options": [
       {
         "key": "A",
-        "text": "1.8 m"
+        "text": "spider is moving down on the wall. What is the maximum height h of the spider that John can see its image in the mirror?"
       },
       {
         "key": "B",
@@ -669,19 +662,19 @@ const MCQ_ITEMS = [
     "options": [
       {
         "key": "A",
-        "text": "I₂ only"
+        "text": "I2 only"
       },
       {
         "key": "B",
-        "text": "I₃ only"
+        "text": "I3 only"
       },
       {
         "key": "C",
-        "text": "I₂ and I₄ only"
+        "text": "I2 and I4 only"
       },
       {
         "key": "D",
-        "text": "I₂, I₃ and I₄ only"
+        "text": "I2, I3 and I4 only"
       }
     ],
     "answer": "C",
@@ -774,7 +767,7 @@ const MCQ_ITEMS = [
     "id": "light-2024-q26",
     "section": "refraction-snells-law",
     "difficulty": "Standard",
-    "stem": "The figure below show a light ray entering medium Y from medium X. Which statement(s) is/are correct?\n\n(1) The light travels faster in medium X.\n\n(2) φ is the angle of refraction.\n\n(3) Medium X can be water while medium Y is air.",
+    "stem": "The figure below show a light ray entering medium Y from medium X. Which statement(s) is/are correct?\n\n(1) The light travels faster in medium X.\n\n(2)  is the angle of refraction.\n\n(3) Medium X can be water while medium Y is air.",
     "options": [
       {
         "key": "A",
@@ -794,11 +787,34 @@ const MCQ_ITEMS = [
       }
     ],
     "answer": "A",
-    "hint": "The figure below show a light ray entering medium Y from medium X. Which statement(s) is/are correct? (1) The light travels faster in medium X. (2) φ is the angle of refraction. (3) Medium X can be water while medium Y is air.",
+    "hint": "The figure below show a light ray entering medium Y from medium X. Which statement(s) is/are correct? (1) The light travels faster in medium X. (2)  is the angle of refraction. (3) Medium X can be water while medium Y is air.",
     "image": {
       "src": "./assets/light-2024-q26-fig.png",
       "alt": "Diagram for light-2024-q26",
       "caption": "Fig - Question 26"
+    }
+  },
+  {
+    "id": "light-2024-q27",
+    "section": "refraction-snells-law",
+    "difficulty": "Applied",
+    "stem": "The following figure shows a light ray travelling from medium X to a vacuum. What is the refractive index of medium X?",
+    "options": [
+      {
+        "key": "A",
+        "text": "B"
+      },
+      {
+        "key": "C",
+        "text": "D"
+      }
+    ],
+    "answer": "A",
+    "hint": "The following figure shows a light ray travelling from medium X to a vacuum. What is the refractive index of medium X?",
+    "image": {
+      "src": "./assets/light-2024-q27-fig.png",
+      "alt": "Diagram for light-2024-q27",
+      "caption": "Fig - Question 27"
     }
   },
   {
@@ -898,7 +914,7 @@ const MCQ_ITEMS = [
     "id": "light-2024-q31",
     "section": "refraction-snells-law",
     "difficulty": "Applied",
-    "stem": "A ray of light is incident from air to an equilateral triangular glass prism at an angle θ. Its consequent path is shown below. The refractive index of the glass is 1.6. What is θ?",
+    "stem": "A ray of light is incident from air to an equilateral triangular glass prism at an angle . Its consequent path is shown below. The refractive index of the glass is 1.6. What is ?",
     "options": [
       {
         "key": "A",
@@ -960,7 +976,7 @@ const MCQ_ITEMS = [
     "id": "light-2024-q33",
     "section": "total-internal-reflection",
     "difficulty": "Applied",
-    "stem": "The speeds of light in medium 𝑋 and medium 𝑌 are 2 × 10⁸ m s⁻¹ and 1.5 × 10⁸ m s⁻¹ respectively What is the critical angle for the interface of the two media?",
+    "stem": "The speeds of light in medium 𝑋 and medium 𝑌 are 2 × 108 m s−1 and 1.5 × 108 m s−1 respectively What is the critical angle for the interface of the two media?",
     "options": [
       {
         "key": "A",
@@ -980,7 +996,7 @@ const MCQ_ITEMS = [
       }
     ],
     "answer": "D",
-    "hint": "The speeds of light in medium 𝑋 and medium 𝑌 are 2 × 10⁸ m s⁻¹ and 1.5 × 10⁸ m s⁻¹ respectively What is the critical angle for the interface of the two media? 19.5° 30° 41.8° 48.6° 14 警告: 不可翻印,販賣,違者必究 2025-26 Light revision (MC set 1) 薈進教育中心 Unit Education Tel: 98583618"
+    "hint": "The speeds of light in medium 𝑋 and medium 𝑌 are 2 × 108 m s−1 and 1.5 × 108 m s−1 respectively What is the critical angle for the interface of the two media? 19.5° 30° 41.8° 48.6° 14 警告: 不可翻印,販賣,違者必究 2025-26 Light revision (MC set 1) 薈進教育中心 Unit Education Tel: 98583618"
   },
   {
     "id": "light-2024-q34",
@@ -1068,7 +1084,7 @@ const MCQ_ITEMS = [
       }
     ],
     "answer": "C",
-    "hint": "When light travels from an optically denser medium to an optically less dense medium, (1) its speed increases. (2) its colour changes. (3) it bends away from the normal. 33. The speeds of light in medium 𝑋 and medium 𝑌 are 2 × 10⁸ m s⁻¹ and 1.5 × 10⁸ m s⁻¹ respectively What is the critical angle for the interface of the two media? 19.5° 30° 41.8° 48.6° 14 警告: 不可翻印,販賣,違者必究 2025-26 Light revision (MC set 1) 薈進教育中心 Unit Education Tel: 98583618"
+    "hint": "When light travels from an optically denser medium to an optically less dense medium, (1) its speed increases. (2) its colour changes. (3) it bends away from the normal. 33. The speeds of light in medium 𝑋 and medium 𝑌 are 2 × 108 m s−1 and 1.5 × 108 m s−1 respectively What is the critical angle for the interface of the two media? 19.5° 30° 41.8° 48.6° 14 警告: 不可翻印,販賣,違者必究 2025-26 Light revision (MC set 1) 薈進教育中心 Unit Education Tel: 98583618"
   },
   {
     "id": "light-2024-q37",
@@ -1223,27 +1239,27 @@ const MCQ_ITEMS = [
     "id": "light-2024-q42",
     "section": "refraction-snells-law",
     "difficulty": "Applied",
-    "stem": "It is known that the refractive index of ice is lower than that of quartz, which is in turn lower than that of diamond. The figure below shows how a ray of light travels through the three materials. Which of the following combinations is the most appropriate?\n\nmaterial A material B material C",
+    "stem": "It is known that the refractive index of ice is lower than that of quartz, which is in turn lower than that of diamond. The figure below shows how a ray of light travels through the three materials. Which of the following combinations is the most appropriate? material A material B material C",
     "options": [
       {
         "key": "A",
-        "text": "ice, quartz, diamond"
+        "text": "ice quartz diamond"
       },
       {
         "key": "B",
-        "text": "quartz, diamond, ice"
+        "text": "quartz diamond ice"
       },
       {
         "key": "C",
-        "text": "ice, diamond, quartz"
+        "text": "ice diamond quartz"
       },
       {
         "key": "D",
-        "text": "diamond, quartz, ice"
+        "text": "diamond quartz ice"
       }
     ],
     "answer": "B",
-    "hint": "It is known that the refractive index of ice is lower than that of quartz, which is in turn lower than that of diamond. The figure below shows how a ray of light travels through the three materials. Which of the following combinations is the most appropriate?\n\nmaterial A material B material C",
+    "hint": "It is known that the refractive index of ice is lower than that of quartz, which is in turn lower than that of diamond. The figure below shows how a ray of light travels through the three materials. Which of the following combinations is the most appropriate? material A material B material C",
     "image": {
       "src": "./assets/light-2024-q42-fig.png",
       "alt": "Diagram for light-2024-q42",
@@ -1618,27 +1634,27 @@ const MCQ_ITEMS = [
     "id": "light-2024b-q01",
     "section": "refraction-snells-law",
     "difficulty": "Standard",
-    "stem": "What types of light rays do figures (a), (b) and (c) represent?\n\nFigure (a) Figure (b) Figure (c)",
+    "stem": "What types of light rays do figures (a), (b) and (c) represent? Figure (a) Figure (b) Figure (c)",
     "options": [
       {
         "key": "A",
-        "text": "convergent, divergent, parallel"
+        "text": "convergent divergent parallel"
       },
       {
         "key": "B",
-        "text": "divergent, parallel, convergent"
+        "text": "divergent parallel convergent"
       },
       {
         "key": "C",
-        "text": "parallel, divergent, convergent"
+        "text": "parallel divergent convergent"
       },
       {
         "key": "D",
-        "text": "divergent, convergent, parallel"
+        "text": "divergent convergent parallel"
       }
     ],
     "answer": "D",
-    "hint": "What types of light rays do figures (a), (b) and (c) represent?\n\nFigure (a) Figure (b) Figure (c)",
+    "hint": "What types of light rays do figures (a), (b) and (c) represent? Figure (a) Figure (b) Figure (c)",
     "image": {
       "src": "./assets/light-2024b-q01-fig.png",
       "alt": "Diagram for light-2024b-q01",
@@ -1701,18 +1717,11 @@ const MCQ_ITEMS = [
     ],
     "answer": "D",
     "hint": "The figure below shows a periscope (潛望鏡) which consists of two plane mirrors.",
-    "images": [
-      {
-        "src": "./assets/light-2024b-q03-fig.png",
-        "alt": "Diagram for light-2024b-q03",
-        "caption": "Fig - Question 3"
-      },
-      {
-        "src": "./assets/light-2024b-q03-fig-2.png",
-        "alt": "Options A–D for light-2024b-q03",
-        "caption": "Options A–D"
-      }
-    ]
+    "image": {
+      "src": "./assets/light-2024b-q03-fig.png",
+      "alt": "Diagram for light-2024b-q03",
+      "caption": "Fig - Question 3"
+    }
   },
   {
     "id": "light-2024b-q04",
@@ -1749,27 +1758,27 @@ const MCQ_ITEMS = [
     "id": "light-2024b-q05",
     "section": "reflection",
     "difficulty": "Standard",
-    "stem": "Heidi is standing between two parallel mirrors, M₁ and M₂, with their reflective surfaces facing each other as shown below. When Heidi looks at M₁, she sees multiple images in the mirror. Which of the following is/are the image(s) of Heidi seen in M₁?",
+    "stem": "Heidi is standing between two parallel mirrors, M1 and M2, with their reflective surfaces facing each other as shown below. When Heidi looks at M1, she sees multiple images in the mirror. Which of the following is/are the image(s) of Heidi seen in M1?",
     "options": [
       {
         "key": "A",
-        "text": "I₁ only"
+        "text": "I1 only"
       },
       {
         "key": "B",
-        "text": "I₁ and I₂ only"
+        "text": "I1 and I2 only"
       },
       {
         "key": "C",
-        "text": "I₁ and I₃ only"
+        "text": "I1 and I3 only"
       },
       {
         "key": "D",
-        "text": "I₁, I₃ and I₄ only"
+        "text": "I1, I3 and I4 only"
       }
     ],
     "answer": "C",
-    "hint": "Heidi is standing between two parallel mirrors, M₁ and M₂, with their reflective surfaces facing each other as shown below. When Heidi looks at M₁, she sees multiple images in the mirror. Which of the following is/are the image(s) of Heidi seen in M₁? 3 警告: 不可翻印,販賣,違者必究 2024-25 Light revision 薈進教育中心 Unit Education Tel: 98583618",
+    "hint": "Heidi is standing between two parallel mirrors, M1 and M2, with their reflective surfaces facing each other as shown below. When Heidi looks at M1, she sees multiple images in the mirror. Which of the following is/are the image(s) of Heidi seen in M1? 3 警告: 不可翻印,販賣,違者必究 2024-25 Light revision 薈進教育中心 Unit Education Tel: 98583618",
     "image": {
       "src": "./assets/light-2024b-q05-fig.png",
       "alt": "Diagram for light-2024b-q05",
@@ -1780,7 +1789,7 @@ const MCQ_ITEMS = [
     "id": "light-2024b-q06",
     "section": "reflection",
     "difficulty": "Standard",
-    "stem": "In the figure below, what is the angle of reflection of the ray on mirror M₂?",
+    "stem": "In the figure below, what is the angle of reflection of the ray on mirror M2?",
     "options": [
       {
         "key": "A",
@@ -1800,7 +1809,7 @@ const MCQ_ITEMS = [
       }
     ],
     "answer": "A",
-    "hint": "In the figure below, what is the angle of reflection of the ray on mirror M₂? 40° 45° 50° 55°",
+    "hint": "In the figure below, what is the angle of reflection of the ray on mirror M2? 40° 45° 50° 55°",
     "image": {
       "src": "./assets/light-2024b-q06-fig.png",
       "alt": "Diagram for light-2024b-q06",
@@ -1811,27 +1820,27 @@ const MCQ_ITEMS = [
     "id": "light-2024b-q07",
     "section": "reflection",
     "difficulty": "Applied",
-    "stem": "John is in front of a plane mirror. If the mirror moves away from him at a speed of 2 m s⁻¹, at what speed does his image move away from him?",
+    "stem": "John is in front of a plane mirror. If the mirror moves away from him at a speed of 2 m s−1, at what speed does his image move away from him?",
     "options": [
       {
         "key": "A",
-        "text": "1 m s⁻¹"
+        "text": "1 m s−1"
       },
       {
         "key": "B",
-        "text": "2 m s⁻¹"
+        "text": "2 m s−1"
       },
       {
         "key": "C",
-        "text": "4 m s⁻¹"
+        "text": "4 m s−1"
       },
       {
         "key": "D",
-        "text": "8 m s⁻¹"
+        "text": "8 m s−1"
       }
     ],
     "answer": "C",
-    "hint": "John is in front of a plane mirror. If the mirror moves away from him at a speed of 2 m s⁻¹, at what speed does his image move away from him? 1 m s⁻¹ 2 m s⁻¹ 4 m s⁻¹ 8 m s⁻¹"
+    "hint": "John is in front of a plane mirror. If the mirror moves away from him at a speed of 2 m s−1, at what speed does his image move away from him? 1 m s−1 2 m s−1 4 m s−1 8 m s−1"
   },
   {
     "id": "light-2024b-q08",
@@ -1934,19 +1943,19 @@ const MCQ_ITEMS = [
     "options": [
       {
         "key": "A",
-        "text": "0.03 ms⁻¹"
+        "text": "0.03 ms−1"
       },
       {
         "key": "B",
-        "text": "0.06 ms⁻¹"
+        "text": "0.06 ms−1"
       },
       {
         "key": "C",
-        "text": "60 ms⁻¹"
+        "text": "60 ms−1"
       },
       {
         "key": "D",
-        "text": "150 ms⁻¹"
+        "text": "150 ms−1"
       }
     ],
     "answer": "C",
@@ -2048,7 +2057,7 @@ const MCQ_ITEMS = [
     "id": "light-2024b-q15",
     "section": "refraction-snells-law",
     "difficulty": "Applied",
-    "stem": "A light ray enters a semicircular glass block as shown.\n\nWhich of the following equations is/are correct?\n\n(1) i = r₁\n\n(2) Refractive index of glass = sin r₂ / sin i\n\n(3) r₁ = r₂",
+    "stem": "A light ray enters a semicircular glass block as shown.\n\nWhich of the following equations is/are correct?\n\n(1) i = r1\n\n(2) Refractive index of glass = sin r2 / sin i\n\n(3) r1 = r2",
     "options": [
       {
         "key": "A",
@@ -2068,7 +2077,7 @@ const MCQ_ITEMS = [
       }
     ],
     "answer": "A",
-    "hint": "By the law of reflection at the flat surface, i = r₁. Snell's law gives n = sin r₂ / sin i (glass to air). r₁ and r₂ are not equal in general.",
+    "hint": "By the law of reflection at the flat surface, i = r1. Snell's law gives n = sin r2 / sin i (glass to air). r1 and r2 are not equal in general.",
     "image": {
       "src": "./assets/light-2024b-q15-fig.png",
       "alt": "Diagram for light-2024b-q15",
@@ -2083,19 +2092,19 @@ const MCQ_ITEMS = [
     "options": [
       {
         "key": "A",
-        "text": "path1"
+        "text": "Path"
       },
       {
         "key": "B",
-        "text": "path2"
+        "text": "Path"
       },
       {
         "key": "C",
-        "text": "path3"
+        "text": "Path"
       },
       {
         "key": "D",
-        "text": "path4"
+        "text": "Path"
       }
     ],
     "answer": "A",
@@ -2170,7 +2179,7 @@ const MCQ_ITEMS = [
     "id": "light-2024b-q19",
     "section": "refraction-snells-law",
     "difficulty": "Applied",
-    "stem": "A ray of light travels from medium X to medium Y as shown. The speed of light in air and medium X are 3 × 10⁸ m s⁻¹ and 2.5 × 10⁸ m s⁻¹ respectively. Find the refractive index of medium Y.",
+    "stem": "A ray of light travels from medium X to medium Y as shown. The speed of light in air and medium X are 3  108 m s−1 and 2.5  108 m s−1 respectively. Find the refractive index of medium Y.",
     "options": [
       {
         "key": "A",
@@ -2294,32 +2303,27 @@ const MCQ_ITEMS = [
     "id": "light-2024b-q25",
     "section": "total-internal-reflection",
     "difficulty": "Applied",
-    "stem": "Which of the following combinations of refractive indices gives the smallest critical angle for the interface between media X and Y?",
+    "stem": "Which of the following combinations of refractive indices gives the smallest critical angle for the interface between media X and Y? Refractive index of medium X Refractive index of medium Y",
     "options": [
       {
         "key": "A",
-        "text": "A"
+        "text": "1.6 1.1"
       },
       {
         "key": "B",
-        "text": "B"
+        "text": "1.7 1.1"
       },
       {
         "key": "C",
-        "text": "C"
+        "text": "2.0 1.5"
       },
       {
         "key": "D",
-        "text": "D"
+        "text": "2.1 1.5"
       }
     ],
     "answer": "C",
-    "hint": "Which of the following combinations of refractive indices gives the smallest critical angle for the interface between media X and Y? Refractive index of medium X Refractive index of medium Y 1.6 1.1 1.7 1.1 2.0 1.5 2.1 1.5 1.6 = 0.6875 𝐵: 1.1 1.7 = 0.647 𝐶: 1.5 2.0 = 0.75 𝐷: 1.5 2.1 = 0.714 24. A ray of light is incident from air to an equilateral triangular glass prism at an angle . Its consequent path is shown below. The refractive index of the glass is 1.6. What is ? 14.4° 21.3° 35.6° 42.0°",
-    "image": {
-      "src": "./assets/light-2024b-q25-fig.png",
-      "alt": "Diagram for light-2024b-q25",
-      "caption": "Fig - Question 25"
-    }
+    "hint": "Which of the following combinations of refractive indices gives the smallest critical angle for the interface between media X and Y? Refractive index of medium X Refractive index of medium Y 1.6 1.1 1.7 1.1 2.0 1.5 2.1 1.5 1.6 = 0.6875 𝐵: 1.1 1.7 = 0.647 𝐶: 1.5 2.0 = 0.75 𝐷: 1.5 2.1 = 0.714 24. A ray of light is incident from air to an equilateral triangular glass prism at an angle . Its consequent path is shown below. The refractive index of the glass is 1.6. What is ? 14.4° 21.3° 35.6° 42.0°"
   },
   {
     "id": "light-2024b-q26",
@@ -2387,7 +2391,7 @@ const MCQ_ITEMS = [
     "id": "light-2024b-q30",
     "section": "total-internal-reflection",
     "difficulty": "Applied",
-    "stem": "Which of the following statements is/are correct?\n\nGiven:\nrefractive index of pure water = 1.33\nrefractive index of peanut oil = 1.47\n\n(1) The apparent depth of a beaker filled with pure water is less than that of the same beaker filled with peanut oil.\n\n(2) In air, the critical angle of peanut oil is smaller than that of pure water.\n\n(3) Total internal reflection may occur when light enters pure water from peanut oil.",
+    "stem": "Which of the following statements is/are correct?\n\nGiven:\nrefractive index of pure water = 1.33 refractive index of peanut oil = 1.47\n\n(1) The apparent depth of a beaker filled with pure water is less than that of the same beaker filled with peanut oil.\n\n(2) In air, the critical angle of peanut oil is smaller than that of pure water.\n\n(3) Total internal reflection may occur when light enters pure water from peanut oil.",
     "options": [
       {
         "key": "A",

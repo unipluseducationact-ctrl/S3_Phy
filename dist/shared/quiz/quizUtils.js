@@ -131,8 +131,40 @@ export function formatPhysicsSymbols(s) {
   return t;
 }
 
+/** Join PDF column-wrap line breaks; keep (1)(2), (a), Given: blocks. */
+export function repairPdfLineBreaks(s) {
+  if (s == null || s === "") return s;
+  let t = String(s);
+  t = t.replace(/([A-Za-z0-9])([−–-])\n(?=[a-z])/g, "$1$2");
+
+  const lines = t.split("\n");
+  const out = [];
+  for (let i = 0; i < lines.length; i++) {
+    let line = lines[i];
+    while (i + 1 < lines.length) {
+      const cur = line.trimEnd();
+      const next = lines[i + 1].trim();
+      if (!next) break;
+      if (/^\(\d+\)/.test(next)) break;
+      if (/^\([a-d]\)/i.test(next)) break;
+      if (/^Given:/i.test(next)) break;
+      if (/^Substance\b/i.test(next)) break;
+      if (/[.?!:]$/.test(cur)) break;
+      if (/^[a-z(]/.test(next)) {
+        const joiner = /[−–-]$/.test(cur) ? "" : " ";
+        line = cur + joiner + next;
+        i++;
+        continue;
+      }
+      break;
+    }
+    out.push(line);
+  }
+  return out.join("\n");
+}
+
 export function formatQuizText(s) {
-  return formatPhysicsSymbols(formatPhysicsUnits(s));
+  return formatPhysicsSymbols(formatPhysicsUnits(repairPdfLineBreaks(s)));
 }
 
 export function questionFormat(q) {
