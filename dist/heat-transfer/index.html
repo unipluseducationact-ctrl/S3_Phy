@@ -1322,19 +1322,7 @@
             const op = Math.min(1, 0.35 + strength * 0.15);
             let svg = '';
             if (convScenario === 'room') {
-                const ac = getRoomACRect(w, h);
-                const ht = getRoomHeaterRect(w, h);
-                const sign = getRoomCirculationSign(w, h);
-                const acCx = ac.x + ac.w / 2;
-                const htCx = ht.x + ht.w / 2;
-                const acCurveX = acCx - sign * 30;
-                const htCurveX = htCx + sign * 30;
-                if (roomAC_Active) {
-                    svg += `<path d="M ${acCx} ${ac.y + ac.h} Q ${acCx} ${ac.y + ac.h + 45} ${acCurveX} ${ac.y + ac.h + 85}" fill="none" stroke="#38bdf8" stroke-width="2" opacity="${op}"/>`;
-                }
-                if (roomHeater_Active) {
-                    svg += `<path d="M ${htCx} ${ht.y} Q ${htCx} ${ht.y - 50} ${htCurveX} ${ht.y - 90}" fill="none" stroke="#ef4444" stroke-width="2" opacity="${op}"/>`;
-                }
+                // Live flow lines drawn on canvas each frame — no static SVG arcs
             } else if (convScenario === 'kettle') {
                 // Let the canvas handle the dynamic flowing streamline paths.
                 // We'll draw premium solid SVG arrows showing fluid rise (warm/orange) and sink (cool/blue).
@@ -2628,6 +2616,63 @@
             }
         }
 
+        /** Room scenario: animated circulation arcs tied to AC/heater positions */
+        function drawRoomLiveFlowLines(w, h) {
+            const ac = getRoomACRect(w, h);
+            const ht = getRoomHeaterRect(w, h);
+            const acCx = ac.x + ac.w / 2;
+            const htCx = ht.x + ht.w / 2;
+            const sign = getRoomCirculationSign(w, h);
+            const cx = (acCx + htCx) / 2;
+            const cy = h / 2;
+            const rx = Math.max(w * 0.28, Math.abs(acCx - htCx) / 2 + 80);
+            const ry = h * 0.30;
+            const pulse = 0.5 + 0.5 * Math.sin(Date.now() / 600);
+            const dashOffset = -(Date.now() / 45);
+
+            function traceEllipseArc(startAngle, sweepRad, color, alpha, active) {
+                if (!active) return;
+                const steps = 52;
+                convCtx.save();
+                convCtx.strokeStyle = color;
+                convCtx.globalAlpha = alpha + pulse * 0.12;
+                convCtx.lineWidth = 2;
+                convCtx.setLineDash([6, 8]);
+                convCtx.lineDashOffset = dashOffset;
+                convCtx.beginPath();
+                for (let i = 0; i <= steps; i++) {
+                    const angle = startAngle + (sweepRad * i) / steps;
+                    const px = cx + rx * Math.cos(angle);
+                    const py = cy + ry * Math.sin(angle);
+                    if (i === 0) convCtx.moveTo(px, py);
+                    else convCtx.lineTo(px, py);
+                }
+                convCtx.stroke();
+
+                const endAngle = startAngle + sweepRad;
+                const ex = cx + rx * Math.cos(endAngle);
+                const ey = cy + ry * Math.sin(endAngle);
+                const tangent = endAngle + (sweepRad > 0 ? Math.PI / 2 : -Math.PI / 2);
+                convCtx.setLineDash([]);
+                convCtx.globalAlpha = Math.min(1, alpha + 0.25);
+                convCtx.fillStyle = color;
+                convCtx.beginPath();
+                convCtx.moveTo(ex, ey);
+                convCtx.lineTo(ex - 6 * Math.cos(tangent - 0.45), ey - 6 * Math.sin(tangent - 0.45));
+                convCtx.lineTo(ex - 6 * Math.cos(tangent + 0.45), ey - 6 * Math.sin(tangent + 0.45));
+                convCtx.closePath();
+                convCtx.fill();
+                convCtx.restore();
+            }
+
+            const acAngle = Math.atan2(ac.y + ac.h + 25 - cy, acCx - cx);
+            const htAngle = Math.atan2(ht.y - 25 - cy, htCx - cx);
+            const halfLoop = Math.PI * 0.92 * sign;
+
+            traceEllipseArc(acAngle, halfLoop, 'rgb(56, 189, 248)', 0.42, roomAC_Active);
+            traceEllipseArc(htAngle, halfLoop, 'rgb(239, 68, 68)', 0.48, roomHeater_Active);
+        }
+
         /** 情境環流裝飾曲線 · Scenario-specific convection streamlines */
         function drawConvectionStreamlines(rect) {
             const w = rect.width;
@@ -2637,26 +2682,7 @@
             const pulse = 0.5 + 0.5 * Math.sin(Date.now() / 600);
 
             if (convScenario === 'room') {
-                const sign = getRoomCirculationSign(w, h);
-                convCtx.strokeStyle = `rgba(99, 102, 241, ${0.12 + pulse * 0.08})`;
-                convCtx.lineWidth = 1.5;
-                convCtx.beginPath();
-                convCtx.ellipse(cx, cy, w * 0.38, h * 0.32, 0, 0, Math.PI * 2);
-                convCtx.stroke();
-
-                // Direction arrow on circulation ellipse (follows AC/heater layout)
-                const arrowAngle = sign > 0 ? -Math.PI / 4 : Math.PI / 4;
-                const arrowR = w * 0.38;
-                const ax = cx + arrowR * Math.cos(arrowAngle);
-                const ay = cy + h * 0.32 * Math.sin(arrowAngle);
-                const tangent = arrowAngle + sign * Math.PI / 2;
-                convCtx.fillStyle = `rgba(99, 102, 241, ${0.35 + pulse * 0.15})`;
-                convCtx.beginPath();
-                convCtx.moveTo(ax, ay);
-                convCtx.lineTo(ax - 8 * Math.cos(tangent - 0.4), ay - 8 * Math.sin(tangent - 0.4));
-                convCtx.lineTo(ax - 8 * Math.cos(tangent + 0.4), ay - 8 * Math.sin(tangent + 0.4));
-                convCtx.closePath();
-                convCtx.fill();
+                drawRoomLiveFlowLines(w, h);
             } else if (convScenario === 'kettle') {
                 let khx = kettleHeaterX || (w / 2);
                 const kMinX = 45;
@@ -3371,7 +3397,7 @@
                 physicsState.convection.currentStrength = convParticles.reduce((s, p) => s + Math.abs(p.vx) + Math.abs(p.vy), 0) / convParticles.length;
 
                 convFrameCount++;
-                if (convFrameCount % 30 === 0) {
+                if (convFrameCount % 30 === 0 && convScenario !== 'room') {
                     updateConvectionAnnotations(physicsState.convection.currentStrength);
                 }
             }
@@ -3557,6 +3583,7 @@
                         radChart.data.labels.shift();
                         radChart.data.datasets.forEach(d => d.data.shift());
                     }
+                    updateRadiationChartYScale();
                     radChart.update('none');
                 }
             }, 1000);
@@ -3823,7 +3850,7 @@
                         y: {
                             title: { display: true, text: t('charts.radTemp'), color: '#64748b', font: { size: 9, weight: 'bold' } },
                             min: 15,
-                            max: 130,
+                            max: 50,
                             grid: { color: 'rgba(255, 255, 255, 0.02)' },
                             ticks: { color: '#475569', font: { size: 9 } }
                         }
@@ -3833,6 +3860,24 @@
                     }
                 }
             });
+            updateRadiationChartYScale();
+        }
+
+        function updateRadiationChartYScale() {
+            if (!radChart) return;
+            let peak = 20;
+            if (radHeaterOn) peak = Math.max(peak, radHeaterTemp * 0.9);
+            radChart.data.datasets.forEach(ds => {
+                ds.data.forEach(v => {
+                    const n = parseFloat(v);
+                    if (!isNaN(n)) peak = Math.max(peak, n);
+                });
+            });
+            peak = Math.max(peak, tempBlack, tempShiny);
+            const yMax = Math.ceil(Math.max(peak * 1.08, 40) / 10) * 10;
+            if (radChart.options.scales.y.max !== yMax) {
+                radChart.options.scales.y.max = yMax;
+            }
         }
 
         function resetRadiationSim() {
@@ -3861,6 +3906,7 @@
             if (radChart) {
                 radChart.data.labels = [];
                 radChart.data.datasets.forEach(d => d.data = []);
+                updateRadiationChartYScale();
                 radChart.update();
             }
             radChartTime = 0;
