@@ -257,9 +257,34 @@
             min-height: 0;
             align-self: stretch;
         }
+        @media (min-width: 1024px) {
+            #sec-convection.main-grid {
+                align-items: stretch;
+            }
+            #sec-convection .tab-sim-col,
+            #sec-convection .tab-sidebar-col {
+                display: flex;
+                flex-direction: column;
+                min-height: 0;
+                height: 100%;
+            }
+            #sec-convection .sim-panel-fill {
+                flex: 1 1 auto;
+                min-height: 0;
+                height: 100%;
+            }
+            #sec-convection .canvas-container {
+                flex: 1 1 auto;
+                min-height: 0;
+            }
+            #sec-convection .conv-scenarios-panel {
+                flex: 0 1 auto;
+                overflow: visible;
+            }
+        }
         body.embed-mode #sec-convection .canvas-container {
             flex: 1 1 auto;
-            min-height: clamp(12rem, 32vh, 100%);
+            min-height: 0;
             max-height: none !important;
             height: auto !important;
         }
@@ -269,14 +294,14 @@
         body.embed-mode #sec-convection .tab-sidebar-col {
             min-height: 0;
             max-height: 100%;
-            overflow-y: auto;
+            overflow: visible;
             display: flex;
             flex-direction: column;
         }
         body.embed-mode #sec-convection .conv-scenarios-panel {
-            flex: 1 1 auto;
+            flex: 0 1 auto;
             min-height: 0;
-            overflow-y: auto;
+            overflow: visible;
         }
         body.embed-mode #sec-convection .conv-scenarios-card {
             padding: 1rem;
@@ -536,11 +561,6 @@
                     <!-- Dynamic Scenario Control Dock -->
                     <div id="convection-controls" class="pt-4 border-t border-slate-800 space-y-3 flex-shrink-0">
                         <!-- Content gets populated dynamically by switchConvectionScenario() -->
-                    </div>
-
-                    <!-- Physics Scenario Explainer -->
-                    <div class="glass-panel-light rounded-xl p-3 border border-slate-800 text-[11px] text-slate-400 leading-relaxed flex-shrink-0" id="convection-explanation" data-i18n="common.loading">
-                        Loading explainer...
                     </div>
                 </div>
             </div>
@@ -1150,7 +1170,7 @@
 
             const skipI18nIds = new Set([
                 'cond-bar-hot', 'cond-play-text', 'conv-play-text', 'rad-heat-lbl',
-                'cond-amp-stat', 'cond-elec-stat', 'convection-explanation',
+                'cond-amp-stat', 'cond-elec-stat',
                 'flask-detail-title', 'flask-detail-desc',
                 'status-pin-a', 'status-pin-b', 'status-pin-c',
                 'rate-black', 'rate-shiny', 'kettle-pos-val',
@@ -1191,7 +1211,6 @@
             if (typeof condMaterial !== 'undefined') changeConductionMaterial();
             if (typeof convScenario !== 'undefined') {
                 updateConvectionControls();
-                if (convScenario === 'breeze') updateBreezeExplanation();
             }
             updateRadiationHeaterLabel();
             updateWaxPinStatuses();
@@ -2483,7 +2502,6 @@
                         </div>
                     </div>
                 `;
-                document.getElementById('convection-explanation').innerText = t('convection.roomExplainer');
             } else if (convScenario === 'kettle') {
                 container.innerHTML = `
                     <div class="space-y-2">
@@ -2502,7 +2520,6 @@
                         </div>
                     </div>
                 `;
-                document.getElementById('convection-explanation').innerText = t('convection.kettleExplainer');
             } else if (convScenario === 'breeze') {
                 container.innerHTML = `
                     <div class="space-y-2">
@@ -2518,7 +2535,6 @@
                     </div>
                 `;
                 lucide.createIcons();
-                updateBreezeExplanation();
             }
         }
 
@@ -2603,17 +2619,7 @@
                 btnDay.className = "px-3 py-2 bg-slate-900/60 text-slate-400 border border-slate-800 rounded-xl text-xs font-bold transition-all flex items-center justify-center gap-1.5";
                 btnNight.className = "px-3 py-2 bg-indigo-500/20 text-indigo-400 border border-indigo-500/30 rounded-xl text-xs font-bold transition-all flex items-center justify-center gap-1.5";
             }
-            updateBreezeExplanation();
             updateConvectionAnnotations();
-        }
-
-        function updateBreezeExplanation() {
-            const exp = document.getElementById('convection-explanation');
-            if (breezeTime === 'day') {
-                exp.innerText = t('convection.breezeDayExplainer');
-            } else {
-                exp.innerText = t('convection.breezeNightExplainer');
-            }
         }
 
         /** Room scenario: animated circulation arcs tied to AC/heater positions */

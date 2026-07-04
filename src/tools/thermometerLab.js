@@ -6,6 +6,7 @@ const THERM_FLOAT_BREAKPOINT = 1024;
 const CSS = `
 .tl-wrap {
   --tl-bg: #09090b;
+  --tl-viz-top-reserve: 44px;
   --tl-panel: #151518;
   --tl-border: #27272a;
   --tl-green: #00e676;
@@ -293,9 +294,10 @@ const CSS = `
     grid-column: 1;
     grid-row: 1;
     min-height: 0;
+    padding-top: var(--tl-viz-top-reserve);
     display: flex;
     justify-content: center;
-    align-items: center;
+    align-items: flex-end;
   }
   .tl-wrap .tl-viz-graph {
     grid-column: 2;
@@ -1359,6 +1361,7 @@ export function createThermometerLab(t, options = {}) {
   const LABEL_MARGIN = 8;
   const LABEL_LEFT = 10;
   const PHYS_SCENE_OFFSET_X = 40;
+  const PHYS_SCENE_OFFSET_Y = 44;
   const SCENE_WIDTH = PHYS_WIDTH - PHYS_SCENE_OFFSET_X;
   const BEAKER_W = 130;
   const GRAPH_WIDTH = 640;
@@ -2446,7 +2449,7 @@ export function createThermometerLab(t, options = {}) {
     graphCtx.clearRect(0, 0, GRAPH_WIDTH, GRAPH_HEIGHT);
 
     physCtx.save();
-    physCtx.translate(PHYS_SCENE_OFFSET_X, 0);
+    physCtx.translate(PHYS_SCENE_OFFSET_X, PHYS_SCENE_OFFSET_Y);
     const physLayout = getPhysLayout();
     drawBeaker(physCtx, physLayout);
     if (state.thermometerType === 'liquid') {
