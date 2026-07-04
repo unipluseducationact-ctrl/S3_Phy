@@ -519,6 +519,49 @@
       lucide.createIcons();
     }
 
+    function getLabSceneLayout(w, h, opts = {}) {
+      const overhead = opts.overhead ?? 0;
+      const centerX = w / 2;
+      const beakerH = Math.min(h * 0.55, w * 0.50 * (180 / 160));
+      const beakerW = beakerH * (160 / 180);
+      const scale = beakerH / 180;
+      const plateH = 15 * scale;
+      const gap = 20 * scale;
+      const sceneH = overhead + gap + beakerH + plateH;
+      const sceneTop = Math.max(16, (h - sceneH) / 2);
+      const beakerY = sceneTop + overhead + gap + beakerH;
+      return {
+        centerX,
+        beakerX: centerX - beakerW / 2,
+        beakerY,
+        beakerW,
+        beakerH,
+        scale,
+        plateH,
+        sceneTop,
+        gap,
+      };
+    }
+
+    function initMixIceCubes() {
+      const w = mixCanvas.width / window.devicePixelRatio;
+      const h = mixCanvas.height / window.devicePixelRatio;
+      const baseScale = Math.min(h / 320, w / 480, 1.3);
+      const layout = getLabSceneLayout(w, h, { overhead: 140 * baseScale });
+      const { beakerW, scale } = layout;
+      const halfW = (beakerW / 2) * 0.9;
+      mixState.iceCubes = [];
+      const cubeCount = Math.max(3, Math.min(10, Math.ceil(mixState.massB * 15)));
+      for (let i = 0; i < cubeCount; i++) {
+        mixState.iceCubes.push({
+          rx: -halfW + Math.random() * (halfW * 2),
+          ry: -15 * scale - Math.random() * 30 * scale,
+          size: (15 + Math.random() * 10) * scale,
+          angle: Math.random() * Math.PI * 2,
+        });
+      }
+    }
+
     function resizeCanvas(canvas) {
       const rect = canvas.parentNode.getBoundingClientRect();
       canvas.width = rect.width * window.devicePixelRatio;
@@ -611,17 +654,10 @@
       mixState.complete = false;
       
       // Initialize ice cubes if substance B is ice (using relative coordinates)
-      mixState.iceCubes = [];
       if (mixState.subB === "ice") {
-        const cubeCount = Math.max(3, Math.min(10, Math.ceil(mixState.massB * 15)));
-        for (let i = 0; i < cubeCount; i++) {
-          mixState.iceCubes.push({
-            rx: -55 + Math.random() * 110, // relative to centerX (beaker width is 160)
-            ry: -15 - Math.random() * 30,  // relative to beakerY (beaker bottom)
-            size: 15 + Math.random() * 10,
-            angle: Math.random() * Math.PI * 2
-          });
-        }
+        initMixIceCubes();
+      } else {
+        mixState.iceCubes = [];
       }
 
       const nameA = currentLang === 'en' ? SUBSTANCES[mixState.subA].nameEn : SUBSTANCES[mixState.subA].nameZh;
@@ -811,42 +847,43 @@
       const h = mixCanvas.height / window.devicePixelRatio;
       mixCtx.clearRect(0, 0, w, h);
 
-      const centerX = w / 2;
-      const beakerW = 160;
-      const beakerH = 180;
-      const beakerY = h - 40;
-      const beakerX = centerX - beakerW / 2;
+      const baseScale = Math.min(h / 320, w / 480, 1.3);
+      const scaleOnly = Math.min(h * 0.55, w * 0.50 * (180 / 160)) / 180;
+      const layout = getLabSceneLayout(w, h, {
+        overhead: mixState.scenario === "sideBySide" ? 0 : 140 * baseScale,
+      });
+      const { centerX, beakerW, beakerH, beakerY, beakerX, scale, sceneTop } = layout;
 
-      const fillHeightB = 180 * 0.4;
+      const fillHeightB = beakerH * 0.4;
       const liquidY_B = beakerY - fillHeightB;
 
       if (mixState.scenario === "sideBySide") {
         // Drawing Side-by-Side Thermal Contact
-        const blockW = 80;
-        const blockH = 140;
+        const blockW = 80 * scaleOnly;
+        const blockH = 140 * scaleOnly;
         
-        const blockX_A = centerX - blockW - 2;
-        const blockX_B = centerX + 2;
-        const blockY = beakerY - blockH;
+        const blockX_A = centerX - blockW - 2 * scaleOnly;
+        const blockX_B = centerX + 2 * scaleOnly;
+        const blockY = Math.max(16, (h - blockH) / 2);
 
         // Visual Heat glow for Substance A (Hot)
         const glowOpacityA = Math.min(0.6, (mixState.tempCurA - 20) / 100);
-        const glowGradA = mixCtx.createRadialGradient(blockX_A + blockW / 2, blockY + blockH / 2, 20, blockX_A + blockW / 2, blockY + blockH / 2, 80);
+        const glowGradA = mixCtx.createRadialGradient(blockX_A + blockW / 2, blockY + blockH / 2, 20 * scaleOnly, blockX_A + blockW / 2, blockY + blockH / 2, 80 * scaleOnly);
         glowGradA.addColorStop(0, `rgba(239, 68, 68, ${glowOpacityA})`);
         glowGradA.addColorStop(1, "rgba(239, 68, 68, 0)");
         mixCtx.fillStyle = glowGradA;
         mixCtx.beginPath();
-        mixCtx.arc(blockX_A + blockW / 2, blockY + blockH / 2, 80, 0, Math.PI * 2);
+        mixCtx.arc(blockX_A + blockW / 2, blockY + blockH / 2, 80 * scaleOnly, 0, Math.PI * 2);
         mixCtx.fill();
 
         // Visual Cold glow for Substance B (Cold)
         const glowOpacityB = Math.max(0.05, Math.min(0.4, (25 - mixState.tempCurB) / 50));
-        const glowGradB = mixCtx.createRadialGradient(blockX_B + blockW / 2, blockY + blockH / 2, 20, blockX_B + blockW / 2, blockY + blockH / 2, 80);
+        const glowGradB = mixCtx.createRadialGradient(blockX_B + blockW / 2, blockY + blockH / 2, 20 * scaleOnly, blockX_B + blockW / 2, blockY + blockH / 2, 80 * scaleOnly);
         glowGradB.addColorStop(0, `rgba(14, 165, 233, ${glowOpacityB})`);
         glowGradB.addColorStop(1, "rgba(14, 165, 233, 0)");
         mixCtx.fillStyle = glowGradB;
         mixCtx.beginPath();
-        mixCtx.arc(blockX_B + blockW / 2, blockY + blockH / 2, 80, 0, Math.PI * 2);
+        mixCtx.arc(blockX_B + blockW / 2, blockY + blockH / 2, 80 * scaleOnly, 0, Math.PI * 2);
         mixCtx.fill();
 
         // Render Block A
@@ -860,20 +897,20 @@
         };
         mixCtx.fillStyle = colorsA[mixState.subA];
         mixCtx.beginPath();
-        mixCtx.roundRect(blockX_A, blockY, blockW, blockH, 8);
+        mixCtx.roundRect(blockX_A, blockY, blockW, blockH, 8 * scaleOnly);
         mixCtx.fill();
         mixCtx.strokeStyle = "rgba(255,255,255,0.2)";
-        mixCtx.lineWidth = 2;
+        mixCtx.lineWidth = 2 * scaleOnly;
         mixCtx.stroke();
 
         // Block A Info Label
         mixCtx.fillStyle = mixState.subA === "glass" || mixState.subA === "milk" ? "#1e293b" : "#ffffff";
-        mixCtx.font = "bold 13px sans-serif";
+        mixCtx.font = `bold ${13 * scaleOnly}px sans-serif`;
         mixCtx.textAlign = "center";
-        mixCtx.fillText("A: " + getSubName(mixState.subA), blockX_A + blockW / 2, blockY + 30);
-        mixCtx.fillText(mixState.tempCurA.toFixed(1) + " °C", blockX_A + blockW / 2, blockY + 50);
-        mixCtx.font = "bold 10px sans-serif";
-        mixCtx.fillText(`${mixState.massA.toFixed(2)} kg`, blockX_A + blockW / 2, blockY + 70);
+        mixCtx.fillText("A: " + getSubName(mixState.subA), blockX_A + blockW / 2, blockY + 30 * scaleOnly);
+        mixCtx.fillText(mixState.tempCurA.toFixed(1) + " °C", blockX_A + blockW / 2, blockY + 50 * scaleOnly);
+        mixCtx.font = `bold ${10 * scaleOnly}px sans-serif`;
+        mixCtx.fillText(`${mixState.massA.toFixed(2)} kg`, blockX_A + blockW / 2, blockY + 70 * scaleOnly);
 
         // Render Block B (Cold block/container)
         const colorsB = {
@@ -887,28 +924,28 @@
         };
         mixCtx.fillStyle = colorsB[mixState.subB];
         mixCtx.beginPath();
-        mixCtx.roundRect(blockX_B, blockY, blockW, blockH, 8);
+        mixCtx.roundRect(blockX_B, blockY, blockW, blockH, 8 * scaleOnly);
         mixCtx.fill();
         mixCtx.stroke();
 
         // Block B Info Label
         mixCtx.fillStyle = mixState.subB === "glass" || mixState.subB === "milk" ? "#1e293b" : "#ffffff";
-        mixCtx.font = "bold 13px sans-serif";
+        mixCtx.font = `bold ${13 * scaleOnly}px sans-serif`;
         mixCtx.textAlign = "center";
-        mixCtx.fillText("B: " + getSubName(mixState.subB), blockX_B + blockW / 2, blockY + 30);
-        mixCtx.fillText(mixState.tempCurB.toFixed(1) + " °C", blockX_B + blockW / 2, blockY + 50);
-        mixCtx.font = "bold 10px sans-serif";
-        mixCtx.fillText(`${mixState.massB.toFixed(2)} kg`, blockX_B + blockW / 2, blockY + 70);
+        mixCtx.fillText("B: " + getSubName(mixState.subB), blockX_B + blockW / 2, blockY + 30 * scaleOnly);
+        mixCtx.fillText(mixState.tempCurB.toFixed(1) + " °C", blockX_B + blockW / 2, blockY + 50 * scaleOnly);
+        mixCtx.font = `bold ${10 * scaleOnly}px sans-serif`;
+        mixCtx.fillText(`${mixState.massB.toFixed(2)} kg`, blockX_B + blockW / 2, blockY + 70 * scaleOnly);
 
         // Contact interface visual heat conduction waves
         if (mixState.running) {
           mixCtx.strokeStyle = "rgba(239, 68, 68, 0.5)";
-          mixCtx.lineWidth = 3;
-          const conductionOffset = (Date.now() / 60) % 20;
-          for (let y = blockY + 20; y < blockY + blockH - 10; y += 25) {
+          mixCtx.lineWidth = 3 * scaleOnly;
+          const conductionOffset = (Date.now() / 60) % (20 * scaleOnly);
+          for (let y = blockY + 20 * scaleOnly; y < blockY + blockH - 10 * scaleOnly; y += 25 * scaleOnly) {
             mixCtx.beginPath();
-            mixCtx.moveTo(centerX - 15 + conductionOffset, y);
-            mixCtx.lineTo(centerX + 15 - conductionOffset, y);
+            mixCtx.moveTo(centerX - 15 * scaleOnly + conductionOffset, y);
+            mixCtx.lineTo(centerX + 15 * scaleOnly - conductionOffset, y);
             mixCtx.stroke();
           }
         }
@@ -917,9 +954,9 @@
 
         // Glass Beaker Bottom Base & Outer wall
         mixCtx.strokeStyle = "rgba(226, 232, 240, 0.8)";
-        mixCtx.lineWidth = 3;
+        mixCtx.lineWidth = 3 * scale;
         mixCtx.beginPath();
-        mixCtx.ellipse(centerX, beakerY - beakerH, beakerW / 2, 15, 0, Math.PI, 2 * Math.PI);
+        mixCtx.ellipse(centerX, beakerY - beakerH, beakerW / 2, 15 * scale, 0, Math.PI, 2 * Math.PI);
         mixCtx.stroke();
 
         // Render Substance B (Cold Liquid or Ice)
@@ -927,12 +964,12 @@
         
         // Cold glow representation
         const glowOpacityB = Math.max(0.05, Math.min(0.4, (25 - mixState.tempCurB) / 50));
-        const glowGradB = mixCtx.createRadialGradient(centerX, liquidY_B + fillHeightB / 2, 30, centerX, liquidY_B + fillHeightB / 2, 90);
+        const glowGradB = mixCtx.createRadialGradient(centerX, liquidY_B + fillHeightB / 2, 30 * scale, centerX, liquidY_B + fillHeightB / 2, 90 * scale);
         glowGradB.addColorStop(0, `rgba(14, 165, 233, ${glowOpacityB})`);
         glowGradB.addColorStop(1, "rgba(14, 165, 233, 0)");
         mixCtx.fillStyle = glowGradB;
         mixCtx.beginPath();
-        mixCtx.arc(centerX, liquidY_B + fillHeightB / 2, 90, 0, Math.PI * 2);
+        mixCtx.arc(centerX, liquidY_B + fillHeightB / 2, 90 * scale, 0, Math.PI * 2);
         mixCtx.fill();
 
         if (isB_Liquid) {
@@ -972,7 +1009,7 @@
               mixCtx.translate(absX, absY);
               mixCtx.rotate(cube.angle);
               mixCtx.beginPath();
-              mixCtx.roundRect(-size/2, -size/2, size, size, 2);
+              mixCtx.roundRect(-size/2, -size/2, size, size, 2 * scale);
               mixCtx.fill();
               mixCtx.stroke();
               mixCtx.restore();
@@ -980,10 +1017,10 @@
           });
         } else {
           // Cold metal blocks inside the beaker
-          const blockW = 70;
-          const blockH = 60;
+          const blockW = 70 * scale;
+          const blockH = 60 * scale;
           const blockX = centerX - blockW / 2;
-          const blockY = beakerY - blockH - 5;
+          const blockY = beakerY - blockH - 5 * scale;
           const metalColors = {
             copper: "#b45309",
             aluminum: "#64748b",
@@ -991,33 +1028,33 @@
           };
           mixCtx.fillStyle = metalColors[mixState.subB];
           mixCtx.beginPath();
-          mixCtx.roundRect(blockX, blockY, blockW, blockH, 4);
+          mixCtx.roundRect(blockX, blockY, blockW, blockH, 4 * scale);
           mixCtx.fill();
           mixCtx.strokeStyle = "rgba(255,255,255,0.2)";
-          mixCtx.lineWidth = 2;
+          mixCtx.lineWidth = 2 * scale;
           mixCtx.stroke();
         }
 
         // Render Substance A (Hot Substance)
         // If not contacted, it is hanging above, about to be poured/lowered
-        const fillHeightA = 180 * 0.3;
-        const blockW = 65;
-        const blockH = 55;
+        const fillHeightA = beakerH * 0.3;
+        const blockW = 65 * scale;
+        const blockH = 55 * scale;
         const blockX = centerX - blockW / 2;
         
         let blockY_A;
         if (!mixState.contacted) {
           // Elevated/hovering state
-          blockY_A = beakerY - beakerH - 45 + Math.sin(Date.now() * 0.005) * 5;
+          blockY_A = beakerY - beakerH - 45 * scale + Math.sin(Date.now() * 0.005) * 5 * scale;
           
           const isA_Liquid = mixState.subA !== "copper" && mixState.subA !== "aluminum" && mixState.subA !== "glass";
           
           if (isA_Liquid) {
             // Draw floating small pouring beaker
             mixCtx.strokeStyle = "rgba(226, 232, 240, 0.7)";
-            mixCtx.lineWidth = 2.5;
+            mixCtx.lineWidth = 2.5 * scale;
             mixCtx.beginPath();
-            mixCtx.roundRect(centerX - 35, blockY_A, 70, 50, 4);
+            mixCtx.roundRect(centerX - 35 * scale, blockY_A, 70 * scale, 50 * scale, 4 * scale);
             mixCtx.stroke();
 
             // Small beaker liquid contents
@@ -1028,14 +1065,14 @@
             };
             mixCtx.fillStyle = colorsA[mixState.subA];
             mixCtx.beginPath();
-            mixCtx.roundRect(centerX - 33, blockY_A + 15, 66, 33, 2);
+            mixCtx.roundRect(centerX - 33 * scale, blockY_A + 15 * scale, 66 * scale, 33 * scale, 2 * scale);
             mixCtx.fill();
             
             // Pouring beaker label
             mixCtx.fillStyle = mixState.subA === "milk" ? "#1e293b" : "#ffffff";
-            mixCtx.font = "bold 9px sans-serif";
+            mixCtx.font = `bold ${9 * scale}px sans-serif`;
             mixCtx.textAlign = "center";
-            mixCtx.fillText(getSubName(mixState.subA) + " (A)", centerX, blockY_A + 33);
+            mixCtx.fillText(getSubName(mixState.subA) + " (A)", centerX, blockY_A + 33 * scale);
           } else {
             // Hanging solid block A
             const metalColors = {
@@ -1045,30 +1082,30 @@
             };
             mixCtx.fillStyle = metalColors[mixState.subA];
             mixCtx.beginPath();
-            mixCtx.roundRect(blockX, blockY_A, blockW, blockH, 4);
+            mixCtx.roundRect(blockX, blockY_A, blockW, blockH, 4 * scale);
             mixCtx.fill();
             mixCtx.strokeStyle = "rgba(255,255,255,0.2)";
             mixCtx.stroke();
 
             // Hanging string/thread
             mixCtx.strokeStyle = "#94a3b8";
-            mixCtx.lineWidth = 1.5;
+            mixCtx.lineWidth = 1.5 * scale;
             mixCtx.beginPath();
-            mixCtx.moveTo(centerX, 0);
+            mixCtx.moveTo(centerX, sceneTop);
             mixCtx.lineTo(centerX, blockY_A);
             mixCtx.stroke();
             
             mixCtx.fillStyle = mixState.subA === "glass" ? "#1e293b" : "#ffffff";
-            mixCtx.font = "bold 9px sans-serif";
+            mixCtx.font = `bold ${9 * scale}px sans-serif`;
             mixCtx.textAlign = "center";
-            mixCtx.fillText(getSubName(mixState.subA) + " (A)", centerX, blockY_A + blockH/2 + 3);
+            mixCtx.fillText(getSubName(mixState.subA) + " (A)", centerX, blockY_A + blockH/2 + 3 * scale);
           }
 
           // Label: Waiting for Contact
           mixCtx.fillStyle = "#94a3b8";
-          mixCtx.font = "bold 11px sans-serif";
+          mixCtx.font = `bold ${11 * scale}px sans-serif`;
           mixCtx.textAlign = "center";
-          mixCtx.fillText(`${currentLang === 'en' ? 'Contact Pending' : '等待接觸'}`, centerX, beakerY - blockH - 25);
+          mixCtx.fillText(`${currentLang === 'en' ? 'Contact Pending' : '等待接觸'}`, centerX, beakerY - blockH - 25 * scale);
         } else {
           // Contact/Poured State
           const isA_Liquid = mixState.subA !== "copper" && mixState.subA !== "aluminum" && mixState.subA !== "glass";
@@ -1081,7 +1118,7 @@
               coffee: "rgba(120, 53, 4, 0.85)"
             };
             const mixedColor = colorsMixed[mixState.subA];
-            const mixY = beakerY - fillHeightB - (180 * 0.25);
+            const mixY = beakerY - fillHeightB - beakerH * 0.25;
 
             mixCtx.fillStyle = mixedColor;
             mixCtx.beginPath();
@@ -1100,7 +1137,7 @@
             mixCtx.fill();
           } else {
             // Lowered solid metal block A fully inside Substance B
-            blockY_A = beakerY - blockH - 8;
+            blockY_A = beakerY - blockH - 8 * scale;
             
             const metalColors = {
               copper: "#b45309",
@@ -1109,74 +1146,76 @@
             };
             mixCtx.fillStyle = metalColors[mixState.subA];
             mixCtx.beginPath();
-            mixCtx.roundRect(blockX, blockY_A, blockW, blockH, 4);
+            mixCtx.roundRect(blockX, blockY_A, blockW, blockH, 4 * scale);
             mixCtx.fill();
             mixCtx.strokeStyle = "rgba(255,255,255,0.25)";
             mixCtx.stroke();
 
             mixCtx.strokeStyle = "#94a3b8";
-            mixCtx.lineWidth = 1.5;
+            mixCtx.lineWidth = 1.5 * scale;
             mixCtx.beginPath();
-            mixCtx.moveTo(centerX, 0);
+            mixCtx.moveTo(centerX, sceneTop);
             mixCtx.lineTo(centerX, blockY_A);
             mixCtx.stroke();
 
             mixCtx.fillStyle = mixState.subA === "glass" ? "#1e293b" : "#ffffff";
-            mixCtx.font = "bold 9px sans-serif";
+            mixCtx.font = `bold ${9 * scale}px sans-serif`;
             mixCtx.textAlign = "center";
-            mixCtx.fillText("A", centerX, blockY_A + blockH/2 + 3);
+            mixCtx.fillText("A", centerX, blockY_A + blockH/2 + 3 * scale);
           }
 
           // Visual temperature transfer waves inside the container
           if (mixState.running) {
             mixCtx.strokeStyle = "rgba(239, 68, 68, 0.35)";
-            mixCtx.lineWidth = 2.5;
-            const waveOffset = (Date.now() / 60) % 25;
-            for (let r = 20; r <= 80; r += 20) {
+            mixCtx.lineWidth = 2.5 * scale;
+            const waveOffset = (Date.now() / 60) % (25 * scale);
+            for (let r = 20 * scale; r <= 80 * scale; r += 20 * scale) {
               mixCtx.beginPath();
-              mixCtx.arc(centerX, beakerY - 40, (r + waveOffset) % 80, 0, Math.PI * 2);
+              mixCtx.arc(centerX, beakerY - 40 * scale, (r + waveOffset) % (80 * scale), 0, Math.PI * 2);
               mixCtx.stroke();
             }
           }
 
           // Label: Equilibrium or contact temperature
           mixCtx.fillStyle = "#10b981";
-          mixCtx.font = "bold 11px sans-serif";
+          mixCtx.font = `bold ${11 * scale}px sans-serif`;
           mixCtx.textAlign = "center";
-          mixCtx.fillText(`${currentLang === 'en' ? 'Contact Temp' : '接觸面溫度'}`, centerX, beakerY - blockH - 25);
+          mixCtx.fillText(`${currentLang === 'en' ? 'Contact Temp' : '接觸面溫度'}`, centerX, beakerY - blockH - 25 * scale);
         }
 
         // Draw Standard Beaker glass outer walls
         mixCtx.strokeStyle = "rgba(226, 232, 240, 0.9)";
-        mixCtx.lineWidth = 4;
+        mixCtx.lineWidth = 4 * scale;
         mixCtx.beginPath();
-        mixCtx.ellipse(centerX, beakerY, beakerW / 2, 10, 0, 0, Math.PI);
+        mixCtx.ellipse(centerX, beakerY, beakerW / 2, 10 * scale, 0, 0, Math.PI);
         mixCtx.lineTo(beakerX, beakerY - beakerH);
         mixCtx.moveTo(beakerX + beakerW, beakerY);
         mixCtx.lineTo(beakerX + beakerW, beakerY - beakerH);
         mixCtx.stroke();
 
         mixCtx.beginPath();
-        mixCtx.ellipse(centerX, beakerY - beakerH, beakerW / 2, 15, 0, 0, Math.PI * 2);
+        mixCtx.ellipse(centerX, beakerY - beakerH, beakerW / 2, 15 * scale, 0, 0, Math.PI * 2);
         mixCtx.stroke();
       }
 
       // Glass Beaker Temperature Labels
+      if (mixState.scenario !== "sideBySide") {
       mixCtx.fillStyle = "rgba(255, 255, 255, 0.85)";
-      mixCtx.font = "bold 11px sans-serif";
+      mixCtx.font = `bold ${11 * scale}px sans-serif`;
       mixCtx.textAlign = "center";
       
       if (!mixState.contacted) {
-        mixCtx.fillText(`${currentLang === 'en' ? 'Beaker Temp' : '燒杯溫度'}`, centerX, beakerY - 30);
-        mixCtx.fillText(`${mixState.tempCurB.toFixed(1)} °C`, centerX, beakerY - 15);
+        mixCtx.fillText(`${currentLang === 'en' ? 'Beaker Temp' : '燒杯溫度'}`, centerX, beakerY - 30 * scale);
+        mixCtx.fillText(`${mixState.tempCurB.toFixed(1)} °C`, centerX, beakerY - 15 * scale);
       } else {
         if (mixState.subB === "ice" && mixState.iceMeltingPhase === "melting") {
-          mixCtx.fillText(`${currentLang === 'en' ? 'Equilibrium' : '平衡溫度'}`, centerX, beakerY - 30);
-          mixCtx.fillText(`${currentLang === 'en' ? 'Melting Ice (0.0 °C)' : '冰水混合 (0.0 °C)'}`, centerX, beakerY - 15);
+          mixCtx.fillText(`${currentLang === 'en' ? 'Equilibrium' : '平衡溫度'}`, centerX, beakerY - 30 * scale);
+          mixCtx.fillText(`${currentLang === 'en' ? 'Melting Ice (0.0 °C)' : '冰水混合 (0.0 °C)'}`, centerX, beakerY - 15 * scale);
         } else {
-          mixCtx.fillText(`${currentLang === 'en' ? 'Equilibrium' : '平衡溫度'}`, centerX, beakerY - 30);
-          mixCtx.fillText(`${mixState.tempCurB.toFixed(1)} °C`, centerX, beakerY - 15);
+          mixCtx.fillText(`${currentLang === 'en' ? 'Equilibrium' : '平衡溫度'}`, centerX, beakerY - 30 * scale);
+          mixCtx.fillText(`${mixState.tempCurB.toFixed(1)} °C`, centerX, beakerY - 15 * scale);
         }
+      }
       }
     }
 

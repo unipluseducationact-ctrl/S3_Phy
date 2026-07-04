@@ -551,6 +551,43 @@
       lucide.createIcons();
     }
 
+    function getLabSceneLayout(w, h, opts = {}) {
+      const overhead = opts.overhead ?? 0;
+      const centerX = w / 2;
+      const beakerH = Math.min(h * 0.55, w * 0.50 * (180 / 160));
+      const beakerW = beakerH * (160 / 180);
+      const scale = beakerH / 180;
+      const plateH = 15 * scale;
+      const gap = 20 * scale;
+      const sceneH = overhead + gap + beakerH + plateH;
+      const sceneTop = Math.max(16, (h - sceneH) / 2);
+      const beakerY = sceneTop + overhead + gap + beakerH;
+      return {
+        centerX,
+        beakerX: centerX - beakerW / 2,
+        beakerY,
+        beakerW,
+        beakerH,
+        scale,
+        plateH,
+        sceneTop,
+        gap,
+        plateY: beakerY + 8 * scale,
+      };
+    }
+
+    function getHeatingLabLayout(w, h) {
+      const preScale = Math.min(h * 0.55, w * 0.50 * (180 / 160)) / 180;
+      return getLabSceneLayout(w, h, { overhead: 90 * preScale });
+    }
+
+    function getHeatingLabScale() {
+      const w = heatCanvas.width / window.devicePixelRatio;
+      const h = heatCanvas.height / window.devicePixelRatio;
+      if (w <= 0 || h <= 0) return 1;
+      return Math.min(h * 0.55, w * 0.50 * (180 / 160)) / 180;
+    }
+
     function resizeCanvas(canvas) {
       const rect = canvas.parentNode.getBoundingClientRect();
       canvas.width = rect.width * window.devicePixelRatio;
@@ -654,6 +691,8 @@
     function computeHeatingPowers(state) {
       let heatLossPower = 0;
       let netPower = state.power;
+      const scale = getHeatingLabScale();
+      const beakerH = 180 * scale;
 
       if (state.enableLoss) {
         const tempDiff = Math.max(0, state.temp - 20);
@@ -663,13 +702,13 @@
 
         let submergedFraction = 1.0;
         if (state.sourceType === "coil") {
-          const fillHeight = state.substance === "water" ? 180 * (0.2 + 0.6 * (state.mass / 1.0)) : 180 * 0.7;
-          const liquidTop = 180 - fillHeight;
-          const coilOffset = (100 - state.coilDepth) / 100 * 80;
-          const loopsStart = 180 - 80 - coilOffset;
-          const loopsEnd = 180 - 20 - coilOffset;
-          const overlap = Math.max(0, Math.min(loopsEnd, 180) - Math.max(loopsStart, liquidTop));
-          submergedFraction = Math.max(0, Math.min(1, overlap / 60));
+          const fillHeight = state.substance === "water" ? beakerH * (0.2 + 0.6 * (state.mass / 1.0)) : beakerH * 0.7;
+          const liquidTop = beakerH - fillHeight;
+          const coilOffset = (100 - state.coilDepth) / 100 * 80 * scale;
+          const loopsStart = beakerH - 80 * scale - coilOffset;
+          const loopsEnd = beakerH - 20 * scale - coilOffset;
+          const overlap = Math.max(0, Math.min(loopsEnd, beakerH) - Math.max(loopsStart, liquidTop));
+          submergedFraction = Math.max(0, Math.min(1, overlap / (60 * scale)));
         }
 
         const enteredPower = state.power * submergedFraction;
@@ -829,10 +868,13 @@
       heatState.temp = tempFromEnergy(heatState, heatState.energy);
 
       if (heatState.substance === "water" && heatState.temp >= 100 && Math.random() < 0.3) {
+        const w = heatCanvas.width / window.devicePixelRatio;
+        const h = heatCanvas.height / window.devicePixelRatio;
+        const { beakerX, beakerY, beakerW, scale } = getHeatingLabLayout(w, h);
         heatState.bubbles.push({
-          x: 50 + Math.random() * 100,
-          y: 160,
-          r: 2 + Math.random() * 5,
+          x: beakerX + 15 * scale + Math.random() * (beakerW - 30 * scale),
+          y: beakerY - 10 * scale,
+          r: (2 + Math.random() * 5) * scale,
           speed: 1 + Math.random() * 3
         });
       }
@@ -912,38 +954,36 @@
       const h = heatCanvas.height / window.devicePixelRatio;
       heatCtx.clearRect(0, 0, w, h);
 
-      const centerX = w / 2;
-      const beakerW = 160;
-      const beakerH = 180;
-      const beakerY = h - 40;
-      const beakerX = centerX - beakerW / 2;
+      const layout = getHeatingLabLayout(w, h);
+      const { centerX, beakerW, beakerH, beakerY, beakerX, scale, plateH, plateY } = layout;
+      const plateW = 200 * scale;
 
       if (heatState.sourceType === "hotplate") {
-        const plateGrad = heatCtx.createLinearGradient(centerX - 100, h - 30, centerX + 100, h - 10);
+        const plateGrad = heatCtx.createLinearGradient(centerX - plateW / 2, plateY, centerX + plateW / 2, plateY + plateH);
         plateGrad.addColorStop(0, "#334155");
         plateGrad.addColorStop(0.5, heatState.running ? "#ef4444" : "#475569");
         plateGrad.addColorStop(1, "#1e293b");
         
         heatCtx.fillStyle = plateGrad;
         heatCtx.beginPath();
-        heatCtx.roundRect(centerX - 100, h - 30, 200, 15, 5);
+        heatCtx.roundRect(centerX - plateW / 2, plateY, plateW, plateH, 5 * scale);
         heatCtx.fill();
 
         heatCtx.fillStyle = "#94a3b8";
         heatCtx.beginPath();
-        heatCtx.arc(centerX + 60, h - 22, 5, 0, Math.PI * 2);
+        heatCtx.arc(centerX + 60 * scale, plateY + plateH / 2, 5 * scale, 0, Math.PI * 2);
         heatCtx.fill();
         
         heatCtx.fillStyle = heatState.running ? "#ef4444" : "#1e293b";
         heatCtx.beginPath();
-        heatCtx.arc(centerX - 70, h - 22, 3, 0, Math.PI * 2);
+        heatCtx.arc(centerX - 70 * scale, plateY + plateH / 2, 3 * scale, 0, Math.PI * 2);
         heatCtx.fill();
       }
 
       heatCtx.strokeStyle = "rgba(226, 232, 240, 0.8)";
-      heatCtx.lineWidth = 3;
+      heatCtx.lineWidth = 3 * scale;
       heatCtx.beginPath();
-      heatCtx.ellipse(centerX, beakerY - beakerH, beakerW / 2, 15, 0, Math.PI, 2 * Math.PI);
+      heatCtx.ellipse(centerX, beakerY - beakerH, beakerW / 2, 15 * scale, 0, Math.PI, 2 * Math.PI);
       heatCtx.stroke();
 
       const fillHeight = heatState.substance === "water" ? beakerH * (0.2 + 0.6 * (heatState.mass / 1.0)) : beakerH * 0.7; 
@@ -957,7 +997,7 @@
         heatCtx.moveTo(beakerX + 2, beakerY - 2);
         heatCtx.lineTo(beakerX + 2, liquidY);
         
-        const waveAmp = 1 + (heatState.temp - 20) / 80 * 4; // rises from 1px up to 5px as temp increases
+        const waveAmp = (1 + (heatState.temp - 20) / 80 * 4) * scale;
         for (let x = beakerX + 2; x <= beakerX + beakerW - 2; x++) {
           const waveY = liquidY + Math.sin(x * 0.05 + time) * waveAmp;
           heatCtx.lineTo(x, waveY);
@@ -971,9 +1011,9 @@
           const bubbleChance = (heatState.temp - 50) / 50 * 0.3;
           if (Math.random() < bubbleChance) {
             heatState.bubbles.push({
-              x: beakerX + 15 + Math.random() * (beakerW - 30),
-              y: beakerY - 10,
-              r: 1 + Math.random() * 4,
+              x: beakerX + 15 * scale + Math.random() * (beakerW - 30 * scale),
+              y: beakerY - 10 * scale,
+              r: (1 + Math.random() * 4) * scale,
               speed: 0.8 + Math.random() * 2,
               wobble: Math.random() * 10
             });
@@ -982,7 +1022,7 @@
 
         heatCtx.fillStyle = "rgba(255, 255, 255, 0.4)";
         heatCtx.strokeStyle = "rgba(255, 255, 255, 0.7)";
-        heatCtx.lineWidth = 1;
+        heatCtx.lineWidth = 1 * scale;
         heatState.bubbles.forEach((b, idx) => {
           b.y -= b.speed;
           b.x += Math.sin(b.y * 0.1 + b.wobble) * 0.5; 
@@ -1003,30 +1043,30 @@
           glass: { primary: "rgba(203, 213, 225, 0.4)", light: "rgba(255, 255, 255, 0.8)", dark: "rgba(148, 163, 184, 0.5)" }
         };
         const colors = metalColors[heatState.substance];
-        const blockW = 100;
-        const blockH = 90;
+        const blockW = 100 * scale;
+        const blockH = 90 * scale;
         const blockX = centerX - blockW / 2;
-        const blockY = beakerY - blockH - 10;
+        const blockY = beakerY - blockH - 10 * scale;
 
         if (heatState.running && heatState.temp > 40) {
           const glowOpacity = Math.min(0.6, (heatState.temp - 40) / 200);
-          const glowGrad = heatCtx.createRadialGradient(centerX, blockY + blockH / 2, 40, centerX, blockY + blockH / 2, 90);
+          const glowGrad = heatCtx.createRadialGradient(centerX, blockY + blockH / 2, 40 * scale, centerX, blockY + blockH / 2, 90 * scale);
           glowGrad.addColorStop(0, `rgba(239, 68, 68, ${glowOpacity})`);
           glowGrad.addColorStop(1, "rgba(239, 68, 68, 0)");
           heatCtx.fillStyle = glowGrad;
           heatCtx.beginPath();
-          heatCtx.arc(centerX, blockY + blockH / 2, 90, 0, Math.PI * 2);
+          heatCtx.arc(centerX, blockY + blockH / 2, 90 * scale, 0, Math.PI * 2);
           heatCtx.fill();
         }
 
         heatCtx.fillStyle = colors.primary;
         heatCtx.beginPath();
-        heatCtx.roundRect(blockX, blockY, blockW, blockH, 4);
+        heatCtx.roundRect(blockX, blockY, blockW, blockH, 4 * scale);
         heatCtx.fill();
 
         heatCtx.fillStyle = colors.light;
         heatCtx.beginPath();
-        heatCtx.ellipse(centerX, blockY, blockW / 2, 10, 0, 0, Math.PI * 2);
+        heatCtx.ellipse(centerX, blockY, blockW / 2, 10 * scale, 0, 0, Math.PI * 2);
         heatCtx.fill();
 
         const blockGrad = heatCtx.createLinearGradient(blockX, blockY, blockX + blockW, blockY);
@@ -1037,36 +1077,36 @@
         heatCtx.fillRect(blockX, blockY, blockW, blockH);
 
         heatCtx.fillStyle = heatState.substance === "glass" ? "#1e293b" : "#ffffff";
-        heatCtx.font = "bold 13px sans-serif";
+        heatCtx.font = `bold ${13 * scale}px sans-serif`;
         heatCtx.textAlign = "center";
-        heatCtx.fillText(getSubName(heatState.substance), centerX, blockY + blockH / 2 + 5);
+        heatCtx.fillText(getSubName(heatState.substance), centerX, blockY + blockH / 2 + 5 * scale);
       }
 
       if (heatState.sourceType === "coil") {
-        const coilX = centerX - 15;
-        const coilOffset = (100 - heatState.coilDepth) / 100 * 80;
-        const coilY = 30 + coilOffset;
-        const loopsEnd = beakerY - 20 - coilOffset;
-        const loopsStart = beakerY - 80 - coilOffset;
+        const coilX = centerX - 15 * scale;
+        const coilOffset = (100 - heatState.coilDepth) / 100 * 80 * scale;
+        const coilY = layout.sceneTop + 30 * scale + coilOffset;
+        const loopsEnd = beakerY - 20 * scale - coilOffset;
+        const loopsStart = beakerY - 80 * scale - coilOffset;
 
-        const stemGrad = heatCtx.createLinearGradient(coilX, 0, coilX + 30, 0);
+        const stemGrad = heatCtx.createLinearGradient(coilX, 0, coilX + 30 * scale, 0);
         stemGrad.addColorStop(0, "#475569");
         stemGrad.addColorStop(0.5, "#94a3b8");
         stemGrad.addColorStop(1, "#334155");
         heatCtx.fillStyle = stemGrad;
-        heatCtx.fillRect(centerX - 8, coilY, 16, loopsStart - coilY + 5);
+        heatCtx.fillRect(centerX - 8 * scale, coilY, 16 * scale, loopsStart - coilY + 5 * scale);
 
         const coilOpacity = heatState.running ? 0.4 + Math.sin(Date.now() * 0.01) * 0.2 : 0;
         heatCtx.save();
         if (heatState.running) {
-          heatCtx.shadowBlur = 15;
+          heatCtx.shadowBlur = 15 * scale;
           heatCtx.shadowColor = `rgba(239, 68, 68, ${0.5 + coilOpacity})`;
         }
         heatCtx.strokeStyle = heatState.running ? `rgba(239, 68, 68, ${0.8 + coilOpacity})` : "#64748b";
-        heatCtx.lineWidth = 4;
+        heatCtx.lineWidth = 4 * scale;
         heatCtx.beginPath();
-        for (let yPos = loopsStart; yPos <= loopsEnd; yPos += 12) {
-          heatCtx.ellipse(centerX, yPos, 18, 6, 0, 0, Math.PI * 2);
+        for (let yPos = loopsStart; yPos <= loopsEnd; yPos += 12 * scale) {
+          heatCtx.ellipse(centerX, yPos, 18 * scale, 6 * scale, 0, 0, Math.PI * 2);
         }
         heatCtx.stroke();
         heatCtx.restore();
@@ -1074,16 +1114,16 @@
 
       if (heatState.running) {
         heatCtx.strokeStyle = "rgba(239, 68, 68, 0.25)";
-        heatCtx.lineWidth = 2;
-        const waveOffset = (Date.now() / 80) % 30;
-        const coilOffset = (100 - heatState.coilDepth) / 100 * 80;
-        const startHeatY = heatState.sourceType === "coil" ? (beakerY - 20 - coilOffset) : beakerY - 10;
-        const endHeatY = heatState.substance === "water" ? liquidY : beakerY - beakerH + 30;
+        heatCtx.lineWidth = 2 * scale;
+        const waveOffset = (Date.now() / 80) % (30 * scale);
+        const coilOffset = (100 - heatState.coilDepth) / 100 * 80 * scale;
+        const startHeatY = heatState.sourceType === "coil" ? (beakerY - 20 * scale - coilOffset) : beakerY - 10 * scale;
+        const endHeatY = heatState.substance === "water" ? liquidY : beakerY - beakerH + 30 * scale;
 
-        for (let xOffset = -50; xOffset <= 50; xOffset += 25) {
+        for (let xOffset = -50 * scale; xOffset <= 50 * scale; xOffset += 25 * scale) {
           heatCtx.beginPath();
-          for (let y = startHeatY; y >= endHeatY; y -= 10) {
-            const x = centerX + xOffset + Math.sin(y * 0.08 - waveOffset) * 4;
+          for (let y = startHeatY; y >= endHeatY; y -= 10 * scale) {
+            const x = centerX + xOffset + Math.sin(y * 0.08 - waveOffset) * 4 * scale;
             if (y === startHeatY) heatCtx.moveTo(x, y);
             else heatCtx.lineTo(x, y);
           }
@@ -1093,69 +1133,69 @@
 
       // Drawing Beaker glass overlay
       heatCtx.strokeStyle = "rgba(226, 232, 240, 0.9)";
-      heatCtx.lineWidth = 4;
+      heatCtx.lineWidth = 4 * scale;
       heatCtx.beginPath();
-      heatCtx.ellipse(centerX, beakerY, beakerW / 2, 10, 0, 0, Math.PI);
+      heatCtx.ellipse(centerX, beakerY, beakerW / 2, 10 * scale, 0, 0, Math.PI);
       heatCtx.lineTo(beakerX, beakerY - beakerH);
       heatCtx.moveTo(beakerX + beakerW, beakerY);
       heatCtx.lineTo(beakerX + beakerW, beakerY - beakerH);
       heatCtx.stroke();
 
       heatCtx.beginPath();
-      heatCtx.ellipse(centerX, beakerY - beakerH, beakerW / 2, 15, 0, 0, Math.PI);
+      heatCtx.ellipse(centerX, beakerY - beakerH, beakerW / 2, 15 * scale, 0, 0, Math.PI);
       heatCtx.stroke();
 
       if (heatState.hasCover) {
         heatCtx.fillStyle = "rgba(148, 163, 184, 0.85)";
         heatCtx.strokeStyle = "#475569";
-        heatCtx.lineWidth = 2;
+        heatCtx.lineWidth = 2 * scale;
         heatCtx.beginPath();
-        heatCtx.ellipse(centerX, beakerY - beakerH - 2, beakerW / 2 + 6, 12, 0, 0, Math.PI * 2);
+        heatCtx.ellipse(centerX, beakerY - beakerH - 2 * scale, beakerW / 2 + 6 * scale, 12 * scale, 0, 0, Math.PI * 2);
         heatCtx.fill();
         heatCtx.stroke();
 
         heatCtx.fillStyle = "#334155";
-        heatCtx.fillRect(centerX - 15, beakerY - beakerH - 18, 30, 8);
+        heatCtx.fillRect(centerX - 15 * scale, beakerY - beakerH - 18 * scale, 30 * scale, 8 * scale);
       }
 
       // Thermometer body drawing
-      const thermoX = centerX + 50;
-      const thermoY = beakerY - beakerH - 10;
-      const thermoH = 150;
+      const thermoX = centerX + 50 * scale;
+      const thermoY = beakerY - beakerH - 10 * scale;
+      const thermoH = 150 * scale;
       
       heatCtx.fillStyle = "rgba(255,255,255,0.15)";
       heatCtx.strokeStyle = "rgba(226, 232, 240, 0.6)";
-      heatCtx.lineWidth = 2;
+      heatCtx.lineWidth = 2 * scale;
       heatCtx.beginPath();
-      heatCtx.roundRect(thermoX - 6, thermoY, 12, thermoH, 6);
+      heatCtx.roundRect(thermoX - 6 * scale, thermoY, 12 * scale, thermoH, 6 * scale);
       heatCtx.fill();
       heatCtx.stroke();
 
-      const liquidHeight = Math.max(10, Math.min(thermoH - 10, 10 + (heatState.temp / 100) * (thermoH - 25)));
+      const liquidHeight = Math.max(10 * scale, Math.min(thermoH - 10 * scale, 10 * scale + (heatState.temp / 100) * (thermoH - 25 * scale)));
       heatCtx.fillStyle = "#ef4444";
       heatCtx.beginPath();
-      heatCtx.roundRect(thermoX - 3, thermoY + thermoH - liquidHeight, 6, liquidHeight, 3);
+      heatCtx.roundRect(thermoX - 3 * scale, thermoY + thermoH - liquidHeight, 6 * scale, liquidHeight, 3 * scale);
       heatCtx.fill();
 
       heatCtx.fillStyle = "#ef4444";
       heatCtx.beginPath();
-      heatCtx.arc(thermoX, thermoY + thermoH, 10, 0, Math.PI * 2);
+      heatCtx.arc(thermoX, thermoY + thermoH, 10 * scale, 0, Math.PI * 2);
       heatCtx.fill();
       
       // Drawing measurement ticks
       heatCtx.strokeStyle = "rgba(255,255,255,0.7)";
-      heatCtx.lineWidth = 1;
+      heatCtx.lineWidth = 1 * scale;
       for (let tempVal = 0; tempVal <= 100; tempVal += 20) {
-        const tickY = thermoY + thermoH - (10 + (tempVal / 100) * (thermoH - 25));
+        const tickY = thermoY + thermoH - (10 * scale + (tempVal / 100) * (thermoH - 25 * scale));
         heatCtx.beginPath();
-        heatCtx.moveTo(thermoX - 6, tickY);
-        heatCtx.lineTo(thermoX - 2, tickY);
+        heatCtx.moveTo(thermoX - 6 * scale, tickY);
+        heatCtx.lineTo(thermoX - 2 * scale, tickY);
         heatCtx.stroke();
         
         heatCtx.fillStyle = "rgba(255,255,255,0.9)";
-        heatCtx.font = "8px sans-serif";
+        heatCtx.font = `${8 * scale}px sans-serif`;
         heatCtx.textAlign = "left";
-        heatCtx.fillText(tempVal + "°", thermoX + 8, tickY + 3);
+        heatCtx.fillText(tempVal + "°", thermoX + 8 * scale, tickY + 3 * scale);
       }
     }
 

@@ -7,7 +7,7 @@ export function createThermalMixingLab(t) {
   const base = import.meta.env.BASE_URL || '/';
   const root = base.endsWith('/') ? base : base + '/';
   function iframeSrc() {
-    return root + 'thermal-mixing/index.html?embed=1&lang=' + encodeURIComponent(getLang()) + '&v=2';
+    return root + 'thermal-mixing/index.html?embed=1&lang=' + encodeURIComponent(getLang()) + '&v=3';
   }
   iframe.src = iframeSrc();
   iframe.title = t('tools.thermalMixing.title') || 'Thermal Mixing Lab';
