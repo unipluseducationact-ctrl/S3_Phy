@@ -214,6 +214,13 @@
             <i data-lucide="play" class="w-5 h-5"></i>
             <span class="lab-btn-label" data-i18n="startMixing">Run Mixing</span>
           </button>
+          <button id="mixSpeedBtn" type="button" class="px-3 py-3 bg-slate-100 hover:bg-slate-200 active:bg-slate-300 text-slate-600 font-bold rounded-xl transition-all flex items-center justify-center gap-1 min-w-[3.25rem]" title="Playback speed">
+            <i data-lucide="gauge" class="w-4 h-4"></i>
+            <span class="lab-speed-label text-sm">1×</span>
+          </button>
+          <button id="mixSkipBtn" type="button" class="px-3 py-3 bg-slate-100 hover:bg-slate-200 active:bg-slate-300 text-slate-600 font-bold rounded-xl transition-all flex items-center justify-center" data-i18n-title="skipToEndTitle">
+            <i data-lucide="skip-forward" class="w-5 h-5"></i>
+          </button>
           <button id="resetMixBtn" class="px-4 py-3 bg-slate-100 hover:bg-slate-200 active:bg-slate-300 text-slate-600 font-bold rounded-xl transition-all flex items-center justify-center">
             <i data-lucide="rotate-ccw" class="w-5 h-5"></i>
           </button>
@@ -293,7 +300,8 @@
         clickStartToSee: "Click 'Run Mixing' to see calculation steps.",
         showControls: "Show parameters",
         hideControls: "Hide parameters",
-        dragHint: "Drag to move"
+        dragHint: "Drag to move",
+        skipToEndTitle: "Skip to end of simulation"
       },
       zhHant: {
         mixingControls: "混合實驗參數",
@@ -327,9 +335,12 @@
         clickStartToSee: "點擊「開始混合」以顯示詳細計算步驟。",
         showControls: "顯示參數",
         hideControls: "隱藏參數",
-        dragHint: "拖曳以移動"
+        dragHint: "拖曳以移動",
+        skipToEndTitle: "跳至模擬結果"
       }
     };
+
+    const PLAYBACK_SPEEDS = [1, 2, 4];
 
     const CONTROLS_STORAGE_KEY = 's3phy-thermal-mixing-controls-collapsed';
     let floatControlsApi = null;
@@ -483,8 +494,30 @@
       lastStirTime: 0,
       iceCubes: [],
       scenario: "standard", // standard or sideBySide
-      iceMeltingPhase: "solid" // solid, melting, completed (for cold ice cases)
+      iceMeltingPhase: "solid", // solid, melting, completed (for cold ice cases)
+      playbackSpeed: 1,
+      complete: false
     };
+
+    function cyclePlaybackSpeed(state, btn) {
+      const i = PLAYBACK_SPEEDS.indexOf(state.playbackSpeed);
+      state.playbackSpeed = PLAYBACK_SPEEDS[(i + 1) % PLAYBACK_SPEEDS.length];
+      btn.querySelector(".lab-speed-label").textContent = state.playbackSpeed + "×";
+      btn.classList.toggle("bg-amber-100", state.playbackSpeed > 1);
+      btn.classList.toggle("text-amber-800", state.playbackSpeed > 1);
+      btn.classList.toggle("bg-slate-100", state.playbackSpeed === 1);
+      btn.classList.toggle("text-slate-600", state.playbackSpeed === 1);
+    }
+
+    function updateMixSkipButton() {
+      const skipBtn = document.getElementById("mixSkipBtn");
+      if (skipBtn) skipBtn.disabled = mixState.complete;
+    }
+
+    function setMixStartButtonIdle() {
+      document.getElementById("startMixBtn").innerHTML = `<i data-lucide="play" class="w-5 h-5"></i><span class="lab-btn-label">${currentLang === "en" ? "Run Mixing" : "開始混合"}</span>`;
+      lucide.createIcons();
+    }
 
     function resizeCanvas(canvas) {
       const rect = canvas.parentNode.getBoundingClientRect();
@@ -575,6 +608,7 @@
       mixState.tempCurA = mixState.tempA;
       mixState.tempCurB = mixState.tempB;
       mixState.iceMeltingPhase = "solid";
+      mixState.complete = false;
       
       // Initialize ice cubes if substance B is ice (using relative coordinates)
       mixState.iceCubes = [];
@@ -600,153 +634,174 @@
       lucide.createIcons();
       document.getElementById("mixingSteps").innerHTML = `<div class="text-slate-400 text-center py-10">${currentLang === 'en' ? 'Click "Run Mixing" to see calculation steps.' : '點擊「開始混合」以顯示詳細計算步驟。'}</div>`;
       drawMixingLab();
+      updateMixSkipButton();
+    }
+
+    function stepMixingLab(dt) {
+      mixState.timeElapsed += dt;
+
+      if (Date.now() - mixState.lastStirTime > 1500) {
+        mixState.stirMultiplier = 1.0;
+      }
+
+      if (mixState.scenario === "sideBySide") {
+        mixState.contacted = true;
+      } else if (mixState.timeElapsed >= 1.0) {
+        mixState.contacted = true;
+      }
+
+      const cA = SUBSTANCES[mixState.subA].c;
+      const cB = SUBSTANCES[mixState.subB].c;
+      const mA = mixState.massA;
+      const mB = mixState.massB;
+      const mContainer = 0.15;
+      const cContainer = C_GLASS;
+
+      const baseCapA = mA * cA;
+      const baseCapB = mB * cB;
+      const containerCap = mixState.includeContainer ? (mContainer * cContainer) : 0;
+      let finished = false;
+
+      if (mixState.contacted) {
+        if (mixState.subB === "ice" && mixState.iceMeltingPhase !== "completed") {
+          const latentFusionHeat = mB * L_FUSION;
+
+          if (mixState.iceMeltingPhase === "solid") {
+            const totalCap = baseCapA + containerCap;
+
+            if (mixState.tempCurB < 0) {
+              const rate = 0.2 * mixState.stirMultiplier;
+              const deltaTA = (mixState.tempCurA - mixState.tempCurB) * rate * dt;
+              mixState.tempCurA -= deltaTA;
+
+              const absorbedEnergy = deltaTA * totalCap;
+              mixState.tempCurB += absorbedEnergy / baseCapB;
+              if (mixState.tempCurB >= 0) {
+                mixState.tempCurB = 0;
+                mixState.iceMeltingPhase = "melting";
+                mixState.energyAbsorbedInMelting = 0;
+              }
+            } else {
+              mixState.iceMeltingPhase = "melting";
+              mixState.energyAbsorbedInMelting = 0;
+            }
+          } else if (mixState.iceMeltingPhase === "melting") {
+            const rate = 0.15 * mixState.stirMultiplier;
+            const tempDiff = mixState.tempCurA - 0;
+            const heatTransferred = tempDiff * rate * (baseCapA + containerCap) * dt;
+
+            mixState.tempCurA -= heatTransferred / (baseCapA + containerCap);
+            mixState.energyAbsorbedInMelting += heatTransferred;
+
+            const meltFraction = Math.max(0, 1 - (mixState.energyAbsorbedInMelting / latentFusionHeat));
+            mixState.iceCubes.forEach(cube => {
+              cube.meltedSize = (cube.size || 20) * Math.pow(meltFraction, 1/3);
+            });
+
+            if (mixState.energyAbsorbedInMelting >= latentFusionHeat) {
+              mixState.iceMeltingPhase = "completed";
+              mixState.tempCurB = 0;
+              mixState.iceCubes = [];
+            }
+
+            if (mixState.tempCurA <= 0) {
+              mixState.tempCurA = 0;
+              finished = true;
+            }
+          }
+        } else {
+          const heatCapacityB = mixState.subB === "ice" ? mB * C_WATER : baseCapB;
+          const totalCapA = baseCapA + containerCap;
+          const totalCapB = heatCapacityB;
+          const finalEquilibrium = (totalCapA * mixState.tempA + totalCapB * mixState.tempB) / (totalCapA + totalCapB);
+          const rate = 0.15 * mixState.stirMultiplier;
+          const tempDiff = mixState.tempCurA - mixState.tempCurB;
+
+          if (Math.abs(tempDiff) < 0.05) {
+            mixState.tempCurA = finalEquilibrium;
+            mixState.tempCurB = finalEquilibrium;
+            finished = true;
+          } else {
+            const deltaTA = (tempDiff * rate * totalCapB / (totalCapA + totalCapB)) * dt;
+            mixState.tempCurA -= deltaTA;
+            mixState.tempCurB += (deltaTA * totalCapA) / totalCapB;
+          }
+        }
+      }
+
+      const nameA = currentLang === "en" ? SUBSTANCES[mixState.subA].nameEn : SUBSTANCES[mixState.subA].nameZh;
+      const nameB = currentLang === "en" ? SUBSTANCES[mixState.subB].nameEn : SUBSTANCES[mixState.subB].nameZh;
+
+      document.getElementById("liveTempA").textContent = `${currentLang === "en" ? "Substance A" : "物質 A"} (${nameA}): ${mixState.tempCurA.toFixed(1)} °C`;
+      document.getElementById("liveTempB").textContent = `${currentLang === "en" ? "Substance B" : "物質 B"} (${nameB}): ${mixState.tempCurB.toFixed(1)} °C`;
+
+      if (mixState.contacted) {
+        if (mixState.subB === "ice" && mixState.iceMeltingPhase === "melting") {
+          document.getElementById("liveTempMix").textContent = `${currentLang === "en" ? "Equilibrium" : "平衡溫度"}: ${currentLang === "en" ? "Melting Ice (0.0 °C)" : "冰水混合 (0.0 °C)"}`;
+        } else {
+          document.getElementById("liveTempMix").textContent = `${currentLang === "en" ? "Equilibrium" : "平衡溫度"}: ${mixState.tempCurB.toFixed(1)} °C`;
+        }
+      } else {
+        document.getElementById("liveTempMix").textContent = `${currentLang === "en" ? "Equilibrium" : "平衡溫度"}: ${currentLang === "en" ? "No Contact" : "未接觸"}`;
+      }
+
+      if (finished) mixState.complete = true;
+      return { finished };
+    }
+
+    function skipMixingLabToEnd() {
+      if (mixState.complete) return;
+      clearInterval(mixInterval);
+      mixState.running = true;
+      let guard = 0;
+      let result;
+      do {
+        result = stepMixingLab(0.5 * mixState.playbackSpeed);
+        guard++;
+      } while (!result.finished && guard < 50000);
+
+      mixState.running = false;
+      setMixStartButtonIdle();
+      updateMixingSteps();
+      drawMixingLab();
+      updateMixSkipButton();
     }
 
     document.getElementById("resetMixBtn").addEventListener("click", resetMixingLab);
+
+    document.getElementById("mixSpeedBtn").addEventListener("click", () => {
+      cyclePlaybackSpeed(mixState, document.getElementById("mixSpeedBtn"));
+    });
+
+    document.getElementById("mixSkipBtn").addEventListener("click", skipMixingLabToEnd);
 
     document.getElementById("startMixBtn").addEventListener("click", () => {
       if (mixState.running) {
         clearInterval(mixInterval);
         mixState.running = false;
-        document.getElementById("startMixBtn").innerHTML = `<i data-lucide="play" class="w-5 h-5"></i><span class="lab-btn-label">${currentLang === 'en' ? 'Run Mixing' : '開始混合'}</span>`;
+        document.getElementById("startMixBtn").innerHTML = `<i data-lucide="play" class="w-5 h-5"></i><span class="lab-btn-label">${currentLang === "en" ? "Run Mixing" : "開始混合"}</span>`;
         lucide.createIcons();
       } else {
         mixState.running = true;
-        document.getElementById("startMixBtn").innerHTML = `<i data-lucide="pause" class="w-5 h-5"></i><span class="lab-btn-label">${currentLang === 'en' ? 'Pause' : '暫停'}</span>`;
+        mixState.complete = false;
+        document.getElementById("startMixBtn").innerHTML = `<i data-lucide="pause" class="w-5 h-5"></i><span class="lab-btn-label">${currentLang === "en" ? "Pause" : "暫停"}</span>`;
         lucide.createIcons();
+        updateMixSkipButton();
 
         const fps = 30;
-        const dt = 1 / fps;
+        const baseDt = 1 / fps;
 
         mixInterval = setInterval(() => {
-          mixState.timeElapsed += dt;
-
-          if (Date.now() - mixState.lastStirTime > 1500) {
-            mixState.stirMultiplier = 1.0;
-          }
-
-          // In standard scenario, contact begins when Substance A is poured (let's say 1 second delay of animation)
-          // In side-by-side contact, contact begins immediately
-          if (mixState.scenario === "sideBySide") {
-            mixState.contacted = true;
-          } else {
-            if (mixState.timeElapsed >= 1.0) {
-              mixState.contacted = true;
-            }
-          }
-
-          const cA = SUBSTANCES[mixState.subA].c;
-          const cB = SUBSTANCES[mixState.subB].c;
-          const mA = mixState.massA;
-          const mB = mixState.massB;
-          const mContainer = 0.15;
-          const cContainer = C_GLASS;
-
-          const baseCapA = mA * cA;
-          const baseCapB = mB * cB;
-          const containerCap = mixState.includeContainer ? (mContainer * cContainer) : 0;
-
-          if (mixState.contacted) {
-            if (mixState.subB === "ice" && mixState.iceMeltingPhase !== "completed") {
-              // Detailed multi-stage melting simulation
-              const latentFusionHeat = mB * L_FUSION;
-              const heatTo0Ice = mB * C_ICE * (0 - mixState.tempB);
-
-              if (mixState.iceMeltingPhase === "solid") {
-                const totalCap = baseCapA + containerCap;
-                const coolingLimitTemp = (totalCap * mixState.tempCurA + baseCapB * mixState.tempCurB) / (totalCap + baseCapB);
-                
-                if (mixState.tempCurB < 0) {
-                  const rate = 0.2 * mixState.stirMultiplier;
-                  const deltaTA = (mixState.tempCurA - mixState.tempCurB) * rate * dt;
-                  mixState.tempCurA -= deltaTA;
-                  
-                  const absorbedEnergy = deltaTA * totalCap;
-                  mixState.tempCurB += absorbedEnergy / baseCapB;
-                  if (mixState.tempCurB >= 0) {
-                    mixState.tempCurB = 0;
-                    mixState.iceMeltingPhase = "melting";
-                    mixState.energyAbsorbedInMelting = 0;
-                  }
-                } else {
-                  mixState.iceMeltingPhase = "melting";
-                  mixState.energyAbsorbedInMelting = 0;
-                }
-              } else if (mixState.iceMeltingPhase === "melting") {
-                const rate = 0.15 * mixState.stirMultiplier;
-                const tempDiff = mixState.tempCurA - 0;
-                const heatTransferred = tempDiff * rate * (baseCapA + containerCap) * dt;
-
-                mixState.tempCurA -= heatTransferred / (baseCapA + containerCap);
-                mixState.energyAbsorbedInMelting += heatTransferred;
-
-                // Scale down ice cubes visually
-                const meltFraction = Math.max(0, 1 - (mixState.energyAbsorbedInMelting / latentFusionHeat));
-                mixState.iceCubes.forEach(cube => {
-                  cube.meltedSize = (cube.size || 20) * Math.pow(meltFraction, 1/3);
-                });
-
-                if (mixState.energyAbsorbedInMelting >= latentFusionHeat) {
-                  mixState.iceMeltingPhase = "completed";
-                  mixState.tempCurB = 0;
-                  mixState.iceCubes = [];
-                }
-
-                // If hot substance A drops to 0 before ice finishes melting: thermal equilibrium is reached at 0 with partial ice remaining.
-                if (mixState.tempCurA <= 0) {
-                  mixState.tempCurA = 0;
-                  clearInterval(mixInterval);
-                  mixState.running = false;
-                  document.getElementById("startMixBtn").innerHTML = `<i data-lucide="play" class="w-5 h-5"></i><span class="lab-btn-label">${currentLang === 'en' ? 'Run Mixing' : '開始混合'}</span>`;
-                  lucide.createIcons();
-                }
-              }
-            } else {
-              // Pure single-phase heat transfer (conduction / mixing)
-              const heatCapacityB = mixState.subB === "ice" ? mB * C_WATER : baseCapB;
-              
-              const totalCapA = baseCapA + containerCap;
-              const totalCapB = heatCapacityB;
-
-              const finalEquilibrium = (totalCapA * mixState.tempA + totalCapB * mixState.tempB) / (totalCapA + totalCapB);
-              
-              // Thermal transfer rate
-              const rate = 0.15 * mixState.stirMultiplier;
-              const tempDiff = mixState.tempCurA - mixState.tempCurB;
-              
-              if (Math.abs(tempDiff) < 0.05) {
-                mixState.tempCurA = finalEquilibrium;
-                mixState.tempCurB = finalEquilibrium;
-                clearInterval(mixInterval);
-                mixState.running = false;
-                document.getElementById("startMixBtn").innerHTML = `<i data-lucide="play" class="w-5 h-5"></i><span class="lab-btn-label">${currentLang === 'en' ? 'Run Mixing' : '開始混合'}</span>`;
-                lucide.createIcons();
-              } else {
-                const deltaTA = (tempDiff * rate * totalCapB / (totalCapA + totalCapB)) * dt;
-                mixState.tempCurA -= deltaTA;
-                mixState.tempCurB += (deltaTA * totalCapA) / totalCapB;
-              }
-            }
-          }
-
-          const nameA = currentLang === 'en' ? SUBSTANCES[mixState.subA].nameEn : SUBSTANCES[mixState.subA].nameZh;
-          const nameB = currentLang === 'en' ? SUBSTANCES[mixState.subB].nameEn : SUBSTANCES[mixState.subB].nameZh;
-
-          document.getElementById("liveTempA").textContent = `${currentLang === 'en' ? 'Substance A' : '物質 A'} (${nameA}): ${mixState.tempCurA.toFixed(1)} °C`;
-          document.getElementById("liveTempB").textContent = `${currentLang === 'en' ? 'Substance B' : '物質 B'} (${nameB}): ${mixState.tempCurB.toFixed(1)} °C`;
-          
-          if (mixState.contacted) {
-            if (mixState.subB === "ice" && mixState.iceMeltingPhase === "melting") {
-              document.getElementById("liveTempMix").textContent = `${currentLang === 'en' ? 'Equilibrium' : '平衡溫度'}: ${currentLang === 'en' ? 'Melting Ice (0.0 °C)' : '冰水混合 (0.0 °C)'}`;
-            } else {
-              document.getElementById("liveTempMix").textContent = `${currentLang === 'en' ? 'Equilibrium' : '平衡溫度'}: ${mixState.tempCurB.toFixed(1)} °C`;
-            }
-          } else {
-            document.getElementById("liveTempMix").textContent = `${currentLang === 'en' ? 'Equilibrium' : '平衡溫度'}: ${currentLang === 'en' ? 'No Contact' : '未接觸'}`;
-          }
-
+          const dt = baseDt * mixState.playbackSpeed;
+          const { finished } = stepMixingLab(dt);
           updateMixingSteps();
           drawMixingLab();
+          if (finished) {
+            clearInterval(mixInterval);
+            mixState.running = false;
+            setMixStartButtonIdle();
+            updateMixSkipButton();
+          }
         }, 1000 / fps);
       }
     });

@@ -189,6 +189,18 @@
           </label>
         </div>
 
+        <!-- Beaker Container Effect -->
+        <div class="flex items-center justify-between p-3 bg-slate-50 border border-slate-200 rounded-xl">
+          <div class="flex flex-col">
+            <span class="text-xs font-bold text-slate-700" data-i18n="includeContainer">Include Container Effect</span>
+            <span class="text-[10px] text-slate-400" data-i18n="containerDesc">Glass beaker (0.15 kg, c = 670 J kg⁻¹ °C⁻¹)</span>
+          </div>
+          <label class="relative inline-flex items-center cursor-pointer">
+            <input type="checkbox" id="heatIncludeContainer" class="sr-only peer">
+            <div class="w-11 h-6 bg-slate-200 peer-focus:outline-none rounded-full peer peer-checked:after:translate-x-full peer-checked:after:border-white after:content-[''] after:absolute after:top-[2px] after:left-[2px] after:bg-white after:border-slate-300 after:border after:rounded-full after:h-5 after:w-5 after:transition-all peer-checked:bg-blue-600"></div>
+          </label>
+        </div>
+
         <!-- Cover Toggle -->
         <div id="heatCoverContainer" class="flex items-center justify-between p-3 bg-slate-50 border border-slate-200 rounded-xl hidden">
           <div class="flex flex-col">
@@ -207,6 +219,13 @@
           <button id="startHeatBtn" class="flex-1 py-3 bg-blue-600 hover:bg-blue-700 active:bg-blue-800 text-white font-bold rounded-xl shadow-md shadow-blue-200 transition-all flex items-center justify-center gap-2">
             <i data-lucide="play" class="w-5 h-5"></i>
             <span class="lab-btn-label" data-i18n="startSim">Start Lab</span>
+          </button>
+          <button id="heatSpeedBtn" type="button" class="px-3 py-3 bg-slate-100 hover:bg-slate-200 active:bg-slate-300 text-slate-600 font-bold rounded-xl transition-all flex items-center justify-center gap-1 min-w-[3.25rem]" title="Playback speed">
+            <i data-lucide="gauge" class="w-4 h-4"></i>
+            <span class="lab-speed-label text-sm">1×</span>
+          </button>
+          <button id="heatSkipBtn" type="button" class="px-3 py-3 bg-slate-100 hover:bg-slate-200 active:bg-slate-300 text-slate-600 font-bold rounded-xl transition-all flex items-center justify-center" data-i18n-title="skipToEndTitle">
+            <i data-lucide="skip-forward" class="w-5 h-5"></i>
           </button>
           <button id="resetHeatBtn" class="px-4 py-3 bg-slate-100 hover:bg-slate-200 active:bg-slate-300 text-slate-600 font-bold rounded-xl transition-all flex items-center justify-center">
             <i data-lucide="rotate-ccw" class="w-5 h-5"></i>
@@ -281,6 +300,8 @@
         coilDepth: "Coil Immersion Depth",
         enableHeatLoss: "Heat Loss to Surroundings",
         heatLossDesc: "Consider real-world heat exchange",
+        includeContainer: "Include Container Effect",
+        containerDesc: "Glass beaker (0.15 kg, c = 670 J kg⁻¹ °C⁻¹)",
         startSim: "Start Lab",
         visualLab: "Interactive Lab View",
         liveStats: "Live Stats",
@@ -288,7 +309,8 @@
         clickStartToSee: "Click 'Start Lab' to see calculation steps.",
         showControls: "Show parameters",
         hideControls: "Hide parameters",
-        dragHint: "Drag to move"
+        dragHint: "Drag to move",
+        skipToEndTitle: "Skip to end of simulation"
       },
       zhHant: {
         controlPanel: "實驗參數控制",
@@ -315,6 +337,8 @@
         coilDepth: "電熱線圈浸入深度",
         enableHeatLoss: "向環境散失熱量",
         heatLossDesc: "考慮真實物理環境下的熱交換",
+        includeContainer: "考慮容器熱量吸收",
+        containerDesc: "玻璃燒杯 (0.15 kg, c = 670 J kg⁻¹ °C⁻¹)",
         startSim: "開始實驗",
         visualLab: "實驗室實時畫面",
         liveStats: "實時數據",
@@ -322,9 +346,13 @@
         clickStartToSee: "點擊「開始實驗」以顯示詳細計算步驟。",
         showControls: "顯示參數",
         hideControls: "隱藏參數",
-        dragHint: "拖曳以移動"
+        dragHint: "拖曳以移動",
+        skipToEndTitle: "跳至模擬結果"
       }
     };
+
+    const PLAYBACK_SPEEDS = [1, 2, 4];
+    const M_CONTAINER = 0.15;
 
     const CONTROLS_STORAGE_KEY = 's3phy-specific-heat-controls-collapsed';
     let floatControlsApi = null;
@@ -471,9 +499,57 @@
       substance: "water",
       sourceType: "coil", // coil or hotplate
       hasCover: false,
+      includeContainer: false,
       bubbles: [],
-      heatLossPower: 0
+      heatLossPower: 0,
+      playbackSpeed: 1,
+      complete: false
     };
+
+    function cyclePlaybackSpeed(state, btn) {
+      const i = PLAYBACK_SPEEDS.indexOf(state.playbackSpeed);
+      state.playbackSpeed = PLAYBACK_SPEEDS[(i + 1) % PLAYBACK_SPEEDS.length];
+      btn.querySelector(".lab-speed-label").textContent = state.playbackSpeed + "×";
+      btn.classList.toggle("bg-amber-100", state.playbackSpeed > 1);
+      btn.classList.toggle("text-amber-800", state.playbackSpeed > 1);
+      btn.classList.toggle("bg-slate-100", state.playbackSpeed === 1);
+      btn.classList.toggle("text-slate-600", state.playbackSpeed === 1);
+    }
+
+    function heatingSubstanceCap(state) {
+      return state.mass * SUBSTANCES[state.substance].c;
+    }
+
+    function heatingContainerCap(state) {
+      return state.includeContainer ? M_CONTAINER * C_GLASS : 0;
+    }
+
+    function heatingTotalCap(state) {
+      return heatingSubstanceCap(state) + heatingContainerCap(state);
+    }
+
+    function heatingCapDenomLatex(includeContainer) {
+      return includeContainer
+        ? "m c + m_{\\text{cont}} c_{\\text{cont}}"
+        : "m \\cdot c";
+    }
+
+    function heatingCapDenomSub(includeContainer, m, c) {
+      if (!includeContainer) {
+        return `${m}\\text{ kg} \\cdot ${c}\\text{ J kg}^{-1}\\text{ }^{\\circ}\\text{C}^{-1}`;
+      }
+      return `${m}\\text{ kg} \\cdot ${c} + ${M_CONTAINER}\\text{ kg} \\cdot ${C_GLASS}\\text{ J kg}^{-1}\\text{ }^{\\circ}\\text{C}^{-1}`;
+    }
+
+    function updateHeatSkipButton() {
+      const skipBtn = document.getElementById("heatSkipBtn");
+      if (skipBtn) skipBtn.disabled = heatState.complete;
+    }
+
+    function setHeatStartButtonIdle() {
+      document.getElementById("startHeatBtn").innerHTML = `<i data-lucide="play" class="w-5 h-5"></i><span class="lab-btn-label">${currentLang === "en" ? "Start Lab" : "開始實驗"}</span>`;
+      lucide.createIcons();
+    }
 
     function resizeCanvas(canvas) {
       const rect = canvas.parentNode.getBoundingClientRect();
@@ -561,13 +637,18 @@
       resetHeatingLab();
     });
 
+    document.getElementById("heatIncludeContainer").addEventListener("change", (e) => {
+      heatState.includeContainer = e.target.checked;
+      resetHeatingLab();
+    });
+
     function tempFromEnergy(state, energy) {
-      const c = SUBSTANCES[state.substance].c;
+      const totalCap = heatingTotalCap(state);
       if (state.substance === "water") {
-        const energyTo100 = state.mass * c * (100 - state.initTemp);
+        const energyTo100 = totalCap * (100 - state.initTemp);
         if (energy >= energyTo100) return 100;
       }
-      return state.initTemp + energy / (state.mass * c);
+      return state.initTemp + energy / totalCap;
     }
 
     function computeHeatingPowers(state) {
@@ -608,8 +689,7 @@
       if (TfTarget <= Ti) return null;
 
       if (!state.enableLoss) {
-        const c = SUBSTANCES[state.substance].c;
-        return (state.mass * c * (TfTarget - Ti)) / state.power;
+        return (heatingTotalCap(state) * (TfTarget - Ti)) / state.power;
       }
 
       const sim = {
@@ -692,10 +772,11 @@
 
       const formula = heatState.enableLoss
         ? "t \\approx \\text{simulated stepwise}"
-        : "t = \\frac{m c (T_f - T_i)}{P}";
+        : `t = \\frac{${heatingCapDenomLatex(heatState.includeContainer)} (T_f - T_i)}{P}`;
+      const capNote = heatState.includeContainer ? `,\\ m_{cont}=${M_CONTAINER}` : "";
       const sub = heatState.enableLoss
-        ? `t \\approx ${requiredT.toFixed(1)}\\text{ s} \\quad (${m}\\text{ kg},\\ c=${c},\\ T_f=${TfTarget}^{\\circ}\\text{C})`
-        : `t = \\frac{${m}\\text{ kg} \\cdot ${c}\\text{ J kg}^{-1}\\text{ }^{\\circ}\\text{C}^{-1} \\cdot ${deltaT.toFixed(1)}\\text{ }^{\\circ}\\text{C}}{${P}\\text{ W}} = ${requiredT.toFixed(1)}\\text{ s}`;
+        ? `t \\approx ${requiredT.toFixed(1)}\\text{ s} \\quad (${m}\\text{ kg},\\ c=${c}${capNote},\\ T_f=${TfTarget}^{\\circ}\\text{C})`
+        : `t = \\frac{${heatingCapDenomSub(heatState.includeContainer, m, c)} \\cdot ${deltaT.toFixed(1)}\\text{ }^{\\circ}\\text{C}}{${P}\\text{ W}} = ${requiredT.toFixed(1)}\\text{ s}`;
 
       try {
         katex.render(formula, formulaDiv, { throwOnError: false, displayMode: true });
@@ -719,6 +800,7 @@
       heatState.energy = 0;
       heatState.bubbles = [];
       heatState.heatLossPower = 0;
+      heatState.complete = false;
       document.getElementById("liveTemp").textContent = heatState.temp.toFixed(1) + " °C";
       document.getElementById("liveEnergy").textContent = "E = 0 J";
       document.getElementById("liveTime").textContent = `t = 0 / ${heatState.duration} s`;
@@ -727,10 +809,71 @@
       lucide.createIcons();
       updateHeatingIdleSteps();
       drawHeatingLab();
+      updateHeatSkipButton();
+    }
+
+    function stepHeatingLab(rawDt) {
+      let dt = rawDt;
+      let ended = false;
+      if (heatState.timeElapsed + dt >= heatState.duration) {
+        dt = heatState.duration - heatState.timeElapsed;
+        heatState.timeElapsed = heatState.duration;
+        ended = true;
+      } else {
+        heatState.timeElapsed += dt;
+      }
+
+      const { netPower, heatLossPower } = computeHeatingPowers(heatState);
+      heatState.energy += netPower * dt;
+      heatState.heatLossPower = heatLossPower;
+      heatState.temp = tempFromEnergy(heatState, heatState.energy);
+
+      if (heatState.substance === "water" && heatState.temp >= 100 && Math.random() < 0.3) {
+        heatState.bubbles.push({
+          x: 50 + Math.random() * 100,
+          y: 160,
+          r: 2 + Math.random() * 5,
+          speed: 1 + Math.random() * 3
+        });
+      }
+
+      document.getElementById("liveTemp").textContent = heatState.temp.toFixed(1) + " °C";
+      document.getElementById("liveEnergy").textContent = `E = ${Math.round(heatState.energy).toLocaleString()} J`;
+      document.getElementById("liveTime").textContent = `t = ${Math.round(heatState.timeElapsed)} / ${heatState.duration} s`;
+      document.getElementById("liveHeatLoss").textContent = currentLang === "en"
+        ? `Heat Loss: ${Math.round(heatLossPower)} W`
+        : `熱量流失: ${Math.round(heatLossPower)} W`;
+
+      if (ended) heatState.complete = true;
+      return { ended };
+    }
+
+    function skipHeatingLabToEnd() {
+      if (heatState.complete) return;
+      clearInterval(heatInterval);
+      heatState.running = true;
+      let guard = 0;
+      let result;
+      do {
+        result = stepHeatingLab(0.5 * heatState.playbackSpeed);
+        guard++;
+      } while (!result.ended && guard < 50000);
+
+      heatState.running = false;
+      setHeatStartButtonIdle();
+      updateHeatingSteps();
+      drawHeatingLab();
+      updateHeatSkipButton();
     }
 
     document.getElementById("resetHeatBtn").addEventListener("click", resetHeatingLab);
     document.getElementById("calcHeatTimeBtn").addEventListener("click", applyRequiredHeatingTime);
+
+    document.getElementById("heatSpeedBtn").addEventListener("click", () => {
+      cyclePlaybackSpeed(heatState, document.getElementById("heatSpeedBtn"));
+    });
+
+    document.getElementById("heatSkipBtn").addEventListener("click", skipHeatingLabToEnd);
 
     document.getElementById("startHeatBtn").addEventListener("click", () => {
       if (heatState.running) {
@@ -740,54 +883,26 @@
         lucide.createIcons();
       } else {
         heatState.running = true;
+        heatState.complete = false;
         document.getElementById("startHeatBtn").innerHTML = `<i data-lucide="pause" class="w-5 h-5"></i><span class="lab-btn-label">${currentLang === 'en' ? 'Pause Lab' : '暫停實驗'}</span>`;
         lucide.createIcons();
+        updateHeatSkipButton();
 
         const fps = 30;
-        const timeStep = 1 / fps; 
-        const speedMultiplier = Math.max(1, heatState.duration / 30); 
+        const timeStep = 1 / fps;
+        const speedMultiplier = Math.max(1, heatState.duration / 30);
 
         heatInterval = setInterval(() => {
-          let dt = timeStep * speedMultiplier;
-          let ended = false;
-          if (heatState.timeElapsed + dt >= heatState.duration) {
-            dt = heatState.duration - heatState.timeElapsed;
-            heatState.timeElapsed = heatState.duration;
-            ended = true;
-          } else {
-            heatState.timeElapsed += dt;
-          }
-
-          const c = SUBSTANCES[heatState.substance].c;
-          
-          const { netPower, heatLossPower } = computeHeatingPowers(heatState);
-
-          heatState.energy += netPower * dt;
-          heatState.heatLossPower = heatLossPower;
-
+          const dt = timeStep * speedMultiplier * heatState.playbackSpeed;
+          const { ended } = stepHeatingLab(dt);
+          updateHeatingSteps();
+          drawHeatingLab();
           if (ended) {
             clearInterval(heatInterval);
             heatState.running = false;
-            document.getElementById("startHeatBtn").innerHTML = `<i data-lucide="play" class="w-5 h-5"></i><span class="lab-btn-label">${currentLang === 'en' ? 'Start Lab' : '開始實驗'}</span>`;
-            lucide.createIcons();
+            setHeatStartButtonIdle();
+            updateHeatSkipButton();
           }
-
-          heatState.temp = tempFromEnergy(heatState, heatState.energy);
-          if (heatState.substance === "water" && heatState.temp >= 100 && Math.random() < 0.3) {
-            heatState.bubbles.push({
-              x: 50 + Math.random() * 100,
-              y: 160,
-              r: 2 + Math.random() * 5,
-              speed: 1 + Math.random() * 3
-            });
-          }
-
-          document.getElementById("liveTemp").textContent = heatState.temp.toFixed(1) + " °C";
-          document.getElementById("liveEnergy").textContent = `E = ${Math.round(heatState.energy).toLocaleString()} J`;
-          document.getElementById("liveTime").textContent = `t = ${Math.round(heatState.timeElapsed)} / ${heatState.duration} s`;
-          document.getElementById("liveHeatLoss").textContent = currentLang === 'en' ? `Heat Loss: ${Math.round(heatLossPower)} W` : `熱量流失: ${Math.round(heatLossPower)} W`;
-          updateHeatingSteps();
-          drawHeatingLab();
         }, 1000 / fps);
       }
     });
@@ -1057,6 +1172,9 @@
       const E = heatState.energy;
       const showLoss = heatState.enableLoss;
       const heatLossPower = heatState.heatLossPower;
+      const includeContainer = heatState.includeContainer;
+      const capLatex = heatingCapDenomLatex(includeContainer);
+      const capSub = heatingCapDenomSub(includeContainer, m, c);
 
       const P_avg = t > 0 ? E / t : (showLoss ? P - heatLossPower : P);
 
@@ -1085,6 +1203,7 @@
             <span><span class="text-slate-500">${keyText.time}</span> <span class="font-bold">${t.toFixed(1)} s</span></span>
             ${showLoss ? `<span><span class="text-slate-500">${keyText.loss}</span> <span class="font-bold text-red-700">${Math.round(heatLossPower)} W</span></span>` : ''}
             <span><span class="text-slate-500">${keyText.pavg}</span> <span class="font-bold">${Math.round(P_avg)} W</span></span>
+            <span class="text-slate-500">${currentLang === 'en' ? 'container' : '容器'}: <span class="font-semibold text-slate-700">${includeContainer ? (currentLang === 'en' ? 'on' : '開') : (currentLang === 'en' ? 'off' : '關')}</span></span>
           </div>
         `;
       }
@@ -1103,10 +1222,12 @@
           desc: "Accumulated net energy absorbed by substance during the elapsed heating time."
         },
         {
-          title: "3. Temperature Change (ΔT)",
-          formula: "\\Delta T = \\frac{E}{m \\cdot c}",
-          sub: `\\Delta T = \\frac{${Math.round(E)}\\text{ J}}{${m}\\text{ kg} \\cdot ${c}\\text{ J kg}^{-1}\\text{ }^{\\circ}\\text{C}^{-1}} = ${(Tf - Ti).toFixed(2)}\\text{ }^{\\circ}\\text{C}`,
-          desc: `Calculated temperature rise from net energy, mass, and specific heat capacity (c = ${c} J kg⁻¹ °C⁻¹).`
+          title: "3. Temperature Change (ΔT)" + (includeContainer ? " (Substance & Container)" : ""),
+          formula: `\\Delta T = \\frac{E}{${capLatex}}`,
+          sub: `\\Delta T = \\frac{${Math.round(E)}\\text{ J}}{${capSub}} = ${(Tf - Ti).toFixed(2)}\\text{ }^{\\circ}\\text{C}`,
+          desc: includeContainer
+            ? `Calculated temperature rise from net energy, substance mass, beaker, and specific heat capacities (c = ${c} J kg⁻¹ °C⁻¹).`
+            : `Calculated temperature rise from net energy, mass, and specific heat capacity (c = ${c} J kg⁻¹ °C⁻¹).`
         },
         {
           title: "4. Final Temperature (T<sub>f</sub>)",
@@ -1122,10 +1243,12 @@
           desc: "Total heat energy released by the heater and absorbed by the substance, assuming no heat loss."
         },
         {
-          title: "2. Temperature Change (ΔT)",
-          formula: "\\Delta T = \\frac{E}{m \\cdot c}",
-          sub: `\\Delta T = \\frac{${Math.round(E)}\\text{ J}}{${m}\\text{ kg} \\cdot ${c}\\text{ J kg}^{-1}\\text{ }^{\\circ}\\text{C}^{-1}} = ${(Tf - Ti).toFixed(2)}\\text{ }^{\\circ}\\text{C}`,
-          desc: `Calculated temperature rise based on the energy supplied, mass, and specific heat capacity (c = ${c} J kg⁻¹ °C⁻¹).`
+          title: "2. Temperature Change (ΔT)" + (includeContainer ? " (Substance & Container)" : ""),
+          formula: `\\Delta T = \\frac{E}{${capLatex}}`,
+          sub: `\\Delta T = \\frac{${Math.round(E)}\\text{ J}}{${capSub}} = ${(Tf - Ti).toFixed(2)}\\text{ }^{\\circ}\\text{C}`,
+          desc: includeContainer
+            ? `Calculated temperature rise based on energy supplied, substance, glass beaker, and specific heat capacities (c = ${c} J kg⁻¹ °C⁻¹).`
+            : `Calculated temperature rise based on the energy supplied, mass, and specific heat capacity (c = ${c} J kg⁻¹ °C⁻¹).`
         },
         {
           title: "3. Final Temperature (T<sub>f</sub>)",
@@ -1147,10 +1270,12 @@
           desc: "物質在已過去的加熱時間內吸收的淨熱能總和。"
         },
         {
-          title: "3. 溫度變化 (ΔT)",
-          formula: "\\Delta T = \\frac{E}{m \\cdot c}",
-          sub: `\\Delta T = \\frac{${Math.round(E)}\\text{ J}}{${m}\\text{ kg} \\cdot ${c}\\text{ J kg}^{-1}\\text{ }^{\\circ}\\text{C}^{-1}} = ${(Tf - Ti).toFixed(2)}\\text{ }^{\\circ}\\text{C}`,
-          desc: `由物質的質量和比熱容量（比熱 c = ${c} J kg⁻¹ °C⁻¹）決定的溫度升幅。`
+          title: "3. 溫度變化 (ΔT)" + (includeContainer ? "（物質及容器）" : ""),
+          formula: `\\Delta T = \\frac{E}{${capLatex}}`,
+          sub: `\\Delta T = \\frac{${Math.round(E)}\\text{ J}}{${capSub}} = ${(Tf - Ti).toFixed(2)}\\text{ }^{\\circ}\\text{C}`,
+          desc: includeContainer
+            ? `由物質、玻璃燒杯嘅質量同比熱容量（比熱 c = ${c} J kg⁻¹ °C⁻¹）決定嘅溫度升幅。`
+            : `由物質的質量和比熱容量（比熱 c = ${c} J kg⁻¹ °C⁻¹）決定的溫度升幅。`
         },
         {
           title: "4. 最終溫度 (T<sub>f</sub>)",
@@ -1166,10 +1291,12 @@
           desc: "在無熱量流失的理想系統中，加熱器釋放並被物質完全吸收的總熱能。"
         },
         {
-          title: "2. 溫度變化 (ΔT)",
-          formula: "\\Delta T = \\frac{E}{m \\cdot c}",
-          sub: `\\Delta T = \\frac{${Math.round(E)}\\text{ J}}{${m}\\text{ kg} \\cdot ${c}\\text{ J kg}^{-1}\\text{ }^{\\circ}\\text{C}^{-1}} = ${(Tf - Ti).toFixed(2)}\\text{ }^{\\circ}\\text{C}`,
-          desc: `由物質的質量和比熱容量（比熱 c = ${c} J kg⁻¹ °C⁻¹）決定的溫度升幅。`
+          title: "2. 溫度變化 (ΔT)" + (includeContainer ? "（物質及容器）" : ""),
+          formula: `\\Delta T = \\frac{E}{${capLatex}}`,
+          sub: `\\Delta T = \\frac{${Math.round(E)}\\text{ J}}{${capSub}} = ${(Tf - Ti).toFixed(2)}\\text{ }^{\\circ}\\text{C}`,
+          desc: includeContainer
+            ? `由輸入能量、物質、玻璃燒杯嘅質量同比熱容量（比熱 c = ${c} J kg⁻¹ °C⁻¹）決定嘅溫度升幅。`
+            : `由物質的質量和比熱容量（比熱 c = ${c} J kg⁻¹ °C⁻¹）決定的溫度升幅。`
         },
         {
           title: "3. 最終溫度 (T<sub>f</sub>)",

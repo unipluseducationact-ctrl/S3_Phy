@@ -261,6 +261,13 @@
             <i data-lucide="play" class="w-5 h-5"></i>
             <span class="lab-btn-label" id="stateBtnText" data-i18n="startState">Start Heating</span>
           </button>
+          <button id="stateSpeedBtn" type="button" class="px-3 py-3 bg-slate-100 hover:bg-slate-200 active:bg-slate-300 text-slate-600 font-bold rounded-xl transition-all flex items-center justify-center gap-1 min-w-[3.25rem]" title="Playback speed">
+            <i data-lucide="gauge" class="w-4 h-4"></i>
+            <span class="lab-speed-label text-sm">1×</span>
+          </button>
+          <button id="stateSkipBtn" type="button" class="px-3 py-3 bg-slate-100 hover:bg-slate-200 active:bg-slate-300 text-slate-600 font-bold rounded-xl transition-all flex items-center justify-center" data-i18n-title="skipToEndTitle">
+            <i data-lucide="skip-forward" class="w-5 h-5"></i>
+          </button>
           <button id="resetStateBtn" class="px-4 py-3 bg-slate-100 hover:bg-slate-200 active:bg-slate-300 text-slate-600 font-bold rounded-xl transition-all flex items-center justify-center">
             <i data-lucide="rotate-ccw" class="w-5 h-5"></i>
           </button>
@@ -356,7 +363,8 @@
         clickStartToSee: "Click 'Start' to see calculation steps.",
         showControls: "Show parameters",
         hideControls: "Hide parameters",
-        dragHint: "Drag to move"
+        dragHint: "Drag to move",
+        skipToEndTitle: "Skip to end of simulation"
       },
       zhHant: {
         stateControls: "潛熱實驗參數",
@@ -391,9 +399,13 @@
         clickStartToSee: "點擊「開始」以顯示詳細計算步驟。",
         showControls: "顯示參數",
         hideControls: "隱藏參數",
-        dragHint: "拖曳以移動"
+        dragHint: "拖曳以移動",
+        skipToEndTitle: "跳至模擬結果"
       }
     };
+
+    const PLAYBACK_SPEEDS = [1, 2, 4];
+    const STATE_BASE_SIM_SPEED = 4.0;
 
     const CONTROLS_STORAGE_KEY = 's3phy-change-of-state-controls-collapsed';
     let floatControlsApi = null;
@@ -588,8 +600,36 @@
       bubbles: [],
       steamParticles: [],
       chartData: { labels: [0], temps: [-10] },
-      heatLossPower: 0
+      heatLossPower: 0,
+      playbackSpeed: 1
     };
+
+    function cyclePlaybackSpeed(state, btn) {
+      const i = PLAYBACK_SPEEDS.indexOf(state.playbackSpeed);
+      state.playbackSpeed = PLAYBACK_SPEEDS[(i + 1) % PLAYBACK_SPEEDS.length];
+      btn.querySelector(".lab-speed-label").textContent = state.playbackSpeed + "×";
+      btn.classList.toggle("bg-amber-100", state.playbackSpeed > 1);
+      btn.classList.toggle("text-amber-800", state.playbackSpeed > 1);
+      btn.classList.toggle("bg-slate-100", state.playbackSpeed === 1);
+      btn.classList.toggle("text-slate-600", state.playbackSpeed === 1);
+    }
+
+    function isStateLabComplete() {
+      return stateState.phase === "vaporized" && stateState.timeElapsed > 0;
+    }
+
+    function updateStateSkipButton() {
+      const skipBtn = document.getElementById("stateSkipBtn");
+      if (skipBtn) skipBtn.disabled = isStateLabComplete();
+    }
+
+    function setStateStartButtonIdle() {
+      const btnText = stateState.mode === "heating"
+        ? (currentLang === "en" ? "Start Heating" : "開始加熱")
+        : (currentLang === "en" ? "Start Cooling" : "開始冷卻");
+      document.getElementById("startStateBtn").innerHTML = `<i data-lucide="play" class="w-5 h-5"></i><span class="lab-btn-label">${btnText}</span>`;
+      lucide.createIcons();
+    }
 
     function resizeCanvas(canvas) {
       const parent = canvas.parentNode;
@@ -822,186 +862,212 @@
 
       initChart();
       drawStateLab();
+      updateStateSkipButton();
+    }
+
+    function stepStateLab(dt, options) {
+      const thinChart = options && options.thinChart;
+      const lastChartT = options && options.lastChartT != null ? options.lastChartT : stateState.timeElapsed;
+      stateState.timeElapsed += dt;
+
+      const subData = substanceC_water[stateState.substance];
+      const m = stateState.mass;
+      const P = stateState.power;
+      let netPower = P;
+
+      let heatLossPower = 0;
+      if (stateState.enableLoss) {
+        const tempDiff = Math.max(0, stateState.temp - 20);
+        const coolingLossPower = tempDiff * 0.45 * 1.5;
+
+        if (stateState.mode === "heating") {
+          heatLossPower = coolingLossPower;
+          netPower = Math.max(0, P - coolingLossPower);
+        } else {
+          heatLossPower = coolingLossPower;
+          netPower = P + coolingLossPower;
+        }
+      }
+      stateState.heatLossPower = heatLossPower;
+
+      stateState.energy += netPower * dt;
+
+      const E = stateState.energy;
+      const cS = subData.cSolid;
+      const cL = subData.cLiquid;
+      const cG = subData.cGas;
+      const Lf = subData.lFusion;
+      const Lv = subData.lVapor;
+      const Tm = subData.tMelting;
+      const Tb = subData.tBoiling;
+      const Ti = stateState.initTemp;
+      let finished = false;
+
+      if (stateState.mode === "heating") {
+        const E1 = m * cS * (Tm - Ti);
+        const E2 = E1 + m * Lf;
+        const E3 = E2 + m * cL * (Tb - Tm);
+        const E4 = E3 + m * Lv;
+        const E5 = E4 + m * cG * (140 - Tb);
+
+        if (E < E1) {
+          stateState.phase = stateState.substance === "water" ? "iceHeating" : "solidHeating";
+          stateState.temp = Ti + E / (m * cS);
+        } else if (E < E2) {
+          stateState.phase = "iceMelting";
+          stateState.temp = Tm;
+          if (stateState.substance === "water") {
+            const meltFraction = Math.max(0, 1 - (E - E1) / (m * Lf));
+            stateState.iceCubes.forEach(cube => {
+              cube.meltedSize = (cube.size || 20) * Math.pow(meltFraction, 1/3);
+            });
+          }
+        } else if (E < E3) {
+          stateState.phase = stateState.substance === "water" ? "waterHeating" : "liquidHeating";
+          stateState.temp = Tm + (E - E2) / (m * cL);
+          stateState.iceCubes = [];
+        } else if (E < E4) {
+          if (stateState.substance === "water") {
+            stateState.phase = "waterBoiling";
+            stateState.temp = Tb;
+            if (!thinChart && Math.random() < 0.25) {
+              const w = stateCanvas.width / window.devicePixelRatio;
+              const h = stateCanvas.height / window.devicePixelRatio;
+              const centerX = w / 2;
+              const beakerW = 160;
+              const beakerY = h - 40;
+              const beakerX = centerX - beakerW / 2;
+              stateState.bubbles.push({
+                x: beakerX + 15 + Math.random() * (beakerW - 30),
+                y: beakerY - 10 - Math.random() * 15,
+                r: 1.5 + Math.random() * 4,
+                speed: 1.2 + Math.random() * 2
+              });
+            }
+          } else {
+            stateState.energy = E3;
+            stateState.temp = Tb;
+            stateState.phase = "vaporized";
+            finished = true;
+          }
+        } else if (stateState.isSealed && E < E5) {
+          stateState.phase = "steamHeating";
+          stateState.temp = Tb + (E - E4) / (m * cG);
+          stateState.bubbles = [];
+        } else {
+          const E_term = stateState.isSealed ? E5 : E4;
+          const excess = E - E_term;
+          stateState.energy = E_term;
+          if (netPower > 0) stateState.timeElapsed -= excess / netPower;
+          stateState.phase = "vaporized";
+          stateState.temp = stateState.isSealed ? 140 : Tb;
+          finished = true;
+        }
+      } else {
+        const E1 = m * cL * (Ti - Tm);
+        const E2 = E1 + m * Lf;
+        const E3 = E2 + m * cS * (Tm - -20);
+
+        if (E < E1) {
+          stateState.phase = "liquidCooling";
+          stateState.temp = Ti - E / (m * cL);
+        } else if (E < E2) {
+          stateState.phase = "solidifying";
+          stateState.temp = Tm;
+        } else if (E < E3) {
+          stateState.phase = "solidCooling";
+          stateState.temp = Tm - (E - E2) / (m * cS);
+        } else {
+          const excess = E - E3;
+          stateState.energy = E3;
+          if (netPower > 0) stateState.timeElapsed -= excess / netPower;
+          stateState.temp = -20;
+          stateState.phase = "vaporized";
+          finished = true;
+        }
+      }
+
+      document.getElementById("liveStateTemp").textContent = stateState.temp.toFixed(1) + " °C";
+      document.getElementById("liveStateEnergy").textContent = `E = ${Math.round(stateState.energy).toLocaleString()} J`;
+      document.getElementById("liveStateTime").textContent = `t = ${stateState.timeElapsed.toFixed(1)} s`;
+
+      if (document.getElementById("liveStateLoss")) {
+        const currentLoss = Math.round(stateState.heatLossPower || 0);
+        document.getElementById("liveStateLoss").textContent = stateState.mode === "heating"
+          ? (currentLang === "en" ? `Heat Loss: ${currentLoss} W` : `熱量流失: ${currentLoss} W`)
+          : (currentLang === "en" ? `Heat Dissipation: ${currentLoss} W` : `散熱功率: ${currentLoss} W`);
+      }
+
+      const shouldPushChart = !thinChart
+        || finished
+        || stateState.chartData.labels.length === 0
+        || (stateState.timeElapsed - lastChartT >= 5);
+      if (shouldPushChart) {
+        stateState.chartData.labels.push(stateState.timeElapsed);
+        stateState.chartData.temps.push(stateState.temp);
+        if (options) options.lastChartT = stateState.timeElapsed;
+      }
+
+      return { finished, lastChartT: options ? options.lastChartT : stateState.timeElapsed };
+    }
+
+    function skipStateLabToEnd() {
+      if (isStateLabComplete()) return;
+      clearInterval(stateInterval);
+      stateState.running = true;
+      const skipOpts = { thinChart: true, lastChartT: stateState.timeElapsed };
+      let guard = 0;
+      let result;
+      do {
+        result = stepStateLab(2.0, skipOpts);
+        guard++;
+      } while (!result.finished && guard < 50000);
+
+      stateState.running = false;
+      setStateStartButtonIdle();
+      updateChart();
+      updateStateSteps();
+      drawStateLab();
+      updateStateSkipButton();
     }
 
     document.getElementById("resetStateBtn").addEventListener("click", resetStateLab);
+
+    document.getElementById("stateSpeedBtn").addEventListener("click", () => {
+      cyclePlaybackSpeed(stateState, document.getElementById("stateSpeedBtn"));
+    });
+
+    document.getElementById("stateSkipBtn").addEventListener("click", skipStateLabToEnd);
 
     document.getElementById("startStateBtn").addEventListener("click", () => {
       if (stateState.running) {
         clearInterval(stateInterval);
         stateState.running = false;
-        
-        const btnText = stateState.mode === "heating" ? (currentLang === 'en' ? 'Resume Heating' : '繼續加熱') : (currentLang === 'en' ? 'Resume Cooling' : '繼續冷卻');
+
+        const btnText = stateState.mode === "heating" ? (currentLang === "en" ? "Resume Heating" : "繼續加熱") : (currentLang === "en" ? "Resume Cooling" : "繼續冷卻");
         document.getElementById("startStateBtn").innerHTML = `<i data-lucide="play" class="w-5 h-5"></i><span class="lab-btn-label">${btnText}</span>`;
         lucide.createIcons();
       } else {
         stateState.running = true;
-        document.getElementById("startStateBtn").innerHTML = `<i data-lucide="pause" class="w-5 h-5"></i><span class="lab-btn-label">${currentLang === 'en' ? 'Pause' : '暫停'}</span>`;
+        document.getElementById("startStateBtn").innerHTML = `<i data-lucide="pause" class="w-5 h-5"></i><span class="lab-btn-label">${currentLang === "en" ? "Pause" : "暫停"}</span>`;
         lucide.createIcons();
+        updateStateSkipButton();
 
         const fps = 30;
-        const timeStep = 1 / fps; 
-        const speedMultiplier = 4.0; // Speed up change of state curve
+        const timeStep = 1 / fps;
 
         stateInterval = setInterval(() => {
-          const dt = timeStep * speedMultiplier;
-          stateState.timeElapsed += dt;
-
-          const subData = substanceC_water[stateState.substance];
-          const m = stateState.mass;
-          const P = stateState.power;
-          let netPower = P;
-
-          // Real-time Environmental heat loss / dissipation calculation
-          let heatLossPower = 0;
-          if (stateState.enableLoss) {
-            const tempDiff = Math.max(0, stateState.temp - 20);
-            const coolingLossPower = tempDiff * 0.45 * 1.5; 
-
-            if (stateState.mode === "heating") {
-              heatLossPower = coolingLossPower;
-              netPower = Math.max(0, P - coolingLossPower);
-            } else {
-              // Cooling mode: Net rate of heat removal is P_cooler + natural cooling loss
-              heatLossPower = coolingLossPower;
-              netPower = P + coolingLossPower; 
-            }
-          }
-          stateState.heatLossPower = heatLossPower;
-
-          // Euler Integration for energy accumulation
-          stateState.energy += netPower * dt;
-
-          const E = stateState.energy;
-
-          // Energy points calculations based on dynamic substance selected
-          const cS = subData.cSolid;
-          const cL = subData.cLiquid;
-          const cG = subData.cGas;
-          const Lf = subData.lFusion;
-          const Lv = subData.lVapor;
-          const Tm = subData.tMelting;
-          const Tb = subData.tBoiling;
-          const Ti = stateState.initTemp;
-
-          if (stateState.mode === "heating") {
-            // Heating mode logic
-            const E1 = m * cS * (Tm - Ti);
-            const E2 = E1 + m * Lf;
-            const E3 = E2 + m * cL * (Tb - Tm);
-            const E4 = E3 + m * Lv;
-            const E5 = E4 + m * cG * (140 - Tb); // Closed sealed container heats steam to 140
-
-            if (E < E1) {
-              stateState.phase = stateState.substance === "water" ? "iceHeating" : "solidHeating";
-              stateState.temp = Ti + E / (m * cS);
-            } else if (E < E2) {
-              stateState.phase = "iceMelting";
-              stateState.temp = Tm;
-
-              // Melt ice cubes visually
-              if (stateState.substance === "water") {
-                const meltFraction = Math.max(0, 1 - (E - E1) / (m * Lf));
-                stateState.iceCubes.forEach(cube => {
-                  cube.meltedSize = (cube.size || 20) * Math.pow(meltFraction, 1/3);
-                });
-              }
-            } else if (E < E3) {
-              stateState.phase = stateState.substance === "water" ? "waterHeating" : "liquidHeating";
-              stateState.temp = Tm + (E - E2) / (m * cL);
-              stateState.iceCubes = [];
-            } else if (E < E4) {
-              if (stateState.substance === "water") {
-                stateState.phase = "waterBoiling";
-                stateState.temp = Tb;
-                if (Math.random() < 0.25) {
-                  const w = stateCanvas.width / window.devicePixelRatio;
-                  const h = stateCanvas.height / window.devicePixelRatio;
-                  const centerX = w / 2;
-                  const beakerW = 160;
-                  const beakerY = h - 40;
-                  const beakerX = centerX - beakerW / 2;
-                  stateState.bubbles.push({
-                    x: beakerX + 15 + Math.random() * (beakerW - 30),
-                    y: beakerY - 10 - Math.random() * 15,
-                    r: 1.5 + Math.random() * 4,
-                    speed: 1.2 + Math.random() * 2
-                  });
-                }
-              } else {
-                // Naphthalene is treated as fully vaporized / completed once boiling pt is crossed
-                stateState.energy = E3;
-                stateState.temp = Tb;
-                stateState.phase = "vaporized";
-                clearInterval(stateInterval);
-                stateState.running = false;
-                document.getElementById("startStateBtn").innerHTML = `<i data-lucide="play" class="w-5 h-5"></i><span class="lab-btn-label">${currentLang === 'en' ? 'Start Heating' : '開始加熱'}</span>`;
-                lucide.createIcons();
-              }
-            } else if (stateState.isSealed && E < E5) {
-              stateState.phase = "steamHeating";
-              stateState.temp = Tb + (E - E4) / (m * cG);
-              stateState.bubbles = [];
-            } else {
-              // precise terminal boundaries
-              const E_term = stateState.isSealed ? E5 : E4;
-              const excess = E - E_term;
-              stateState.energy = E_term;
-              stateState.timeElapsed -= excess / netPower;
-              stateState.phase = "vaporized";
-              stateState.temp = stateState.isSealed ? 140 : Tb;
-              clearInterval(stateInterval);
-              stateState.running = false;
-              document.getElementById("startStateBtn").innerHTML = `<i data-lucide="play" class="w-5 h-5"></i><span class="lab-btn-label">${currentLang === 'en' ? 'Start Heating' : '開始加熱'}</span>`;
-              lucide.createIcons();
-            }
-          } else {
-            // Cooling mode logic
-            const E1 = m * cL * (Ti - Tm);
-            const E2 = E1 + m * Lf;
-            const E3 = E2 + m * cS * (Tm - -20); // Solid cools down below melting
-
-            if (E < E1) {
-              stateState.phase = "liquidCooling";
-              stateState.temp = Ti - E / (m * cL);
-            } else if (E < E2) {
-              stateState.phase = "solidifying";
-              stateState.temp = Tm;
-            } else if (E < E3) {
-              stateState.phase = stateState.substance === "water" ? "solidCooling" : "solidCooling";
-              stateState.temp = Tm - (E - E2) / (m * cS);
-            } else {
-              // Precise cooling termination at -20 °C
-              const excess = E - E3;
-              stateState.energy = E3;
-              stateState.timeElapsed -= excess / netPower;
-              stateState.temp = -20;
-              stateState.phase = "vaporized";
-              clearInterval(stateInterval);
-              stateState.running = false;
-              document.getElementById("startStateBtn").innerHTML = `<i data-lucide="play" class="w-5 h-5"></i><span class="lab-btn-label">${currentLang === 'en' ? 'Start Cooling' : '開始冷卻'}</span>`;
-              lucide.createIcons();
-            }
-          }
-
-          document.getElementById("liveStateTemp").textContent = stateState.temp.toFixed(1) + " °C";
-          document.getElementById("liveStateEnergy").textContent = `E = ${Math.round(stateState.energy).toLocaleString()} J`;
-          document.getElementById("liveStateTime").textContent = `t = ${stateState.timeElapsed.toFixed(1)} s`;
-          
-          if (document.getElementById("liveStateLoss")) {
-            const currentLoss = Math.round(stateState.heatLossPower || 0);
-            document.getElementById("liveStateLoss").textContent = stateState.mode === "heating" ? 
-              (currentLang === 'en' ? `Heat Loss: ${currentLoss} W` : `熱量流失: ${currentLoss} W`) : 
-              (currentLang === 'en' ? `Heat Dissipation: ${currentLoss} W` : `散熱功率: ${currentLoss} W`);
-          }
-
-          // Push to graph points
-          stateState.chartData.labels.push(stateState.timeElapsed);
-          stateState.chartData.temps.push(stateState.temp);
-
+          const dt = timeStep * STATE_BASE_SIM_SPEED * stateState.playbackSpeed;
+          const { finished } = stepStateLab(dt);
           updateChart();
           updateStateSteps();
           drawStateLab();
+          if (finished) {
+            clearInterval(stateInterval);
+            stateState.running = false;
+            setStateStartButtonIdle();
+            updateStateSkipButton();
+          }
         }, 1000 / fps);
       }
     });
