@@ -249,8 +249,8 @@
           <div class="grid grid-cols-2 gap-x-2 gap-y-1 font-mono text-[11px] text-slate-600" id="stateConstantsBox">
             <div class="flex justify-between"><span data-i18n="cIce">c<sub>ice</sub>:</span><span>2100</span></div>
             <div class="flex justify-between"><span data-i18n="cWater">c<sub>water</sub>:</span><span>4200</span></div>
-            <div class="flex justify-between"><span data-i18n="lfIce">l<sub>fusion</sub> (ice):</span><span>3.34e5</span></div>
-            <div class="flex justify-between"><span data-i18n="lvWater">l<sub>vapor</sub> (water):</span><span>2.26e6</span></div>
+            <div class="flex justify-between"><span data-i18n="lfIce">l<sub>fusion</sub> (ice):</span><span>3.34 × 10<sup>5</sup></span></div>
+            <div class="flex justify-between"><span data-i18n="lvWater">l<sub>vapor</sub> (water):</span><span>2.26 × 10<sup>6</sup></span></div>
           </div>
         </div>
         </div>
@@ -528,6 +528,18 @@
     const L_FUSION = 3.34e5; // J kg⁻¹
     const L_VAPOR = 2.26e6;  // J kg⁻¹
 
+    function formatSciKaTeX(value) {
+      const exp = Math.floor(Math.log10(value));
+      const mantissa = +(value / Math.pow(10, exp)).toFixed(2);
+      return `${mantissa} \\times 10^{${exp}}`;
+    }
+
+    function formatSciHTML(value) {
+      const exp = Math.floor(Math.log10(value));
+      const mantissa = +(value / Math.pow(10, exp)).toFixed(2);
+      return `${mantissa} × 10<sup>${exp}</sup>`;
+    }
+
     const SUBSTANCES = {
       water: { nameEn: "Water", nameZh: "水", c: C_WATER },
       copper: { nameEn: "Copper", nameZh: "銅", c: C_COPPER },
@@ -670,8 +682,8 @@
         constantsBox.innerHTML = `
           <div class="flex justify-between"><span data-i18n="cIce">${currentLang === 'en' ? 'c<sub>ice</sub>:' : '冰的比熱容量 c<sub>ice</sub>:'}</span><span>2100 J kg⁻¹ °C⁻¹</span></div>
           <div class="flex justify-between"><span data-i18n="cWater">${currentLang === 'en' ? 'c<sub>water</sub>:' : '水的比熱容量 c<sub>water</sub>:'}</span><span>4200 J kg⁻¹ °C⁻¹</span></div>
-          <div class="flex justify-between"><span data-i18n="lfIce">${currentLang === 'en' ? 'l<sub>fusion</sub> (ice):' : '冰的熔化潛熱 l<sub>f</sub>:'}</span><span>3.34e5 J kg⁻¹</span></div>
-          <div class="flex justify-between"><span data-i18n="lvWater">${currentLang === 'en' ? 'l<sub>vapor</sub> (water):' : '水的汽化潛熱 l<sub>v</sub>:'}</span><span>2.26e6 J kg⁻¹</span></div>
+          <div class="flex justify-between"><span data-i18n="lfIce">${currentLang === 'en' ? 'l<sub>fusion</sub> (ice):' : '冰的熔化潛熱 l<sub>f</sub>:'}</span><span>${formatSciHTML(L_FUSION)} J kg⁻¹</span></div>
+          <div class="flex justify-between"><span data-i18n="lvWater">${currentLang === 'en' ? 'l<sub>vapor</sub> (water):' : '水的汽化潛熱 l<sub>v</sub>:'}</span><span>${formatSciHTML(L_VAPOR)} J kg⁻¹</span></div>
         `;
 
         if (mode === "heating") {
@@ -694,7 +706,7 @@
         constantsBox.innerHTML = `
           <div class="flex justify-between"><span>c<sub>solid</sub> (naph):</span><span>1720 J kg⁻¹ °C⁻¹</span></div>
           <div class="flex justify-between"><span>c<sub>liquid</sub> (naph):</span><span>2200 J kg⁻¹ °C⁻¹</span></div>
-          <div class="flex justify-between"><span>l<sub>fusion</sub> (naph):</span><span>1.49e5 J kg⁻¹</span></div>
+          <div class="flex justify-between"><span>l<sub>fusion</sub> (naph):</span><span>${formatSciHTML(substanceC_water.naphthalene.lFusion)} J kg⁻¹</span></div>
           <div class="flex justify-between"><span>Melting Pt (naph):</span><span>80 °C</span></div>
         `;
 
@@ -1462,7 +1474,7 @@
           "Phase 2: Solid Melting (Latent Heat of Fusion)",
           "階段 2: 固態熔化 (熔化潛熱吸收)",
           "E_{\\text{fusion}} = m \\cdot l_f",
-          `E_{\\text{fusion}} = ${m}\\text{ kg} \\cdot ${Lf.toExponential(2)} = ${Math.round(m * Lf).toLocaleString()}\\text{ J}`,
+          `E_{\\text{fusion}} = ${m}\\text{ kg} \\cdot ${formatSciKaTeX(Lf)}\\text{ J kg}^{-1} = ${Math.round(m * Lf).toLocaleString()}\\text{ J}`,
           `Latent heat required to break molecular bonds to change phase from solid to liquid at melting point. Melting progress: ${p === "iceMelting" ? Math.round(Math.min(100, Math.max(0, (E - E1) / (m * Lf) * 100))) : (E >= E2 ? 100 : 0)}%.`,
           `在熔點時打破分子鍵以將其由固態轉變為液態所需的能量（比熔化潛熱）。熔化進度：${p === "iceMelting" ? Math.round(Math.min(100, Math.max(0, (E - E1) / (m * Lf) * 100))) : (E >= E2 ? 100 : 0)}%。`,
           p === "iceMelting"
@@ -1485,7 +1497,7 @@
             "Phase 4: Liquid Boiling (Latent Heat of Vaporization)",
             "階段 4: 液體沸騰 (汽化潛熱吸收)",
             "E_{\\text{vapor}} = m \\cdot l_v",
-            `E_{\\text{vapor}} = ${m}\\text{ kg} \\cdot ${Lv.toExponential(2)} = ${Math.round(m * Lv).toLocaleString()}\\text{ J}`,
+            `E_{\\text{vapor}} = ${m}\\text{ kg} \\cdot ${formatSciKaTeX(Lv)}\\text{ J kg}^{-1} = ${Math.round(m * Lv).toLocaleString()}\\text{ J}`,
             `Latent heat required to completely transform liquid into gas at boiling point. Boiling progress: ${p === "waterBoiling" ? Math.round(Math.min(100, Math.max(0, (E - E3) / (m * Lv) * 100))) : (E >= E4 ? 100 : 0)}%.`,
             `在沸點時完全將液體汽化轉變為氣體分子所需的潛熱能。汽化沸騰進度：${p === "waterBoiling" ? Math.round(Math.min(100, Math.max(0, (E - E3) / (m * Lv) * 100))) : (E >= E4 ? 100 : 0)}%。`,
             p === "waterBoiling"
@@ -1518,7 +1530,7 @@
           "Phase 2: Solidifying (Latent Heat Released)",
           "階段 2: 凝固放熱 (物態熔化潛熱釋出)",
           "E_{\\text{freeze}} = m \\cdot l_f",
-          `E_{\\text{freeze}} = ${m}\\text{ kg} \\cdot ${Lf.toExponential(2)} = ${Math.round(m * Lf).toLocaleString()}\\text{ J}`,
+          `E_{\\text{freeze}} = ${m}\\text{ kg} \\cdot ${formatSciKaTeX(Lf)}\\text{ J kg}^{-1} = ${Math.round(m * Lf).toLocaleString()}\\text{ J}`,
           `Latent heat released as liquid solidifies into crystalline lattice structures. Freezing progress: ${p === "solidifying" ? Math.round(Math.min(100, Math.max(0, (E - E1) / (m * Lf) * 100))) : (E >= E2 ? 100 : 0)}%.`,
           `液態凝固結晶成固態晶格結構時向外界釋放的潛熱能量。凝固進度：${p === "solidifying" ? Math.round(Math.min(100, Math.max(0, (E - E1) / (m * Lf) * 100))) : (E >= E2 ? 100 : 0)}%。`,
           p === "solidifying"

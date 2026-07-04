@@ -1125,6 +1125,32 @@
       }
     }
 
+    function mixingCapSide(includeContainer) {
+      return includeContainer
+        ? '(m_A c_A + m_{\\text{cont}} c_{\\text{cont}})'
+        : 'm_A c_A';
+    }
+
+    function mixingHeatLossFormula(includeContainer) {
+      return `Q_{\\text{loss}} = ${mixingCapSide(includeContainer)} \\cdot (T_{i,A} - T_A)`;
+    }
+
+    function mixingConservationSub(includeContainer) {
+      return `${mixingCapSide(includeContainer)} \\cdot (T_{i,A} - T_f) = m_B c_B \\cdot (T_f - T_{i,B})`;
+    }
+
+    function mixingEquilibriumFormula(includeContainer) {
+      const capA = mixingCapSide(includeContainer);
+      return `T_f = \\frac{${capA} T_{i,A} + m_B c_B T_{i,B}}{${capA} + m_B c_B}`;
+    }
+
+    function mixingHeatLossSub(includeContainer, mA, cA, cContainer, TiA, TfA, totalHeatSupplied) {
+      const capExpr = includeContainer
+        ? `(${mA}\\text{ kg} \\cdot ${cA} + 0.15\\text{ kg} \\cdot ${cContainer})`
+        : `(${mA}\\text{ kg} \\cdot ${cA})`;
+      return `Q_{\\text{loss}} = ${capExpr} \\cdot (${TiA}^{\\circ}\\text{C} - ${TfA.toFixed(1)}^{\\circ}\\text{C}) = ${Math.round(totalHeatSupplied).toLocaleString()}\\text{ J}`;
+    }
+
     function updateMixingSteps() {
       const stepsContainer = document.getElementById("mixingSteps");
       stepsContainer.innerHTML = "";
@@ -1168,6 +1194,8 @@
         `;
       }
 
+      const includeContainer = mixState.includeContainer;
+
       if (subB === "ice" && mixState.iceMeltingPhase !== "completed") {
         // Step-by-Step for ICE melting mixture
         const heatTo0Ice = mB * C_ICE * (0 - TiB);
@@ -1176,10 +1204,12 @@
 
         const steps = currentLang === "en" ? [
           {
-            title: "1. Heat Released by Substance A & Container",
-            formula: "Q_{\\text{loss}} = (m_A c_A + m_{\\text{cont}} c_{\\text{cont}}) \\cdot (T_{i,A} - T_A)",
-            sub: `Q_{\\text{loss}} = (${mA}\\text{ kg} \\cdot ${cA} + ${mixState.includeContainer ? 0.15 : 0}\\text{ kg} \\cdot ${cContainer}) \\cdot (${TiA}^{\\circ}\\text{C} - ${TfA.toFixed(1)}^{\\circ}\\text{C}) = ${Math.round(totalHeatSupplied).toLocaleString()}\\text{ J}`,
-            desc: "Heat energy lost by hot substance A (and glass container) to melt the ice."
+            title: "1. Heat Released by Substance A" + (includeContainer ? " & Container" : ""),
+            formula: mixingHeatLossFormula(includeContainer),
+            sub: mixingHeatLossSub(includeContainer, mA, cA, cContainer, TiA, TfA, totalHeatSupplied),
+            desc: includeContainer
+              ? "Heat energy lost by hot substance A and glass container to melt the ice."
+              : "Heat energy lost by hot substance A to melt the ice."
           },
           {
             title: "2. Heat Required to Warm Ice to 0 °C",
@@ -1201,10 +1231,12 @@
           }
         ] : [
           {
-            title: "1. 物質 A 及容器釋放的熱量",
-            formula: "Q_{\\text{loss}} = (m_A c_A + m_{\\text{cont}} c_{\\text{cont}}) \\cdot (T_{i,A} - T_A)",
-            sub: `Q_{\\text{loss}} = (${mA}\\text{ kg} \\cdot ${cA} + ${mixState.includeContainer ? 0.15 : 0}\\text{ kg} \\cdot ${cContainer}) \\cdot (${TiA}^{\\circ}\\text{C} - ${TfA.toFixed(1)}^{\\circ}\\text{C}) = ${Math.round(totalHeatSupplied).toLocaleString()}\\text{ J}`,
-            desc: "高溫物質 A（及玻璃燒杯容器）所釋放，用於融化冰塊的熱能。"
+            title: "1. 物質 A" + (includeContainer ? " 及容器" : "") + "釋放的熱量",
+            formula: mixingHeatLossFormula(includeContainer),
+            sub: mixingHeatLossSub(includeContainer, mA, cA, cContainer, TiA, TfA, totalHeatSupplied),
+            desc: includeContainer
+              ? "高溫物質 A 及玻璃燒杯容器所釋放，用於融化冰塊的熱能。"
+              : "高溫物質 A 所釋放，用於融化冰塊的熱能。"
           },
           {
             title: "2. 冰塊升溫至 0 °C 所需熱量",
@@ -1242,8 +1274,10 @@
           {
             title: "1. Heat Conservation Equation",
             formula: "Q_{\\text{loss}} = Q_{\\text{gain}}",
-            sub: `(m_A c_A + m_{\\text{cont}} c_{\\text{cont}}) \\cdot (T_{i,A} - T_f) = m_B c_B \\cdot (T_f - T_{i,B})`,
-            desc: "Assuming an isolated system with no heat loss to surroundings, thermal energy lost by hot substance equals energy gained by cold substance."
+            sub: mixingConservationSub(includeContainer),
+            desc: includeContainer
+              ? "Assuming an isolated system, thermal energy lost by hot substance A and container equals energy gained by cold substance B."
+              : "Assuming an isolated system with no heat loss to surroundings, thermal energy lost by hot substance equals energy gained by cold substance."
           },
           {
             title: "2. Real-Time Energy Transferred",
@@ -1253,7 +1287,7 @@
           },
           {
             title: "3. Theoretical Equilibrium Temperature (T_f)",
-            formula: "T_f = \\frac{(m_A c_A + m_{\\text{cont}} c_{\\text{cont}}) T_{i,A} + m_B c_B T_{i,B}}{(m_A c_A + m_{\\text{cont}} c_{\\text{cont}}) + m_B c_B}",
+            formula: mixingEquilibriumFormula(includeContainer),
             sub: `T_f = \\frac{(${Math.round(totalCapA)} \\cdot ${TiA}) + (${Math.round(totalCapB)} \\cdot ${TiB})}{${Math.round(totalCapA)} + ${Math.round(totalCapB)}} = ${finalEquilibrium.toFixed(2)}\\text{ }^{\\circ}\\text{C}`,
             desc: "The final temperature that both substances will reach once thermal equilibrium is fully established."
           }
@@ -1261,8 +1295,10 @@
           {
             title: "1. 熱量守恆控制方程",
             formula: "Q_{\\text{loss}} = Q_{\\text{gain}}",
-            sub: `(m_A c_A + m_{\\text{cont}} c_{\\text{cont}}) \\cdot (T_{i,A} - T_f) = m_B c_B \\cdot (T_f - T_{i,B})`,
-            desc: "假設系統與外界完全隔絕無熱量流失，高溫物質（及玻璃燒杯容器）失去的熱量等於低溫物質吸收的熱量。"
+            sub: mixingConservationSub(includeContainer),
+            desc: includeContainer
+              ? "假設系統與外界完全隔絕，高溫物質及玻璃燒杯容器失去的熱量等於低溫物質吸收的熱量。"
+              : "假設系統與外界完全隔絕無熱量流失，高溫物質失去的熱量等於低溫物質吸收的熱量。"
           },
           {
             title: "2. 實時熱量轉移量",
@@ -1272,7 +1308,7 @@
           },
           {
             title: "3. 理論最終平衡溫度 (T_f)",
-            formula: "T_f = \\frac{(m_A c_A + m_{\\text{cont}} c_{\\text{cont}}) T_{i,A} + m_B c_B T_{i,B}}{(m_A c_A + m_{\\text{cont}} c_{\\text{cont}}) + m_B c_B}",
+            formula: mixingEquilibriumFormula(includeContainer),
             sub: `T_f = \\frac{(${Math.round(totalCapA)} \\cdot ${TiA}) + (${Math.round(totalCapB)} \\cdot ${TiB})}{${Math.round(totalCapA)} + ${Math.round(totalCapB)}} = ${finalEquilibrium.toFixed(2)}\\text{ }^{\\circ}\\text{C}`,
             desc: "當熱交換結束，兩物質完全達到熱平衡時的最終穩定溫度。"
           }

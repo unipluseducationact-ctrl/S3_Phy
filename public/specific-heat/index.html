@@ -164,6 +164,13 @@
           <input type="number" id="heatInitTemp" min="0" max="100" step="1" value="20" class="w-full px-3 py-2 bg-slate-50 border border-slate-200 rounded-lg text-sm font-mono font-bold focus:outline-none focus:ring-2 focus:ring-blue-500">
         </div>
 
+        <!-- Target Final Temp -->
+        <div class="space-y-2">
+          <label class="block text-xs font-bold uppercase tracking-wider text-slate-500" data-i18n="targetTemp">Target Final Temp (T<sub>f</sub>) [°C]</label>
+          <input type="number" id="heatTargetTemp" min="0" max="200" step="1" value="80" class="w-full px-3 py-2 bg-slate-50 border border-slate-200 rounded-lg text-sm font-mono font-bold focus:outline-none focus:ring-2 focus:ring-blue-500">
+          <button type="button" id="calcHeatTimeBtn" class="w-full py-2.5 bg-indigo-50 hover:bg-indigo-100 active:bg-indigo-200 text-indigo-700 font-bold rounded-xl border border-indigo-200 transition-all text-sm" data-i18n="calcRequiredTime">Calculate Required Time</button>
+        </div>
+
         <!-- Heating Time Typing Box -->
         <div class="space-y-2">
           <label class="block text-xs font-bold tracking-wider text-slate-500" data-i18n="duration">Heating Duration (t) [s]</label>
@@ -265,6 +272,11 @@
         mass: "Mass (m) [kg]",
         power: "Heater Power (P) [W]",
         initTemp: "Initial Temp (T<sub>i</sub>) [°C]",
+        targetTemp: "Target Final Temp (T<sub>f</sub>) [°C]",
+        calcRequiredTime: "Calculate Required Time",
+        requiredTimeTitle: "Required Heating Time",
+        requiredTimeDescIdeal: "Ideal system (no heat loss): time needed to reach the target final temperature.",
+        requiredTimeDescLoss: "Estimated by stepwise simulation including heat loss to surroundings.",
         duration: "Heating Duration (t) [s]",
         coilDepth: "Coil Immersion Depth",
         enableHeatLoss: "Heat Loss to Surroundings",
@@ -294,6 +306,11 @@
         mass: "質量 (m) [kg]",
         power: "加熱器功率 (P) [W]",
         initTemp: "初始溫度 (T<sub>i</sub>) [°C]",
+        targetTemp: "目標最終溫度 (T<sub>f</sub>) [°C]",
+        calcRequiredTime: "計算所需時間",
+        requiredTimeTitle: "所需加熱時間",
+        requiredTimeDescIdeal: "理想系統（無熱流失）：達到目標最終溫度所需的時間。",
+        requiredTimeDescLoss: "以逐步積分估算，已考慮向周圍散失的熱量。",
         duration: "加熱時間 (t) [s]",
         coilDepth: "電熱線圈浸入深度",
         enableHeatLoss: "向環境散失熱量",
@@ -369,7 +386,7 @@
       if (heatState.timeElapsed > 0) {
         updateHeatingSteps();
       } else {
-        document.getElementById("heatingSteps").innerHTML = `<div class="text-slate-400 text-center py-10">${currentLang === 'en' ? 'Click "Start Lab" to see calculation steps.' : '點擊「開始實驗」以顯示詳細計算步驟。'}</div>`;
+        updateHeatingIdleSteps();
       }
 
       // Update live heat loss label
@@ -449,6 +466,7 @@
       enableLoss: false,
       power: 1000,
       initTemp: 20,
+      targetTemp: 80,
       duration: 60,
       substance: "water",
       sourceType: "coil", // coil or hotplate
@@ -512,6 +530,11 @@
       resetHeatingLab();
     });
 
+    document.getElementById("heatTargetTemp").addEventListener("input", (e) => {
+      heatState.targetTemp = parseFloat(e.target.value) || 0;
+      if (!heatState.running && heatState.timeElapsed === 0) updateHeatingIdleSteps();
+    });
+
     document.getElementById("heatTime").addEventListener("input", (e) => {
       heatState.duration = parseInt(e.target.value) || 10;
       resetHeatingLab();
@@ -538,6 +561,156 @@
       resetHeatingLab();
     });
 
+    function tempFromEnergy(state, energy) {
+      const c = SUBSTANCES[state.substance].c;
+      if (state.substance === "water") {
+        const energyTo100 = state.mass * c * (100 - state.initTemp);
+        if (energy >= energyTo100) return 100;
+      }
+      return state.initTemp + energy / (state.mass * c);
+    }
+
+    function computeHeatingPowers(state) {
+      let heatLossPower = 0;
+      let netPower = state.power;
+
+      if (state.enableLoss) {
+        const tempDiff = Math.max(0, state.temp - 20);
+        const lidFactor = state.hasCover ? 0.2 : 1.2;
+        const volumeFactor = 0.5 + 0.5 * (state.mass / 1.0);
+        const coolingLossPower = tempDiff * lidFactor * volumeFactor * 1.5;
+
+        let submergedFraction = 1.0;
+        if (state.sourceType === "coil") {
+          const fillHeight = state.substance === "water" ? 180 * (0.2 + 0.6 * (state.mass / 1.0)) : 180 * 0.7;
+          const liquidTop = 180 - fillHeight;
+          const coilOffset = (100 - state.coilDepth) / 100 * 80;
+          const loopsStart = 180 - 80 - coilOffset;
+          const loopsEnd = 180 - 20 - coilOffset;
+          const overlap = Math.max(0, Math.min(loopsEnd, 180) - Math.max(loopsStart, liquidTop));
+          submergedFraction = Math.max(0, Math.min(1, overlap / 60));
+        }
+
+        const enteredPower = state.power * submergedFraction;
+        const directAirLoss = state.power * (1 - submergedFraction);
+        heatLossPower = coolingLossPower + directAirLoss;
+        netPower = Math.max(0, enteredPower - coolingLossPower);
+      }
+
+      return { netPower, heatLossPower };
+    }
+
+    function calcRequiredHeatingTime(state) {
+      const Ti = state.initTemp;
+      const TfTarget = state.substance === "water"
+        ? Math.min(state.targetTemp, 100)
+        : state.targetTemp;
+      if (TfTarget <= Ti) return null;
+
+      if (!state.enableLoss) {
+        const c = SUBSTANCES[state.substance].c;
+        return (state.mass * c * (TfTarget - Ti)) / state.power;
+      }
+
+      const sim = {
+        ...state,
+        temp: Ti,
+        energy: 0,
+        timeElapsed: 0,
+        heatLossPower: 0,
+        running: false
+      };
+      const dt = 0.1;
+      let t = 0;
+      while (t < 86400) {
+        const { netPower } = computeHeatingPowers(sim);
+        sim.energy += netPower * dt;
+        sim.temp = tempFromEnergy(sim, sim.energy);
+        t += dt;
+        if (sim.temp >= TfTarget - 1e-6) return t;
+      }
+      return null;
+    }
+
+    function applyRequiredHeatingTime() {
+      const t = calcRequiredHeatingTime(heatState);
+      if (t == null) return;
+      const rounded = Math.max(1, Math.round(t * 10) / 10);
+      heatState.duration = Math.max(1, Math.round(rounded));
+      document.getElementById("heatTime").value = heatState.duration;
+      document.getElementById("liveTime").textContent = `t = 0 / ${heatState.duration} s`;
+      updateHeatingIdleSteps();
+    }
+
+    function updateHeatingIdleSteps() {
+      const stepsContainer = document.getElementById("heatingSteps");
+      stepsContainer.innerHTML = "";
+
+      const Ti = heatState.initTemp;
+      const TfTarget = heatState.substance === "water"
+        ? Math.min(heatState.targetTemp, 100)
+        : heatState.targetTemp;
+      const m = heatState.mass;
+      const P = heatState.power;
+      const c = SUBSTANCES[heatState.substance].c;
+      const dict = i18n[currentLang];
+
+      if (TfTarget <= Ti) {
+        stepsContainer.innerHTML = `<div class="text-slate-400 text-center py-10">${currentLang === 'en' ? 'Set target final temperature above initial temperature.' : '請設定高於初始溫度的目標最終溫度。'}</div>`;
+        return;
+      }
+
+      const requiredT = calcRequiredHeatingTime(heatState);
+      if (requiredT == null) {
+        stepsContainer.innerHTML = `<div class="text-slate-400 text-center py-10">${dict.clickStartToSee}</div>`;
+        return;
+      }
+
+      const deltaT = TfTarget - Ti;
+      const card = document.createElement("div");
+      card.className = "p-3 rounded-xl border bg-emerald-50/50 border-emerald-200 space-y-1.5";
+
+      const titleDiv = document.createElement("div");
+      titleDiv.className = "font-bold text-slate-700 text-base";
+      titleDiv.innerHTML = dict.requiredTimeTitle;
+      card.appendChild(titleDiv);
+
+      const formulaDiv = document.createElement("div");
+      formulaDiv.className = "my-1 text-center";
+      card.appendChild(formulaDiv);
+
+      const subDiv = document.createElement("div");
+      subDiv.className = "my-1 text-center text-sm text-emerald-700 font-semibold";
+      card.appendChild(subDiv);
+
+      const descDiv = document.createElement("p");
+      descDiv.className = "text-xs text-slate-500 leading-snug";
+      descDiv.textContent = heatState.enableLoss ? dict.requiredTimeDescLoss : dict.requiredTimeDescIdeal;
+      card.appendChild(descDiv);
+
+      stepsContainer.appendChild(card);
+
+      const formula = heatState.enableLoss
+        ? "t \\approx \\text{simulated stepwise}"
+        : "t = \\frac{m c (T_f - T_i)}{P}";
+      const sub = heatState.enableLoss
+        ? `t \\approx ${requiredT.toFixed(1)}\\text{ s} \\quad (${m}\\text{ kg},\\ c=${c},\\ T_f=${TfTarget}^{\\circ}\\text{C})`
+        : `t = \\frac{${m}\\text{ kg} \\cdot ${c}\\text{ J kg}^{-1}\\text{ }^{\\circ}\\text{C}^{-1} \\cdot ${deltaT.toFixed(1)}\\text{ }^{\\circ}\\text{C}}{${P}\\text{ W}} = ${requiredT.toFixed(1)}\\text{ s}`;
+
+      try {
+        katex.render(formula, formulaDiv, { throwOnError: false, displayMode: true });
+        katex.render(sub, subDiv, { throwOnError: false, displayMode: true });
+      } catch (err) {
+        formulaDiv.textContent = formula;
+        subDiv.textContent = sub;
+      }
+
+      const hint = document.createElement("div");
+      hint.className = "text-slate-400 text-center py-6 text-sm";
+      hint.textContent = dict.clickStartToSee;
+      stepsContainer.appendChild(hint);
+    }
+
     function resetHeatingLab() {
       clearInterval(heatInterval);
       heatState.running = false;
@@ -552,11 +725,12 @@
       document.getElementById("liveHeatLoss").textContent = "Heat Loss: 0 W";
       document.getElementById("startHeatBtn").innerHTML = `<i data-lucide="play" class="w-5 h-5"></i><span class="lab-btn-label">${currentLang === 'en' ? 'Start Lab' : '開始實驗'}</span>`;
       lucide.createIcons();
-      document.getElementById("heatingSteps").innerHTML = `<div class="text-slate-400 text-center py-10">${currentLang === 'en' ? 'Click "Start Lab" to see calculation steps.' : '點擊「開始實驗」以顯示詳細計算步驟。'}</div>`;
+      updateHeatingIdleSteps();
       drawHeatingLab();
     }
 
     document.getElementById("resetHeatBtn").addEventListener("click", resetHeatingLab);
+    document.getElementById("calcHeatTimeBtn").addEventListener("click", applyRequiredHeatingTime);
 
     document.getElementById("startHeatBtn").addEventListener("click", () => {
       if (heatState.running) {
@@ -586,31 +760,7 @@
 
           const c = SUBSTANCES[heatState.substance].c;
           
-          let heatLossPower = 0;
-          let netPower = heatState.power;
-
-          if (heatState.enableLoss) {
-            const tempDiff = Math.max(0, heatState.temp - 20);
-            const lidFactor = heatState.hasCover ? 0.2 : 1.2;
-            const volumeFactor = 0.5 + 0.5 * (heatState.mass / 1.0);
-            const coolingLossPower = tempDiff * lidFactor * volumeFactor * 1.5;
-
-            let submergedFraction = 1.0;
-            if (heatState.sourceType === "coil") {
-              const fillHeight = heatState.substance === "water" ? 180 * (0.2 + 0.6 * (heatState.mass / 1.0)) : 180 * 0.7;
-              const liquidTop = 180 - fillHeight;
-              const coilOffset = (100 - heatState.coilDepth) / 100 * 80;
-              const loopsStart = 180 - 80 - coilOffset;
-              const loopsEnd = 180 - 20 - coilOffset;
-              const overlap = Math.max(0, Math.min(loopsEnd, 180) - Math.max(loopsStart, liquidTop));
-              submergedFraction = Math.max(0, Math.min(1, overlap / 60));
-            }
-
-            const enteredPower = heatState.power * submergedFraction;
-            const directAirLoss = heatState.power * (1 - submergedFraction);
-            heatLossPower = coolingLossPower + directAirLoss;
-            netPower = Math.max(0, enteredPower - coolingLossPower);
-          }
+          const { netPower, heatLossPower } = computeHeatingPowers(heatState);
 
           heatState.energy += netPower * dt;
           heatState.heatLossPower = heatLossPower;
@@ -622,24 +772,14 @@
             lucide.createIcons();
           }
 
-          // Check boiling for water
-          if (heatState.substance === "water") {
-            const energyTo100 = heatState.mass * c * (100 - heatState.initTemp);
-            if (heatState.energy >= energyTo100) {
-              heatState.temp = 100;
-              if (Math.random() < 0.3) {
-                heatState.bubbles.push({
-                  x: 50 + Math.random() * 100,
-                  y: 160,
-                  r: 2 + Math.random() * 5,
-                  speed: 1 + Math.random() * 3
-                });
-              }
-            } else {
-              heatState.temp = heatState.initTemp + heatState.energy / (heatState.mass * c);
-            }
-          } else {
-            heatState.temp = heatState.initTemp + heatState.energy / (heatState.mass * c);
+          heatState.temp = tempFromEnergy(heatState, heatState.energy);
+          if (heatState.substance === "water" && heatState.temp >= 100 && Math.random() < 0.3) {
+            heatState.bubbles.push({
+              x: 50 + Math.random() * 100,
+              y: 160,
+              r: 2 + Math.random() * 5,
+              speed: 1 + Math.random() * 3
+            });
           }
 
           document.getElementById("liveTemp").textContent = heatState.temp.toFixed(1) + " °C";
