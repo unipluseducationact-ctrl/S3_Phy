@@ -1053,6 +1053,46 @@ a {
   grid-column: 1 / -1;
 }
 
+/* Fullscreen — compact live calculations */
+.tool-stage:fullscreen .tl-wrap .tl-live-calculations,
+.tool-stage.tool-stage--overlay-fullscreen .tl-wrap .tl-live-calculations,
+#app.is-lab-fullscreen .tl-wrap .tl-live-calculations {
+  padding: 10px 14px;
+}
+
+.tool-stage:fullscreen .tl-wrap .tl-live-calculations .tl-math-formula,
+.tool-stage.tool-stage--overlay-fullscreen .tl-wrap .tl-live-calculations .tl-math-formula,
+#app.is-lab-fullscreen .tl-wrap .tl-live-calculations .tl-math-formula {
+  font-size: 1.25rem;
+  padding: 8px 10px;
+  margin: 4px 0;
+  min-height: unset !important;
+}
+
+.tool-stage:fullscreen .tl-wrap .tl-live-calculations .tl-worked-solution,
+.tool-stage.tool-stage--overlay-fullscreen .tl-wrap .tl-live-calculations .tl-worked-solution,
+#app.is-lab-fullscreen .tl-wrap .tl-live-calculations .tl-worked-solution {
+  padding: 10px 14px;
+}
+
+.tool-stage:fullscreen .tl-wrap .tl-live-calculations .tl-worked-solution p,
+.tool-stage.tool-stage--overlay-fullscreen .tl-wrap .tl-live-calculations .tl-worked-solution p,
+#app.is-lab-fullscreen .tl-wrap .tl-live-calculations .tl-worked-solution p {
+  font-size: 0.95rem;
+}
+
+.tool-stage:fullscreen .tl-wrap .tl-live-calculations .tl-info-label,
+.tool-stage.tool-stage--overlay-fullscreen .tl-wrap .tl-live-calculations .tl-info-label,
+#app.is-lab-fullscreen .tl-wrap .tl-live-calculations .tl-info-label {
+  font-size: 0.9rem;
+}
+
+.tool-stage:fullscreen .tl-wrap .tl-live-calculations .tl-live-value,
+.tool-stage.tool-stage--overlay-fullscreen .tl-wrap .tl-live-calculations .tl-live-value,
+#app.is-lab-fullscreen .tl-wrap .tl-live-calculations .tl-live-value {
+  font-size: 1.05rem;
+}
+
 .tool-stage > * {
   min-height: var(--tool-viewport-min-h);
 }
