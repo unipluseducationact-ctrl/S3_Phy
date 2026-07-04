@@ -1,5 +1,7 @@
 import { getLang } from '../i18n.js';
 
+const HEAT_WORKSHEET_VERSION = '20260704h';
+
 /** @param {(key: string) => string} t */
 export function createHeatFinalExamWorksheet(t) {
   const wrap = document.createElement('div');
@@ -10,7 +12,7 @@ export function createHeatFinalExamWorksheet(t) {
   const root = base.endsWith('/') ? base : `${base}/`;
 
   function iframeSrc() {
-    return `${root}f3-heat-final-exam/quiz.html?embed=1`;
+    return `${root}f3-heat-final-exam/quiz.html?embed=1&v=${HEAT_WORKSHEET_VERSION}`;
   }
 
   iframe.src = iframeSrc();

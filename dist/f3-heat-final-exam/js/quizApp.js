@@ -542,21 +542,11 @@ export function initQuiz() {
     }
   }
 
-  function renderEmptyState() {
-    const el = els.quizArea;
-    el.className = "quiz-empty text-center text-on-surface-variant py-12 text-body-sm";
-    el.innerHTML = `
-      <p class="mb-4">${escHtml(t("empty"))}</p>
-      <button type="button" class="px-8 py-3 rounded-full bg-primary text-on-primary font-label-bold text-body-sm hover:opacity-90 transition-opacity" id="btn-generate-inline">
-        ${escHtml(t("btnGenerate"))}
-      </button>`;
-    el.querySelector("#btn-generate-inline")?.addEventListener("click", generate);
-  }
-
   function renderQuiz() {
     const el = els.quizArea;
     if (!lastQuestions.length) {
-      renderEmptyState();
+      el.className = "quiz-empty text-center text-on-surface-variant py-12 text-body-sm";
+      el.textContent = t("empty");
       return;
     }
 
@@ -926,7 +916,8 @@ export function initQuiz() {
 
   bindFilterListeners();
   applyLang();
-  renderEmptyState();
+  els.quizArea.textContent = t("empty");
+  els.quizArea.className = "quiz-empty text-center text-on-surface-variant py-12 text-body-sm";
 
   bindTrueFocus(els.quizContainer);
 
@@ -939,4 +930,21 @@ export function initQuiz() {
   });
 }
 
-document.addEventListener("DOMContentLoaded", () => initQuiz());
+function bootQuiz() {
+  try {
+    initQuiz();
+  } catch (err) {
+    console.error("Quiz init failed:", err);
+    const box = document.getElementById("quiz-bank-summary");
+    if (box) {
+      const msg = String(err?.message || err).replace(/</g, "&lt;");
+      box.innerHTML = `<p class="font-label-bold text-tertiary mb-1">Quiz failed to start</p><p class="text-body-sm text-on-surface-variant">${msg}</p>`;
+    }
+  }
+}
+
+if (document.readyState === "loading") {
+  document.addEventListener("DOMContentLoaded", bootQuiz);
+} else {
+  bootQuiz();
+}
