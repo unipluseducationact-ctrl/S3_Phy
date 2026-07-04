@@ -394,14 +394,28 @@
   }
 
   // ../js/quizExport.js
-  function figureExportCaptions(q) {
-    if (q.images?.length) {
-      return q.images.map((img) => img.caption || img.alt || "see notes");
+  const EXPORT_Q_STYLE = "page-break-inside:avoid;break-inside:avoid-page;mso-page-break-inside:avoid;margin-bottom:1rem";
+  const EXPORT_FIG_STYLE = "page-break-inside:avoid;break-inside:avoid-page;margin:0.75rem 0";
+  const EXPORT_HEAD_STYLE = "<style>.export-q{page-break-inside:avoid;break-inside:avoid-page;mso-page-break-inside:avoid;margin-bottom:1rem}.export-q h2{margin-top:0}.export-fig img{max-width:100%;height:auto;display:block}</style>";
+  function resolveExportAssetUrl(src) {
+    if (!src) return "";
+    try {
+      return new URL(src, window.location.href).href;
+    } catch {
+      return src;
     }
-    if (q.image?.src) {
-      return [q.image.caption || q.image.alt || "see notes"];
-    }
-    return [];
+  }
+  function buildExportFigureHtml(fig) {
+    const src = resolveExportAssetUrl(fig.src);
+    if (!src) return "";
+    const alt = escHtml(fig.alt || fig.caption || "Diagram");
+    const caption = fig.caption ? `<figcaption>${escHtml(fig.caption)}</figcaption>` : "";
+    return `<figure class="export-fig" style="${EXPORT_FIG_STYLE}"><img src="${escHtml(src)}" alt="${alt}" style="max-width:100%;height:auto;display:block" />${caption}</figure>`;
+  }
+  function buildExportFiguresHtml(q, answersMode) {
+    if (answersMode) return "";
+    const figs = q.images?.length ? q.images : q.image?.src ? [q.image] : [];
+    return figs.map(buildExportFigureHtml).join("");
   }
   function fillLineExportHtml(line, answersMode) {
     let html = "";
@@ -422,14 +436,11 @@
     let body = "";
     questions.forEach((q, i) => {
       const fmt = questionFormat(q);
+      body += `<div class="export-q" style="${EXPORT_Q_STYLE}">`;
       body += `<h2>Q${i + 1} \xB7 ${escHtml(q.section)} \xB7 ${escHtml(q.difficulty)} \xB7 ${escHtml(fmt.toUpperCase())}</h2>`;
       body += `<div class="stem"><b>EN:</b> ${formatStemHtml(q.stem)}</div>`;
       if (q.stemZh) body += `<p><b>\u4E2D\u6587\uFF1A</b> ${escHtml(q.stemZh)}</p>`;
-      if (!answersMode) {
-        figureExportCaptions(q).forEach((caption) => {
-          body += `<p><i>[Diagram: ${escHtml(caption)}]</i></p>`;
-        });
-      }
+      body += buildExportFiguresHtml(q, answersMode);
       if (!answersMode) {
         if (fmt === "fill" && getFillLines(q).length) {
           if (q.wordBank?.length) {
@@ -440,6 +451,21 @@
             body += `<li>${fillLineExportHtml(line, answersMode)}</li>`;
           });
           body += "</ol>";
+        } else if (q.optionsLayout === "table" && q.optionTable?.rows?.length) {
+          const headers = q.optionTable.headers || [];
+          body += "<table border='1' cellpadding='6' cellspacing='0' style='border-collapse:collapse;width:100%;max-width:100%'><tr><th></th>";
+          headers.forEach((h) => {
+            body += `<th>${escHtml(h)}</th>`;
+          });
+          body += "</tr>";
+          q.optionTable.rows.forEach((row) => {
+            body += `<tr><td><b>${escHtml(row.key)}</b></td>`;
+            (row.cells || []).forEach((cell) => {
+              body += `<td>${escHtml(cell)}</td>`;
+            });
+            body += "</tr>";
+          });
+          body += "</table>";
         } else if (q.options?.length) {
           body += "<ul>";
           q.options.forEach((opt) => {
@@ -454,6 +480,7 @@
         body += `<p><b>Answer / \u7B54\u6848\uFF1A</b> ${escHtml(ma.en)}</p>`;
         if (ma.zh) body += `<p>${escHtml(ma.zh)}</p>`;
       }
+      body += "</div>";
     });
     return body;
   }
@@ -465,7 +492,7 @@
     const titleEn = answersMode ? "S3 Optics Ch.3 \u2014 Light & Lens \u2014 Answers" : "S3 Optics Ch.3 \u2014 Light & Lens \u2014 Questions";
     const titleZh = answersMode ? "S3 \u5149\u5B78 \u7B2C\u4E09\u7AE0 \u2014 \u7B54\u6848" : "S3 \u5149\u5B78 \u7B2C\u4E09\u7AE0 \u2014 \u8A66\u984C";
     const body = buildDocBody(questions, answersMode);
-    const html = `<html xmlns:o="urn:schemas-microsoft-com:office:office" xmlns:w="urn:schemas-microsoft-com:office:word" xmlns="http://www.w3.org/TR/REC-html40"><head><meta charset="utf-8"><title>${escHtml(titleEn)}</title></head><body><h1>${escHtml(titleEn)}</h1><h2 style="font-size:14pt">${escHtml(titleZh)}</h2>${body}</body></html>`;
+    const html = `<html xmlns:o="urn:schemas-microsoft-com:office:office" xmlns:w="urn:schemas-microsoft-com:office:word" xmlns="http://www.w3.org/TR/REC-html40"><head><meta charset="utf-8"><title>${escHtml(titleEn)}</title>${EXPORT_HEAD_STYLE}</head><body><h1>${escHtml(titleEn)}</h1><h2 style="font-size:14pt">${escHtml(titleZh)}</h2>${body}</body></html>`;
     const blob = new Blob(["\uFEFF", html], { type: "application/msword" });
     const a = document.createElement("a");
     const ts = (/* @__PURE__ */ new Date()).toISOString().slice(0, 19).replace(/[:T]/g, "-");

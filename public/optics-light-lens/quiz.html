@@ -90,6 +90,8 @@ tailwind.config = {
   body * { visibility: hidden; }
   #quiz-pdf-sheet, #quiz-pdf-sheet * { visibility: visible; }
   #quiz-pdf-sheet { display: block !important; position: absolute; left: 0; top: 0; width: 100%; padding: 1rem; }
+  #quiz-pdf-sheet .export-q { page-break-inside: avoid; break-inside: avoid-page; margin-bottom: 1rem; }
+  #quiz-pdf-sheet .export-fig img { max-width: 100%; height: auto; }
   #settings-panel { display: none !important; }
 }
 </style>
