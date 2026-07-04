@@ -109,17 +109,35 @@ html.s3phy-embed .lab-viz-dual {
   flex: 1 1 auto;
   min-height: 0;
   height: 100%;
-  grid-template-rows: minmax(0, 1fr) minmax(0, 1fr);
+  grid-template-rows: minmax(0, auto) minmax(0, 1fr);
   align-content: stretch;
   overflow: hidden;
 }
 
-html.s3phy-embed .lab-viz-dual .lab-viz-canvas,
-html.s3phy-embed .lab-viz-dual .lab-viz-chart-wrap {
-  max-height: none;
-  min-height: 0;
+html.s3phy-embed .lab-viz-dual .lab-viz-panel:first-child {
+  flex: 0 0 auto;
+  max-height: min(240px, 34vh);
+}
+
+html.s3phy-embed .lab-viz-dual .lab-viz-panel-chart {
   flex: 1 1 auto;
+  min-height: 0;
+  overflow: hidden;
+}
+
+html.s3phy-embed .lab-viz-dual .lab-viz-canvas {
+  flex: 0 0 auto !important;
+  min-height: 100px !important;
+  max-height: min(140px, 22vh) !important;
+  aspect-ratio: 16 / 9;
   height: auto;
+}
+
+html.s3phy-embed .lab-viz-dual .lab-viz-chart-wrap {
+  flex: 1 1 auto;
+  min-height: 180px;
+  height: 100%;
+  max-height: none;
   aspect-ratio: unset;
 }
 
