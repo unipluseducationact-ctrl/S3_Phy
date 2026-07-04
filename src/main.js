@@ -90,11 +90,17 @@ function clearSplashTimers() {
   splashTimers = [];
 }
 
+const DANMAKU_MAX_ITEMS = 12;
+
 function startDanmaku(splashEl, danmakuField) {
   const pool = [...SPLASH_PHRASES.en, ...SPLASH_PHRASES.zhHant];
 
   const spawn = () => {
     if (!splashEl.parentElement) return;
+    if (danmakuField.childElementCount >= DANMAKU_MAX_ITEMS) {
+      splashTimers.push(window.setTimeout(spawn, 800));
+      return;
+    }
     const item = document.createElement('div');
     item.className = 'splash-danmaku-item';
     item.textContent = pool[Math.floor(Math.random() * pool.length)];

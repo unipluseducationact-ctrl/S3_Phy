@@ -1,10 +1,7 @@
 import { t, getLang } from '../i18n.js';
-import { langKey, hydrateNoteCards, hydrateSummaryCards } from './hubHelpers.js';
+import { cleanupLabInstance, hydrateNoteCards, hydrateSummaryCards } from './hubHelpers.js';
 import { mountHubShell } from '../hubShell.js';
 import { renderToolsShell, hydrateToolsShell } from '../tools/toolsShell.js';
-import { createOpticsLightLensWorksheet } from '../worksheets/opticsLightLensWorksheet.js';
-import { createOpticsCh4EmWorksheet } from '../worksheets/opticsCh4EmWorksheet.js';
-import { createOpticsCh3Quiz } from '../worksheets/opticsCh3Quiz.js';
 import { mountFlashcardStudy } from '../flashcards/flashcardStudy.js';
 import { buildOpticsDeck } from '../flashcards/flashcardDeck.js';
 
@@ -12,9 +9,29 @@ const TOOL_ORDER = ['rotatingMirror', 'planeMirrorLab', 'refractionTir', 'lens',
 const WORKSHEET_ORDER = ['lightLens', 'emWave'];
 const SUMMARY_ASSET_VERSION = '20260627-em-v2';
 
-const WORKSHEET_FACTORIES = {
-  lightLens: createOpticsLightLensWorksheet,
-  emWave: createOpticsCh4EmWorksheet,
+const OPTICS_NOTE_ROWS = [
+  { key: 'reflection', fileEn: 'reflection-en.pdf', fileZh: 'reflection-zhHant.pdf' },
+  { key: 'refraction', fileEn: 'refraction-en.pdf', fileZh: 'refraction-zhHant.pdf' },
+  { key: 'tir', fileEn: 'tir-en.pdf', fileZh: 'tir-zhHant.pdf' },
+  { key: 'convexLens', fileEn: 'convex-lens-en.pdf', fileZh: 'convex-lens-zhHant.pdf' },
+  { key: 'concaveLens', fileEn: 'concave-lens-en.pdf', fileZh: 'concave-lens-zhHant.pdf' },
+  { key: 'em', fileEn: 'emwaves-en.pdf', fileZh: 'emwaves-zhHant.pdf' },
+];
+
+const OPTICS_SUMMARY_ROWS = [
+  { key: 'reflection', type: 'image', fileEn: 'reflection-en.webp', fileZh: 'reflection-zhHant.webp' },
+  { key: 'refraction', type: 'image', fileEn: 'refraction-en.webp', fileZh: 'refraction-zhHant.webp' },
+  { key: 'tir', type: 'image', fileEn: 'tir-en.webp', fileZh: 'tir-zhHant.webp' },
+  { key: 'convex', type: 'image', fileEn: 'convex-en.webp', fileZh: 'convex-zhHant.webp' },
+  { key: 'concave', type: 'image', fileEn: 'concave-en.webp', fileZh: 'concave-zhHant.webp' },
+  { key: 'em', type: 'image', fileEn: 'em-en.webp', fileZh: 'em-zhHant.webp' },
+];
+
+const WORKSHEET_LOADERS = {
+  lightLens: () =>
+    import('../worksheets/opticsLightLensWorksheet.js').then((m) => m.createOpticsLightLensWorksheet),
+  emWave: () =>
+    import('../worksheets/opticsCh4EmWorksheet.js').then((m) => m.createOpticsCh4EmWorksheet),
 };
 
 const TOOL_LOADERS = {
@@ -54,6 +71,7 @@ export function mountOpticsHub(root) {
 
   let shell = null;
   let el = { main: null };
+  let activeLabInstance = null;
   let destroyFlashcards = null;
   let destroyWorksheet = null;
 
@@ -66,28 +84,43 @@ export function mountOpticsHub(root) {
     { value: 'em', labelKey: 'topic.em' },
   ];
 
+  function cleanupActiveLab() {
+    cleanupLabInstance(activeLabInstance);
+    activeLabInstance = null;
+  }
+
   async function mountActiveTool(stage) {
     stage.innerHTML = '';
+    cleanupActiveLab();
     const loader = TOOL_LOADERS[toolId];
     if (!loader) return;
     const factory = await loader();
     const node = toolId === 'lens' ? factory(t, { defaultKind: lensDefaultKind }) : factory(t);
+    activeLabInstance = node;
     stage.appendChild(node);
   }
 
-  function mountActiveWorksheet(stage) {
+  async function mountActiveWorksheet(stage) {
     if (!stage) return;
     destroyWorksheet?.();
     destroyWorksheet = null;
     stage.innerHTML = '';
-    const factory = WORKSHEET_FACTORIES[worksheetId];
-    if (!factory) return;
+    const loader = WORKSHEET_LOADERS[worksheetId];
+    if (!loader) return;
+    const factory = await loader();
     const node = factory(t);
     stage.appendChild(node);
     destroyWorksheet =
       node._opticsLightLensWorksheetCleanup ||
       node._opticsCh4EmWorksheetCleanup ||
       null;
+  }
+
+  async function mountQuiz(panel) {
+    const { createOpticsCh3Quiz } = await import('../worksheets/opticsCh3Quiz.js');
+    const node = createOpticsCh3Quiz(t);
+    panel.appendChild(node);
+    destroyWorksheet = node._opticsCh3QuizCleanup || null;
   }
 
   function renderWorksheets() {
@@ -125,14 +158,12 @@ export function mountOpticsHub(root) {
     }
     else if (section === 'worksheets') {
       el.main.innerHTML = renderWorksheets();
-      mountActiveWorksheet(el.main.querySelector('[data-worksheet-stage]'));
+      void mountActiveWorksheet(el.main.querySelector('[data-worksheet-stage]'));
     }
     else if (section === 'quiz') {
       el.main.innerHTML = '<section class="panel panel--quiz-embed"></section>';
       const panel = el.main.querySelector('.panel--quiz-embed');
-      const node = createOpticsCh3Quiz(t);
-      panel.appendChild(node);
-      destroyWorksheet = node._opticsCh3QuizCleanup || null;
+      void mountQuiz(panel);
     }
     else if (section === 'flashcards') {
       destroyFlashcards = mountFlashcardStudy(el.main, {
@@ -161,17 +192,25 @@ export function mountOpticsHub(root) {
     if (section === 'summary') void hydrateSummary();
   }
 
+  function onLangChange() {
+    shell?.refreshLabels();
+    renderMain();
+  }
+
   function render() {
     shell?.destroy();
     shell = mountHubShell(root, {
       subtitleKey: 'strand.optics.subtitle',
       activeSection: section,
       onSection: (id) => {
+        if (section === 'tools' && id !== 'tools') {
+          cleanupActiveLab();
+        }
         section = id;
         shell.updateSection(section);
         renderMain();
       },
-      onLang: () => render(),
+      onLang: onLangChange,
     });
     el.main = shell.main;
     shell.updateSection(section);
@@ -219,7 +258,7 @@ export function mountOpticsHub(root) {
     const ws = ev.target.closest('[data-worksheet]');
     if (ws && section === 'worksheets') {
       const id = ws.getAttribute('data-worksheet');
-      if (id && id !== worksheetId && WORKSHEET_FACTORIES[id]) {
+      if (id && id !== worksheetId && WORKSHEET_LOADERS[id]) {
         worksheetId = id;
         renderMain();
       }
@@ -237,108 +276,52 @@ export function mountOpticsHub(root) {
   }
 
   function renderNotesShell() {
-    const rows = [
-      { key: 'reflection', fileEn: 'reflection-en.pdf', fileZh: 'reflection-zhHant.pdf' },
-      { key: 'refraction', fileEn: 'refraction-en.pdf', fileZh: 'refraction-zhHant.pdf' },
-      { key: 'tir', fileEn: 'tir-en.pdf', fileZh: 'tir-zhHant.pdf' },
-      { key: 'convexLens', fileEn: 'convex-lens-en.pdf', fileZh: 'convex-lens-zhHant.pdf' },
-      { key: 'concaveLens', fileEn: 'concave-lens-en.pdf', fileZh: 'concave-lens-zhHant.pdf' },
-      { key: 'em', fileEn: 'emwaves-en.pdf', fileZh: 'emwaves-zhHant.pdf' },
-    ];
     return `
       <section class="panel">
         <h2>${t('notes.title')}</h2>
         <p class="lead">${t('notes.intro')}</p>
         <p class="lead">${t('notes.embedHint')}</p>
         <div class="grid cols-3x2" data-notes-grid>
-          ${rows
-            .map((r) => {
-              const title = t(`notes.card.${r.key}`);
-              return `
+          ${OPTICS_NOTE_ROWS.map((r) => {
+            const title = t(`notes.card.${r.key}`);
+            return `
             <div class="card" data-note-card="${r.key}">
               <h3>${title}</h3>
               <div data-note-body></div>
             </div>`;
-            })
-            .join('')}
+          }).join('')}
         </div>
       </section>`;
   }
 
   async function hydrateNotes() {
-    const rows = [
-      { key: 'reflection', fileEn: 'reflection-en.pdf', fileZh: 'reflection-zhHant.pdf' },
-      { key: 'refraction', fileEn: 'refraction-en.pdf', fileZh: 'refraction-zhHant.pdf' },
-      { key: 'tir', fileEn: 'tir-en.pdf', fileZh: 'tir-zhHant.pdf' },
-      { key: 'convexLens', fileEn: 'convex-lens-en.pdf', fileZh: 'convex-lens-zhHant.pdf' },
-      { key: 'concaveLens', fileEn: 'concave-lens-en.pdf', fileZh: 'concave-lens-zhHant.pdf' },
-      { key: 'em', fileEn: 'emwaves-en.pdf', fileZh: 'emwaves-zhHant.pdf' },
-    ];
-    await hydrateNoteCards(root, rows);
+    await hydrateNoteCards(root, OPTICS_NOTE_ROWS);
   }
 
   function renderSummary() {
-    const items = [
-      {
-        key: 'reflection',
-        type: 'image',
-        fileEn: 'reflection-en.webp',
-        fileZh: 'reflection-zhHant.webp',
-      },
-      {
-        key: 'refraction',
-        type: 'image',
-        fileEn: 'refraction-en.webp',
-        fileZh: 'refraction-zhHant.webp',
-      },
-      { key: 'tir', type: 'image', fileEn: 'tir-en.webp', fileZh: 'tir-zhHant.webp' },
-      { key: 'convex', type: 'image', fileEn: 'convex-en.webp', fileZh: 'convex-zhHant.webp' },
-      { key: 'concave', type: 'image', fileEn: 'concave-en.webp', fileZh: 'concave-zhHant.webp' },
-      { key: 'em', type: 'image', fileEn: 'em-en.webp', fileZh: 'em-zhHant.webp' },
-    ];
     return `
       <section class="panel">
         <h2>${t('summary.title')}</h2>
         <p class="lead">${t('summary.intro')}</p>
         <p class="lead">${t('notes.embedHint')}</p>
         <div class="grid cols-3x2" data-summary-grid>
-          ${items
-            .map((it) => {
-              const title = t(`summary.item.${it.key}`);
-              return `
+          ${OPTICS_SUMMARY_ROWS.map((it) => {
+            const title = t(`summary.item.${it.key}`);
+            return `
             <div class="card" data-summary-card="${it.key}">
               <h3>${title}</h3>
               <div data-summary-body></div>
             </div>`;
-            })
-            .join('')}
+          }).join('')}
         </div>
       </section>`;
   }
 
   async function hydrateSummary() {
-    const rows = [
-      {
-        key: 'reflection',
-        type: 'image',
-        fileEn: 'reflection-en.webp',
-        fileZh: 'reflection-zhHant.webp',
-      },
-      {
-        key: 'refraction',
-        type: 'image',
-        fileEn: 'refraction-en.webp',
-        fileZh: 'refraction-zhHant.webp',
-      },
-      { key: 'tir', type: 'image', fileEn: 'tir-en.webp', fileZh: 'tir-zhHant.webp' },
-      { key: 'convex', type: 'image', fileEn: 'convex-en.webp', fileZh: 'convex-zhHant.webp' },
-      { key: 'concave', type: 'image', fileEn: 'concave-en.webp', fileZh: 'concave-zhHant.webp' },
-      { key: 'em', type: 'image', fileEn: 'em-en.webp', fileZh: 'em-zhHant.webp' },
-    ];
-    await hydrateSummaryCards(root, rows, { version: SUMMARY_ASSET_VERSION });
+    await hydrateSummaryCards(root, OPTICS_SUMMARY_ROWS, { version: SUMMARY_ASSET_VERSION });
   }
 
-  const onLang = () => render();
+  const onLang = onLangChange;
   const onClick = (ev) => onMainClick(ev);
 
   window.addEventListener('s3phy:lang', onLang);
@@ -351,6 +334,7 @@ export function mountOpticsHub(root) {
     root.removeEventListener('click', onClick);
     destroyFlashcards?.();
     destroyWorksheet?.();
+    cleanupActiveLab();
     shell?.destroy();
   };
 }

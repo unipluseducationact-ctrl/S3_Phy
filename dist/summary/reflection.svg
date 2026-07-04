@@ -1,8 +1,0 @@
-<svg xmlns="http://www.w3.org/2000/svg" width="640" height="360" viewBox="0 0 640 360">
-  <rect width="640" height="360" fill="#0f1419"/>
-  <text x="24" y="40" fill="#e8eef5" font-size="22" font-family="system-ui">Reflection  summary placeholder</text>
-  <line x1="300" y1="280" x2="300" y2="80" stroke="#94a3b8" stroke-width="4"/>
-  <line x1="120" y1="140" x2="300" y2="220" stroke="#fbbf24" stroke-width="3"/>
-  <line x1="300" y1="220" x2="480" y2="140" stroke="#6ee7b7" stroke-width="3"/>
-  <text x="24" y="330" fill="#9aa8b8" font-size="14" font-family="system-ui">Replace with final HKDSE artwork.</text>
-</svg>

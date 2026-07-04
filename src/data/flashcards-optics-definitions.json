@@ -287,7 +287,7 @@
       "q": "可見光三原色？",
       "a": "<strong>紅</strong>、<strong>綠</strong>、<strong>藍</strong>"
     },
-    "backImage": "./flashcards/optics-definitions/figure_rgb.png",
+    "backImage": "./flashcards/optics-definitions/figure_rgb.webp",
     "imageAlt": "RGB colour mixing diagram"
   },
   {
@@ -300,7 +300,7 @@
       "q": "光的三次色同混合？",
       "a": "<strong>黃</strong>（R+G）、<strong>青</strong>（G+B）、<strong>洋紅</strong>（B+R）"
     },
-    "backImage": "./flashcards/optics-definitions/figure_rgb.png",
+    "backImage": "./flashcards/optics-definitions/figure_rgb.webp",
     "imageAlt": "RGB colour mixing diagram"
   },
   {

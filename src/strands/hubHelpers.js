@@ -1,15 +1,33 @@
 import { getLang, t } from '../i18n.js';
 
+const assetExistsCache = new Map();
+
 export function langKey() {
   return getLang() === 'zh-Hant' ? 'zhHant' : 'en';
 }
 
+/** @param {HTMLElement | null | undefined} inst */
+export function cleanupLabInstance(inst) {
+  if (!inst) return;
+  for (const key of Object.keys(inst)) {
+    if (key.endsWith('Cleanup') && typeof inst[key] === 'function') {
+      inst[key]();
+    }
+  }
+}
+
 export async function assetExists(folder, name) {
   const url = `${import.meta.env.BASE_URL}${folder}/${name}`;
+  if (assetExistsCache.has(url)) {
+    return assetExistsCache.get(url);
+  }
   try {
     const res = await fetch(url, { method: 'HEAD' });
-    return res.ok;
+    const ok = res.ok;
+    assetExistsCache.set(url, ok);
+    return ok;
   } catch {
+    assetExistsCache.set(url, false);
     return false;
   }
 }

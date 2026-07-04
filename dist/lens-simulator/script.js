@@ -3019,7 +3019,6 @@ function setupUIInteractions() {
             const target = this.getAttribute('data-target');
             const isIncrease = this.classList.contains('increase');
             
-            console.log(`按钮点击: ${target}, 增加: ${isIncrease}`); // 调试日志
             
             // 单次调整值
             adjustValue(target, isIncrease);
@@ -3042,7 +3041,6 @@ function setupUIInteractions() {
             const target = this.getAttribute('data-target');
             const isIncrease = this.classList.contains('increase');
             
-            console.log(`触摸按钮: ${target}, 增加: ${isIncrease}`); // 调试日志
             
             // 单次调整值
             adjustValue(target, isIncrease);
@@ -3090,7 +3088,6 @@ function setupUIInteractions() {
         
         // 确保在允许范围内
         if (newValue >= minValue && newValue <= maxValue) {
-            console.log(`调整 ${target} 从 ${value} 到 ${newValue}`); // 调试
             
             // 使用全局更新函数
             if (target === 'objectDistance') {
@@ -4394,7 +4391,6 @@ function updateObjectHeight(value) {
 function adjustUILayout() {
     // 使用更长的延迟确保DOM完全加载
     setTimeout(() => {
-        console.log("开始调整UI布局...");
         
         try {
             // 更广泛的选择器来查找顶部控件容器
@@ -4407,7 +4403,6 @@ function adjustUILayout() {
                 return;
             }
             
-            console.log("找到顶部控件容器:", topControls);
             
             // 找到所有滑块控件
             const sliderControls = topControls.querySelectorAll('.slider-control');
@@ -4416,7 +4411,6 @@ function adjustUILayout() {
                 return;
             }
             
-            console.log("找到" + sliderControls.length + "个滑块控件");
             
             // 查找透镜位置控件（使用多种选择方法确保找到）
             let lensPositionControl = null;
@@ -4426,7 +4420,6 @@ function adjustUILayout() {
                 const title = control.querySelector('.slider-title');
                 if (title && (title.textContent.includes('透鏡位置') || title.textContent.includes('Lens Position'))) {
                     lensPositionControl = control;
-                    console.log("通过标题文本找到透镜位置控件");
                     break;
                 }
             }
@@ -4436,7 +4429,6 @@ function adjustUILayout() {
                 for (const control of sliderControls) {
                     if (control.querySelector('#lensPositionSlider') || control.querySelector('#lensPositionInput')) {
                         lensPositionControl = control;
-                        console.log("通过输入ID找到透镜位置控件");
                         break;
                     }
                 }
@@ -4463,8 +4455,6 @@ function adjustUILayout() {
                 }
             }
             
-            console.log("第一排控件数:", firstRowControls.length);
-            console.log("第二排控件数:", secondRowControls.length);
             
             // 检查透镜位置控件是否已经在第一排
             let isLensPositionInFirstRow = false;
@@ -4477,7 +4467,6 @@ function adjustUILayout() {
             
             // 如果透镜位置控件在第二排，将其移动到第一排
             if (!isLensPositionInFirstRow) {
-                console.log("将透镜位置控件移动到第一排");
                 
                 // 将透镜位置控件添加到第一排末尾
                 if (firstRowControls.length > 0) {
@@ -4498,7 +4487,6 @@ function adjustUILayout() {
             // 移除第二排的所有其他控件
             for (const control of secondRowControls) {
                 if (control.parentNode) {
-                    console.log("移除第二排控件:", control);
                     control.parentNode.removeChild(control);
                 }
             }
@@ -4559,7 +4547,6 @@ function adjustUILayout() {
             }
             
             // 更新画布大小以适应新布局
-            console.log("UI布局调整完成，重新调整画布大小");
             setTimeout(resizeCanvas, 300);
             
         } catch (error) {
@@ -4570,13 +4557,11 @@ function adjustUILayout() {
 
 // 确保在窗口加载完成后执行
 window.addEventListener('load', function() {
-    console.log("窗口加载完成，调用adjustUILayout");
     // 在DOM完全加载后调用
     setTimeout(adjustUILayout, 1000);
     
     // 添加窗口大小改变时重新调整布局
     window.addEventListener('resize', function() {
-        console.log("窗口大小改变，重新调整UI布局");
         adjustUILayout();
     });
     
@@ -4586,7 +4571,6 @@ window.addEventListener('load', function() {
 
 // 设置悬停提示功能
 function setupTooltips() {
-    console.log("设置悬停提示功能...");
     
     // 获取关键元素
     const canvas = document.getElementById('lensCanvas');
@@ -4643,7 +4627,6 @@ function setupTooltips() {
         tooltip.style.display = 'none';
     });
     
-    console.log("物体悬停提示功能设置完成");
 }
 
 // 繪製光束 (多條光線)

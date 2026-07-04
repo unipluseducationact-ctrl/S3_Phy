@@ -1,7 +1,0 @@
-<svg xmlns="http://www.w3.org/2000/svg" width="640" height="360" viewBox="0 0 640 360">
-  <rect width="640" height="360" fill="#0f1419"/>
-  <text x="24" y="40" fill="#e8eef5" font-size="22" font-family="system-ui">Thin lenses  summary placeholder</text>
-  <path d="M320 90 Q302 180 320 270 Q338 180 320 90" fill="none" stroke="#94a3b8" stroke-width="4"/>
-  <line x1="40" y1="180" x2="600" y2="180" stroke="#334155" stroke-width="2"/>
-  <text x="24" y="330" fill="#9aa8b8" font-size="14" font-family="system-ui">Replace with final HKDSE artwork.</text>
-</svg>

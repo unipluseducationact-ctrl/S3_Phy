@@ -1,9 +1,7 @@
 import { t, getLang } from '../i18n.js';
-import { langKey, assetExists, noteExists, hydrateNoteCards, renderPdfPreviewBlock } from './hubHelpers.js';
+import { cleanupLabInstance, hydrateNoteCards, hydrateSummaryCards } from './hubHelpers.js';
 import { mountHubShell } from '../hubShell.js';
 import { renderToolsShell, hydrateToolsShell } from '../tools/toolsShell.js';
-import { createHeatFinalExamWorksheet } from '../worksheets/heatFinalExamWorksheet.js';
-import { createHeatCh1Quiz } from '../worksheets/heatCh1Quiz.js';
 import { mountFlashcardStudy } from '../flashcards/flashcardStudy.js';
 import { buildHeatDeck } from '../flashcards/flashcardDeck.js';
 
@@ -37,6 +35,23 @@ const HEAT_TOPICS = [
     tool: 'heatTransfer',
   },
 ];
+
+const SUMMARY_POSTER_BASE = {
+  thermometer: 'thermometer',
+  heatInternalEnergy: 'heat-internal-energy',
+  changeOfState: 'change-of-state',
+  heatTransfer: 'heat-transfer',
+};
+
+const HEAT_SUMMARY_ROWS = HEAT_TOPICS.map((r) => {
+  const posterBase = SUMMARY_POSTER_BASE[r.id];
+  return {
+    key: r.id,
+    type: 'image',
+    fileEn: `${posterBase}-en.webp`,
+    fileZh: `${posterBase}-zhHant.webp`,
+  };
+});
 
 const TOOL_ORDER = [
   'faultyCalibration',
@@ -93,11 +108,14 @@ export function mountHeatHub(root) {
     thermistor: 'thermistor',
   };
 
+  function cleanupActiveLab() {
+    cleanupLabInstance(activeLabInstance);
+    activeLabInstance = null;
+  }
+
   async function mountActiveTool(stage) {
     stage.innerHTML = '';
-    if (activeLabInstance?._thermometerLabCleanup) {
-      activeLabInstance._thermometerLabCleanup();
-    }
+    cleanupActiveLab();
     const loader = TOOL_LOADERS[toolId];
     if (!loader) return;
     const factory = await loader();
@@ -107,6 +125,20 @@ export function mountHeatHub(root) {
       activeLabInstance = factory(t);
     }
     stage.appendChild(activeLabInstance);
+  }
+
+  async function mountWorksheet(panel) {
+    const { createHeatFinalExamWorksheet } = await import('../worksheets/heatFinalExamWorksheet.js');
+    const node = createHeatFinalExamWorksheet(t);
+    panel.appendChild(node);
+    destroyWorksheet = node._heatFinalExamWorksheetCleanup || null;
+  }
+
+  async function mountQuiz(panel) {
+    const { createHeatCh1Quiz } = await import('../worksheets/heatCh1Quiz.js');
+    const node = createHeatCh1Quiz(t);
+    panel.appendChild(node);
+    destroyWorksheet = node._heatCh1QuizCleanup || null;
   }
 
   function renderMain() {
@@ -130,15 +162,11 @@ export function mountHeatHub(root) {
     else if (section === 'worksheets') {
       el.main.innerHTML = '<section class="panel panel--worksheets-embed"></section>';
       const panel = el.main.querySelector('.panel--worksheets-embed');
-      const node = createHeatFinalExamWorksheet(t);
-      panel.appendChild(node);
-      destroyWorksheet = node._heatFinalExamWorksheetCleanup || null;
+      void mountWorksheet(panel);
     } else if (section === 'quiz') {
       el.main.innerHTML = '<section class="panel panel--quiz-embed"></section>';
       const panel = el.main.querySelector('.panel--quiz-embed');
-      const node = createHeatCh1Quiz(t);
-      panel.appendChild(node);
-      destroyWorksheet = node._heatCh1QuizCleanup || null;
+      void mountQuiz(panel);
     } else if (section === 'flashcards') {
       destroyFlashcards = mountFlashcardStudy(el.main, {
         deckOptions: HEAT_DECK_OPTIONS.map((o) => ({
@@ -166,6 +194,11 @@ export function mountHeatHub(root) {
     if (section === 'summary') void hydrateSummary();
   }
 
+  function onLangChange() {
+    shell?.refreshLabels();
+    renderMain();
+  }
+
   function render() {
     shell?.destroy();
     shell = mountHubShell(root, {
@@ -173,16 +206,13 @@ export function mountHeatHub(root) {
       activeSection: section,
       onSection: (id) => {
         if (section === 'tools' && id !== 'tools') {
-          if (activeLabInstance?._thermometerLabCleanup) {
-            activeLabInstance._thermometerLabCleanup();
-            activeLabInstance = null;
-          }
+          cleanupActiveLab();
         }
         section = id;
         shell.updateSection(section);
         renderMain();
       },
-      onLang: () => render(),
+      onLang: onLangChange,
     });
     el.main = shell.main;
     shell.updateSection(section);
@@ -276,55 +306,11 @@ export function mountHeatHub(root) {
       </section>`;
   }
 
-  const SUMMARY_POSTER_BASE = {
-    thermometer: 'thermometer',
-    heatInternalEnergy: 'heat-internal-energy',
-    changeOfState: 'change-of-state',
-    heatTransfer: 'heat-transfer',
-  };
-
   async function hydrateSummary() {
-    const lk = langKey();
-    await Promise.all(
-      HEAT_TOPICS.map(async (r) => {
-        const card = root.querySelector(`[data-summary-card="${r.id}"]`);
-        if (!card) return;
-        const body = card.querySelector('[data-summary-body]');
-
-        const posterBase = SUMMARY_POSTER_BASE[r.id];
-        if (posterBase) {
-          const file = lk === 'zhHant'
-            ? `${posterBase}-zhHant.webp`
-            : `${posterBase}-en.webp`;
-          const ok = await assetExists('summary', file);
-          const url = `${import.meta.env.BASE_URL}summary/${file}`;
-          if (ok) {
-            body.innerHTML = `
-          <img class="summary-thumb" src="${url}" alt="${t(`summary.item.${r.id}`)}" loading="lazy" />
-          <p style="margin-top:8px"><a href="${url}" target="_blank" rel="noopener">${t('summary.viewImage')}</a></p>`;
-          } else {
-            body.innerHTML = `<p class="lead">${t('summary.missing')}</p>`;
-          }
-          return;
-        }
-
-        const file = lk === 'zhHant' ? r.fileZh : r.fileEn;
-        const ok = await noteExists(file);
-        const url = `${import.meta.env.BASE_URL}notes/${file}`;
-        if (ok) {
-          body.innerHTML = renderPdfPreviewBlock(
-            t(`summary.item.${r.id}`),
-            url,
-            t('summary.download'),
-          );
-        } else {
-          body.innerHTML = `<p class="lead">${t('summary.missing')}</p>`;
-        }
-      }),
-    );
+    await hydrateSummaryCards(root, HEAT_SUMMARY_ROWS);
   }
 
-  const onLang = () => render();
+  const onLang = onLangChange;
   const onClick = (ev) => onMainClick(ev);
 
   window.addEventListener('s3phy:lang', onLang);
@@ -336,9 +322,7 @@ export function mountHeatHub(root) {
     window.removeEventListener('s3phy:lang', onLang);
     root.removeEventListener('click', onClick);
     destroyFlashcards?.();
-    if (activeLabInstance?._thermometerLabCleanup) {
-      activeLabInstance._thermometerLabCleanup();
-    }
+    cleanupActiveLab();
     shell?.destroy();
   };
 }
