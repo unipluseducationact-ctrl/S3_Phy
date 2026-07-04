@@ -412,10 +412,26 @@
     const caption = fig.caption ? `<figcaption>${escHtml(fig.caption)}</figcaption>` : "";
     return `<figure class="export-fig" style="${EXPORT_FIG_STYLE}"><img src="${escHtml(src)}" alt="${alt}" style="max-width:100%;height:auto;display:block" />${caption}</figure>`;
   }
-  function buildExportFiguresHtml(q, answersMode) {
-    if (answersMode) return "";
+  function buildExportFiguresHtml(q) {
     const figs = q.images?.length ? q.images : q.image?.src ? [q.image] : [];
     return figs.map(buildExportFigureHtml).join("");
+  }
+  function waitForExportImages(container) {
+    const imgs = [...container.querySelectorAll("img")];
+    if (!imgs.length) return Promise.resolve();
+    return Promise.all(
+      imgs.map(
+        (img) =>
+          new Promise((resolve) => {
+            if (img.complete && img.naturalWidth > 0) {
+              resolve();
+              return;
+            }
+            img.addEventListener("load", () => resolve(), { once: true });
+            img.addEventListener("error", () => resolve(), { once: true });
+          })
+      )
+    );
   }
   function fillLineExportHtml(line, answersMode) {
     let html = "";
@@ -440,7 +456,7 @@
       body += `<h2>Q${i + 1} \xB7 ${escHtml(q.section)} \xB7 ${escHtml(q.difficulty)} \xB7 ${escHtml(fmt.toUpperCase())}</h2>`;
       body += `<div class="stem"><b>EN:</b> ${formatStemHtml(q.stem)}</div>`;
       if (q.stemZh) body += `<p><b>\u4E2D\u6587\uFF1A</b> ${escHtml(q.stemZh)}</p>`;
-      body += buildExportFiguresHtml(q, answersMode);
+      body += buildExportFiguresHtml(q);
       if (!answersMode) {
         if (fmt === "fill" && getFillLines(q).length) {
           if (q.wordBank?.length) {
@@ -501,7 +517,7 @@
     a.click();
     URL.revokeObjectURL(a.href);
   }
-  function printSheet(questions, answersMode, lang) {
+  async function printSheet(questions, answersMode, lang) {
     if (!questions.length) {
       alert(noQuizAlertMessage(lang));
       return;
@@ -512,6 +528,7 @@
     let html = `<h1>${escHtml(titleEn)}</h1>`;
     html += buildDocBody(questions, answersMode);
     sheet.innerHTML = html;
+    await waitForExportImages(sheet);
     window.print();
   }
 
