@@ -1,4 +1,4 @@
-import { createQuizExport } from "../../shared/quiz/quizExport.js?v=20260704e";
+import { createQuizExport } from "../../shared/quiz/quizExport.js?v=20260704f";
 
 const { downloadWord, printSheet } = createQuizExport({
   titleEnQuestions: "Heat Ch.1 Quiz — Questions",

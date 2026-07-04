@@ -1,2 +1,3 @@
-# GitHub Pages root redirect must stay UTF-8 text (avoid UTF-16 from editors on Windows).
-scripts/github-pages-repo-root-redirect.html text eol=lf
+*.js text eol=lf working-tree-encoding=UTF-8
+*.mjs text eol=lf working-tree-encoding=UTF-8
+*.cjs text eol=lf working-tree-encoding=UTF-8
