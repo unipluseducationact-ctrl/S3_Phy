@@ -45,7 +45,7 @@
     .lab-controls.lab-controls-float {
       position: absolute;
       z-index: 40;
-      width: min(320px, calc(100% - 24px));
+      width: var(--s3-float-panel-w);
       box-shadow: 0 8px 24px rgba(15, 23, 42, 0.12);
     }
     .lab-controls-body { transition: max-height 0.25s ease, opacity 0.2s ease; }
@@ -71,6 +71,7 @@
     .lab-controls-actions { flex-direction: row; gap: 0.5rem; }
     .lab-controls-actions button { padding: 0.625rem 0.75rem; justify-content: center; }
     .lab-controls-actions button.flex-1 { white-space: nowrap; min-width: 0; }
+    #startStateBtn .lab-btn-label { font-size: clamp(0.75rem, 2.8vw, 0.875rem); }
     .lab-controls-drag-handle {
       display: none;
       cursor: grab;
@@ -261,11 +262,11 @@
             <i data-lucide="play" class="w-5 h-5"></i>
             <span class="lab-btn-label" id="stateBtnText" data-i18n="startState">Start Heating</span>
           </button>
-          <button id="stateSpeedBtn" type="button" class="px-3 py-3 bg-slate-100 hover:bg-slate-200 active:bg-slate-300 text-slate-600 font-bold rounded-xl transition-all flex items-center justify-center gap-1 min-w-[3.25rem]" title="Playback speed">
+          <button id="stateSpeedBtn" type="button" class="px-2.5 py-3 bg-slate-100 hover:bg-slate-200 active:bg-slate-300 text-slate-600 font-bold rounded-xl transition-all flex items-center justify-center gap-1 min-w-[3rem]" title="Playback speed">
             <i data-lucide="gauge" class="w-4 h-4"></i>
             <span class="lab-speed-label text-sm">1×</span>
           </button>
-          <button id="stateSkipBtn" type="button" class="px-3 py-3 bg-slate-100 hover:bg-slate-200 active:bg-slate-300 text-slate-600 font-bold rounded-xl transition-all flex items-center justify-center" data-i18n-title="skipToEndTitle">
+          <button id="stateSkipBtn" type="button" class="px-2.5 py-3 bg-slate-100 hover:bg-slate-200 active:bg-slate-300 text-slate-600 font-bold rounded-xl transition-all flex items-center justify-center" data-i18n-title="skipToEndTitle">
             <i data-lucide="skip-forward" class="w-5 h-5"></i>
           </button>
           <button id="resetStateBtn" class="px-4 py-3 bg-slate-100 hover:bg-slate-200 active:bg-slate-300 text-slate-600 font-bold rounded-xl transition-all flex items-center justify-center">
@@ -484,8 +485,11 @@
       } else {
         const isPaused = stateState.timeElapsed > 0;
         if (isPaused) {
-          const btnText = stateState.mode === "heating" ? (currentLang === 'en' ? 'Resume Heating' : '繼續加熱') : (currentLang === 'en' ? 'Resume Cooling' : '繼續冷卻');
-          document.getElementById("startStateBtn").innerHTML = `<i data-lucide="play" class="w-5 h-5"></i><span class="lab-btn-label">${btnText}</span>`;
+          const fullText = stateState.mode === "heating" ? (currentLang === 'en' ? 'Resume Heating' : '繼續加熱') : (currentLang === 'en' ? 'Resume Cooling' : '繼續冷卻');
+          const btnText = currentLang === 'en' ? 'Resume' : fullText;
+          const startBtn = document.getElementById("startStateBtn");
+          startBtn.title = fullText;
+          startBtn.innerHTML = `<i data-lucide="play" class="w-5 h-5"></i><span class="lab-btn-label">${btnText}</span>`;
         } else {
           const btnText = stateState.mode === "heating" ? (currentLang === 'en' ? 'Start Heating' : '開始加熱') : (currentLang === 'en' ? 'Start Cooling' : '開始冷卻');
           document.getElementById("startStateBtn").innerHTML = `<i data-lucide="play" class="w-5 h-5"></i><span class="lab-btn-label">${btnText}</span>`;
@@ -1077,8 +1081,11 @@
         clearInterval(stateInterval);
         stateState.running = false;
 
-        const btnText = stateState.mode === "heating" ? (currentLang === "en" ? "Resume Heating" : "繼續加熱") : (currentLang === "en" ? "Resume Cooling" : "繼續冷卻");
-        document.getElementById("startStateBtn").innerHTML = `<i data-lucide="play" class="w-5 h-5"></i><span class="lab-btn-label">${btnText}</span>`;
+        const fullText = stateState.mode === "heating" ? (currentLang === "en" ? "Resume Heating" : "繼續加熱") : (currentLang === "en" ? "Resume Cooling" : "繼續冷卻");
+        const btnText = currentLang === "en" ? "Resume" : fullText;
+        const startBtn = document.getElementById("startStateBtn");
+        startBtn.title = fullText;
+        startBtn.innerHTML = `<i data-lucide="play" class="w-5 h-5"></i><span class="lab-btn-label">${btnText}</span>`;
         lucide.createIcons();
       } else {
         stateState.running = true;

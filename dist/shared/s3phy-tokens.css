@@ -44,5 +44,5 @@
   /* Breakpoints (for reference in media queries) */
   --s3-bp-md: 820px;
   --s3-bp-lg: 1024px;
-  --s3-float-panel-w: min(360px, calc(100% - 24px));
+  --s3-float-panel-w: min(380px, calc(100% - 24px));
 }

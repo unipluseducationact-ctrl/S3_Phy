@@ -164,6 +164,8 @@
 
         /* Embedded in S3_Phy hub iframe */
         body.embed-mode {
+            display: flex;
+            flex-direction: column;
             overflow: hidden;
             min-height: 100% !important;
             height: 100%;
@@ -174,6 +176,8 @@
             padding-top: 0.75rem;
             padding-bottom: 0.75rem;
             overflow: auto;
+            display: flex;
+            flex-direction: column;
         }
         body.embed-mode header {
             padding-top: 0.5rem;
@@ -181,9 +185,23 @@
             flex-shrink: 0;
         }
         body.embed-mode footer {
-            padding-top: 0.75rem;
-            padding-bottom: 0.75rem;
-            flex-shrink: 0;
+            display: none;
+        }
+        body.embed-mode .tab-content.main-grid {
+            flex: 1 1 auto;
+            min-height: 0;
+            align-content: start;
+        }
+        body.embed-mode .tab-sidebar-col {
+            min-height: 0;
+            max-height: none;
+            overflow-y: auto;
+            overscroll-behavior: contain;
+        }
+        body.embed-mode .tab-sim-col {
+            min-height: 0;
+            display: flex;
+            flex-direction: column;
         }
         body.embed-mode .sim-main-col {
             flex: 1 1 auto;
@@ -191,9 +209,15 @@
         }
         body.embed-mode .canvas-container {
             flex: 1 1 auto;
-            min-height: 0 !important;
+            min-height: clamp(10rem, 32vh, 22rem) !important;
             height: auto !important;
-            max-height: none;
+            max-height: clamp(14rem, 42vh, 26rem);
+        }
+        body.embed-mode .chart-panel {
+            flex: 0 1 auto;
+            min-height: clamp(9rem, 24vh, 16rem);
+            height: auto !important;
+            max-height: clamp(11rem, 28vh, 18rem);
         }
         body.embed-mode .max-w-7xl {
             max-width: none;
@@ -257,7 +281,7 @@
         <!-- ================== CONDUCTION SECTION ================== -->
         <section id="sec-conduction" class="tab-content main-grid grid grid-cols-1 lg:grid-cols-12 gap-6">
             <!-- Left Panel: Interactive Simulation Area -->
-            <div class="lg:col-span-7 sim-main-col flex flex-col gap-6">
+            <div class="lg:col-span-7 sim-main-col tab-sim-col flex flex-col gap-6">
                 <!-- Simulation Box -->
                 <div class="glass-panel rounded-2xl p-5 flex flex-col flex-grow relative overflow-hidden">
                     <div class="flex items-center justify-between mb-4 border-b border-slate-800 pb-3">
@@ -277,7 +301,7 @@
                     </div>
 
                     <!-- Sandbox Viewport -->
-                    <div class="relative bg-slate-950 rounded-xl overflow-hidden border border-slate-800/80 flex flex-col min-h-[18rem] h-72 lg:h-[380px] xl:h-[420px] canvas-container">
+                    <div class="relative bg-slate-950 rounded-xl overflow-hidden border border-slate-800/80 flex flex-col min-h-[12rem] flex-1 canvas-container">
                         <!-- Larger HTML-based Glassmorphic Legend placed at absolute top-left of the sandbox -->
                         <div id="cond-legend-metal" class="absolute top-4 left-10 bg-slate-950/90 border border-slate-800/80 rounded-xl p-3 flex flex-col gap-2.5 shadow-xl select-none z-20 backdrop-blur-sm">
                             <div class="flex items-center gap-2.5">
@@ -344,7 +368,7 @@
             </div>
 
             <!-- Right Panel: Core Physics, Curriculum, & Interactive Experiment -->
-            <div class="lg:col-span-5 flex flex-col gap-6">
+            <div class="lg:col-span-5 tab-sidebar-col flex flex-col gap-6">
                 <!-- Syllabus Information Panel -->
                 <div class="glass-panel rounded-2xl p-5 border-l-4 border-l-indigo-500">
                     <span class="text-[10px] font-black tracking-widest text-indigo-400 uppercase" data-i18n="common.curriculumConcept">Curriculum Concept</span>
@@ -365,7 +389,7 @@
                 </div>
 
                 <!-- Real-Time Analytical Graph placed elegantly under Concept Panel -->
-                <div class="glass-panel rounded-2xl p-5 flex flex-col h-80 lg:h-[390px] xl:h-[430px]">
+                <div class="glass-panel rounded-2xl p-5 flex flex-col chart-panel min-h-[10rem]">
                     <div class="flex justify-between items-center mb-3">
                         <div>
                             <h4 class="font-bold text-sm text-slate-200" data-i18n="conduction.graphTitle">Real-time Conduction Comparison</h4>
@@ -386,7 +410,7 @@
         <!-- ================== CONVECTION SECTION ================== -->
         <section id="sec-convection" class="tab-content main-grid grid grid-cols-1 lg:grid-cols-12 gap-6 hidden">
             <!-- Left Panel: Interactive Simulation Area -->
-            <div class="lg:col-span-8 sim-main-col flex flex-col gap-6">
+            <div class="lg:col-span-8 sim-main-col tab-sim-col flex flex-col gap-6">
                 <div class="glass-panel rounded-2xl p-5 flex flex-col flex-grow relative overflow-hidden">
                     <div class="flex items-center justify-between mb-4 border-b border-slate-800 pb-3">
                         <div class="flex items-center gap-2.5">
@@ -405,7 +429,7 @@
                     </div>
 
                     <!-- Sandbox Viewport -->
-                    <div class="relative bg-slate-950 rounded-xl overflow-hidden border border-slate-800/80 flex flex-col min-h-[20rem] h-80 md:h-[400px] lg:h-[450px] xl:h-[480px] canvas-container">
+                    <div class="relative bg-slate-950 rounded-xl overflow-hidden border border-slate-800/80 flex flex-col min-h-[12rem] flex-1 canvas-container">
                         <canvas id="convectionCanvas" class="w-full flex-grow bg-slate-950"></canvas>
                         <svg id="conv-annotation-svg" viewBox="0 0 800 400" class="svg-annotation absolute inset-0 bottom-6 w-full h-[calc(100%-1.5rem)] pointer-events-none" aria-label="Convection flow annotations" preserveAspectRatio="xMidYMid meet">
                             <g id="conv-flow-arrows"></g>
@@ -419,7 +443,7 @@
             </div>
 
             <!-- Right Panel: Core Physics, Curriculum, & Scenarios -->
-            <div class="lg:col-span-4 flex flex-col gap-6">
+            <div class="lg:col-span-4 tab-sidebar-col flex flex-col gap-6">
                 <!-- Syllabus Information Panel -->
                 <div class="glass-panel rounded-2xl p-5 border-l-4 border-l-sky-500">
                     <span class="text-[10px] font-black tracking-widest text-sky-400 uppercase" data-i18n="common.curriculumConcept">Curriculum Concept</span>
@@ -1331,6 +1355,7 @@
             if (conductionSec && !conductionSec.classList.contains('hidden')) {
                 setupCanvas(document.getElementById('conductionCanvas'));
                 updateConductionAnnotations();
+                if (condChart) condChart.resize();
             }
             const convectionSec = document.getElementById('sec-convection');
             if (convectionSec && !convectionSec.classList.contains('hidden')) {
@@ -4418,6 +4443,8 @@
                 if (mainEl && typeof ResizeObserver !== 'undefined') {
                     const ro = new ResizeObserver(() => handleResize());
                     ro.observe(mainEl);
+                    const chartPanel = document.querySelector('#sec-conduction .chart-panel');
+                    if (chartPanel) ro.observe(chartPanel);
                 }
             }
             const langParam = urlParams.get('lang');
