@@ -989,7 +989,6 @@
         const ma = modelAnswerText(q);
         body += `<p><b>Answer / \u7B54\u6848\uFF1A</b> ${escHtml(ma.en)}</p>`;
         if (ma.zh) body += `<p>${escHtml(ma.zh)}</p>`;
-        body += `<p><i>Hint / \u63D0\u793A:</i> ${escHtml(q.hint || "")}</p>`;
       }
     });
     return body;
@@ -1140,7 +1139,6 @@
       btnDocA: "Word \u2014 Answers",
       btnPrint: "Print / Save as PDF",
       hPractice: "On-screen practice",
-      txtPracticeHint: "One attempt per question. Wrong answers show the model answer.",
       btnSummary: "Session summary",
       quizCheck: "Check answer",
       empty: "Generate questions first.",
@@ -1152,7 +1150,6 @@
       progressNone: "No session yet",
       progressCompletedPrefix: "Completed ",
       correct: "Correct.",
-      hintPrefix: "Hint:",
       modelPrefix: "Model answer:",
       printConfirm: "Print ANSWER sheet? (Cancel = questions only)",
       summaryTitle: "Summary",
@@ -1201,7 +1198,6 @@
       btnDocA: "Word \u2014 \u7B54\u6848",
       btnPrint: "\u6253\u5370\uFF0F\u53E6\u5B58 PDF",
       hPractice: "\u4E92\u52A8\u7EC3\u4E60",
-      txtPracticeHint: "\u6BCF\u9898\u53EA\u7B54\u4E00\u6B21\uFF1B\u7B54\u9519\u5373\u663E\u793A\u53C2\u8003\u7B54\u6848\u3002",
       btnSummary: "\u5B66\u4E60\u6458\u8981",
       quizCheck: "\u68C0\u67E5\u7B54\u6848",
       empty: "\u8BF7\u5148\u6309\u300C\u751F\u6210\u9898\u76EE\u300D\u3002",
@@ -1213,7 +1209,6 @@
       progressNone: "\u5C1A\u672A\u751F\u6210\u9898\u76EE",
       progressCompletedPrefix: "\u5DF2\u5B8C\u6210 ",
       correct: "\u6B63\u786E\u3002",
-      hintPrefix: "\u63D0\u793A\uFF1A",
       modelPrefix: "\u53C2\u8003\u7B54\u6848\uFF1A",
       printConfirm: "\u8981\u6253\u5370\u300C\u7B54\u6848\u7248\u300D\u5417\uFF1F\uFF08\u53D6\u6D88 = \u8BD5\u9898\u7248\uFF09",
       summaryTitle: "\u6458\u8981",
@@ -1262,7 +1257,6 @@
       btnDocA: "Word \u2014 \u7B54\u6848",
       btnPrint: "\u5217\u5370\uFF0F\u53E6\u5B58 PDF",
       hPractice: "\u4E92\u52D5\u7DF4\u7FD2",
-      txtPracticeHint: "\u6BCF\u984C\u53EA\u7B54\u4E00\u6B21\uFF1B\u7B54\u932F\u5373\u986F\u793A\u53C3\u8003\u7B54\u6848\u3002",
       btnSummary: "\u5B78\u7FD2\u6458\u8981",
       quizCheck: "\u6AA2\u67E5\u7B54\u6848",
       empty: "\u8ACB\u5148\u6309\u300C\u7522\u751F\u984C\u76EE\u300D\u3002",
@@ -1274,7 +1268,6 @@
       progressNone: "\u5C1A\u672A\u7522\u751F\u984C\u76EE",
       progressCompletedPrefix: "\u5DF2\u5B8C\u6210 ",
       correct: "\u6B63\u78BA\u3002",
-      hintPrefix: "\u63D0\u793A\uFF1A",
       modelPrefix: "\u53C3\u8003\u7B54\u6848\uFF1A",
       printConfirm: "\u8981\u5217\u5370\u300C\u7B54\u6848\u7248\u300D\u55CE\uFF1F\uFF08\u53D6\u6D88 = \u8A66\u984C\u7248\uFF09",
       summaryTitle: "\u6458\u8981",

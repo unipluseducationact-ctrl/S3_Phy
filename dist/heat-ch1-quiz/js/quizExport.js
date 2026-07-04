@@ -56,7 +56,6 @@ function buildDocBody(questions, answersMode) {
       const ma = modelAnswerText(q);
       body += `<p><b>Answer / 答案：</b> ${escHtml(ma.en)}</p>`;
       if (ma.zh) body += `<p>${escHtml(ma.zh)}</p>`;
-      body += `<p><i>Hint / 提示:</i> ${escHtml(q.hint || "")}</p>`;
     }
   });
   return body;
