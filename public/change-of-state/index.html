@@ -96,12 +96,12 @@
     /* Dual-panel viz (animation + chart): grid stack, bounded heights, no flex-grow overlap */
     .lab-viz-dual {
       display: grid;
-      grid-template-rows: auto minmax(180px, min(320px, 36vh));
+      grid-template-rows: auto minmax(180px, 1fr);
       gap: 0.75rem;
       align-content: stretch;
       min-height: 0;
-      height: auto;
-      max-height: calc(100dvh - 44px);
+      height: 100%;
+      max-height: none;
       overflow: hidden;
       overflow-x: hidden;
     }
@@ -113,9 +113,9 @@
         max-height: 160px;
       }
       .lab-section.controls-floating .lab-viz-chart-wrap {
-        flex: 1 1 auto;
+        flex: 0 0 auto;
         min-height: 180px;
-        max-height: min(300px, 34vh);
+        margin-top: auto;
       }
     }
     .lab-steps .katex { font-size: 1.2em; }
@@ -129,7 +129,7 @@
       display: flex;
       flex-direction: column;
     }
-    .lab-viz-dual .lab-viz-panel-chart { z-index: 2; overflow: hidden; flex: 1 1 auto; min-height: 0; }
+    .lab-viz-dual .lab-viz-panel-chart { z-index: 2; overflow: hidden; flex: 1 1 auto; min-height: 0; display: flex; flex-direction: column; }
     .lab-viz-dual .lab-viz-canvas {
       aspect-ratio: 16 / 10;
       width: 100%;
@@ -142,9 +142,9 @@
     .lab-viz-dual .lab-viz-chart-wrap {
       position: relative;
       width: 100%;
-      flex: 1 1 auto;
+      flex: 0 0 auto;
       min-height: 180px;
-      max-height: min(300px, 34vh);
+      margin-top: auto;
       overflow: visible;
     }
     .lab-viz-dual .lab-viz-canvas canvas {
@@ -600,34 +600,30 @@
       ctx.scale(window.devicePixelRatio, window.devicePixelRatio);
     }
 
-    function getChartMaxHeight() {
-      const embed = document.documentElement.classList.contains('s3phy-embed');
-      const vhBased = Math.round(window.innerHeight * (embed ? 0.34 : 0.38));
-      return Math.min(embed ? 300 : 340, Math.max(180, vhBased));
+    function getChartTargetHeight(w) {
+      const chartPanel = document.querySelector('.lab-viz-panel-chart');
+      if (!chartPanel) return Math.max(180, Math.round(w * 10 / 16));
+
+      const header = chartPanel.querySelector('h3');
+      const headerH = header ? header.getBoundingClientRect().height + 8 : 0;
+      const panelPad = 28;
+      const fromPanel = Math.max(180, chartPanel.clientHeight - headerH - panelPad);
+      const fromAspect = Math.round(w * 10 / 16);
+      const absoluteMax = Math.min(480, Math.round(window.innerHeight * 0.52));
+
+      return Math.max(180, Math.min(fromPanel, fromAspect, absoluteMax));
     }
 
     function sizeChartContainer() {
       const wrap = document.querySelector('.lab-viz-chart-wrap');
-      const chartPanel = document.querySelector('.lab-viz-panel-chart');
       if (!wrap) return;
       const w = wrap.getBoundingClientRect().width;
       if (w <= 0) return;
 
-      const maxH = getChartMaxHeight();
-      let h;
-      if (chartPanel && chartPanel.clientHeight > 0) {
-        const header = chartPanel.querySelector('h3');
-        const gap = 8;
-        const headerH = header ? header.getBoundingClientRect().height + gap : 0;
-        const panelPad = 28;
-        h = Math.max(180, chartPanel.clientHeight - headerH - panelPad);
-      } else {
-        h = Math.max(200, Math.round(w * 10 / 16));
-      }
-      h = Math.min(maxH, h);
+      const h = getChartTargetHeight(w);
       wrap.style.height = h + 'px';
       wrap.style.minHeight = h + 'px';
-      wrap.style.maxHeight = maxH + 'px';
+      wrap.style.maxHeight = h + 'px';
     }
 
     function layoutLabCanvases() {

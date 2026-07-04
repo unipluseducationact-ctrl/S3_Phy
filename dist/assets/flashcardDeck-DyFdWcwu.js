@@ -1,4 +1,4 @@
-import{t as o,g as F,s as Z,_ as P}from"./index-CT9TyK8q.js";function W(){return F()==="zh-Hant"?"zhHant":"en"}async function H(e,t){const r=`./${e}/${t}`;try{return(await fetch(r,{method:"HEAD"})).ok}catch{return!1}}async function j(e){return H("notes",e)}function Q(e){return`${String(e).split("#")[0]}#view=FitH&toolbar=0&navpanes=0&scrollbar=0`}function K(e,t,r){const l=Q(t);return`
+import{t as o,g as F,s as Z,_ as P}from"./index-CU-fKI19.js";function W(){return F()==="zh-Hant"?"zhHant":"en"}async function H(e,t){const r=`./${e}/${t}`;try{return(await fetch(r,{method:"HEAD"})).ok}catch{return!1}}async function j(e){return H("notes",e)}function Q(e){return`${String(e).split("#")[0]}#view=FitH&toolbar=0&navpanes=0&scrollbar=0`}function K(e,t,r){const l=Q(t);return`
     <div class="note-preview-wrap">
       <iframe class="note-preview" title="${e.replace(/"/g,"&quot;")}" src="${l}" loading="lazy"></iframe>
     </div>
