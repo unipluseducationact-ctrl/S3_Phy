@@ -47,7 +47,7 @@ const UI = {
     btnDocA: "Word — Answers",
     btnPrint: "Print / Save as PDF",
     hPractice: "On-screen practice",
-    txtPracticeHint: "First wrong: hint only. Second wrong: model answer.",
+    txtPracticeHint: "One attempt per question. Wrong answers show the model answer.",
     btnSummary: "Session summary",
     quizCheck: "Check answer",
     empty: "Generate questions first.",
@@ -66,8 +66,8 @@ const UI = {
     summaryTitle: "Summary",
     summaryScoreLabel: "Score (correct / total)",
     summaryFirstTry: "Correct on first attempt",
-    summaryWrongTitle: "Wrong twice — review these",
-    summaryNoneWrong: "None — no questions failed after two attempts.",
+    summaryWrongTitle: "Incorrect — review these",
+    summaryNoneWrong: "None — all questions answered correctly.",
     summaryIncomplete: "Still in progress",
     summaryByTypeTitle: "Correct rate by topic",
     summaryByTypeColType: "Topic",
@@ -83,9 +83,9 @@ const UI = {
       "Several concepts need consolidation. Review thermometer, heat capacity, latent heat and heat transfer before the next round.",
     revWeakOne: "Prioritise revision on {type} — you scored {c}/{t} ({pct}%) in that topic.",
     revStrongOne: "Strength: every {type} item correct ({n} questions).",
-    revTwoStrike: "Questions missed twice: study the model answers, then regenerate those topics.",
+    revTwoStrike: "Questions answered incorrectly: study the model answers, then regenerate those topics.",
     revIncomplete: "Finish questions still in progress for a fair measure of strengths and gaps.",
-    revFirstTryLow: "Many items needed two attempts. Read each stem carefully before answering.",
+    revFirstTryLow: "Many items were answered incorrectly. Read each stem carefully before answering.",
     revBalanced: "Errors spread across topics — continue balanced practice.",
     hideSettings: "Hide settings",
     showSettings: "Show settings",
@@ -111,7 +111,7 @@ const UI = {
     btnDocA: "Word — 答案",
     btnPrint: "打印／另存 PDF",
     hPractice: "互动练习",
-    txtPracticeHint: "第一次答错只显示提示；第二次答错显示参考答案。",
+    txtPracticeHint: "每题只答一次；答错即显示参考答案。",
     btnSummary: "学习摘要",
     quizCheck: "检查答案",
     empty: "请先按「生成题目」。",
@@ -130,8 +130,8 @@ const UI = {
     summaryTitle: "摘要",
     summaryScoreLabel: "得分（答对／总题数）",
     summaryFirstTry: "首次即答对",
-    summaryWrongTitle: "两次皆错 — 需重温",
-    summaryNoneWrong: "没有此类题目。",
+    summaryWrongTitle: "答错 — 需重温",
+    summaryNoneWrong: "没有答错的题目。",
     summaryIncomplete: "尚未答对",
     summaryByTypeTitle: "各课题答对率",
     summaryByTypeColType: "课题",
@@ -145,9 +145,9 @@ const UI = {
     revBandLow: "多个概念仍需巩固。请先温习流动镶嵌、渗透性、渗透与主动运输。",
     revWeakOne: "建议优先温习「{type}」：本次 {c}/{t}（{pct}%）。",
     revStrongOne: "强项：「{type}」本次全对（共 {n} 题）。",
-    revTwoStrike: "曾两次答错的题目：请细读参考答案后再练。",
+    revTwoStrike: "答错的题目：请细读参考答案后再练。",
     revIncomplete: "尚有未答对题目，建议先完成。",
-    revFirstTryLow: "不少题目需第二次才答对。作答前宜放慢阅读题干。",
+    revFirstTryLow: "不少题目答错。作答前宜放慢阅读题干。",
     revBalanced: "错误分散在不同课题，宜均衡练习。",
     hideSettings: "隐藏设定",
     showSettings: "显示设定",
@@ -173,7 +173,7 @@ const UI = {
     btnDocA: "Word — 答案",
     btnPrint: "列印／另存 PDF",
     hPractice: "互動練習",
-    txtPracticeHint: "第一次答錯只顯示提示；第二次答錯顯示參考答案。",
+    txtPracticeHint: "每題只答一次；答錯即顯示參考答案。",
     btnSummary: "學習摘要",
     quizCheck: "檢查答案",
     empty: "請先按「產生題目」。",
@@ -192,8 +192,8 @@ const UI = {
     summaryTitle: "摘要",
     summaryScoreLabel: "得分（答對／總題數）",
     summaryFirstTry: "首次即答對",
-    summaryWrongTitle: "兩次皆錯 — 需重溫",
-    summaryNoneWrong: "沒有此類題目。",
+    summaryWrongTitle: "答錯 — 需重溫",
+    summaryNoneWrong: "沒有答錯的題目。",
     summaryIncomplete: "尚未答對",
     summaryByTypeTitle: "各課題答對率",
     summaryByTypeColType: "課題",
@@ -207,9 +207,9 @@ const UI = {
     revBandLow: "多個概念仍需鞏固。請先溫習溫度計、比熱容、潛熱同熱傳遞。",
     revWeakOne: "建議優先溫習「{type}」：本次 {c}/{t}（{pct}%）。",
     revStrongOne: "強項：「{type}」本次全對（共 {n} 題）。",
-    revTwoStrike: "曾兩次答錯的題目：請細讀參考答案後再練。",
+    revTwoStrike: "答錯的題目：請細讀參考答案後再練。",
     revIncomplete: "尚有未答對題目，建議先完成。",
-    revFirstTryLow: "不少題目需第二次才答對。作答前宜放慢閱讀題幹。",
+    revFirstTryLow: "不少題目答錯。作答前宜放慢閱讀題幹。",
     revBalanced: "錯誤分散在不同課題，宜均衡練習。",
     hideSettings: "隱藏設定",
     showSettings: "顯示設定",
@@ -639,36 +639,26 @@ export function initQuiz() {
           fillInputs.forEach((inp) => inp.classList.add("border-tertiary"));
         }
 
-        if (state.wrong === 1) {
-          fb.className = "mt-3 text-body-sm p-3 rounded-xl bg-primary-fixed/50 text-on-surface border border-primary/20";
-          fb.innerHTML = `<strong>${escHtml(t("hintPrefix"))}</strong> ${escHtml(q.hint || "")}`;
-        } else {
-          state.solved = true;
-          attemptMap.set(q.id, state);
-          showModelAnswer();
-          btn.disabled = true;
-          optionButtons.forEach((b) => {
-            b.disabled = true;
-            if (b.dataset.key === q.answer) {
-              b.classList.add("border-tertiary", "bg-tertiary/10");
-            }
-          });
-          fillInputs.forEach((inp) => {
-            inp.disabled = true;
-          });
-          updateProgress();
-        }
+        state.solved = true;
+        attemptMap.set(q.id, state);
+        showModelAnswer();
+        btn.disabled = true;
+        optionButtons.forEach((b) => {
+          b.disabled = true;
+          if (b.dataset.key === q.answer) {
+            b.classList.add("border-tertiary", "bg-tertiary/10");
+          }
+        });
+        fillInputs.forEach((inp) => {
+          inp.disabled = true;
+        });
+        updateProgress();
       });
 
       wrap.appendChild(btn);
       wrap.appendChild(fb);
 
-      if (st.solved && st.wrong > 0 && st.wrong < 2) {
-        fb.classList.remove("hidden");
-        fb.className = "mt-3 text-body-sm p-3 rounded-xl bg-primary-fixed/50 text-on-surface border border-primary/20";
-        fb.innerHTML = `<strong>${escHtml(t("hintPrefix"))}</strong> ${escHtml(q.hint || "")}`;
-      }
-      if (st.solved && st.wrong >= 2) {
+      if (st.solved && st.wrong >= 1) {
         fb.classList.remove("hidden");
         showModelAnswer();
         btn.disabled = true;

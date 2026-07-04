@@ -331,14 +331,12 @@
       if (!byType.has(sid)) byType.set(sid, { total: 0, correct: 0, firstTry: 0 });
       const agg = byType.get(sid);
       agg.total += 1;
-      if (st.solved && st.wrong < 2) {
+      if (st.solved && st.wrong === 0) {
         correct += 1;
         agg.correct += 1;
-        if (st.wrong === 0) {
-          firstTry += 1;
-          agg.firstTry += 1;
-        }
-      } else if (st.solved && st.wrong >= 2) {
+        firstTry += 1;
+        agg.firstTry += 1;
+      } else if (st.solved && st.wrong >= 1) {
         failed.push({ n, q });
       } else {
         incomplete.push(n);
@@ -590,7 +588,7 @@
       btnDocA: "Word \u2014 Answers",
       btnPrint: "Print / Save as PDF",
       hPractice: "On-screen practice",
-      txtPracticeHint: "First wrong: hint only. Second wrong: model answer.",
+      txtPracticeHint: "One attempt per question. Wrong answers show the model answer.",
       btnSummary: "Session summary",
       quizCheck: "Check answer",
       empty: "Generate questions first.",
@@ -608,8 +606,8 @@
       summaryTitle: "Summary",
       summaryScoreLabel: "Score (correct / total)",
       summaryFirstTry: "Correct on first attempt",
-      summaryWrongTitle: "Wrong twice \u2014 review these",
-      summaryNoneWrong: "None \u2014 no questions failed after two attempts.",
+      summaryWrongTitle: "Incorrect \u2014 review these",
+      summaryNoneWrong: "None \u2014 all questions answered correctly.",
       summaryIncomplete: "Still in progress",
       summaryByTypeTitle: "Correct rate by topic",
       summaryByTypeColType: "Topic",
@@ -623,9 +621,9 @@
       revBandLow: "Several concepts need consolidation. Review reflection, Snell's law, total internal reflection, lens ray diagrams, and the lens formula before the next round.",
       revWeakOne: "Prioritise revision on {type} \u2014 you scored {c}/{t} ({pct}%) in that topic.",
       revStrongOne: "Strength: every {type} item correct ({n} questions).",
-      revTwoStrike: "Questions missed twice: study the model answers, then regenerate those topics.",
+      revTwoStrike: "Questions answered incorrectly: study the model answers, then regenerate those topics.",
       revIncomplete: "Finish questions still in progress for a fair measure of strengths and gaps.",
-      revFirstTryLow: "Many items needed two attempts. Read each stem carefully before answering.",
+      revFirstTryLow: "Many items were answered incorrectly. Read each stem carefully before answering.",
       revBalanced: "Errors spread across topics \u2014 continue balanced practice.",
       hideSettings: "Hide settings",
       showSettings: "Show settings"
@@ -651,7 +649,7 @@
       btnDocA: "Word \u2014 \u7B54\u6848",
       btnPrint: "\u6253\u5370\uFF0F\u53E6\u5B58 PDF",
       hPractice: "\u4E92\u52A8\u7EC3\u4E60",
-      txtPracticeHint: "\u7B2C\u4E00\u6B21\u7B54\u9519\u53EA\u663E\u793A\u63D0\u793A\uFF1B\u7B2C\u4E8C\u6B21\u7B54\u9519\u663E\u793A\u53C2\u8003\u7B54\u6848\u3002",
+      txtPracticeHint: "\u6BCF\u9898\u53EA\u7B54\u4E00\u6B21\uFF1B\u7B54\u9519\u5373\u663E\u793A\u53C2\u8003\u7B54\u6848\u3002",
       btnSummary: "\u5B66\u4E60\u6458\u8981",
       quizCheck: "\u68C0\u67E5\u7B54\u6848",
       empty: "\u8BF7\u5148\u6309\u300C\u751F\u6210\u9898\u76EE\u300D\u3002",
@@ -669,8 +667,8 @@
       summaryTitle: "\u6458\u8981",
       summaryScoreLabel: "\u5F97\u5206\uFF08\u7B54\u5BF9\uFF0F\u603B\u9898\u6570\uFF09",
       summaryFirstTry: "\u9996\u6B21\u5373\u7B54\u5BF9",
-      summaryWrongTitle: "\u4E24\u6B21\u7686\u9519 \u2014 \u9700\u91CD\u6E29",
-      summaryNoneWrong: "\u6CA1\u6709\u6B64\u7C7B\u9898\u76EE\u3002",
+      summaryWrongTitle: "\u7B54\u9519 \u2014 \u9700\u91CD\u6E29",
+      summaryNoneWrong: "\u6CA1\u6709\u7B54\u9519\u7684\u9898\u76EE\u3002",
       summaryIncomplete: "\u5C1A\u672A\u7B54\u5BF9",
       summaryByTypeTitle: "\u5404\u8BFE\u9898\u7B54\u5BF9\u7387",
       summaryByTypeColType: "\u8BFE\u9898",
@@ -684,9 +682,9 @@
       revBandLow: "\u591A\u4E2A\u6982\u5FF5\u4ECD\u9700\u5DE9\u56FA\u3002\u8BF7\u5148\u6E29\u4E60\u6D41\u52A8\u9576\u5D4C\u3001\u6E17\u900F\u6027\u3001\u6E17\u900F\u4E0E\u4E3B\u52A8\u8FD0\u8F93\u3002",
       revWeakOne: "\u5EFA\u8BAE\u4F18\u5148\u6E29\u4E60\u300C{type}\u300D\uFF1A\u672C\u6B21 {c}/{t}\uFF08{pct}%\uFF09\u3002",
       revStrongOne: "\u5F3A\u9879\uFF1A\u300C{type}\u300D\u672C\u6B21\u5168\u5BF9\uFF08\u5171 {n} \u9898\uFF09\u3002",
-      revTwoStrike: "\u66FE\u4E24\u6B21\u7B54\u9519\u7684\u9898\u76EE\uFF1A\u8BF7\u7EC6\u8BFB\u53C2\u8003\u7B54\u6848\u540E\u518D\u7EC3\u3002",
+      revTwoStrike: "\u7B54\u9519\u7684\u9898\u76EE\uFF1A\u8BF7\u7EC6\u8BFB\u53C2\u8003\u7B54\u6848\u540E\u518D\u7EC3\u3002",
       revIncomplete: "\u5C1A\u6709\u672A\u7B54\u5BF9\u9898\u76EE\uFF0C\u5EFA\u8BAE\u5148\u5B8C\u6210\u3002",
-      revFirstTryLow: "\u4E0D\u5C11\u9898\u76EE\u9700\u7B2C\u4E8C\u6B21\u624D\u7B54\u5BF9\u3002\u4F5C\u7B54\u524D\u5B9C\u653E\u6162\u9605\u8BFB\u9898\u5E72\u3002",
+      revFirstTryLow: "\u4E0D\u5C11\u9898\u76EE\u7B54\u9519\u3002\u4F5C\u7B54\u524D\u5B9C\u653E\u6162\u9605\u8BFB\u9898\u5E72\u3002",
       revBalanced: "\u9519\u8BEF\u5206\u6563\u5728\u4E0D\u540C\u8BFE\u9898\uFF0C\u5B9C\u5747\u8861\u7EC3\u4E60\u3002",
       hideSettings: "\u9690\u85CF\u8BBE\u5B9A",
       showSettings: "\u663E\u793A\u8BBE\u5B9A"
@@ -712,7 +710,7 @@
       btnDocA: "Word \u2014 \u7B54\u6848",
       btnPrint: "\u5217\u5370\uFF0F\u53E6\u5B58 PDF",
       hPractice: "\u4E92\u52D5\u7DF4\u7FD2",
-      txtPracticeHint: "\u7B2C\u4E00\u6B21\u7B54\u932F\u53EA\u986F\u793A\u63D0\u793A\uFF1B\u7B2C\u4E8C\u6B21\u7B54\u932F\u986F\u793A\u53C3\u8003\u7B54\u6848\u3002",
+      txtPracticeHint: "\u6BCF\u984C\u53EA\u7B54\u4E00\u6B21\uFF1B\u7B54\u932F\u5373\u986F\u793A\u53C3\u8003\u7B54\u6848\u3002",
       btnSummary: "\u5B78\u7FD2\u6458\u8981",
       quizCheck: "\u6AA2\u67E5\u7B54\u6848",
       empty: "\u8ACB\u5148\u6309\u300C\u7522\u751F\u984C\u76EE\u300D\u3002",
@@ -730,8 +728,8 @@
       summaryTitle: "\u6458\u8981",
       summaryScoreLabel: "\u5F97\u5206\uFF08\u7B54\u5C0D\uFF0F\u7E3D\u984C\u6578\uFF09",
       summaryFirstTry: "\u9996\u6B21\u5373\u7B54\u5C0D",
-      summaryWrongTitle: "\u5169\u6B21\u7686\u932F \u2014 \u9700\u91CD\u6EAB",
-      summaryNoneWrong: "\u6C92\u6709\u6B64\u985E\u984C\u76EE\u3002",
+      summaryWrongTitle: "\u7B54\u932F \u2014 \u9700\u91CD\u6EAB",
+      summaryNoneWrong: "\u6C92\u6709\u7B54\u932F\u7684\u984C\u76EE\u3002",
       summaryIncomplete: "\u5C1A\u672A\u7B54\u5C0D",
       summaryByTypeTitle: "\u5404\u8AB2\u984C\u7B54\u5C0D\u7387",
       summaryByTypeColType: "\u8AB2\u984C",
@@ -745,9 +743,9 @@
       revBandLow: "\u591A\u500B\u6982\u5FF5\u4ECD\u9700\u978F\u56FA\u3002\u8ACB\u5148\u6EAB\u7FD2\u6D41\u52D5\u9472\u5D4C\u3001\u6EF2\u900F\u6027\u3001\u6EF2\u900F\u8207\u4E3B\u52D5\u904B\u8F38\u3002",
       revWeakOne: "\u5EFA\u8B70\u512A\u5148\u6EAB\u7FD2\u300C{type}\u300D\uFF1A\u672C\u6B21 {c}/{t}\uFF08{pct}%\uFF09\u3002",
       revStrongOne: "\u5F37\u9805\uFF1A\u300C{type}\u300D\u672C\u6B21\u5168\u5C0D\uFF08\u5171 {n} \u984C\uFF09\u3002",
-      revTwoStrike: "\u66FE\u5169\u6B21\u7B54\u932F\u7684\u984C\u76EE\uFF1A\u8ACB\u7D30\u8B80\u53C3\u8003\u7B54\u6848\u5F8C\u518D\u7DF4\u3002",
+      revTwoStrike: "\u7B54\u932F\u7684\u984C\u76EE\uFF1A\u8ACB\u7D30\u8B80\u53C3\u8003\u7B54\u6848\u5F8C\u518D\u7DF4\u3002",
       revIncomplete: "\u5C1A\u6709\u672A\u7B54\u5C0D\u984C\u76EE\uFF0C\u5EFA\u8B70\u5148\u5B8C\u6210\u3002",
-      revFirstTryLow: "\u4E0D\u5C11\u984C\u76EE\u9700\u7B2C\u4E8C\u6B21\u624D\u7B54\u5C0D\u3002\u4F5C\u7B54\u524D\u5B9C\u653E\u6162\u95B1\u8B80\u984C\u5E79\u3002",
+      revFirstTryLow: "\u4E0D\u5C11\u984C\u76EE\u7B54\u932F\u3002\u4F5C\u7B54\u524D\u5B9C\u653E\u6162\u95B1\u8B80\u984C\u5E79\u3002",
       revBalanced: "\u932F\u8AA4\u5206\u6563\u5728\u4E0D\u540C\u8AB2\u984C\uFF0C\u5B9C\u5747\u8861\u7DF4\u7FD2\u3002",
       hideSettings: "\u96B1\u85CF\u8A2D\u5B9A",
       showSettings: "\u986F\u793A\u8A2D\u5B9A"
@@ -1106,34 +1104,24 @@
           } else {
             fillInputs.forEach((inp) => inp.classList.add("border-tertiary"));
           }
-          if (state.wrong === 1) {
-            fb.className = "mt-3 text-body-sm p-3 rounded-xl bg-primary-fixed/50 text-on-surface border border-primary/20";
-            fb.innerHTML = `<strong>${escHtml(t("hintPrefix"))}</strong> ${escHtml(q.hint || "")}`;
-          } else {
-            state.solved = true;
-            attemptMap.set(q.id, state);
-            showModelAnswer();
-            btn.disabled = true;
-            optionButtons.forEach((b) => {
-              b.disabled = true;
-              if (b.dataset.key === q.answer) {
-                b.classList.add("border-tertiary", "bg-tertiary/10");
-              }
-            });
-            fillInputs.forEach((inp) => {
-              inp.disabled = true;
-            });
-            updateProgress();
-          }
+          state.solved = true;
+          attemptMap.set(q.id, state);
+          showModelAnswer();
+          btn.disabled = true;
+          optionButtons.forEach((b) => {
+            b.disabled = true;
+            if (b.dataset.key === q.answer) {
+              b.classList.add("border-tertiary", "bg-tertiary/10");
+            }
+          });
+          fillInputs.forEach((inp) => {
+            inp.disabled = true;
+          });
+          updateProgress();
         });
         wrap.appendChild(btn);
         wrap.appendChild(fb);
-        if (st.solved && st.wrong > 0 && st.wrong < 2) {
-          fb.classList.remove("hidden");
-          fb.className = "mt-3 text-body-sm p-3 rounded-xl bg-primary-fixed/50 text-on-surface border border-primary/20";
-          fb.innerHTML = `<strong>${escHtml(t("hintPrefix"))}</strong> ${escHtml(q.hint || "")}`;
-        }
-        if (st.solved && st.wrong >= 2) {
+        if (st.solved && st.wrong >= 1) {
           fb.classList.remove("hidden");
           showModelAnswer();
           btn.disabled = true;
