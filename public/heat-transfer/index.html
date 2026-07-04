@@ -164,6 +164,7 @@
 
         /* Embedded in S3_Phy hub iframe */
         body.embed-mode {
+            --ht-embed-main-h: calc(100dvh - 5.5rem);
             display: flex;
             flex-direction: column;
             overflow: hidden;
@@ -179,6 +180,11 @@
             display: flex;
             flex-direction: column;
         }
+        body.embed-mode main > .tab-content:not(.hidden) {
+            flex: 1 1 auto;
+            min-height: 0;
+            max-height: var(--ht-embed-main-h);
+        }
         body.embed-mode header {
             padding-top: 0.5rem;
             padding-bottom: 0.5rem;
@@ -191,6 +197,11 @@
             flex: 1 1 auto;
             min-height: 0;
             align-content: start;
+        }
+        @media (min-width: 1024px) {
+            body.embed-mode .tab-content.main-grid {
+                align-items: stretch;
+            }
         }
         body.embed-mode .tab-sidebar-col {
             min-height: 0;
@@ -207,6 +218,15 @@
             flex: 1 1 auto;
             min-height: 0;
         }
+        body.embed-mode .sim-panel-fill {
+            flex: 1 1 auto;
+            min-height: 0;
+            display: flex;
+            flex-direction: column;
+        }
+        body.embed-mode .sidebar-concept {
+            flex-shrink: 0;
+        }
         body.embed-mode .canvas-container {
             flex: 1 1 auto;
             min-height: clamp(10rem, 32vh, 22rem) !important;
@@ -218,6 +238,28 @@
             min-height: clamp(9rem, 24vh, 16rem);
             height: auto !important;
             max-height: clamp(11rem, 28vh, 18rem);
+        }
+        body.embed-mode #sec-conduction .canvas-container {
+            min-height: clamp(11rem, 30vh, 18rem);
+            max-height: clamp(13rem, 34vh, 20rem);
+        }
+        body.embed-mode #sec-conduction .chart-panel {
+            flex: 1 1 auto;
+            min-height: clamp(12rem, 32vh, 18rem);
+            max-height: none;
+        }
+        body.embed-mode #sec-conduction .tab-sidebar-col {
+            max-height: var(--ht-embed-main-h);
+        }
+        body.embed-mode #sec-convection .tab-sim-col {
+            min-height: 0;
+            align-self: stretch;
+        }
+        body.embed-mode #sec-convection .canvas-container {
+            flex: 1 1 auto;
+            min-height: clamp(12rem, 38vh, 100%);
+            max-height: none !important;
+            height: auto !important;
         }
         body.embed-mode .max-w-7xl {
             max-width: none;
@@ -283,7 +325,7 @@
             <!-- Left Panel: Interactive Simulation Area -->
             <div class="lg:col-span-7 sim-main-col tab-sim-col flex flex-col gap-6">
                 <!-- Simulation Box -->
-                <div class="glass-panel rounded-2xl p-5 flex flex-col flex-grow relative overflow-hidden">
+                <div class="glass-panel sim-panel-fill rounded-2xl p-5 flex flex-col flex-grow relative overflow-hidden">
                     <div class="flex items-center justify-between mb-4 border-b border-slate-800 pb-3">
                         <div class="flex items-center gap-2.5">
                             <span class="w-2.5 h-2.5 rounded-full bg-indigo-500 animate-ping"></span>
@@ -370,7 +412,7 @@
             <!-- Right Panel: Core Physics, Curriculum, & Interactive Experiment -->
             <div class="lg:col-span-5 tab-sidebar-col flex flex-col gap-6">
                 <!-- Syllabus Information Panel -->
-                <div class="glass-panel rounded-2xl p-5 border-l-4 border-l-indigo-500">
+                <div class="glass-panel sidebar-concept rounded-2xl p-5 border-l-4 border-l-indigo-500">
                     <span class="text-[10px] font-black tracking-widest text-indigo-400 uppercase" data-i18n="common.curriculumConcept">Curriculum Concept</span>
                     <h3 class="font-black text-lg text-white mt-0.5" data-i18n="conduction.title">Conduction</h3>
                     <p class="text-slate-300 text-xs leading-relaxed mt-2" data-i18n="conduction.concept">
@@ -389,7 +431,7 @@
                 </div>
 
                 <!-- Real-Time Analytical Graph placed elegantly under Concept Panel -->
-                <div class="glass-panel rounded-2xl p-5 flex flex-col chart-panel min-h-[10rem]">
+                <div class="glass-panel rounded-2xl p-5 flex flex-col chart-panel flex-1 min-h-0">
                     <div class="flex justify-between items-center mb-3">
                         <div>
                             <h4 class="font-bold text-sm text-slate-200" data-i18n="conduction.graphTitle">Real-time Conduction Comparison</h4>
@@ -411,7 +453,7 @@
         <section id="sec-convection" class="tab-content main-grid grid grid-cols-1 lg:grid-cols-12 gap-6 hidden">
             <!-- Left Panel: Interactive Simulation Area -->
             <div class="lg:col-span-8 sim-main-col tab-sim-col flex flex-col gap-6">
-                <div class="glass-panel rounded-2xl p-5 flex flex-col flex-grow relative overflow-hidden">
+                <div class="glass-panel sim-panel-fill rounded-2xl p-5 flex flex-col flex-grow relative overflow-hidden">
                     <div class="flex items-center justify-between mb-4 border-b border-slate-800 pb-3">
                         <div class="flex items-center gap-2.5">
                             <span class="w-2.5 h-2.5 rounded-full bg-sky-500 animate-ping"></span>
@@ -429,7 +471,7 @@
                     </div>
 
                     <!-- Sandbox Viewport -->
-                    <div class="relative bg-slate-950 rounded-xl overflow-hidden border border-slate-800/80 flex flex-col min-h-[12rem] flex-1 canvas-container">
+                    <div class="relative bg-slate-950 rounded-xl overflow-hidden border border-slate-800/80 flex flex-col min-h-[12rem] flex-1 canvas-container conv-canvas-fill">
                         <canvas id="convectionCanvas" class="w-full flex-grow bg-slate-950"></canvas>
                         <svg id="conv-annotation-svg" viewBox="0 0 800 400" class="svg-annotation absolute inset-0 bottom-6 w-full h-[calc(100%-1.5rem)] pointer-events-none" aria-label="Convection flow annotations" preserveAspectRatio="xMidYMid meet">
                             <g id="conv-flow-arrows"></g>
@@ -4445,6 +4487,8 @@
                     ro.observe(mainEl);
                     const chartPanel = document.querySelector('#sec-conduction .chart-panel');
                     if (chartPanel) ro.observe(chartPanel);
+                    const convCanvasWrap = document.querySelector('#sec-convection .conv-canvas-fill');
+                    if (convCanvasWrap) ro.observe(convCanvasWrap);
                 }
             }
             const langParam = urlParams.get('lang');
