@@ -294,7 +294,7 @@ export function mountHeatHub(root) {
         <h2>${t('summary.title')}</h2>
         <p class="lead">${t('summary.intro')}</p>
         <p class="lead">${t('notes.embedHint')}</p>
-        <div class="grid cols-2" data-summary-grid>
+        <div class="grid cols-4" data-summary-grid>
           ${HEAT_TOPICS.map(
             (it) => `
             <div class="card" data-summary-card="${it.id}">
