@@ -937,8 +937,6 @@ export function initQuiz() {
     icon: document.getElementById("settings-toggle-icon"),
     label: document.getElementById("settings-toggle-label"),
   });
-
-  requestAnimationFrame(() => generate());
 }
 
 document.addEventListener("DOMContentLoaded", () => initQuiz());
