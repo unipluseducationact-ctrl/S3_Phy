@@ -1,55 +1,215 @@
-# S3_PHY — Uni+ HKDSE Physics Hub
+# ⚛️ Uni+
 
-Static learning site for HKDSE S3 Physics with two strands:
+**An Interactive Learning Hub for HKDSE S3 Physics**
 
-- **Optics** — light and waves: reflection, refraction, total internal reflection, convex and concave lenses, and electromagnetic waves (interactive labs, worksheets, flashcards).
-- **Heat** — temperature and thermal physics: Ch.1 text flashcards (116 cards), interactive labs, worksheets, and notes.
+[Made with JavaScript](https://developer.mozilla.org/en-US/docs/Web/JavaScript)
+[CSS3](https://www.w3.org/Style/CSS/)
+[HTML5](https://developer.mozilla.org/en-US/docs/Web/HTML)
 
-After the entry splash, choose a strand, then use the same hub navigation (Topics, Notes, Tools, Worksheets, Flashcards, Summary). UI strings in **English** and **Traditional Chinese**.
+*Master Physics. Visually & Instantly.*
 
-Deep links: `#/optics` and `#/heat`.
+---
 
-## Local development
+## ✨ Features
+
+### 🧭 Dual-Strand Hub
+
+- **Optics** and **Heat** strands for HKDSE Secondary 3 Physics
+- Entry splash → strand picker → shared hub navigation
+- Seven sections in every strand: **Topics**, **Notes**, **Tools**, **Worksheets**, **Quiz**, **Flashcards**, **Summary**
+- UI in **English** and **Traditional Chinese** (persisted in browser)
+- Deep links: `#/optics` and `#/heat`
+
+### 🔭 Optics — Light & Waves
+
+Topics: reflection, refraction, total internal reflection, convex and concave lenses, electromagnetic waves.
+
+| Lab | Description |
+| --- | --- |
+| **Rotating Mirror** | Explore image rotation with a rotating plane mirror |
+| **Plane Mirror Lab** | Interactive image formation with a plane mirror |
+| **Refraction / TIR** | Snell's law and a total-internal-reflection escape challenge |
+| **Lens Lab** | Convex and concave lens ray diagrams |
+| **RGB Color Mixer** | Additive colour mixing with red, green, and blue light |
+| **EM Spectrum** | Electromagnetic wave spectrum explorer |
+
+- **Worksheets:** Light & Lens, EM Wave
+- **Quiz:** Optics Ch.3 quiz
+- **Flashcards:** 111 cards combined (73 light + 38 definitions), filterable by reflection, refraction/TIR, convex, concave, and EM
+
+### 🌡️ Heat — Temperature & Thermal Physics
+
+Topics: thermometer, heat and internal energy, change of state, heat transfer.
+
+| Lab | Description |
+| --- | --- |
+| **Faulty Calibration** | Correct a thermometer with a wrong scale |
+| **Liquid Thermometer** | Liquid-in-glass thermometer simulation |
+| **Resistance Thermometer** | Resistance-based temperature sensing |
+| **Thermistor** | Thermistor temperature response |
+| **Specific Heat** | Heating curves and specific heat capacity |
+| **Thermal Mixing** | Mix hot and cold substances |
+| **Change of State** | Melting, boiling, and latent heat |
+| **Heat Transfer** | Conduction, convection, and radiation |
+
+- **Worksheets:** F3 Heat final exam practice
+- **Quiz:** Heat Ch.1 quiz
+- **Flashcards:** 116 cards across thermometry, heat & internal energy, change of state, and heat transfer
+
+### 📚 Shared Learning Assets
+
+- **PDF notes** in `public/notes/` (English and Traditional Chinese pairs)
+- **Summary posters** in `public/summary/` (bilingual `.webp` images)
+- **Embedded quizzes** in `public/*-quiz/` folders with print-ready PDF/Word export
+- Missing note files show a friendly notice instead of a broken embed
+
+---
+
+## 🆕 Recent Updates (July 2026)
+
+- Performance optimization, Optics lab cleanup, and dead-code removal
+- Improved responsive layout for iPad and tablets
+- Worksheet PDF and Word export fixes: blank pages, missing figures, and page breaks
+- Heat summary posters evenly distributed across full width
+- Heat worksheet no longer auto-generates on load
+
+---
+
+## 🚀 Quick Start
+
+### Local Development
 
 ```bash
+# Clone the repository
+git clone https://github.com/unipluseducationact-ctrl/S3_Phy.git
+
+# Navigate to project directory
+cd S3_Phy
+
+# Install dependencies
 npm install
+
+# Start dev server (with hot reload)
 npm run dev
 ```
 
 Open **http://localhost:5173/** (Vite dev).
 
+### Production Build
+
 ```bash
+# Build static files to dist/ (includes plane-mirror-lab bundle step)
 npm run build
+
+# Preview production build locally
 npm run preview
 ```
 
-Preview serves the production build (open the URL Vite prints, usually **http://localhost:4173/**).
+Preview serves the production build (usually **http://localhost:4173/**).
 
-## GitHub Pages — why the page was blank
+### Content Export Scripts (Maintainers)
 
-GitHub was serving the **repository root** `index.html`, which only loads `/src/main.js` for Vite dev. That file is not bundled for the static host, so the app stayed empty.
+```bash
+npm run export:heat-flashcards
+npm run export:light-flashcards
+npm run export:optics-definitions-flashcards
+```
+
+---
+
+## 🌐 Live Site & Deployment
+
+**Live URL:** `https://unipluseducationact-ctrl.github.io/S3_PHY/`
+
+If you still see a blank page, open `https://unipluseducationact-ctrl.github.io/S3_PHY/dist/` once, or configure Pages as below.
+
+### Why the page was blank
+
+GitHub was serving the **repository root** `index.html`, which loads `/src/main.js` for Vite dev. That file is not bundled for static hosting, so the app stayed empty.
 
 **Fixes in this repo:**
 
-1. **`dist/` is committed** with the production build. In Pages settings you can use **Deploy from a branch** → **main** → folder **`/dist`** so `https://unipluseducationact-ctrl.github.io/S3_PHY/` serves the built site.
-2. **Root `index.html`** includes a tiny script (stripped from the built `dist/index.html`) that redirects `*.github.io` visitors from `/S3_PHY/` to **`/S3_PHY/dist/`** until you point Pages at `/dist` or Actions.
-3. **`base: './'`** so `./assets/...` works under `/S3_PHY/dist/` as well as when `/dist` contents are mapped to the site root.
+1. **`dist/` is committed** with the production build.
+2. **Root `index.html`** includes a redirect script that sends `*.github.io` visitors from `/S3_PHY/` to `/S3_PHY/dist/` until Pages points at `/dist` or Actions.
+3. **`base: './'`** in `vite.config.js` so `./assets/...` works under `/S3_PHY/dist/` and when `/dist` contents are mapped to the site root.
 
-**Option A — GitHub Actions (recommended):** Settings → Pages → **Source: GitHub Actions**. The workflow builds `dist/` and deploys via the official Pages Actions (`upload-pages-artifact` + `deploy-pages`). Do **not** also use “Deploy from branch → `/dist`” — that second source races with Actions and causes intermittent “Deployment failed, try again later.”
+**Option A — GitHub Actions (recommended):** Settings → Pages → **Source: GitHub Actions**. The workflow in `.github/workflows/deploy-pages.yml` builds `dist/` and deploys via `upload-pages-artifact` + `deploy-pages`. Do **not** also use “Deploy from branch → `/dist`” — that second source races with Actions and causes intermittent deployment failures.
 
-**Option B — Branch + `/dist` on `main`:** Settings → Pages → **Deploy from a branch** → Branch **`main`**, folder **`/dist`**. Uses the committed `dist/` folder (no Actions artifact upload). Site URL: `…/S3_Phy/dist/#/optics`. Disable or delete the GitHub Actions deploy workflow if you use this option only.
+**Option B — Branch + `/dist` on `main`:** Settings → Pages → **Deploy from a branch** → Branch **`main`**, folder **`/dist`**. Disable or delete the GitHub Actions deploy workflow if you use this option only.
 
-## Live URL
+### Adding PDF Notes
 
-`https://unipluseducationact-ctrl.github.io/S3_PHY/`
+Place files under `public/notes/` (see `public/notes/README.txt` for naming conventions).
 
-(If you still see a blank page, open `https://unipluseducationact-ctrl.github.io/S3_PHY/dist/` once, or switch Pages to the `/dist` folder as above.)
+---
 
-## Adding PDF notes
+## 📁 Project Structure
 
-Place files under `public/notes/` (see `public/notes/README.txt`).
+```
+S3_Phy/
+├── .github/workflows/deploy-pages.yml  # GitHub Pages CI deploy
+├── package.json                        # Vite scripts and dependencies
+├── index.html                          # Dev entry + GitHub Pages redirect
+├── vite.config.js                      # base: './'
+├── dist/                               # Committed production build
+├── public/                             # Static labs, quizzes, notes, summary posters
+│   ├── notes/                          # Bilingual PDF notes
+│   ├── summary/                        # Bilingual summary posters
+│   └── *-quiz/                         # Embedded worksheet/quiz apps
+├── scripts/                            # Build, sync, and flashcard export
+├── src/
+│   ├── main.js                         # App entry and hash routing
+│   ├── hubShell.js                     # Shared hub navigation shell
+│   ├── strandHub.js                    # Strand picker after splash
+│   ├── i18n.js                         # English / Traditional Chinese
+│   ├── locales/                        # en.js, zhHant.js
+│   ├── strands/                        # opticsHub.js, heatHub.js
+│   ├── tools/                          # Interactive lab modules
+│   ├── worksheets/                     # Worksheet and quiz embeds
+│   ├── flashcards/                     # Study UI and session logic
+│   └── data/                           # flashcards-*.json decks
+└── README.md
+```
 
-## Tech
+---
 
-- [Vite](https://vitejs.dev/) with `base: './'`
-- Vanilla JavaScript (physics-only)
+## 🎨 Design Philosophy
+
+Uni+ follows modern design principles:
+
+- **Minimal & Clean** — Strand-first hub with focused navigation
+- **Responsive** — Mobile through tablet and desktop, including iPad layouts
+- **Bilingual** — English and Traditional Chinese across UI, notes, and flashcards
+- **Interactive First** — Labs, worksheets, and flashcards over rote memorization
+- **Micro-animations** — Smooth, delightful interactions on splash and hub transitions
+
+---
+
+## 🎓 Target Audience
+
+- **HKDSE Secondary 3 Physics students**
+- **Teachers** looking for labs, worksheets, flashcards, and summary posters
+- **Self-learners** reviewing Optics and Heat topics
+- **Anyone** interested in visual physics learning
+
+---
+
+## 🛡️ License
+
+This project is created for educational purposes. Unauthorized copying, modification, or redistribution without explicit permission is prohibited.
+
+---
+
+## 🙏 Acknowledgments
+
+- **Vite** — Fast build tooling and dev server
+- **Google Fonts (Inter, Montserrat)** — Typography
+- **The Physics Education Community** — For inspiration
+
+---
+
+**Built with ❤️ and lots of ☕**
+
+*Stop memorizing — start visualizing.*
+
+[Buy Me A Coffee](https://buymeacoffee.com/uniplus)
