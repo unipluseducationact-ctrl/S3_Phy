@@ -7,7 +7,7 @@ export function createHeatTransferLab(t) {
   const base = import.meta.env.BASE_URL || '/';
   const root = base.endsWith('/') ? base : base + '/';
   function iframeSrc() {
-    return root + 'heat-transfer/index.html?embed=1&lang=' + encodeURIComponent(getLang()) + '&v=6';
+    return root + 'heat-transfer/index.html?embed=1&lang=' + encodeURIComponent(getLang()) + '&v=7';
   }
   iframe.src = iframeSrc();
   iframe.title = t('tools.heatTransfer.title') || 'Heat Transfer Laboratory';

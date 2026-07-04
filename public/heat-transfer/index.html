@@ -240,8 +240,10 @@
             max-height: clamp(11rem, 28vh, 18rem);
         }
         body.embed-mode #sec-conduction .canvas-container {
-            min-height: clamp(11rem, 30vh, 18rem);
-            max-height: clamp(13rem, 34vh, 20rem);
+            flex: 1 1 auto;
+            min-height: clamp(12rem, 38vh, 100%);
+            max-height: none !important;
+            height: auto !important;
         }
         body.embed-mode #sec-conduction .chart-panel {
             flex: 1 1 auto;
@@ -257,9 +259,27 @@
         }
         body.embed-mode #sec-convection .canvas-container {
             flex: 1 1 auto;
-            min-height: clamp(12rem, 38vh, 100%);
+            min-height: clamp(12rem, 32vh, 100%);
             max-height: none !important;
             height: auto !important;
+        }
+        body.embed-mode #sec-convection.main-grid {
+            gap: 1rem;
+        }
+        body.embed-mode #sec-convection .tab-sidebar-col {
+            min-height: 0;
+            max-height: 100%;
+            overflow-y: auto;
+            display: flex;
+            flex-direction: column;
+        }
+        body.embed-mode #sec-convection .conv-scenarios-panel {
+            flex: 1 1 auto;
+            min-height: 0;
+            overflow-y: auto;
+        }
+        body.embed-mode #sec-convection .conv-scenarios-card {
+            padding: 1rem;
         }
         body.embed-mode .max-w-7xl {
             max-width: none;
@@ -472,14 +492,14 @@
 
                     <!-- Sandbox Viewport -->
                     <div class="relative bg-slate-950 rounded-xl overflow-hidden border border-slate-800/80 flex flex-col min-h-[12rem] flex-1 canvas-container conv-canvas-fill">
-                        <canvas id="convectionCanvas" class="w-full flex-grow bg-slate-950"></canvas>
-                        <svg id="conv-annotation-svg" viewBox="0 0 800 400" class="svg-annotation absolute inset-0 bottom-6 w-full h-[calc(100%-1.5rem)] pointer-events-none" aria-label="Convection flow annotations" preserveAspectRatio="xMidYMid meet">
-                            <g id="conv-flow-arrows"></g>
-                        </svg>
-                        <div class="h-6 bg-slate-900 border-t border-slate-800/80 flex justify-around items-center text-[10px] text-slate-400 font-semibold select-none">
+                        <div class="conv-fluid-legend flex-shrink-0 h-6 bg-slate-900 border-b border-slate-800/80 flex justify-around items-center text-[10px] text-slate-400 font-semibold select-none">
                             <span class="flex items-center gap-1"><span class="w-2.5 h-2.5 rounded-full bg-red-500 animate-pulse"></span><span data-i18n="convection.hotRising">Hot Fluid Expands & Rises (Low ρ)</span></span>
                             <span class="flex items-center gap-1"><span class="w-2.5 h-2.5 rounded-full bg-blue-500 animate-pulse"></span><span data-i18n="convection.coldSinking">Cold Fluid Contracts & Sinks (High ρ)</span></span>
                         </div>
+                        <canvas id="convectionCanvas" class="w-full flex-grow bg-slate-950 min-h-0"></canvas>
+                        <svg id="conv-annotation-svg" viewBox="0 0 800 400" class="svg-annotation absolute inset-x-0 top-6 bottom-0 w-full h-[calc(100%-1.5rem)] pointer-events-none" aria-label="Convection flow annotations" preserveAspectRatio="xMidYMid meet">
+                            <g id="conv-flow-arrows"></g>
+                        </svg>
                     </div>
                 </div>
             </div>
@@ -495,10 +515,10 @@
                     </p>
                 </div>
 
-                <div class="glass-panel rounded-2xl p-5 flex flex-col gap-4">
-                    <h4 class="font-bold text-sm text-slate-200" data-i18n="convection.scenarios">Interactive Scenarios</h4>
+                <div class="glass-panel conv-scenarios-card rounded-2xl p-5 flex flex-col gap-4 flex-1 min-h-0 conv-scenarios-panel">
+                    <h4 class="font-bold text-sm text-slate-200 flex-shrink-0" data-i18n="convection.scenarios">Interactive Scenarios</h4>
                     
-                    <div class="grid grid-cols-1 gap-2">
+                    <div class="grid grid-cols-1 gap-2 flex-shrink-0">
                         <button onclick="switchConvectionScenario('room')" id="btn-conv-room" class="conv-scen-btn w-full text-left px-4 py-3 rounded-xl border border-indigo-600 bg-indigo-600/10 text-white font-bold text-xs flex items-center justify-between transition-all">
                             <span data-i18n="convection.scenRoom">1. Air Conditioner & Floor Heater</span>
                             <i data-lucide="chevron-right" class="w-4 h-4 text-indigo-400"></i>
@@ -514,12 +534,12 @@
                     </div>
 
                     <!-- Dynamic Scenario Control Dock -->
-                    <div id="convection-controls" class="pt-4 border-t border-slate-800 space-y-3">
+                    <div id="convection-controls" class="pt-4 border-t border-slate-800 space-y-3 flex-shrink-0">
                         <!-- Content gets populated dynamically by switchConvectionScenario() -->
                     </div>
 
                     <!-- Physics Scenario Explainer -->
-                    <div class="glass-panel-light rounded-xl p-3 border border-slate-800 text-[11px] text-slate-400 leading-relaxed" id="convection-explanation" data-i18n="common.loading">
+                    <div class="glass-panel-light rounded-xl p-3 border border-slate-800 text-[11px] text-slate-400 leading-relaxed flex-shrink-0" id="convection-explanation" data-i18n="common.loading">
                         Loading explainer...
                     </div>
                 </div>
@@ -1304,13 +1324,16 @@
             if (convScenario === 'room') {
                 const ac = getRoomACRect(w, h);
                 const ht = getRoomHeaterRect(w, h);
+                const sign = getRoomCirculationSign(w, h);
+                const acCx = ac.x + ac.w / 2;
+                const htCx = ht.x + ht.w / 2;
+                const acCurveX = acCx - sign * 30;
+                const htCurveX = htCx + sign * 30;
                 if (roomAC_Active) {
-                    const acCx = ac.x + ac.w / 2;
-                    svg += `<path d="M ${acCx} ${ac.y + ac.h} Q ${acCx} ${ac.y + ac.h + 45} ${acCx - 30} ${ac.y + ac.h + 85}" fill="none" stroke="#38bdf8" stroke-width="2" opacity="${op}"/>`;
+                    svg += `<path d="M ${acCx} ${ac.y + ac.h} Q ${acCx} ${ac.y + ac.h + 45} ${acCurveX} ${ac.y + ac.h + 85}" fill="none" stroke="#38bdf8" stroke-width="2" opacity="${op}"/>`;
                 }
                 if (roomHeater_Active) {
-                    const htCx = ht.x + ht.w / 2;
-                    svg += `<path d="M ${htCx} ${ht.y} Q ${htCx} ${ht.y - 50} ${htCx + 30} ${ht.y - 90}" fill="none" stroke="#ef4444" stroke-width="2" opacity="${op}"/>`;
+                    svg += `<path d="M ${htCx} ${ht.y} Q ${htCx} ${ht.y - 50} ${htCurveX} ${ht.y - 90}" fill="none" stroke="#ef4444" stroke-width="2" opacity="${op}"/>`;
                 }
             } else if (convScenario === 'kettle') {
                 // Let the canvas handle the dynamic flowing streamline paths.
@@ -1723,12 +1746,12 @@
 
             condCtx.clearRect(0, 0, rect.width, rect.height);
 
-            // Calculate scale and offset to center virtual canvas (800x240) uniformly inside actual canvas
+            // Fill sandbox width — horizontal lattice bar uses full container width
             const scaleX = rect.width / w;
             const scaleY = rect.height / h;
-            const s = Math.min(scaleX, scaleY); // Uniform scale factor
+            const s = scaleX;
 
-            const offsetX = (rect.width - w * s) / 2;
+            const offsetX = 0;
             const offsetY = (rect.height - h * s) / 2;
 
             condCtx.save();
@@ -2424,6 +2447,15 @@
             return { x, y: h - 35, w: applianceW, h: 20 };
         }
 
+        /** +1 when AC is right of heater (default); -1 when positions are swapped */
+        function getRoomCirculationSign(w, h) {
+            const ac = getRoomACRect(w, h);
+            const ht = getRoomHeaterRect(w, h);
+            const acCx = ac.x + ac.w / 2;
+            const htCx = ht.x + ht.w / 2;
+            return acCx > htCx ? 1 : -1;
+        }
+
         function getKettlePosLabel() {
             if (kettleHeaterXPercent === 50) return t('common.center');
             return kettleHeaterXPercent < 45 ? t('common.left') : t('common.right');
@@ -2605,11 +2637,26 @@
             const pulse = 0.5 + 0.5 * Math.sin(Date.now() / 600);
 
             if (convScenario === 'room') {
+                const sign = getRoomCirculationSign(w, h);
                 convCtx.strokeStyle = `rgba(99, 102, 241, ${0.12 + pulse * 0.08})`;
                 convCtx.lineWidth = 1.5;
                 convCtx.beginPath();
                 convCtx.ellipse(cx, cy, w * 0.38, h * 0.32, 0, 0, Math.PI * 2);
                 convCtx.stroke();
+
+                // Direction arrow on circulation ellipse (follows AC/heater layout)
+                const arrowAngle = sign > 0 ? -Math.PI / 4 : Math.PI / 4;
+                const arrowR = w * 0.38;
+                const ax = cx + arrowR * Math.cos(arrowAngle);
+                const ay = cy + h * 0.32 * Math.sin(arrowAngle);
+                const tangent = arrowAngle + sign * Math.PI / 2;
+                convCtx.fillStyle = `rgba(99, 102, 241, ${0.35 + pulse * 0.15})`;
+                convCtx.beginPath();
+                convCtx.moveTo(ax, ay);
+                convCtx.lineTo(ax - 8 * Math.cos(tangent - 0.4), ay - 8 * Math.sin(tangent - 0.4));
+                convCtx.lineTo(ax - 8 * Math.cos(tangent + 0.4), ay - 8 * Math.sin(tangent + 0.4));
+                convCtx.closePath();
+                convCtx.fill();
             } else if (convScenario === 'kettle') {
                 let khx = kettleHeaterX || (w / 2);
                 const kMinX = 45;
@@ -2963,17 +3010,23 @@
                     let targetVy = (p.temp - roomTemp) * -0.05;
                     p.vy += (targetVy - p.vy) * 0.1;
 
+                    const sign = getRoomCirculationSign(w, h);
+                    const acCx = acRect.x + acRect.w / 2;
+                    const htCx = htRect.x + htRect.w / 2;
+
                     if (roomAC_Active && !roomHeater_Active) {
-                        if (p.y > h - 50) p.vx -= 0.05;
-                        if (p.x < 50) p.vy -= 0.05;
-                        if (p.y < 50) p.vx += 0.05;
+                        const acSign = acCx > w * 0.5 ? 1 : -1;
+                        if (p.y > h - 50) p.vx -= 0.05 * acSign;
+                        if ((acSign > 0 && p.x < 50) || (acSign < 0 && p.x > w - 50)) p.vy -= 0.05;
+                        if (p.y < 50) p.vx += 0.05 * acSign;
                     } else if (roomHeater_Active && !roomAC_Active) {
-                        if (p.y < 50) p.vx += 0.05;
-                        if (p.x > w - 50) p.vy += 0.05;
-                        if (p.y > h - 50) p.vx -= 0.05;
+                        const htSign = htCx < w * 0.5 ? 1 : -1;
+                        if (p.y < 50) p.vx += 0.05 * htSign;
+                        if ((htSign > 0 && p.x > w - 50) || (htSign < 0 && p.x < 50)) p.vy += 0.05;
+                        if (p.y > h - 50) p.vx -= 0.05 * htSign;
                     } else if (roomAC_Active && roomHeater_Active) {
-                        if (p.y < 60) p.vx += 0.08;
-                        if (p.y > h - 60) p.vx -= 0.08;
+                        if (p.y < 60) p.vx += 0.08 * sign;
+                        if (p.y > h - 60) p.vx -= 0.08 * sign;
                     } else {
                         p.vx += (Math.random() - 0.5) * 0.08;
                         p.vy += (Math.random() - 0.5) * 0.08;
