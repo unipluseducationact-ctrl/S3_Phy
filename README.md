@@ -101,6 +101,9 @@ Open **http://localhost:5173/** (Vite dev).
 # Build static files to dist/ (includes plane-mirror-lab bundle step)
 npm run build
 
+# Rebuild Plane Mirror Lab only (labs/plane-mirror-lab → public/plane-mirror-lab)
+npm run build:plane-mirror-lab
+
 # Preview production build locally
 npm run preview
 ```
@@ -152,6 +155,8 @@ S3_Phy/
 ├── index.html                          # Dev entry + GitHub Pages redirect
 ├── vite.config.js                      # base: './'
 ├── dist/                               # Committed production build
+├── labs/
+│   └── plane-mirror-lab/               # Plane Mirror Lab source (build → public/)
 ├── public/                             # Static labs, quizzes, notes, summary posters
 │   ├── notes/                          # Bilingual PDF notes
 │   ├── summary/                        # Bilingual summary posters

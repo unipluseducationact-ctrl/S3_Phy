@@ -6,6 +6,7 @@
   "scripts": {
     "dev": "vite",
     "build": "node scripts/build-plane-mirror-lab.cjs && vite build",
+    "build:plane-mirror-lab": "node scripts/build-plane-mirror-lab.cjs",
     "preview": "vite preview",
     "export:heat-flashcards": "node scripts/export-heat-ch1-flashcards.js",
     "export:light-flashcards": "node scripts/export-light-ch3-flashcards.js",
