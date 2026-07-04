@@ -232,7 +232,15 @@ export function createQuizExport(meta) {
     const titleEn = answersMode ? meta.titleEnAnswers : meta.titleEnQuestions;
     const html = `<h1>${escHtml(titleEn)}</h1>${buildDocBody(questions, answersMode)}`;
     await prepareSheetForPrint(sheet, html);
-    window.print();
+    await new Promise((resolve) => {
+      const cleanup = () => {
+        sheet.innerHTML = "";
+        window.removeEventListener("afterprint", cleanup);
+        resolve();
+      };
+      window.addEventListener("afterprint", cleanup);
+      window.print();
+    });
   }
 
   return { downloadWord, printSheet };
