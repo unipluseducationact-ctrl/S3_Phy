@@ -416,6 +416,28 @@
     const figs = q.images?.length ? q.images : q.image?.src ? [q.image] : [];
     return figs.map(buildExportFigureHtml).join("");
   }
+  function collectImageUrlsFromHtml(html) {
+    const urls = [];
+    const re = /<img[^>]+src="([^"]+)"/gi;
+    let match;
+    while ((match = re.exec(html)) !== null) urls.push(match[1]);
+    return urls;
+  }
+  function preloadImageUrls(urls) {
+    const unique = [...new Set(urls.filter(Boolean))];
+    if (!unique.length) return Promise.resolve();
+    return Promise.all(
+      unique.map(
+        (url) =>
+          new Promise((resolve) => {
+            const img = new Image();
+            img.onload = () => resolve();
+            img.onerror = () => resolve();
+            img.src = url;
+          })
+      )
+    );
+  }
   function waitForExportImages(container) {
     const imgs = [...container.querySelectorAll("img")];
     if (!imgs.length) return Promise.resolve();
@@ -432,6 +454,29 @@
           })
       )
     );
+  }
+  async function prepareSheetForPrint(sheet, html) {
+    sheet.innerHTML = html;
+    sheet.setAttribute("aria-hidden", "false");
+    sheet.style.display = "block";
+    sheet.style.visibility = "hidden";
+    sheet.style.position = "fixed";
+    sheet.style.left = "0";
+    sheet.style.top = "0";
+    sheet.style.width = "100%";
+    sheet.style.pointerEvents = "none";
+    sheet.style.zIndex = "-1";
+    await preloadImageUrls(collectImageUrlsFromHtml(html));
+    await waitForExportImages(sheet);
+    sheet.style.display = "";
+    sheet.style.visibility = "";
+    sheet.style.position = "";
+    sheet.style.left = "";
+    sheet.style.top = "";
+    sheet.style.width = "";
+    sheet.style.pointerEvents = "";
+    sheet.style.zIndex = "";
+    sheet.setAttribute("aria-hidden", "true");
   }
   function fillLineExportHtml(line, answersMode) {
     let html = "";
@@ -525,10 +570,8 @@
     const sheet = document.getElementById("quiz-pdf-sheet");
     if (!sheet) return;
     const titleEn = answersMode ? "S3 Optics Ch.3 \u2014 Light & Lens (Answers)" : "S3 Optics Ch.3 \u2014 Light & Lens (Questions)";
-    let html = `<h1>${escHtml(titleEn)}</h1>`;
-    html += buildDocBody(questions, answersMode);
-    sheet.innerHTML = html;
-    await waitForExportImages(sheet);
+    const html = `<h1>${escHtml(titleEn)}</h1>${buildDocBody(questions, answersMode)}`;
+    await prepareSheetForPrint(sheet, html);
     window.print();
   }
 
@@ -1180,13 +1223,13 @@
     });
     document.getElementById("btn-doc-q")?.addEventListener("click", () => downloadWord(lastQuestions, false, lang));
     document.getElementById("btn-doc-a")?.addEventListener("click", () => downloadWord(lastQuestions, true, lang));
-    document.getElementById("btn-print")?.addEventListener("click", () => {
+    document.getElementById("btn-print")?.addEventListener("click", async () => {
       if (!lastQuestions.length) {
         alert(t("alertNoQuiz"));
         return;
       }
       const want = confirm(t("printConfirm"));
-      printSheet(lastQuestions, want, lang);
+      await printSheet(lastQuestions, want, lang);
     });
     function syncLangFromParent() {
       const next = resolveQuizLang();

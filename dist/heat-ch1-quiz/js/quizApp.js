@@ -677,13 +677,13 @@ export function initQuiz() {
   });
   document.getElementById("btn-doc-q")?.addEventListener("click", () => downloadWord(lastQuestions, false, lang));
   document.getElementById("btn-doc-a")?.addEventListener("click", () => downloadWord(lastQuestions, true, lang));
-  document.getElementById("btn-print")?.addEventListener("click", () => {
+  document.getElementById("btn-print")?.addEventListener("click", async () => {
     if (!lastQuestions.length) {
       alert(t("alertNoQuiz"));
       return;
     }
     const want = confirm(t("printConfirm"));
-    printSheet(lastQuestions, want, lang);
+    await printSheet(lastQuestions, want, lang);
   });
 
   function syncLangFromParent() {

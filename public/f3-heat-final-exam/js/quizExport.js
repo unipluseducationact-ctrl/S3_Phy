@@ -1,4 +1,4 @@
-import { createQuizExport } from "../../shared/quiz/quizExport.js";
+import { createQuizExport } from "../../shared/quiz/quizExport.js?v=20260704c";
 
 const { downloadWord, printSheet } = createQuizExport({
   titleEnQuestions: "F.3 Heat Final Exam — Questions",
