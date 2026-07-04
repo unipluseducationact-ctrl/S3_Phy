@@ -851,6 +851,7 @@
                     heaterControl: 'Heater Element Control',
                     immersionElement: 'Base Immersion Element',
                     heaterPosition: 'Heater Position',
+                    acPosition: 'AC Position',
                     diurnalSwitcher: 'Diurnal Switcher',
                     daytime: 'Daytime', nighttime: 'Nighttime',
                     roomExplainer: 'Practical App: Air conditioners emit cold, dense air which sinks down. Floor heaters emit warm, less-dense air which floats upward. Placing AC high and heaters low sets up strong, full-room convection loops!',
@@ -973,6 +974,7 @@
                     heaterControl: '加熱元件控制',
                     immersionElement: '底部浸入式元件',
                     heaterPosition: '加熱器位置',
+                    acPosition: '冷氣機位置',
                     diurnalSwitcher: '晝夜切換',
                     daytime: '日間', nighttime: '夜間',
                     roomExplainer: '實際應用：冷氣機釋出冷而密的空氣下沉；地板暖爐釋出熱而稀的空氣上升。冷氣裝高、暖爐放低可形成強對流循環！',
@@ -1234,8 +1236,16 @@
             const op = Math.min(1, 0.35 + strength * 0.15);
             let svg = '';
             if (convScenario === 'room') {
-                if (roomAC_Active) svg += `<path d="M ${w-90} 35 Q ${w-90} 80 ${w-120} 120" fill="none" stroke="#38bdf8" stroke-width="2" opacity="${op}"/>`;
-                if (roomHeater_Active) svg += `<path d="M 90 ${h-40} Q 90 ${h-90} 120 ${h-130}" fill="none" stroke="#ef4444" stroke-width="2" opacity="${op}"/>`;
+                const ac = getRoomACRect(w, h);
+                const ht = getRoomHeaterRect(w, h);
+                if (roomAC_Active) {
+                    const acCx = ac.x + ac.w / 2;
+                    svg += `<path d="M ${acCx} ${ac.y + ac.h} Q ${acCx} ${ac.y + ac.h + 45} ${acCx - 30} ${ac.y + ac.h + 85}" fill="none" stroke="#38bdf8" stroke-width="2" opacity="${op}"/>`;
+                }
+                if (roomHeater_Active) {
+                    const htCx = ht.x + ht.w / 2;
+                    svg += `<path d="M ${htCx} ${ht.y} Q ${htCx} ${ht.y - 50} ${htCx + 30} ${ht.y - 90}" fill="none" stroke="#ef4444" stroke-width="2" opacity="${op}"/>`;
+                }
             } else if (convScenario === 'kettle') {
                 // Let the canvas handle the dynamic flowing streamline paths.
                 // We'll draw premium solid SVG arrows showing fluid rise (warm/orange) and sink (cool/blue).
@@ -1595,6 +1605,7 @@
             physicsState.conduction.sourceTemp = condSourceTemp;
             document.getElementById('cond-temp-val').innerText = val + '°C';
             updateConductionBarLabels();
+            updateConductionChartYScale();
         }
 
         function updateConductionSpeed(val) {
@@ -1926,7 +1937,7 @@
                                 font: { size: 10, weight: 'bold' }
                             },
                             min: 15,
-                            max: 120,
+                            max: 150,
                             grid: { color: 'rgba(255, 255, 255, 0.03)' },
                             ticks: { color: '#64748b', font: { size: 9 } }
                         }
@@ -1939,6 +1950,23 @@
                     }
                 }
             });
+            updateConductionChartYScale();
+        }
+
+        function updateConductionChartYScale() {
+            if (!condChart) return;
+            let peak = condSourceTemp;
+            condChart.data.datasets.forEach(ds => {
+                ds.data.forEach(v => {
+                    const n = parseFloat(v);
+                    if (!isNaN(n)) peak = Math.max(peak, n);
+                });
+            });
+            const yMax = Math.ceil(Math.max(peak * 1.08, 40) / 10) * 10;
+            if (condChart.options.scales.y.max !== yMax) {
+                condChart.options.scales.y.max = yMax;
+                condChart.update('none');
+            }
         }
 
         function startChartTracking() {
@@ -1976,6 +2004,7 @@
                     condChart.data.labels.shift();
                     condChart.data.datasets.forEach(dataset => dataset.data.shift());
                 }
+                updateConductionChartYScale();
                 condChart.update('none');
             }, 1000);
         }
@@ -1984,6 +2013,7 @@
             if (condChart) {
                 condChart.data.labels = [];
                 condChart.data.datasets.forEach(dataset => dataset.data = []);
+                updateConductionChartYScale();
                 condChart.update();
             }
             condChartTime = 0;
@@ -2189,6 +2219,8 @@
 
         let roomAC_Active = true;
         let roomHeater_Active = false;
+        let roomAC_XPercent = 85;
+        let roomHeater_XPercent = 15;
         let breezeTime = 'day';
 
         let roomTemp = 20.0;
@@ -2268,6 +2300,8 @@
         function resetConvectionSim() {
             roomTemp = 20.0;
             kettleHeaterXPercent = 50;
+            roomAC_XPercent = 85;
+            roomHeater_XPercent = 15;
             initConvectionParticles();
             if (!convIsRunning) {
                 toggleConvectionSim();
@@ -2302,6 +2336,27 @@
             updateConvectionAnnotations();
         }
 
+        function getRoomPosLabel(percent) {
+            if (percent === 50) return t('common.center');
+            return percent < 45 ? t('common.left') : t('common.right');
+        }
+
+        function getRoomACRect(w, h) {
+            const applianceW = 65;
+            const minX = 15;
+            const maxX = w - applianceW - 15;
+            const x = minX + (roomAC_XPercent / 100) * (maxX - minX);
+            return { x, y: 15, w: applianceW, h: 20 };
+        }
+
+        function getRoomHeaterRect(w, h) {
+            const applianceW = 65;
+            const minX = 15;
+            const maxX = w - applianceW - 15;
+            const x = minX + (roomHeater_XPercent / 100) * (maxX - minX);
+            return { x, y: h - 35, w: applianceW, h: 20 };
+        }
+
         function getKettlePosLabel() {
             if (kettleHeaterXPercent === 50) return t('common.center');
             return kettleHeaterXPercent < 45 ? t('common.left') : t('common.right');
@@ -2324,6 +2379,20 @@
                                 <span>${t('convection.floorHeater')}</span>
                                 <span class="px-2 py-0.5 ${roomHeater_Active ? 'bg-red-500 text-white' : 'bg-slate-700 text-slate-300'} rounded text-[9px] font-black" id="lbl-heater-state">${roomHeater_Active ? t('common.active') : t('common.standby')}</span>
                             </button>
+                        </div>
+                        <div class="space-y-1.5 mt-2">
+                            <div class="flex justify-between text-[10px] font-black tracking-widest text-slate-400 uppercase">
+                                <span>${t('convection.acPosition')}</span>
+                                <span id="room-ac-pos-val" class="live-value font-bold">${getRoomPosLabel(roomAC_XPercent)}</span>
+                            </div>
+                            <input type="range" id="room-ac-pos-slider" min="10" max="90" value="${roomAC_XPercent}" oninput="updateRoomACPos(this.value)" class="w-full h-1.5 bg-slate-800 rounded-lg appearance-none cursor-pointer">
+                        </div>
+                        <div class="space-y-1.5 mt-2">
+                            <div class="flex justify-between text-[10px] font-black tracking-widest text-slate-400 uppercase">
+                                <span>${t('convection.heaterPosition')}</span>
+                                <span id="room-heater-pos-val" class="live-value font-bold">${getRoomPosLabel(roomHeater_XPercent)}</span>
+                            </div>
+                            <input type="range" id="room-heater-pos-slider" min="10" max="90" value="${roomHeater_XPercent}" oninput="updateRoomHeaterPos(this.value)" class="w-full h-1.5 bg-slate-800 rounded-lg appearance-none cursor-pointer">
                         </div>
                     </div>
                 `;
@@ -2421,6 +2490,20 @@
             updateConvectionAnnotations();
         }
 
+        function updateRoomACPos(val) {
+            roomAC_XPercent = parseInt(val);
+            const lbl = document.getElementById('room-ac-pos-val');
+            if (lbl) lbl.innerText = getRoomPosLabel(roomAC_XPercent);
+            updateConvectionAnnotations();
+        }
+
+        function updateRoomHeaterPos(val) {
+            roomHeater_XPercent = parseInt(val);
+            const lbl = document.getElementById('room-heater-pos-val');
+            if (lbl) lbl.innerText = getRoomPosLabel(roomHeater_XPercent);
+            updateConvectionAnnotations();
+        }
+
         function setBreezeTime(time) {
             breezeTime = time;
             const btnDay = document.getElementById('btn-breeze-day');
@@ -2460,28 +2543,6 @@
                 convCtx.beginPath();
                 convCtx.ellipse(cx, cy, w * 0.38, h * 0.32, 0, 0, Math.PI * 2);
                 convCtx.stroke();
-                if (roomAC_Active) {
-                    for (let i = 0; i < 3; i++) {
-                        const ax = w - 95;
-                        const ay = 40 + i * 18;
-                        convCtx.strokeStyle = `rgba(56, 189, 248, ${0.5 + pulse * 0.3})`;
-                        convCtx.beginPath();
-                        convCtx.moveTo(ax, ay);
-                        convCtx.lineTo(ax - 15, ay + 25);
-                        convCtx.stroke();
-                    }
-                }
-                if (roomHeater_Active) {
-                    for (let i = 0; i < 3; i++) {
-                        const hx = 55 + i * 20;
-                        const hy = h - 45;
-                        convCtx.strokeStyle = `rgba(239, 68, 68, ${0.5 + pulse * 0.3})`;
-                        convCtx.beginPath();
-                        convCtx.moveTo(hx, hy);
-                        convCtx.lineTo(hx, hy - 30);
-                        convCtx.stroke();
-                    }
-                }
             } else if (convScenario === 'kettle') {
                 let khx = kettleHeaterX || (w / 2);
                 const kMinX = 45;
@@ -2629,14 +2690,18 @@
                 }
 
                 if (roomAC_Active) {
-                    convGrid[0][convGridCols-1] = 14;
-                    convGrid[0][convGridCols-2] = 15;
-                    convGrid[1][convGridCols-1] = 16;
+                    const ac = getRoomACRect(w, h);
+                    const acCol = Math.max(0, Math.min(convGridCols - 1, Math.floor((ac.x + ac.w / 2) / w * convGridCols)));
+                    convGrid[0][acCol] = 14;
+                    if (acCol > 0) convGrid[0][acCol - 1] = 15;
+                    convGrid[1][acCol] = 16;
                 }
                 if (roomHeater_Active) {
-                    convGrid[convGridRows-1][0] = 72;
-                    convGrid[convGridRows-1][1] = 70;
-                    convGrid[convGridRows-2][0] = 65;
+                    const ht = getRoomHeaterRect(w, h);
+                    const htCol = Math.max(0, Math.min(convGridCols - 1, Math.floor((ht.x + ht.w / 2) / w * convGridCols)));
+                    convGrid[convGridRows - 1][htCol] = 72;
+                    if (htCol > 0) convGrid[convGridRows - 1][htCol - 1] = 70;
+                    convGrid[convGridRows - 2][htCol] = 65;
                 }
             } else if (convScenario === 'kettle') {
                 let khx = 40 + 45 + (kettleHeaterXPercent / 100) * (w - 80 - 90);
@@ -2734,14 +2799,16 @@
 
             // 4. Scenario-specific decorations and vector annotations
             if (convScenario === 'room') {
+                const acRect = getRoomACRect(w, h);
+                const htRect = getRoomHeaterRect(w, h);
                 // AC Unit rendering
                 if (roomAC_Active) {
-                    let acGrad = convCtx.createLinearGradient(w - 80, 0, w - 15, 0);
+                    let acGrad = convCtx.createLinearGradient(acRect.x, 0, acRect.x + acRect.w, 0);
                     acGrad.addColorStop(0, '#0284c7');
                     acGrad.addColorStop(0.5, '#38bdf8');
                     acGrad.addColorStop(1, '#0c4a6e');
                     convCtx.fillStyle = acGrad;
-                    convCtx.fillRect(w - 80, 15, 65, 20);
+                    convCtx.fillRect(acRect.x, acRect.y, acRect.w, acRect.h);
 
                     // Flow lines blowing down
                     let ventOffset = (Date.now() / 15) % 30;
@@ -2749,40 +2816,40 @@
                     convCtx.lineWidth = 1.5;
                     convCtx.setLineDash([4, 4]);
                     convCtx.beginPath();
-                    convCtx.moveTo(w - 70, 35);
-                    convCtx.lineTo(w - 110 + ventOffset, 75);
-                    convCtx.moveTo(w - 50, 35);
-                    convCtx.lineTo(w - 90 + ventOffset, 75);
+                    convCtx.moveTo(acRect.x + 10, acRect.y + acRect.h);
+                    convCtx.lineTo(acRect.x - 40 + ventOffset, acRect.y + acRect.h + 40);
+                    convCtx.moveTo(acRect.x + acRect.w - 15, acRect.y + acRect.h);
+                    convCtx.lineTo(acRect.x + acRect.w - 55 + ventOffset, acRect.y + acRect.h + 40);
                     convCtx.stroke();
                     convCtx.setLineDash([]);
 
                     convCtx.fillStyle = '#ffffff';
                     convCtx.font = 'bold 9px monospace';
-                    convCtx.fillText(t('convection.acUnit'), w - 72, 28);
+                    convCtx.fillText(t('convection.acUnit'), acRect.x + 8, acRect.y + 13);
                 }
                 // Heater Unit rendering
                 if (roomHeater_Active) {
-                    let heaterGrad = convCtx.createLinearGradient(15, 0, 80, 0);
+                    let heaterGrad = convCtx.createLinearGradient(htRect.x, 0, htRect.x + htRect.w, 0);
                     heaterGrad.addColorStop(0, '#7c2d12');
                     heaterGrad.addColorStop(0.5, '#ea580c');
                     heaterGrad.addColorStop(1, '#431407');
                     convCtx.fillStyle = heaterGrad;
-                    convCtx.fillRect(15, h - 35, 65, 20);
+                    convCtx.fillRect(htRect.x, htRect.y, htRect.w, htRect.h);
 
                     // Rising heat vectors
                     let heatOffset = (Date.now() / 10) % 25;
                     convCtx.strokeStyle = 'rgba(239, 68, 68, 0.5)';
                     convCtx.lineWidth = 1.5;
                     convCtx.beginPath();
-                    convCtx.moveTo(25, h - 35);
-                    convCtx.quadraticCurveTo(25 + Math.sin(heatOffset)*3, h - 50 - heatOffset, 30, h - 65 - heatOffset);
-                    convCtx.moveTo(50, h - 35);
-                    convCtx.quadraticCurveTo(50 + Math.sin(heatOffset + 2)*3, h - 50 - heatOffset, 55, h - 65 - heatOffset);
+                    convCtx.moveTo(htRect.x + 10, htRect.y);
+                    convCtx.quadraticCurveTo(htRect.x + 10 + Math.sin(heatOffset) * 3, htRect.y - 15 - heatOffset, htRect.x + 15, htRect.y - 30 - heatOffset);
+                    convCtx.moveTo(htRect.x + htRect.w - 15, htRect.y);
+                    convCtx.quadraticCurveTo(htRect.x + htRect.w - 15 + Math.sin(heatOffset + 2) * 3, htRect.y - 15 - heatOffset, htRect.x + htRect.w - 10, htRect.y - 30 - heatOffset);
                     convCtx.stroke();
 
                     convCtx.fillStyle = '#ffffff';
                     convCtx.font = 'bold 9px monospace';
-                    convCtx.fillText(t('convection.heater'), 28, h - 22);
+                    convCtx.fillText(t('convection.heater'), htRect.x + 13, htRect.y + 13);
                 }
 
                 // Air density visual panel with dynamic thermostat
@@ -2818,10 +2885,10 @@
                     p.temp += (convGrid[row][col] - p.temp) * 0.15;
                     convGrid[row][col] += (p.temp - convGrid[row][col]) * 0.03;
 
-                    if (roomAC_Active && p.x > w - 110 && p.y < 70) {
+                    if (roomAC_Active && p.x > acRect.x - 25 && p.x < acRect.x + acRect.w + 25 && p.y < acRect.y + acRect.h + 45) {
                         p.temp = Math.max(14, p.temp - 1.8);
                     }
-                    if (roomHeater_Active && p.x < 110 && p.y > h - 70) {
+                    if (roomHeater_Active && p.x > htRect.x - 25 && p.x < htRect.x + htRect.w + 25 && p.y > htRect.y - 45) {
                         p.temp = Math.min(68, p.temp + 1.8);
                     }
 

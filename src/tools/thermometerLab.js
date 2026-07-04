@@ -1360,9 +1360,17 @@ export function createThermometerLab(t, options = {}) {
   const LABEL_LEFT = 10;
   const PHYS_SCENE_OFFSET_X = 40;
   const SCENE_WIDTH = PHYS_WIDTH - PHYS_SCENE_OFFSET_X;
-  const LABEL_INNER_RIGHT = 205;
+  const BEAKER_W = 130;
   const GRAPH_WIDTH = 640;
   const GRAPH_HEIGHT = 420;
+
+  function getPhysLayout() {
+    if (state.thermometerType === 'liquid') {
+      const beakerX = SCENE_WIDTH / 2 - BEAKER_W / 2;
+      return { beakerX, beakerW: BEAKER_W, thermometerX: SCENE_WIDTH / 2 };
+    }
+    return { beakerX: 55, beakerW: BEAKER_W, thermometerX: 120 };
+  }
 
   function getGraphLayout() {
     const margin = { left: 110, top: 48, right: 30, bottom: 65 };
@@ -1539,10 +1547,13 @@ export function createThermometerLab(t, options = {}) {
 
   // Particles
   function initParticles() {
+    const { beakerX, beakerW } = getPhysLayout();
+    const innerX = beakerX + 5;
+    const innerW = beakerW - 10;
     state.iceCubes = [];
     for (let i = 0; i < 5; i++) {
       state.iceCubes.push({
-        x: 60 + Math.random() * 120,
+        x: innerX + Math.random() * innerW,
         y: 200 + Math.random() * 15,
         size: 12 + Math.random() * 8,
         angle: Math.random() * Math.PI,
@@ -1553,7 +1564,7 @@ export function createThermometerLab(t, options = {}) {
     state.bubbles = [];
     for (let i = 0; i < 20; i++) {
       state.bubbles.push({
-        x: 60 + Math.random() * 120,
+        x: innerX + Math.random() * innerW,
         y: 190 + Math.random() * 70,
         r: 1 + Math.random() * 3.5,
         speedY: 0.8 + Math.random() * 1.5,
@@ -1564,7 +1575,7 @@ export function createThermometerLab(t, options = {}) {
     state.heatWaves = [];
     for (let i = 0; i < 8; i++) {
       state.heatWaves.push({
-        x: 65 + Math.random() * 110,
+        x: beakerX + 10 + Math.random() * (beakerW - 20),
         y: 190 + Math.random() * 60,
         length: 15 + Math.random() * 15,
         speedY: 0.5 + Math.random() * 0.6,
@@ -1574,7 +1585,7 @@ export function createThermometerLab(t, options = {}) {
     state.steamParticles = [];
     for (let i = 0; i < 12; i++) {
       state.steamParticles.push({
-        x: 60 + Math.random() * 120,
+        x: innerX + Math.random() * innerW,
         y: 175 + Math.random() * 10,
         r: 2 + Math.random() * 4,
         vx: (Math.random() - 0.5) * 0.3,
@@ -1604,11 +1615,16 @@ export function createThermometerLab(t, options = {}) {
   }
 
   function updateParticles(dt) {
+    const { beakerX, beakerW } = getPhysLayout();
+    const innerX = beakerX + 5;
+    const innerW = beakerW - 10;
+    const iceMinX = beakerX + 10;
+    const iceMaxX = beakerX + beakerW - 10;
     if (state.bathTemp <= 8) {
       state.iceCubes.forEach(ice => {
         ice.x += ice.speedX;
         ice.y += ice.speedY;
-        if (ice.x < 65 || ice.x > 175) ice.speedX *= -1;
+        if (ice.x < iceMinX || ice.x > iceMaxX) ice.speedX *= -1;
         if (ice.y < 195 || ice.y > 210) ice.speedY *= -1;
       });
     }
@@ -1617,7 +1633,7 @@ export function createThermometerLab(t, options = {}) {
         wave.y -= wave.speedY * (1.0 + state.bathTemp / 100);
         if (wave.y < 185) {
           wave.y = 265;
-          wave.x = 65 + Math.random() * 110;
+          wave.x = beakerX + 10 + Math.random() * (beakerW - 20);
         }
       });
     }
@@ -1628,7 +1644,7 @@ export function createThermometerLab(t, options = {}) {
         bubble.x += Math.sin(bubble.phase) * 0.3;
         if (bubble.y < 185) {
           bubble.y = 260 + Math.random() * 10;
-          bubble.x = 60 + Math.random() * 120;
+          bubble.x = innerX + Math.random() * innerW;
         }
       });
     }
@@ -1638,7 +1654,7 @@ export function createThermometerLab(t, options = {}) {
         p.y += p.vy;
         p.alpha -= 0.005;
         if (p.alpha <= 0 || p.y < 130) {
-          p.x = 60 + Math.random() * 120;
+          p.x = innerX + Math.random() * innerW;
           p.y = 175 + Math.random() * 5;
           p.alpha = 0.2 + Math.random() * 0.4;
         }
@@ -1646,10 +1662,10 @@ export function createThermometerLab(t, options = {}) {
     }
   }
 
-  function drawBeaker(ctx) {
-    const bx = 55;
+  function drawBeaker(ctx, layout) {
+    const bx = layout.beakerX;
     const by = 180;
-    const bw = 130;
+    const bw = layout.beakerW;
     const bh = 100;
     const waterY = 190;
 
@@ -1880,8 +1896,8 @@ export function createThermometerLab(t, options = {}) {
     });
   }
 
-  function drawLiquidThermometer(ctx) {
-    const x = 120;
+  function drawLiquidThermometer(ctx, layout) {
+    const x = layout.thermometerX;
     const stemTop = 20;
     const bulbRadius = getBulbVisualRadius();
     const bulbCenterY = 250 + Math.max(0, bulbRadius - BULB_RADIUS_REF) * 0.35;
@@ -1994,15 +2010,17 @@ export function createThermometerLab(t, options = {}) {
 
     // Structure Labels
     if (state.showLabels) {
-      drawLabelLine(ctx, leftX + 1, stemTop + 60, LABEL_LEFT, stemTop + 30, t('tools.thermometerLab.labels.thinWall'), 'left');
-      drawLabelLine(ctx, x, currentY, LABEL_INNER_RIGHT, currentY - 15, t('tools.thermometerLab.labels.meniscus'), 'right');
-      drawLabelLine(ctx, x - boreWidth/2, stemTop + 110, LABEL_LEFT, stemTop + 110, t('tools.thermometerLab.labels.narrowBore'), 'left');
-      drawLabelLine(ctx, x, bulbCenterY, LABEL_INNER_RIGHT, bulbCenterY + 15, t('tools.thermometerLab.labels.largeBulb'), 'right');
+      const labelColRight = layout.beakerX + layout.beakerW + 12;
+      const labelColLeftEnd = leftX - 28;
+      drawLabelLine(ctx, leftX + 1, stemTop + 60, labelColLeftEnd, stemTop + 60, t('tools.thermometerLab.labels.thinWall'), 'right');
+      drawLabelLine(ctx, rightX + 1, currentY, labelColRight, currentY, t('tools.thermometerLab.labels.meniscus'), 'left');
+      drawLabelLine(ctx, leftX, stemTop + 110, labelColLeftEnd, stemTop + 110, t('tools.thermometerLab.labels.narrowBore'), 'right');
+      drawLabelLine(ctx, rightX + 1, bulbCenterY, labelColRight, bulbCenterY, t('tools.thermometerLab.labels.largeBulb'), 'left');
     }
   }
 
-  function drawResistanceProbe(ctx) {
-    const x = 120;
+  function drawResistanceProbe(ctx, layout) {
+    const x = layout.thermometerX;
     const probeTop = 20;
     const probeBottom = 245;
     const width = 10;
@@ -2088,13 +2106,15 @@ export function createThermometerLab(t, options = {}) {
 
     // Structure Labels
     if (state.showLabels) {
-      drawLabelLine(ctx, rx + 1, probeTop + 80, LABEL_LEFT, probeTop + 50, t('tools.thermometerLab.labels.metalSheath'), 'left');
-      drawLabelLine(ctx, x, probeBottom - 20, LABEL_INNER_RIGHT, probeBottom - 40, t('tools.thermometerLab.labels.platinumCoil'), 'right');
+      const labelColRight = layout.beakerX + layout.beakerW + 12;
+      const labelColLeftEnd = rx - 8;
+      drawLabelLine(ctx, rx + 1, probeTop + 80, labelColLeftEnd, probeTop + 80, t('tools.thermometerLab.labels.metalSheath'), 'right');
+      drawLabelLine(ctx, rx + width, probeBottom - 20, labelColRight, probeBottom - 20, t('tools.thermometerLab.labels.platinumCoil'), 'left');
     }
   }
 
-  function drawThermistorProbe(ctx) {
-    const x = 120;
+  function drawThermistorProbe(ctx, layout) {
+    const x = layout.thermometerX;
     const probeTop = 20;
     const beadY = 245;
 
@@ -2195,8 +2215,10 @@ export function createThermometerLab(t, options = {}) {
 
     // Structure Labels
     if (state.showLabels) {
-      drawLabelLine(ctx, x - 2, probeTop + 100, LABEL_LEFT, probeTop + 70, t('tools.thermometerLab.labels.leads'), 'left');
-      drawLabelLine(ctx, x, beadY, LABEL_INNER_RIGHT, beadY - 20, t('tools.thermometerLab.labels.semiconductorBead'), 'right');
+      const labelColRight = layout.beakerX + layout.beakerW + 12;
+      const labelColLeftEnd = tx - 8;
+      drawLabelLine(ctx, tx, probeTop + 100, labelColLeftEnd, probeTop + 100, t('tools.thermometerLab.labels.leads'), 'right');
+      drawLabelLine(ctx, tx + tubeWidth, beadY, labelColRight, beadY, t('tools.thermometerLab.labels.semiconductorBead'), 'left');
     }
   }
 
@@ -2425,13 +2447,14 @@ export function createThermometerLab(t, options = {}) {
 
     physCtx.save();
     physCtx.translate(PHYS_SCENE_OFFSET_X, 0);
-    drawBeaker(physCtx);
+    const physLayout = getPhysLayout();
+    drawBeaker(physCtx, physLayout);
     if (state.thermometerType === 'liquid') {
-      drawLiquidThermometer(physCtx);
+      drawLiquidThermometer(physCtx, physLayout);
     } else if (state.thermometerType === 'resistance') {
-      drawResistanceProbe(physCtx);
+      drawResistanceProbe(physCtx, physLayout);
     } else {
-      drawThermistorProbe(physCtx);
+      drawThermistorProbe(physCtx, physLayout);
     }
     physCtx.restore();
 
