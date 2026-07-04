@@ -1356,6 +1356,9 @@ export function createThermometerLab(t, options = {}) {
 
   const PHYS_WIDTH = 460;
   const PHYS_HEIGHT = 340;
+  const LABEL_MARGIN = 8;
+  const LABEL_LEFT = 10;
+  const LABEL_RIGHT = PHYS_WIDTH - LABEL_MARGIN;
   const PHYS_SCENE_OFFSET_X = 40;
   const GRAPH_WIDTH = 640;
   const GRAPH_HEIGHT = 420;
@@ -1785,32 +1788,79 @@ export function createThermometerLab(t, options = {}) {
     ctx.stroke();
   }
 
+  function wrapLabelText(ctx, text, maxWidth) {
+    const words = text.split(' ');
+    const lines = [];
+
+    function pushLongSegment(segment) {
+      if (ctx.measureText(segment).width <= maxWidth) {
+        lines.push(segment);
+        return;
+      }
+      let chunk = '';
+      for (const ch of segment) {
+        const test = chunk + ch;
+        if (ctx.measureText(test).width > maxWidth && chunk) {
+          lines.push(chunk);
+          chunk = ch;
+        } else {
+          chunk = test;
+        }
+      }
+      if (chunk) lines.push(chunk);
+    }
+
+    let current = '';
+    for (const word of words) {
+      const test = current ? `${current} ${word}` : word;
+      if (ctx.measureText(test).width <= maxWidth || !current) {
+        current = test;
+      } else {
+        pushLongSegment(current);
+        current = word;
+      }
+    }
+    if (current) pushLongSegment(current);
+    return lines.length ? lines : [text];
+  }
+
   function drawLabelLine(ctx, startX, startY, endX, endY, text, align = 'left') {
     if (!state.showLabels) return;
+
+    ctx.font = 'bold 9px system-ui, sans-serif';
+    const lineHeight = 11;
+    const padX = 5;
+    const padY = 3;
+    const maxWidth = Math.max(
+      40,
+      align === 'left'
+        ? PHYS_WIDTH / 2 - LABEL_MARGIN - endX
+        : endX - PHYS_WIDTH / 2
+    );
+
+    const lines = wrapLabelText(ctx, text, maxWidth);
+    const textWidths = lines.map((line) => ctx.measureText(line).width);
+    const boxW = Math.max(...textWidths) + padX * 2;
+    const boxH = lines.length * lineHeight + padY * 2;
+
+    let bx = align === 'left' ? endX : endX - boxW;
+    bx = Math.max(LABEL_MARGIN, Math.min(bx, PHYS_WIDTH - boxW - LABEL_MARGIN));
+    const by = endY - boxH / 2;
+    const lineEndX = align === 'left' ? bx : bx + boxW;
+
     ctx.strokeStyle = 'rgba(6, 182, 212, 0.7)';
     ctx.lineWidth = 1.0;
     ctx.setLineDash([3, 3]);
-    
-    // Draw line
     ctx.beginPath();
     ctx.moveTo(startX, startY);
-    ctx.lineTo(endX, endY);
+    ctx.lineTo(lineEndX, endY);
     ctx.stroke();
     ctx.setLineDash([]);
 
-    // Draw glowing anchor dot
     ctx.fillStyle = '#06b6d4';
     ctx.beginPath();
     ctx.arc(startX, startY, 3, 0, Math.PI * 2);
     ctx.fill();
-
-    // Draw label text background box
-    ctx.font = 'bold 9px system-ui, sans-serif';
-    const textWidth = ctx.measureText(text).width;
-    const boxW = textWidth + 10;
-    const boxH = 16;
-    const bx = align === 'left' ? endX : endX - boxW;
-    const by = endY - boxH / 2;
 
     ctx.fillStyle = 'rgba(21, 21, 24, 0.9)';
     ctx.strokeStyle = '#06b6d4';
@@ -1820,11 +1870,13 @@ export function createThermometerLab(t, options = {}) {
     ctx.fill();
     ctx.stroke();
 
-    // Draw text
     ctx.fillStyle = '#f4f4f5';
     ctx.textAlign = 'center';
     ctx.textBaseline = 'middle';
-    ctx.fillText(text, bx + boxW / 2, by + boxH / 2 + 0.5);
+    lines.forEach((line, i) => {
+      const ty = by + padY + lineHeight * (i + 0.5);
+      ctx.fillText(line, bx + boxW / 2, ty);
+    });
   }
 
   function drawLiquidThermometer(ctx) {
@@ -1941,10 +1993,10 @@ export function createThermometerLab(t, options = {}) {
 
     // Structure Labels
     if (state.showLabels) {
-      drawLabelLine(ctx, leftX + 1, stemTop + 60, 10, stemTop + 30, t('tools.thermometerLab.labels.thinWall'), 'left');
-      drawLabelLine(ctx, x, currentY, 230, currentY - 15, t('tools.thermometerLab.labels.meniscus'), 'left');
-      drawLabelLine(ctx, x - boreWidth/2, stemTop + 110, 10, stemTop + 110, t('tools.thermometerLab.labels.narrowBore'), 'left');
-      drawLabelLine(ctx, x, bulbCenterY, 230, bulbCenterY + 15, t('tools.thermometerLab.labels.largeBulb'), 'left');
+      drawLabelLine(ctx, leftX + 1, stemTop + 60, LABEL_LEFT, stemTop + 30, t('tools.thermometerLab.labels.thinWall'), 'left');
+      drawLabelLine(ctx, x, currentY, LABEL_RIGHT, currentY - 15, t('tools.thermometerLab.labels.meniscus'), 'right');
+      drawLabelLine(ctx, x - boreWidth/2, stemTop + 110, LABEL_LEFT, stemTop + 110, t('tools.thermometerLab.labels.narrowBore'), 'left');
+      drawLabelLine(ctx, x, bulbCenterY, LABEL_RIGHT, bulbCenterY + 15, t('tools.thermometerLab.labels.largeBulb'), 'right');
     }
   }
 
@@ -2035,8 +2087,8 @@ export function createThermometerLab(t, options = {}) {
 
     // Structure Labels
     if (state.showLabels) {
-      drawLabelLine(ctx, rx + 1, probeTop + 80, 10, probeTop + 50, t('tools.thermometerLab.labels.metalSheath'), 'left');
-      drawLabelLine(ctx, x, probeBottom - 20, 230, probeBottom - 40, t('tools.thermometerLab.labels.platinumCoil'), 'left');
+      drawLabelLine(ctx, rx + 1, probeTop + 80, LABEL_LEFT, probeTop + 50, t('tools.thermometerLab.labels.metalSheath'), 'left');
+      drawLabelLine(ctx, x, probeBottom - 20, LABEL_RIGHT, probeBottom - 40, t('tools.thermometerLab.labels.platinumCoil'), 'right');
     }
   }
 
@@ -2142,8 +2194,8 @@ export function createThermometerLab(t, options = {}) {
 
     // Structure Labels
     if (state.showLabels) {
-      drawLabelLine(ctx, x - 2, probeTop + 100, 10, probeTop + 70, t('tools.thermometerLab.labels.leads'), 'left');
-      drawLabelLine(ctx, x, beadY, 230, beadY - 20, t('tools.thermometerLab.labels.semiconductorBead'), 'left');
+      drawLabelLine(ctx, x - 2, probeTop + 100, LABEL_LEFT, probeTop + 70, t('tools.thermometerLab.labels.leads'), 'left');
+      drawLabelLine(ctx, x, beadY, LABEL_RIGHT, beadY - 20, t('tools.thermometerLab.labels.semiconductorBead'), 'right');
     }
   }
 
