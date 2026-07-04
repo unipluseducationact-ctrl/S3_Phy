@@ -14,7 +14,7 @@
   <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/katex@0.16.8/dist/katex.min.css">
   <script src="https://cdn.jsdelivr.net/npm/katex@0.16.8/dist/katex.min.js"></script>
   <link rel="stylesheet" href="../shared/s3phy-tokens.css">
-  <link rel="stylesheet" href="../shared/s3phy-embed.css?v=11">
+  <link rel="stylesheet" href="../shared/s3phy-embed.css?v=12">
   <script src="../shared/s3phy-embed-init.js"></script>
   <style>
     body {
@@ -93,10 +93,10 @@
     }
     .lab-viz { display: flex; flex-direction: column; min-height: 0; }
     .lab-viz-canvas { aspect-ratio: 4 / 3; width: 100%; }
-    /* Dual-panel viz (animation + chart): grid stack, bounded heights, no flex-grow overlap */
+    /* Dual-panel viz (animation + chart): proportional grid rows */
     .lab-viz-dual {
       display: grid !important;
-      grid-template-rows: auto minmax(180px, 1fr);
+      grid-template-rows: minmax(0, 2fr) minmax(0, 3fr);
       gap: 0.75rem;
       align-content: stretch;
       min-height: 0;
@@ -106,45 +106,43 @@
       overflow-x: hidden;
     }
     @media (min-width: 900px) {
-      .lab-section.controls-floating .lab-viz-canvas {
-        aspect-ratio: auto;
-        flex: 0 0 auto;
+      .lab-section.controls-floating .lab-viz-panel:first-child .lab-viz-canvas {
+        aspect-ratio: unset;
+        flex: 1 1 auto;
         min-height: 120px;
-        max-height: 160px;
+        max-height: none;
       }
-      .lab-section.controls-floating .lab-viz-chart-wrap {
-        flex: 0 0 auto;
-        min-height: 180px;
-        margin-top: auto;
+      .lab-section.controls-floating .lab-viz-panel-chart .lab-viz-chart-wrap {
+        flex: 1 1 auto;
+        min-height: 0;
+        margin-top: 0;
       }
     }
     .lab-steps .katex { font-size: 1.2em; }
     .lab-viz-dual .lab-viz-panel {
-      flex: none;
-      flex-shrink: 0;
       min-height: 0;
-      overflow: visible;
+      overflow: hidden;
       position: relative;
       z-index: 1;
       display: flex;
       flex-direction: column;
     }
     .lab-viz-dual .lab-viz-panel-chart { z-index: 2; overflow: hidden; flex: 1 1 auto; min-height: 0; display: flex; flex-direction: column; }
-    .lab-viz-dual .lab-viz-canvas {
-      aspect-ratio: 16 / 10;
+    .lab-viz-dual .lab-viz-panel:first-child .lab-viz-canvas {
       width: 100%;
       height: auto;
       min-height: 120px;
-      max-height: 160px;
-      flex: 0 0 auto;
+      max-height: none;
+      flex: 1 1 auto;
+      aspect-ratio: unset;
       overflow: hidden;
     }
-    .lab-viz-dual .lab-viz-chart-wrap {
+    .lab-viz-dual .lab-viz-panel-chart .lab-viz-chart-wrap {
       position: relative;
       width: 100%;
-      flex: 0 0 auto;
-      min-height: 180px;
-      margin-top: auto;
+      flex: 1 1 auto;
+      min-height: 0;
+      margin-top: 0;
       overflow: visible;
     }
     .lab-viz-dual .lab-viz-canvas canvas {
@@ -600,29 +598,12 @@
       ctx.scale(window.devicePixelRatio, window.devicePixelRatio);
     }
 
-    function getChartTargetHeight(w) {
-      const chartPanel = document.querySelector('.lab-viz-panel-chart');
-      if (!chartPanel) return Math.max(180, Math.round(w * 10 / 16));
-
-      const header = chartPanel.querySelector('h3');
-      const headerH = header ? header.getBoundingClientRect().height + 8 : 0;
-      const panelPad = 28;
-      const fromPanel = Math.max(180, chartPanel.clientHeight - headerH - panelPad);
-      const absoluteMax = Math.min(480, Math.round(window.innerHeight * 0.52));
-
-      return Math.max(180, Math.min(fromPanel, absoluteMax));
-    }
-
     function sizeChartContainer() {
       const wrap = document.querySelector('.lab-viz-chart-wrap');
       if (!wrap) return;
-      const w = wrap.getBoundingClientRect().width;
-      if (w <= 0) return;
-
-      const h = getChartTargetHeight(w);
-      wrap.style.height = h + 'px';
-      wrap.style.minHeight = h + 'px';
-      wrap.style.maxHeight = h + 'px';
+      wrap.style.height = '';
+      wrap.style.minHeight = '';
+      wrap.style.maxHeight = '';
     }
 
     function layoutLabCanvases() {

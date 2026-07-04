@@ -118,14 +118,9 @@ html.s3phy-embed .lab-viz-dual {
   flex: 1 1 auto;
   min-height: 0;
   height: 100%;
-  grid-template-rows: auto minmax(180px, 1fr);
+  grid-template-rows: minmax(0, 2fr) minmax(0, 3fr);
   align-content: stretch;
   overflow: hidden;
-}
-
-html.s3phy-embed .lab-viz-dual .lab-viz-panel:first-child {
-  flex: 0 0 auto;
-  max-height: min(240px, 34vh);
 }
 
 html.s3phy-embed .lab-viz-dual .lab-viz-panel-chart {
@@ -134,25 +129,26 @@ html.s3phy-embed .lab-viz-dual .lab-viz-panel-chart {
   overflow: hidden;
 }
 
-html.s3phy-embed .lab-viz-dual .lab-viz-canvas {
-  flex: 0 0 auto !important;
-  min-height: 100px !important;
-  max-height: min(140px, 22vh) !important;
-  aspect-ratio: 16 / 9;
+html.s3phy-embed .lab-viz-dual .lab-viz-panel:first-child .lab-viz-canvas {
+  flex: 1 1 auto !important;
+  min-height: 120px !important;
+  max-height: none !important;
+  aspect-ratio: unset;
   height: auto;
 }
 
-html.s3phy-embed .lab-viz-dual .lab-viz-chart-wrap {
-  flex: 0 0 auto;
-  min-height: 180px;
+html.s3phy-embed .lab-viz-dual .lab-viz-panel-chart .lab-viz-chart-wrap {
+  flex: 1 1 auto;
+  min-height: 0;
   height: auto !important;
-  margin-top: auto;
+  margin-top: 0;
   aspect-ratio: unset;
 }
 
 html.s3phy-embed .lab-viz-dual .lab-viz-panel {
   flex: 1 1 auto;
   min-height: 0;
+  overflow: hidden;
   display: flex;
   flex-direction: column;
 }
