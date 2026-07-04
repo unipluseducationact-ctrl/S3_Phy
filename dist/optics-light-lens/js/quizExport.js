@@ -1,4 +1,4 @@
-import { createQuizExport } from "../../shared/quiz/quizExport.js?v=20260704c";
+import { createQuizExport } from "../../shared/quiz/quizExport.js?v=20260704e";
 
 const { downloadWord, printSheet } = createQuizExport({
   titleEnQuestions: "S3 Optics Light & Lens — Questions",

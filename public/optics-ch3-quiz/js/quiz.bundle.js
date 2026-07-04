@@ -455,28 +455,37 @@
       )
     );
   }
-  async function prepareSheetForPrint(sheet, html) {
-    sheet.innerHTML = html;
-    sheet.setAttribute("aria-hidden", "false");
-    sheet.style.display = "block";
-    sheet.style.visibility = "hidden";
-    sheet.style.position = "fixed";
-    sheet.style.left = "0";
-    sheet.style.top = "0";
-    sheet.style.width = "100%";
-    sheet.style.pointerEvents = "none";
-    sheet.style.zIndex = "-1";
-    await preloadImageUrls(collectImageUrlsFromHtml(html));
-    await waitForExportImages(sheet);
-    sheet.style.display = "";
-    sheet.style.visibility = "";
-    sheet.style.position = "";
-    sheet.style.left = "";
-    sheet.style.top = "";
-    sheet.style.width = "";
-    sheet.style.pointerEvents = "";
-    sheet.style.zIndex = "";
-    sheet.setAttribute("aria-hidden", "true");
+  const PRINT_DOC_STYLE = "html,body{margin:0;padding:0;min-height:0!important;height:auto!important;background:#fff}body{font-family:Inter,'Segoe UI',sans-serif;font-size:12pt;line-height:1.45;margin:12mm;color:#191c1e}h1{font-size:18pt;margin:0 0 1rem}h2{font-size:13pt;margin:0 0 .5rem}p,ul,ol{margin:.35em 0}ul,ol{padding-left:1.25rem}.export-q{page-break-inside:avoid;break-inside:avoid-page;margin-bottom:1rem}.export-fig{page-break-inside:avoid;break-inside:avoid-page;margin:.75rem 0}.export-fig img{max-width:100%;height:auto;display:block}figcaption{font-size:10pt;color:#414753;margin-top:.25rem}table{border-collapse:collapse;width:100%;margin:.5rem 0}th,td{border:1px solid #c1c6d5;padding:6px;text-align:left}";
+  function getPrintFrame() {
+    let frame = document.getElementById("quiz-print-frame");
+    if (!frame) {
+      frame = document.createElement("iframe");
+      frame.id = "quiz-print-frame";
+      frame.setAttribute("aria-hidden", "true");
+      frame.title = "Print preview";
+      frame.style.cssText = "position:fixed;width:0;height:0;border:0;opacity:0;pointer-events:none;left:-9999px;top:0";
+      document.body.appendChild(frame);
+    }
+    return frame;
+  }
+  async function printStandaloneHtml(titleEn, bodyHtml) {
+    await preloadImageUrls(collectImageUrlsFromHtml(bodyHtml));
+    const frame = getPrintFrame();
+    const win = frame.contentWindow;
+    const doc = win.document;
+    doc.open();
+    doc.write(`<!DOCTYPE html><html lang="en"><head><meta charset="utf-8"><title>${escHtml(titleEn)}</title><style>${PRINT_DOC_STYLE}</style></head><body>${bodyHtml}</body></html>`);
+    doc.close();
+    await waitForExportImages(doc.body);
+    await new Promise((resolve) => {
+      const cleanup = () => {
+        win.removeEventListener("afterprint", cleanup);
+        resolve();
+      };
+      win.addEventListener("afterprint", cleanup);
+      win.focus();
+      win.print();
+    });
   }
   function fillLineExportHtml(line, answersMode) {
     let html = "";
@@ -567,12 +576,9 @@
       alert(noQuizAlertMessage(lang));
       return;
     }
-    const sheet = document.getElementById("quiz-pdf-sheet");
-    if (!sheet) return;
     const titleEn = answersMode ? "S3 Optics Ch.3 \u2014 Light & Lens (Answers)" : "S3 Optics Ch.3 \u2014 Light & Lens (Questions)";
-    const html = `<h1>${escHtml(titleEn)}</h1>${buildDocBody(questions, answersMode)}`;
-    await prepareSheetForPrint(sheet, html);
-    window.print();
+    const bodyHtml = `<h1>${escHtml(titleEn)}</h1>${buildDocBody(questions, answersMode)}`;
+    await printStandaloneHtml(titleEn, bodyHtml);
   }
 
   // ../js/quizEffects.js
