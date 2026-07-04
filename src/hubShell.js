@@ -1,4 +1,5 @@
 import { t, getLang, setLang } from './i18n.js';
+import { initHubNavResize } from './hubNavResize.js';
 
 export const HUB_SECTIONS = ['topics', 'notes', 'tools', 'worksheets', 'quiz', 'flashcards', 'summary'];
 
@@ -44,6 +45,8 @@ export function mountHubShell(root, { subtitleKey, activeSection, onSection, onL
   const backBtn = root.querySelector('[data-strand-back]');
 
   let currentSection = activeSection;
+  const header = root.querySelector('.site-header--hub');
+  const navResize = initHubNavResize(header);
 
   function paintNav(sec) {
     currentSection = sec;
@@ -55,6 +58,7 @@ export function mountHubShell(root, { subtitleKey, activeSection, onSection, onL
     nav.querySelectorAll('button').forEach((btn) => {
       btn.addEventListener('click', () => onSection(btn.getAttribute('data-sec')));
     });
+    requestAnimationFrame(() => navResize.check());
   }
 
   function paintLang() {
@@ -97,6 +101,7 @@ export function mountHubShell(root, { subtitleKey, activeSection, onSection, onL
     },
     destroy() {
       backBtn.removeEventListener('click', onBack);
+      navResize.cleanup();
     },
   };
 }

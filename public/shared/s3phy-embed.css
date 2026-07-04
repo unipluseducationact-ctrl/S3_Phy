@@ -5,6 +5,7 @@ html.s3phy-embed {
   font-size: var(--s3-font-size-base);
   line-height: var(--s3-line-height);
   -webkit-font-smoothing: antialiased;
+  touch-action: manipulation;
 }
 
 html.s3phy-embed:has(.lab-section) {
@@ -59,9 +60,18 @@ html.s3phy-embed #quiz-layout {
   box-sizing: border-box;
 }
 
-@media (min-width: 1024px) {
+@media (min-width: 1101px) {
   html.s3phy-embed #quiz-layout {
     grid-template-columns: minmax(280px, 360px) minmax(0, 1fr);
+  }
+}
+
+@media (max-width: 1100px) {
+  html.s3phy-embed #quiz-layout > aside#settings-panel {
+    position: static;
+    max-height: min(42dvh, 420px);
+    overflow-y: auto;
+    -webkit-overflow-scrolling: touch;
   }
 }
 
@@ -197,6 +207,22 @@ html.s3phy-embed .app-root {
   }
   .lab-section.controls-floating .lab-steps {
     grid-column: span 6 / span 6;
+  }
+}
+
+@media (max-width: 1024px) {
+  html.s3phy-embed .lab-section.controls-floating .lab-viz,
+  html.s3phy-embed .lab-section.controls-floating .lab-steps {
+    grid-column: 1 / -1;
+  }
+
+  html.s3phy-embed .lab-controls.lab-controls-float {
+    position: relative;
+    left: auto !important;
+    top: auto !important;
+    width: 100% !important;
+    max-width: none;
+    margin-bottom: 0.75rem;
   }
 }
 

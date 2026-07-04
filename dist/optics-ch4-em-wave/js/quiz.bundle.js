@@ -595,10 +595,10 @@
     const readOpen = () => {
       try {
         const v = sessionStorage.getItem(storageKey);
-        return v === null ? true : v === "1";
+        if (v !== null) return v === "1";
       } catch {
-        return true;
       }
+      return !window.matchMedia("(max-width: 1100px)").matches;
     };
     let open = readOpen();
     function apply() {

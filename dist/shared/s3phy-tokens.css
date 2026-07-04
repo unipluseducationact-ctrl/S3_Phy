@@ -4,8 +4,13 @@
 :root {
   /* Layout */
   --s3-content-max: min(1600px, calc(100dvw - var(--s3-vp-pad) * 2));
-  --s3-tool-min-h: clamp(560px, calc(100dvh - var(--s3-nav-offset, 96px) - 48px), 1600px);
-  --s3-nav-offset: calc(var(--s3-vp-pad) + 72px + 12px);
+  --s3-bp-sm: 768px;
+  --s3-bp-md: 1024px;
+  --s3-bp-ws: 1100px;
+  --s3-safe-top: env(safe-area-inset-top, 0px);
+  --s3-safe-bottom: env(safe-area-inset-bottom, 0px);
+  --s3-tool-min-h: clamp(480px, calc(100dvh - var(--s3-nav-offset, 96px) - 48px - var(--s3-safe-bottom)), 1600px);
+  --s3-nav-offset: calc(var(--s3-vp-pad) + var(--s3-safe-top) + 72px + 12px);
   --s3-panel-pad: 18px;
   --s3-radius: 14px;
   --s3-vp-pad: clamp(12px, 2vw, 24px);
@@ -42,7 +47,8 @@
   --s3-lab-cyan: #22d3ee;
 
   /* Breakpoints (for reference in media queries) */
-  --s3-bp-md: 820px;
-  --s3-bp-lg: 1024px;
+  --s3-bp-sm: 768px;
+  --s3-bp-md: 1024px;
+  --s3-bp-ws: 1100px;
   --s3-float-panel-w: min(380px, calc(100% - 24px));
 }

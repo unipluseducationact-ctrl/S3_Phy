@@ -10,7 +10,7 @@ export function createEmLab(t) {
   const root = base.endsWith('/') ? base : `${base}/`;
 
   function iframeSrc() {
-    return `${root}em-spectrum/index.html?lang=${encodeURIComponent(getLang())}`;
+    return `${root}em-spectrum/index.html?embed=1&lang=${encodeURIComponent(getLang())}`;
   }
 
   iframe.src = iframeSrc();

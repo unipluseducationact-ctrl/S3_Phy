@@ -1,6 +1,6 @@
 ﻿const SCALE_FLOOR = 0.82;
 
-function syncHubScale() {
+export function syncHubScale() {
   const root = document.documentElement;
   const width = window.innerWidth;
   const height = Math.max(window.innerHeight, 1);

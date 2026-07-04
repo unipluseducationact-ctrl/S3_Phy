@@ -1,7 +1,7 @@
 import { initLabFullscreen } from './labFullscreen.js';
 
 const STORAGE_KEY = 's3phy:tool-picker-collapsed';
-const MOBILE_BREAKPOINT = 820;
+const MOBILE_BREAKPOINT = 768;
 
 /**
  * @param {{ toolOrder: string[], toolId: string, getLabel: (id: string) => string, t: (key: string) => string }} opts
