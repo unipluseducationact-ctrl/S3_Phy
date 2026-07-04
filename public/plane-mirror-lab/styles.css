@@ -540,6 +540,28 @@ input[type=range]:focus-visible::-webkit-slider-thumb {
   color: #fde68a;
 }
 
+.zoom-toolbar {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  margin-top: 4px;
+}
+
+.zoom-label {
+  min-width: 3.2rem;
+  text-align: center;
+  font-size: 0.75rem;
+  font-weight: 600;
+  color: var(--text-muted);
+}
+
+.btn-compact {
+  min-width: 2rem;
+  padding: 5px 8px;
+  font-size: 0.85rem;
+  font-weight: 700;
+}
+
 .sketch-selection-box {
   display: flex;
   align-items: center;
