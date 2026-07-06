@@ -419,7 +419,10 @@ export const QUIZ_EXERCISES = [
           {
             "type": "blank",
             "accept": [
-              "2F"
+              "2F",
+              "2f",
+              "twice the focal length",
+              "at 2F"
             ]
           },
           {
