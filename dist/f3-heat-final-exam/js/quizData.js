@@ -2578,15 +2578,14 @@ export const QUIZ_ITEMS = [
           {
             "type": "blank",
             "accept": [
-              "The flow rate of the steam is 480 kg s⁻¹. Find the energy lost by the steam every second.",
-              "480 kg",
-              "480kg"
+              "1220000000J",
+              "1220000000 J"
             ]
           }
         ]
       }
     ],
-    "hint": "The flow rate of the steam is 480 kg s⁻¹.",
+    "hint": "Use Q = mcΔT per second: multiply mass flow rate, specific heat capacity, and temperature drop.",
     "image": {
       "src": "./assets/f3-heat-lq-2425-q14.png",
       "alt": "The following schematic diagram shows a part of a nuclear power station. Water at 220 °C flows into…",
