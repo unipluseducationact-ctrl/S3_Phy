@@ -2991,16 +2991,16 @@
     "section": "Imported: F3 Heat LQ 2024-25 · Q14(b)",
     "source": "f3-heat-lq-2425",
     "en": {
-      "q": "The following schematic diagram shows a part of a nuclear power station. Water at 220 C flows into the steam generator and is heated to become steam. The steam then pushes a turbine to generate electricity and is coo...\n\n(b) If the internal energy of the steam is transferred to the turbine at 5.5 × 108 W, find the flow rate of the\nseawater.\nGiven: c (seawater) = 4000 J kg–1 °C–1",
-      "answer": "If the internal energy of the steam is transferred to the turbine at 5.5 × 108 W, find the flow rate of the",
-      "exp": "If the internal energy of the steam is transferred to the turbine at 5.5 × 108 W, find the flow rate of the\nseawater.\nGiven: c (seawater) = 4000 J kg–1 °C–1\n(3 marks)",
-      "hint": "If the internal energy of the steam is transferred to the turbine at 5.5 × 108 W, find th…"
+      "q": "The following schematic diagram shows a part of a nuclear power station. Water at 220 C flows into the steam generator and is heated to become steam. The steam then pushes a turbine to generate electricity and is coo...\n\n(b) If the internal energy of the steam is transferred to the turbine at 5.5 × 10⁸ W, find the flow rate of the\nseawater.\nGiven: c (seawater) = 4000 J kg–1 °C–1",
+      "answer": "8400kg s⁻¹",
+      "exp": "8400 kg s⁻¹\nGiven: c (seawater) = 4000 J kg–1 °C–1\n(3 marks)",
+      "hint": "Use power = ṁ c ΔT to find the seawater mass flow rate.",
     },
     "zhHant": {
-      "q": "The following schematic diagram shows a part of a nuclear power station. Water at 220 C flows into the steam generator and is heated to become steam. The steam then pushes a turbine to generate electricity and is coo...\n\n(b) If the internal energy of the steam is transferred to the turbine at 5.5 × 108 W, find the flow rate of the\nseawater.\nGiven: c (seawater) = 4000 J kg–1 °C–1",
-      "answer": "If the internal energy of the steam is transferred to the turbine at 5.5 × 108 W, find the flow rate of the",
-      "exp": "If the internal energy of the steam is transferred to the turbine at 5.5 × 108 W, find the flow rate of the\nseawater.\nGiven: c (seawater) = 4000 J kg–1 °C–1\n(3 marks)",
-      "hint": "If the internal energy of the steam is transferred to the turbine at 5.5 × 108 W, find th…"
+      "q": "The following schematic diagram shows a part of a nuclear power station. Water at 220 C flows into the steam generator and is heated to become steam. The steam then pushes a turbine to generate electricity and is coo...\n\n(b) If the internal energy of the steam is transferred to the turbine at 5.5 × 10⁸ W, find the flow rate of the\nseawater.\nGiven: c (seawater) = 4000 J kg–1 °C–1",
+      "answer": "8400kg s⁻¹",
+      "exp": "8400 kg s⁻¹\nGiven: c (seawater) = 4000 J kg–1 °C–1\n(3 marks)",
+      "hint": "Use power = ṁ c ΔT to find the seawater mass flow rate.",
     }
   },
   {

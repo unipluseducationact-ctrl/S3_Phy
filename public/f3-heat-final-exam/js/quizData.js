@@ -2597,7 +2597,7 @@ export const QUIZ_ITEMS = [
     "format": "fill",
     "section": "heat-internal-energy",
     "difficulty": "Applied",
-    "stem": "The following schematic diagram shows a part of a nuclear power station. Water at 220 °C flows into the steam generator and is heated to become steam. The steam then pushes a turbine to generate electricity and is cooled in the condenser to turn back into water. The water is specially treated so that its boiling point is raised to 280 °C.\n\n(b) If the internal energy of the steam is transferred to the turbine at 5.5 × 108 W, find the flow rate of the seawater.\nGiven: c (seawater) = 4000 J kg⁻¹ °C⁻¹",
+    "stem": "The following schematic diagram shows a part of a nuclear power station. Water at 220 °C flows into the steam generator and is heated to become steam. The steam then pushes a turbine to generate electricity and is cooled in the condenser to turn back into water. The water is specially treated so that its boiling point is raised to 280 °C.\n\n(b) If the internal energy of the steam is transferred to the turbine at 5.5 × 10⁸ W, find the flow rate of the seawater.\nGiven: c (seawater) = 4000 J kg⁻¹ °C⁻¹",
     "lines": [
       {
         "segments": [
@@ -2608,15 +2608,14 @@ export const QUIZ_ITEMS = [
           {
             "type": "blank",
             "accept": [
-              "4000 J kg⁻¹ °C⁻¹",
-              "4000 J",
-              "4000J"
+              "8400kg s⁻¹",
+              "8400 kg s⁻¹"
             ]
           }
         ]
       }
     ],
-    "hint": "If the internal energy of the steam is transferred to the turbine at 5.5 × 108 W, find th…",
+    "hint": "Use power = ṁ c ΔT to find the seawater mass flow rate.",
     "image": {
       "src": "./assets/f3-heat-lq-2425-q14.png",
       "alt": "The following schematic diagram shows a part of a nuclear power station. Water at 220 °C flows into…",
