@@ -4686,15 +4686,15 @@
     "source": "f3-heat-lq-capacity",
     "en": {
       "q": "A student turns on the three identical air conditioners in a classroom of dimensions 9 m  8 m  3 m. The mass of air in every cubic metre is 1.15 kg. The specific heat capacity of air is 1000 J kg−1 C−1.\n\n(c) If the power of each air conditioner is 2000 W, how long does it take to cool the classroom from 33 C\nto 25 C?",
-      "answer": "If the power of each air conditioner is 2000 W, how long does it take to cool the classroom from 33 C",
-      "exp": "If the power of each air conditioner is 2000 W, how long does it take to cool the classroom from 33 C\nto 25 C?\n(2 marks)",
-      "hint": "If the power of each air conditioner is 2000 W, how long does it take to cool the classro…"
+      "answer": "331s",
+      "exp": "331 s\n(2 marks)",
+      "hint": "Find the energy removed, then divide by the total cooling power of all three air conditioners."
     },
     "zhHant": {
       "q": "A student turns on the three identical air conditioners in a classroom of dimensions 9 m  8 m  3 m. The mass of air in every cubic metre is 1.15 kg. The specific heat capacity of air is 1000 J kg−1 C−1.\n\n(c) If the power of each air conditioner is 2000 W, how long does it take to cool the classroom from 33 C\nto 25 C?",
-      "answer": "If the power of each air conditioner is 2000 W, how long does it take to cool the classroom from 33 C",
-      "exp": "If the power of each air conditioner is 2000 W, how long does it take to cool the classroom from 33 C\nto 25 C?\n(2 marks)",
-      "hint": "If the power of each air conditioner is 2000 W, how long does it take to cool the classro…"
+      "answer": "331s",
+      "exp": "331 s\n(2 marks)",
+      "hint": "Find the energy removed, then divide by the total cooling power of all three air conditioners."
     }
   },
   {

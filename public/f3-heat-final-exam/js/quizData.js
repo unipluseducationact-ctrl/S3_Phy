@@ -2978,14 +2978,14 @@ export const QUIZ_ITEMS = [
           {
             "type": "blank",
             "accept": [
-              "2000 W",
-              "2000W"
+              "331s",
+              "331 s"
             ]
           }
         ]
       }
     ],
-    "hint": "If the power of each air conditioner is 2000 W, how long does it take to cool the classro…"
+    "hint": "Find the energy removed, then divide by the total cooling power of all three air conditioners.",
   },
   {
     "id": "heat-lq-capacity-q10b",
