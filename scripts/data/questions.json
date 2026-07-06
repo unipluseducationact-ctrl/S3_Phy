@@ -2991,13 +2991,13 @@
     "section": "Imported: F3 Heat LQ 2024-25 · Q14(b)",
     "source": "f3-heat-lq-2425",
     "en": {
-      "q": "The following schematic diagram shows a part of a nuclear power station. Water at 220 C flows into the steam generator and is heated to become steam. The steam then pushes a turbine to generate electricity and is coo...\n\n(b) If the internal energy of the steam is transferred to the turbine at 5.5 × 10⁸ W, find the flow rate of the\nseawater.\nGiven: c (seawater) = 4000 J kg–1 °C–1",
+      "q": "The following schematic diagram shows a part of a nuclear power station. Water at 220 C flows into the steam generator and is heated to become steam. The steam then pushes a turbine to generate electricity and is coo...\n\nThe flow rate of the steam is 480 kg s⁻¹.\n(b) If the internal energy of the steam is transferred to the turbine at 5.5 × 10⁸ W, find the flow rate of the\nseawater.\nGiven: c (steam) = 2000 J kg–1 °C–1\nGiven: c (seawater) = 4000 J kg–1 °C–1",
       "answer": "8400kg s⁻¹",
       "exp": "8400 kg s⁻¹\nGiven: c (seawater) = 4000 J kg–1 °C–1\n(3 marks)",
       "hint": "Use power = ṁ c ΔT to find the seawater mass flow rate.",
     },
     "zhHant": {
-      "q": "The following schematic diagram shows a part of a nuclear power station. Water at 220 C flows into the steam generator and is heated to become steam. The steam then pushes a turbine to generate electricity and is coo...\n\n(b) If the internal energy of the steam is transferred to the turbine at 5.5 × 10⁸ W, find the flow rate of the\nseawater.\nGiven: c (seawater) = 4000 J kg–1 °C–1",
+      "q": "The following schematic diagram shows a part of a nuclear power station. Water at 220 C flows into the steam generator and is heated to become steam. The steam then pushes a turbine to generate electricity and is coo...\n\nThe flow rate of the steam is 480 kg s⁻¹.\n(b) If the internal energy of the steam is transferred to the turbine at 5.5 × 10⁸ W, find the flow rate of the\nseawater.\nGiven: c (steam) = 2000 J kg–1 °C–1\nGiven: c (seawater) = 4000 J kg–1 °C–1",
       "answer": "8400kg s⁻¹",
       "exp": "8400 kg s⁻¹\nGiven: c (seawater) = 4000 J kg–1 °C–1\n(3 marks)",
       "hint": "Use power = ṁ c ΔT to find the seawater mass flow rate.",
@@ -3037,24 +3037,6 @@
       "answer": "",
       "exp": "Find the temperature T1.\n(2 marks)",
       "hint": "Find the temperature T1.\n(2 marks)"
-    }
-  },
-  {
-    "kind": "short",
-    "topic": "heatInternalEnergy",
-    "section": "Imported: F3 Heat LQ 2024-25 · Q13(b)(ii)",
-    "source": "f3-heat-lq-2425",
-    "en": {
-      "q": "Emily is enjoying hot pot. The pot is put on a stove. The soup of mass 3 kg is heated at a rate of 1000 W. Its specific heat capacity is 4200 J kg−1 C−1. The heat capacity of the pot is negligible. Neglect the energy...\n\n(b) When will the soup reach 100 C again?",
-      "answer": "1010s",
-      "exp": "1010 s\n(2 marks)\nHeat\n(Revision)",
-      "hint": "Find the extra energy needed after cooling, then divide by the heating power."
-    },
-    "zhHant": {
-      "q": "Emily is enjoying hot pot. The pot is put on a stove. The soup of mass 3 kg is heated at a rate of 1000 W. Its specific heat capacity is 4200 J kg−1 C−1. The heat capacity of the pot is negligible. Neglect the energy...\n\n(b) When will the soup reach 100 C again?",
-      "answer": "1010s",
-      "exp": "1010 s\n(2 marks)\nHeat\n(Revision)",
-      "hint": "Find the extra energy needed after cooling, then divide by the heating power."
     }
   },
   {

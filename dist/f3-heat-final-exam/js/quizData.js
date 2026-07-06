@@ -2597,7 +2597,7 @@ export const QUIZ_ITEMS = [
     "format": "fill",
     "section": "heat-internal-energy",
     "difficulty": "Applied",
-    "stem": "The following schematic diagram shows a part of a nuclear power station. Water at 220 °C flows into the steam generator and is heated to become steam. The steam then pushes a turbine to generate electricity and is cooled in the condenser to turn back into water. The water is specially treated so that its boiling point is raised to 280 °C.\n\n(b) If the internal energy of the steam is transferred to the turbine at 5.5 × 10⁸ W, find the flow rate of the seawater.\nGiven: c (seawater) = 4000 J kg⁻¹ °C⁻¹",
+    "stem": "The following schematic diagram shows a part of a nuclear power station. Water at 220 °C flows into the steam generator and is heated to become steam. The steam then pushes a turbine to generate electricity and is cooled in the condenser to turn back into water. The water is specially treated so that its boiling point is raised to 280 °C.\n\nThe flow rate of the steam is 480 kg s⁻¹.\n(b) If the internal energy of the steam is transferred to the turbine at 5.5 × 10⁸ W, find the flow rate of the seawater.\nGiven: c (steam) = 2000 J kg⁻¹ °C⁻¹\nGiven: c (seawater) = 4000 J kg⁻¹ °C⁻¹",
     "lines": [
       {
         "segments": [
@@ -2620,36 +2620,6 @@ export const QUIZ_ITEMS = [
       "src": "./assets/f3-heat-lq-2425-q14.png",
       "alt": "The following schematic diagram shows a part of a nuclear power station. Water at 220 °C flows into…",
       "caption": "Fig · Imported: F3 Heat LQ 2024-25 · Q14(b)"
-    }
-  },
-  {
-    "id": "heat-lq-2425-q13bii",
-    "format": "fill",
-    "section": "heat-internal-energy",
-    "difficulty": "Applied",
-    "stem": "Emily is enjoying hot pot. The pot is put on a stove. The soup of mass 3 kg is heated at a rate of 1000 W. Its specific heat capacity is 4200 J kg⁻¹ °C⁻¹. The heat capacity of the pot is negligible. Neglect the energy loss to the surroundings.\n\n(b) When will the soup reach 100 °C again?",
-    "lines": [
-      {
-        "segments": [
-          {
-            "type": "text",
-            "value": "Answer: "
-          },
-          {
-            "type": "blank",
-            "accept": [
-              "1010s",
-              "1010 s"
-            ]
-          }
-        ]
-      }
-    ],
-    "hint": "Find the extra energy needed after cooling, then divide by the heating power.",
-    "image": {
-      "src": "./assets/f3-heat-lq-2425-q13.png",
-      "alt": "Emily is enjoying hot pot. The pot is put on a stove. The soup of mass 3 kg is heated at a rate of …",
-      "caption": "Fig · Imported: F3 Heat LQ 2024-25 · Q13(b)(ii)"
     }
   },
   {
