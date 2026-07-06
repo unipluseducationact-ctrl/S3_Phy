@@ -419,10 +419,7 @@ export const QUIZ_EXERCISES = [
           {
             "type": "blank",
             "accept": [
-              "2F",
-              "2f",
-              "twice the focal length",
-              "at 2F"
+              "2F"
             ]
           },
           {
@@ -432,7 +429,8 @@ export const QUIZ_EXERCISES = [
         ]
       }
     ],
-    "hint": "Special ray diagram case at 2F."
+    "hint": "Special ray diagram case at 2F.",
+    "answer": "2F"
   },
   {
     "id": "optics-fill-07",
