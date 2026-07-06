@@ -2474,15 +2474,15 @@
     "source": "f3-heat-lq-2425",
     "en": {
       "q": "An iron wok of mass 2 kg containing cooking oil of mass 1 kg is heated by a stove. It takes 2 minutes to raise the temperature of the wok and the oil from 20 C to 180 C.\n\n(a) Find the energy absorbed by the wok and the oil in the 2 minutes.\n(Heat capacity of iron = 920 J C−1, specific heat capacity of cooking oil = 2000 J kg−1 C−1)",
-      "answer": "Find the energy absorbed by the wok and the oil in the 2 minutes.",
-      "exp": "Find the energy absorbed by the wok and the oil in the 2 minutes.\n(Heat capacity of iron = 920 J C−1, specific heat capacity of cooking oil = 2000 J kg−1 C−1)\n(2 marks)",
-      "hint": "Find the energy absorbed by the wok and the oil in the 2 minutes.\n(Heat capacity of iron…"
+      "answer": "467000J",
+      "exp": "467000 J\n(Heat capacity of iron = 920 J C−1, specific heat capacity of cooking oil = 2000 J kg−1 C−1)\n(2 marks)",
+      "hint": "Use Q = CΔT for the wok and Q = mcΔT for the oil, then add the two energies."
     },
     "zhHant": {
       "q": "An iron wok of mass 2 kg containing cooking oil of mass 1 kg is heated by a stove. It takes 2 minutes to raise the temperature of the wok and the oil from 20 C to 180 C.\n\n(a) Find the energy absorbed by the wok and the oil in the 2 minutes.\n(Heat capacity of iron = 920 J C−1, specific heat capacity of cooking oil = 2000 J kg−1 C−1)",
-      "answer": "Find the energy absorbed by the wok and the oil in the 2 minutes.",
-      "exp": "Find the energy absorbed by the wok and the oil in the 2 minutes.\n(Heat capacity of iron = 920 J C−1, specific heat capacity of cooking oil = 2000 J kg−1 C−1)\n(2 marks)",
-      "hint": "Find the energy absorbed by the wok and the oil in the 2 minutes.\n(Heat capacity of iron…"
+      "answer": "467000J",
+      "exp": "467000 J\n(Heat capacity of iron = 920 J C−1, specific heat capacity of cooking oil = 2000 J kg−1 C−1)\n(2 marks)",
+      "hint": "Use Q = CΔT for the wok and Q = mcΔT for the oil, then add the two energies."
     }
   },
   {
@@ -4596,15 +4596,15 @@
     "source": "f3-heat-lq-capacity",
     "en": {
       "q": "An iron wok of mass 2 kg containing cooking oil of mass 1 kg is heated by a stove. It takes 2 minutes to raise the temperature of the wok and the oil from 20 C to 180 C.\n\n(a) Find the energy absorbed by the wok and the oil in the 2 minutes.\n(Heat capacity of iron = 920 JC−1, specific heat capacity of cooking oil = 2000 J kg−1 C−1)",
-      "answer": "Find the energy absorbed by the wok and the oil in the 2 minutes.",
-      "exp": "Find the energy absorbed by the wok and the oil in the 2 minutes.\n(Heat capacity of iron = 920 J C−1, specific heat capacity of cooking oil = 2000 J kg−1 C−1)\n(2 marks)",
-      "hint": "Find the energy absorbed by the wok and the oil in the 2 minutes.\n(Heat capacity of iron…"
+      "answer": "467000J",
+      "exp": "467000 J\n(Heat capacity of iron = 920 J C−1, specific heat capacity of cooking oil = 2000 J kg−1 C−1)\n(2 marks)",
+      "hint": "Use Q = CΔT for the wok and Q = mcΔT for the oil, then add the two energies."
     },
     "zhHant": {
       "q": "An iron wok of mass 2 kg containing cooking oil of mass 1 kg is heated by a stove. It takes 2 minutes to raise the temperature of the wok and the oil from 20 C to 180 C.\n\n(a) Find the energy absorbed by the wok and the oil in the 2 minutes.\n(Heat capacity of iron = 920 JC−1, specific heat capacity of cooking oil = 2000 J kg−1 C−1)",
-      "answer": "Find the energy absorbed by the wok and the oil in the 2 minutes.",
-      "exp": "Find the energy absorbed by the wok and the oil in the 2 minutes.\n(Heat capacity of iron = 920 J C−1, specific heat capacity of cooking oil = 2000 J kg−1 C−1)\n(2 marks)",
-      "hint": "Find the energy absorbed by the wok and the oil in the 2 minutes.\n(Heat capacity of iron…"
+      "answer": "467000J",
+      "exp": "467000 J\n(Heat capacity of iron = 920 J C−1, specific heat capacity of cooking oil = 2000 J kg−1 C−1)\n(2 marks)",
+      "hint": "Use Q = CΔT for the wok and Q = mcΔT for the oil, then add the two energies."
     }
   },
   {

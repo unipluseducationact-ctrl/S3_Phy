@@ -2377,15 +2377,14 @@ export const QUIZ_ITEMS = [
           {
             "type": "blank",
             "accept": [
-              "Find the energy absorbed by the wok and the oil in the 2 minutes.",
-              "2 minutes",
-              "2minutes"
+              "467000J",
+              "467000 J"
             ]
           }
         ]
       }
     ],
-    "hint": "Find the energy absorbed by the wok and the oil in the 2 minutes.\n(Heat capacity of iron…"
+    "hint": "Use Q = CΔT for the wok and Q = mcΔT for the oil, then add the two energies."
   },
   {
     "id": "heat-lq-2425-q6",
@@ -2961,15 +2960,14 @@ export const QUIZ_ITEMS = [
           {
             "type": "blank",
             "accept": [
-              "Find the energy absorbed by the wok and the oil in the 2 minutes.",
-              "2 minutes",
-              "2minutes"
+              "467000J",
+              "467000 J"
             ]
           }
         ]
       }
     ],
-    "hint": "Find the energy absorbed by the wok and the oil in the 2 minutes.\n(Heat capacity of iron…"
+    "hint": "Use Q = CΔT for the wok and Q = mcΔT for the oil, then add the two energies."
   },
   {
     "id": "heat-lq-capacity-q9b",
