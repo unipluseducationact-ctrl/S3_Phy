@@ -2638,15 +2638,14 @@ export const QUIZ_ITEMS = [
           {
             "type": "blank",
             "accept": [
-              "When will the soup reach 100 °C again?",
-              "100 °C",
-              "100°C"
+              "1010s",
+              "1010 s"
             ]
           }
         ]
       }
     ],
-    "hint": "When will the soup reach 100 °C again?\n(2 marks)\nHeat (Revision)",
+    "hint": "Find the extra energy needed after cooling, then divide by the heating power.",
     "image": {
       "src": "./assets/f3-heat-lq-2425-q13.png",
       "alt": "Emily is enjoying hot pot. The pot is put on a stove. The soup of mass 3 kg is heated at a rate of …",

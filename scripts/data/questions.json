@@ -3046,15 +3046,15 @@
     "source": "f3-heat-lq-2425",
     "en": {
       "q": "Emily is enjoying hot pot. The pot is put on a stove. The soup of mass 3 kg is heated at a rate of 1000 W. Its specific heat capacity is 4200 J kg−1 C−1. The heat capacity of the pot is negligible. Neglect the energy...\n\n(b) When will the soup reach 100 C again?",
-      "answer": "When will the soup reach 100 C again?",
-      "exp": "When will the soup reach 100 C again?\n(2 marks)\nHeat\n(Revision)",
-      "hint": "When will the soup reach 100 C again?\n(2 marks)\nHeat\n(Revision)"
+      "answer": "1010s",
+      "exp": "1010 s\n(2 marks)\nHeat\n(Revision)",
+      "hint": "Find the extra energy needed after cooling, then divide by the heating power."
     },
     "zhHant": {
       "q": "Emily is enjoying hot pot. The pot is put on a stove. The soup of mass 3 kg is heated at a rate of 1000 W. Its specific heat capacity is 4200 J kg−1 C−1. The heat capacity of the pot is negligible. Neglect the energy...\n\n(b) When will the soup reach 100 C again?",
-      "answer": "When will the soup reach 100 C again?",
-      "exp": "When will the soup reach 100 C again?\n(2 marks)\nHeat\n(Revision)",
-      "hint": "When will the soup reach 100 C again?\n(2 marks)\nHeat\n(Revision)"
+      "answer": "1010s",
+      "exp": "1010 s\n(2 marks)\nHeat\n(Revision)",
+      "hint": "Find the extra energy needed after cooling, then divide by the heating power."
     }
   },
   {

@@ -1,6 +1,6 @@
 import { getLang } from '../i18n.js';
 
-const HEAT_WORKSHEET_VERSION = '20260706d';
+const HEAT_WORKSHEET_VERSION = '20260706e';
 
 /** @param {(key: string) => string} t */
 export function createHeatFinalExamWorksheet(t) {
