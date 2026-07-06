@@ -2971,17 +2971,17 @@
     "section": "Imported: F3 Heat LQ 2024-25 · Q14(a)",
     "source": "f3-heat-lq-2425",
     "en": {
-      "q": "The following schematic diagram shows a part of a nuclear power station. Water at 220 C flows into the steam generator and is heated to become steam. The steam then pushes a turbine to generate electricity and is coo...\n\n(a) The flow rate of the steam is 480 kg s–1. Find the energy lost by the steam every second.\nGiven: c (steam) = 2000 J kg–1 °C–1",
-      "answer": "The flow rate of the steam is 480 kg s–1. Find the energy lost by the steam every second.",
-      "exp": "The flow rate of the steam is 480 kg s–1. Find the energy lost by the steam every second.\nGiven: c (steam) = 2000 J kg–1 °C–1\n(3 marks)",
-      "hint": "The flow rate of the steam is 480 kg s–1.",
+      "q": "The following schematic diagram shows a part of a nuclear power station. Water at 220 C flows into the steam generator and is heated to become steam. The steam then pushes a turbine to generate electricity and is coo...\n\n(a) The flow rate of the steam is 480 kg s⁻¹. Find the energy lost by the steam every second.\nGiven: c (steam) = 2000 J kg–1 °C–1",
+      "answer": "The flow rate of the steam is 480 kg s⁻¹. Find the energy lost by the steam every second.",
+      "exp": "The flow rate of the steam is 480 kg s⁻¹. Find the energy lost by the steam every second.\nGiven: c (steam) = 2000 J kg–1 °C–1\n(3 marks)",
+      "hint": "The flow rate of the steam is 480 kg s⁻¹.",
       "image": "./worksheet-images/f3-heat-lq-2425-q14-a-x.webp"
     },
     "zhHant": {
-      "q": "The following schematic diagram shows a part of a nuclear power station. Water at 220 C flows into the steam generator and is heated to become steam. The steam then pushes a turbine to generate electricity and is coo...\n\n(a) The flow rate of the steam is 480 kg s–1. Find the energy lost by the steam every second.\nGiven: c (steam) = 2000 J kg–1 °C–1",
-      "answer": "The flow rate of the steam is 480 kg s–1. Find the energy lost by the steam every second.",
-      "exp": "The flow rate of the steam is 480 kg s–1. Find the energy lost by the steam every second.\nGiven: c (steam) = 2000 J kg–1 °C–1\n(3 marks)",
-      "hint": "The flow rate of the steam is 480 kg s–1.",
+      "q": "The following schematic diagram shows a part of a nuclear power station. Water at 220 C flows into the steam generator and is heated to become steam. The steam then pushes a turbine to generate electricity and is coo...\n\n(a) The flow rate of the steam is 480 kg s⁻¹. Find the energy lost by the steam every second.\nGiven: c (steam) = 2000 J kg–1 °C–1",
+      "answer": "The flow rate of the steam is 480 kg s⁻¹. Find the energy lost by the steam every second.",
+      "exp": "The flow rate of the steam is 480 kg s⁻¹. Find the energy lost by the steam every second.\nGiven: c (steam) = 2000 J kg–1 °C–1\n(3 marks)",
+      "hint": "The flow rate of the steam is 480 kg s⁻¹.",
       "image": "./worksheet-images/f3-heat-lq-2425-q14-a-x.webp"
     }
   },
@@ -3261,16 +3261,16 @@
     "section": "Imported: F3 Heat LQ 2024-25 · Q19(b)",
     "source": "f3-heat-lq-2425",
     "en": {
-      "q": "The following diagram shows a steam oven. When the oven operates, it turns water at 25 C into steam at 105 C and passes the steam into the cooking chamber to cook food. Given: Specific heat capacity of steam = 1900...\n\n(b) If the maximum rate of ejection of steam is 0.001 kg s–1, estimate the maximum power of the heater\nin the steam oven.",
-      "answer": "If the maximum rate of ejection of steam is 0.001 kg s–1, estimate the maximum power of the heater",
-      "exp": "If the maximum rate of ejection of steam is 0.001 kg s–1, estimate the maximum power of the heater\nin the steam oven. (2 marks)",
-      "hint": "If the maximum rate of ejection of steam is 0.001 kg s–1, estimate the maximum power of t…"
+      "q": "The following diagram shows a steam oven. When the oven operates, it turns water at 25 C into steam at 105 C and passes the steam into the cooking chamber to cook food. Given: Specific heat capacity of steam = 1900...\n\n(b) If the maximum rate of ejection of steam is 0.001 kg s⁻¹, estimate the maximum power of the heater\nin the steam oven.",
+      "answer": "If the maximum rate of ejection of steam is 0.001 kg s⁻¹, estimate the maximum power of the heater",
+      "exp": "If the maximum rate of ejection of steam is 0.001 kg s⁻¹, estimate the maximum power of the heater\nin the steam oven. (2 marks)",
+      "hint": "If the maximum rate of ejection of steam is 0.001 kg s⁻¹, estimate the maximum power of t…"
     },
     "zhHant": {
-      "q": "The following diagram shows a steam oven. When the oven operates, it turns water at 25 C into steam at 105 C and passes the steam into the cooking chamber to cook food. Given: Specific heat capacity of steam = 1900...\n\n(b) If the maximum rate of ejection of steam is 0.001 kg s–1, estimate the maximum power of the heater\nin the steam oven.",
-      "answer": "If the maximum rate of ejection of steam is 0.001 kg s–1, estimate the maximum power of the heater",
-      "exp": "If the maximum rate of ejection of steam is 0.001 kg s–1, estimate the maximum power of the heater\nin the steam oven. (2 marks)",
-      "hint": "If the maximum rate of ejection of steam is 0.001 kg s–1, estimate the maximum power of t…"
+      "q": "The following diagram shows a steam oven. When the oven operates, it turns water at 25 C into steam at 105 C and passes the steam into the cooking chamber to cook food. Given: Specific heat capacity of steam = 1900...\n\n(b) If the maximum rate of ejection of steam is 0.001 kg s⁻¹, estimate the maximum power of the heater\nin the steam oven.",
+      "answer": "If the maximum rate of ejection of steam is 0.001 kg s⁻¹, estimate the maximum power of the heater",
+      "exp": "If the maximum rate of ejection of steam is 0.001 kg s⁻¹, estimate the maximum power of the heater\nin the steam oven. (2 marks)",
+      "hint": "If the maximum rate of ejection of steam is 0.001 kg s⁻¹, estimate the maximum power of t…"
     }
   },
   {

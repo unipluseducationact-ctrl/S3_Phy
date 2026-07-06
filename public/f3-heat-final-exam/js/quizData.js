@@ -2567,7 +2567,7 @@ export const QUIZ_ITEMS = [
     "format": "fill",
     "section": "heat-internal-energy",
     "difficulty": "Applied",
-    "stem": "The following schematic diagram shows a part of a nuclear power station. Water at 220 °C flows into the steam generator and is heated to become steam. The steam then pushes a turbine to generate electricity and is cooled in the condenser to turn back into water. The water is specially treated so that its boiling point is raised to 280 °C.\n\n(a) The flow rate of the steam is 480 kg s–1. Find the energy lost by the steam every second.\nGiven: c (steam) = 2000 J kg⁻¹ °C⁻¹",
+    "stem": "The following schematic diagram shows a part of a nuclear power station. Water at 220 °C flows into the steam generator and is heated to become steam. The steam then pushes a turbine to generate electricity and is cooled in the condenser to turn back into water. The water is specially treated so that its boiling point is raised to 280 °C.\n\n(a) The flow rate of the steam is 480 kg s⁻¹. Find the energy lost by the steam every second.\nGiven: c (steam) = 2000 J kg⁻¹ °C⁻¹",
     "lines": [
       {
         "segments": [
@@ -2578,7 +2578,7 @@ export const QUIZ_ITEMS = [
           {
             "type": "blank",
             "accept": [
-              "The flow rate of the steam is 480 kg s–1. Find the energy lost by the steam every second.",
+              "The flow rate of the steam is 480 kg s⁻¹. Find the energy lost by the steam every second.",
               "480 kg",
               "480kg"
             ]
@@ -2586,7 +2586,7 @@ export const QUIZ_ITEMS = [
         ]
       }
     ],
-    "hint": "The flow rate of the steam is 480 kg s–1.",
+    "hint": "The flow rate of the steam is 480 kg s⁻¹.",
     "image": {
       "src": "./assets/f3-heat-lq-2425-q14.png",
       "alt": "The following schematic diagram shows a part of a nuclear power station. Water at 220 °C flows into…",
@@ -2812,7 +2812,7 @@ export const QUIZ_ITEMS = [
     "format": "fill",
     "section": "heat-internal-energy",
     "difficulty": "Applied",
-    "stem": "The following diagram shows a steam oven. When the oven operates, it turns water at 25 °C into steam at 105 °C and passes the steam into the cooking chamber to cook food. Given:\nspecific heat capacity of water = 4200 J kg⁻¹ °C⁻¹ specific latent heat of vaporization of water = 2.26 × 10⁶ J kg⁻¹ specific heat capacity of steam = 1900 J kg⁻¹ °C⁻¹\n\n(b) If the maximum rate of ejection of steam is 0.001 kg s–1, estimate the maximum power of the heater in the steam oven.",
+    "stem": "The following diagram shows a steam oven. When the oven operates, it turns water at 25 °C into steam at 105 °C and passes the steam into the cooking chamber to cook food. Given:\nspecific heat capacity of water = 4200 J kg⁻¹ °C⁻¹ specific latent heat of vaporization of water = 2.26 × 10⁶ J kg⁻¹ specific heat capacity of steam = 1900 J kg⁻¹ °C⁻¹\n\n(b) If the maximum rate of ejection of steam is 0.001 kg s⁻¹, estimate the maximum power of the heater in the steam oven.",
     "lines": [
       {
         "segments": [
@@ -2823,7 +2823,7 @@ export const QUIZ_ITEMS = [
           {
             "type": "blank",
             "accept": [
-              "If the maximum rate of ejection of steam is 0.001 kg s–1, estimate the maximum power of the heater",
+              "If the maximum rate of ejection of steam is 0.001 kg s⁻¹, estimate the maximum power of the heater",
               "0.001 kg",
               "0.001kg"
             ]
@@ -2831,7 +2831,7 @@ export const QUIZ_ITEMS = [
         ]
       }
     ],
-    "hint": "If the maximum rate of ejection of steam is 0.001 kg s–1, estimate the maximum power of t…",
+    "hint": "If the maximum rate of ejection of steam is 0.001 kg s⁻¹, estimate the maximum power of t…",
     "image": {
       "src": "./assets/f3-heat-lq-2425-q19d.png",
       "alt": "The following diagram shows a steam oven. When the oven operates, it turns water at 25 °C into stea…",
