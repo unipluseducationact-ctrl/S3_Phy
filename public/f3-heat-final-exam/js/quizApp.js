@@ -559,6 +559,7 @@ export function initQuiz() {
       wrap.className =
         "q-block p-5 md:p-6 rounded-2xl bg-surface border border-outline-variant/25 shadow-sm";
       wrap.id = "q-block-" + q.id;
+      wrap.dataset.startTime = String(Date.now());
 
       const head = document.createElement("div");
       head.className = "text-[11px] font-label-bold uppercase tracking-wide text-on-surface-variant mb-3";
@@ -800,6 +801,24 @@ export function initQuiz() {
         if (ok) {
           state.solved = true;
           attemptMap.set(q.id, state);
+          try {
+  const _startTime = parseInt(wrap.dataset.startTime || String(Date.now()));
+  window.parent.postMessage({
+    type: 'uniplus:quizAnswer',
+    subject: 'PHY',
+    quizId: 'f3-heat-final-exam',
+    questionId: q.id,
+    section: q.section,
+    difficulty: q.difficulty,
+    selectedAnswer: fmt === 'fill'
+      ? fillInputs.map(i => i.value).join('|')
+      : (state.selected || null),
+    correctAnswer: q.answer,
+    isCorrect: true,
+    attemptNumber: (state.wrong || 0) + 1,
+    msTaken: Date.now() - _startTime
+  }, '*');
+} catch (_) {}
           fb.className = "mt-3 text-body-sm p-3 rounded-xl bg-secondary/10 text-secondary font-label-bold";
           fb.textContent = t("correct");
           btn.disabled = true;
@@ -833,6 +852,24 @@ export function initQuiz() {
         } else {
           state.solved = true;
           attemptMap.set(q.id, state);
+          try {
+  const _startTime = parseInt(wrap.dataset.startTime || String(Date.now()));
+  window.parent.postMessage({
+    type: 'uniplus:quizAnswer',
+    subject: 'PHY',
+    quizId: 'f3-heat-final-exam',
+    questionId: q.id,
+    section: q.section,
+    difficulty: q.difficulty,
+    selectedAnswer: fmt === 'fill'
+      ? fillInputs.map(i => i.value).join('|')
+      : (state.selected || null),
+    correctAnswer: q.answer,
+    isCorrect: false,
+    attemptNumber: state.wrong,
+    msTaken: Date.now() - _startTime
+  }, '*');
+} catch (_) {}
           showModelAnswer();
           btn.disabled = true;
           optionButtons.forEach((b) => {
