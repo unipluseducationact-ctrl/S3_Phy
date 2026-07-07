@@ -416,6 +416,7 @@ export function initQuiz() {
       wrap.className =
         "q-block p-5 md:p-6 rounded-2xl bg-surface border border-outline-variant/25 shadow-sm";
       wrap.id = "q-block-" + q.id;
+      wrap.dataset.startTime = String(Date.now());
 
       const head = document.createElement("div");
       head.className = "text-[11px] font-label-bold uppercase tracking-wide text-on-surface-variant mb-3";
@@ -600,7 +601,25 @@ export function initQuiz() {
           if (!selected) return;
           ok = selected === q.answer;
         }
-
+// Uni+ tracker dispatch
+try {
+  const _startTime = parseInt(wrap.dataset.startTime || String(Date.now()));
+  window.parent.postMessage({
+    type: 'uniplus:quizAnswer',
+    subject: 'PHY',
+    quizId: 'heat-ch1',   
+    questionId: q.id,
+    section: q.section,
+    difficulty: q.difficulty,
+    selectedAnswer: fmt === 'fill'
+      ? fillInputs.map(i => i.value).join('|')
+      : (state.selected || null),
+    correctAnswer: q.answer,
+    isCorrect: ok,
+    attemptNumber: (state.wrong || 0) + 1,
+    msTaken: Date.now() - _startTime
+  }, '*');
+} catch (_) {}
         fb.classList.remove("hidden");
 
         if (ok) {
