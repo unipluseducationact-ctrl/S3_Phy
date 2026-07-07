@@ -178,6 +178,19 @@ tailwind.config = {
 </main>
 
 <div aria-hidden="true" id="quiz-pdf-sheet"></div>
-<script type="module" src="./js/quizApp.js?v=20260704c"></script>
+<script type="module">
+  const showLoadError = (err) => {
+    const msg = String(err?.message || err);
+    const box = document.getElementById("quiz-bank-summary");
+    if (box) {
+      box.innerHTML = `
+        <p class="font-label-bold text-tertiary mb-1">Quiz failed to load</p>
+        <p class="text-body-sm text-on-surface-variant">${msg.replace(/</g, "&lt;")}</p>
+        <p class="text-body-sm text-on-surface-variant mt-2">Try <strong>Ctrl+F5</strong> (hard refresh).</p>`;
+    }
+    console.error("Quiz module load failed:", err);
+  };
+  import("./js/quizApp.js?v=20260707a").catch(showLoadError);
+</script>
 </body>
 </html>

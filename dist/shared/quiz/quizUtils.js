@@ -318,6 +318,80 @@ export function allFillFieldsCorrect(q, values) {
   return i === values.length && i > 0;
 }
 
+function stemParagraphHtml(block) {
+  return `<p class="stem-block mb-3 last:mb-0">${block.replace(/\n/g, "<br>")}</p>`;
+}
+
+function isMarkdownTable(text) {
+  const lines = text.trim().split("\n").filter((line) => line.trim());
+  return lines.length >= 2 && lines.every((line) => line.includes("|"));
+}
+
+function markdownTableToHtml(text) {
+  const lines = text
+    .trim()
+    .split("\n")
+    .map((line) => line.trim())
+    .filter((line) => line && !/^\|[\s\-:|]+\|$/.test(line));
+  if (!lines.length) return stemParagraphHtml(text);
+
+  const parseRow = (line) => line.split("|").slice(1, -1).map((cell) => cell.trim());
+  let html =
+    '<div class="stem-table-wrap overflow-x-auto mb-3"><table class="stem-table w-full max-w-xl text-body-sm border-collapse border border-outline-variant/30">';
+
+  lines.forEach((line, i) => {
+    const cells = parseRow(line);
+    const tag = i === 0 ? "th" : "td";
+    html += `<tr class="${i === 0 ? "bg-surface-container-low" : ""}">`;
+    cells.forEach((cell, ci) => {
+      const cls =
+        i === 0
+          ? "px-3 py-2 border border-outline-variant/20 text-left font-label-bold"
+          : ci === 0
+            ? "px-3 py-2 border border-outline-variant/20 font-label-bold whitespace-nowrap"
+            : "px-3 py-2 border border-outline-variant/20";
+      html += `<${tag} class="${cls}">${cell}</${tag}>`;
+    });
+    html += "</tr>";
+  });
+
+  html += "</table></div>";
+  return html;
+}
+
+function expandStemBlocks(block) {
+  if (/\(\d+\)/.test(block)) {
+    const parts = block
+      .split(/(?=\(\d+\))/)
+      .map((part) => part.trim())
+      .filter(Boolean);
+    if (parts.length > 1) return parts;
+  }
+  if (/E(?:<sub>\d<\/sub>|[₀₁₂₃₄₅₆₇₈₉])\s*=/.test(block)) {
+    const parts = block
+      .split(/(?=E(?:<sub>\d<\/sub>|[₀₁₂₃₄₅₆₇₈₉])\s*=)/)
+      .map((part) => part.trim())
+      .filter(Boolean);
+    if (parts.length > 1) return parts;
+  }
+  return [block];
+}
+
+/** Render quiz stem with paragraphs, numbered blocks, and markdown tables. */
+export function formatStemHtml(text) {
+  if (!text) return "";
+  const s = escHtmlQuizText(formatQuizText(text));
+  return s
+    .split(/\n\n+/)
+    .map((part) => part.trim())
+    .filter(Boolean)
+    .map((section) => {
+      if (isMarkdownTable(section)) return markdownTableToHtml(section);
+      return expandStemBlocks(section).map(stemParagraphHtml).join("");
+    })
+    .join("");
+}
+
 export function modelAnswerText(q) {
   const f = questionFormat(q);
   if (f === "tf") {
