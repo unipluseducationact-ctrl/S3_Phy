@@ -745,6 +745,9 @@ export function initQuiz() {
           attemptMap.set(q.id, state);
           try {
   const _startTime = parseInt(wrap.dataset.startTime || String(Date.now()));
+  const _selAns = fmt === 'fill' ? fillInputs.map(i => i.value).join('|') : fmt === 'typein' ? (typeinInput?.value || state.typeinValue || null) : (state.selected || null);
+  const _selOpt = q.options?.find(o => o.key === state.selected);
+  const _corOpt = q.options?.find(o => o.key === q.answer);
   window.parent.postMessage({
     type: 'uniplus:quizAnswer',
     subject: 'PHY',
@@ -752,12 +755,11 @@ export function initQuiz() {
     questionId: q.id,
     section: q.section,
     difficulty: q.difficulty,
-    selectedAnswer: fmt === 'fill'
-      ? fillInputs.map(i => i.value).join('|')
-      : fmt === 'typein'
-      ? (typeinInput?.value || state.typeinValue || null)
-      : (state.selected || null),
+    stem: q.stem || null,
+    selectedAnswer: _selAns,
+    selectedAnswerText: fmt === 'mcq' ? (_selOpt?.text || null) : _selAns,
     correctAnswer: q.answer,
+    correctAnswerText: fmt === 'mcq' ? (_corOpt?.text || null) : null,
     isCorrect: true,
     attemptNumber: (state.wrong || 0) + 1,
     msTaken: Date.now() - _startTime
@@ -804,6 +806,9 @@ export function initQuiz() {
           attemptMap.set(q.id, state);
           try {
   const _startTime = parseInt(wrap.dataset.startTime || String(Date.now()));
+  const _selAns = fmt === 'fill' ? fillInputs.map(i => i.value).join('|') : fmt === 'typein' ? (typeinInput?.value || state.typeinValue || null) : (state.selected || null);
+  const _selOpt = q.options?.find(o => o.key === state.selected);
+  const _corOpt = q.options?.find(o => o.key === q.answer);
   window.parent.postMessage({
     type: 'uniplus:quizAnswer',
     subject: 'PHY',
@@ -811,12 +816,11 @@ export function initQuiz() {
     questionId: q.id,
     section: q.section,
     difficulty: q.difficulty,
-    selectedAnswer: fmt === 'fill'
-      ? fillInputs.map(i => i.value).join('|')
-      : fmt === 'typein'
-      ? (typeinInput?.value || state.typeinValue || null)
-      : (state.selected || null),
+    stem: q.stem || null,
+    selectedAnswer: _selAns,
+    selectedAnswerText: fmt === 'mcq' ? (_selOpt?.text || null) : _selAns,
     correctAnswer: q.answer,
+    correctAnswerText: fmt === 'mcq' ? (_corOpt?.text || null) : null,
     isCorrect: false,
     attemptNumber: state.wrong,
     msTaken: Date.now() - _startTime
