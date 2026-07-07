@@ -803,6 +803,8 @@ export function initQuiz() {
           attemptMap.set(q.id, state);
           try {
   const _startTime = parseInt(wrap.dataset.startTime || String(Date.now()));
+  const _selOpt = q.options?.find(o => o.key === state.selected);
+  const _corOpt = q.options?.find(o => o.key === q.answer);
   window.parent.postMessage({
     type: 'uniplus:quizAnswer',
     subject: 'PHY',
@@ -810,10 +812,11 @@ export function initQuiz() {
     questionId: q.id,
     section: q.section,
     difficulty: q.difficulty,
-    selectedAnswer: fmt === 'fill'
-      ? fillInputs.map(i => i.value).join('|')
-      : (state.selected || null),
+    stem: q.stem || null,
+    selectedAnswer: fmt === 'fill' ? fillInputs.map(i => i.value).join('|') : (state.selected || null),
+    selectedAnswerText: fmt === 'fill' ? fillInputs.map(i => i.value).join('|') : (_selOpt?.text || null),
     correctAnswer: q.answer,
+    correctAnswerText: fmt === 'fill' ? null : (_corOpt?.text || null),
     isCorrect: true,
     attemptNumber: (state.wrong || 0) + 1,
     msTaken: Date.now() - _startTime
@@ -854,6 +857,8 @@ export function initQuiz() {
           attemptMap.set(q.id, state);
           try {
   const _startTime = parseInt(wrap.dataset.startTime || String(Date.now()));
+  const _selOpt = q.options?.find(o => o.key === state.selected);
+  const _corOpt = q.options?.find(o => o.key === q.answer);
   window.parent.postMessage({
     type: 'uniplus:quizAnswer',
     subject: 'PHY',
@@ -861,10 +866,11 @@ export function initQuiz() {
     questionId: q.id,
     section: q.section,
     difficulty: q.difficulty,
-    selectedAnswer: fmt === 'fill'
-      ? fillInputs.map(i => i.value).join('|')
-      : (state.selected || null),
+    stem: q.stem || null,
+    selectedAnswer: fmt === 'fill' ? fillInputs.map(i => i.value).join('|') : (state.selected || null),
+    selectedAnswerText: fmt === 'fill' ? fillInputs.map(i => i.value).join('|') : (_selOpt?.text || null),
     correctAnswer: q.answer,
+    correctAnswerText: fmt === 'fill' ? null : (_corOpt?.text || null),
     isCorrect: false,
     attemptNumber: state.wrong,
     msTaken: Date.now() - _startTime
