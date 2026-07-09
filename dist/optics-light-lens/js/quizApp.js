@@ -1,6 +1,6 @@
-import { QUIZ_ITEMS, QUIZ_SECTIONS } from "./quizData.js?v=20260709a";
-import { sectionLabel, renderSessionSummary } from "./quizSummary.js?v=20260709a";
-import { downloadWord, printSheet } from "./quizExport.js?v=20260709a";
+import { QUIZ_ITEMS, QUIZ_SECTIONS } from "./quizData.js?v=20260709b";
+import { sectionLabel, renderSessionSummary } from "./quizSummary.js?v=20260709b";
+import { downloadWord, printSheet } from "./quizExport.js?v=20260709b";
 import {
   DIFFICULTY_LEVELS,
   difficultyLevel,
@@ -22,14 +22,14 @@ import {
   formatFilterLabel,
   buildQuizBankStats,
   filterQuizPool,
-} from "./quizUtils.js?v=20260709a";
+} from "./quizUtils.js?v=20260709b";
 import {
   animateSplitText,
   bindMagnets,
   bindTrueFocus,
   revealQuestionBlocks,
   initSettingsToggle,
-} from "./quizEffects.js?v=20260709a";
+} from "./quizEffects.js?v=20260709b";
 
 const UI = {
   en: {
@@ -608,7 +608,7 @@ export function initQuiz() {
             if (seg.type === "text") {
               const span = document.createElement("span");
               span.className = "fill-line-text whitespace-pre-wrap";
-              span.textContent = formatQuizText(seg.value || "");
+              span.innerHTML = escHtmlQuizText(formatQuizText(seg.value || ""));
               row.appendChild(span);
               return;
             }

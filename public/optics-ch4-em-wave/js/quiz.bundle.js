@@ -48,7 +48,7 @@
     { "id": "ex-q20", "section": "em-waves", "difficulty": "Standard", "stem": "Which of the following are applications of ultraviolet radiation?\n\n(1) Sterilization of water\n\n(2) Remote control\n\n(3) Checking of banknote", "options": [{ "key": "A", "text": "(1) and (2) only" }, { "key": "B", "text": "(1) and (3) only" }, { "key": "C", "text": "(2) and (3) only" }, { "key": "D", "text": "(1), (2) and (3)" }], "answer": "B", "hint": "Which of the following are applications of ultraviolet radiation?\n\n(1) Sterilization of water\n\n(2) Remote control\n\n(3) Checking of banknote" },
     { "id": "ex-q21", "section": "em-waves", "difficulty": "Standard", "stem": "Which of the following type of electromagnetic waves is best used for killing cancer cells?", "options": [{ "key": "A", "text": "Gamma rays" }, { "key": "B", "text": "Infrared radiation" }, { "key": "C", "text": "Visible light" }, { "key": "D", "text": "Ultraviolet radiation" }], "answer": "A", "hint": "Which of the following type of electromagnetic waves is best used for killing cancer cells?" },
     { "id": "ex-q22", "section": "em-waves", "difficulty": "Standard", "stem": "Which of the following correctly shows the uses of microwaves, radio waves and ultraviolet radiation? Microwaves, Radio waves, Ultraviolet radiation", "options": [{ "key": "A", "text": "Radar, Burglar alarm, Medical diagnosis" }, { "key": "B", "text": "Communication, TV broadcast, Checking banknote" }, { "key": "C", "text": "Tracer, Sterilizing water, Remote control" }, { "key": "D", "text": "Cooking, Radiotherapy, Thermography" }], "answer": "B", "hint": "Which of the following correctly shows the uses of microwaves, radio waves and ultraviolet radiation? Microwaves, Radio waves, Ultraviolet radiation" },
-    { "id": "ch4-q20", "section": "em-waves", "difficulty": "Standard", "stem": "Figure below shows part of the electromagnetic spectrum.", "format": "fill", "lines": [{ "segments": [{ "type": "text", "value": "(a) Which one has the longest wavelength, P, Q, R or S? " }, { "type": "blank", "accept": ["P"] }] }, { "segments": [{ "type": "text", "value": "(b) Which one has the highest speed in a vacuum? " }, { "type": "blank", "accept": ["same", "Same", "the same"] }] }, { "segments": [{ "type": "text", "value": "(c) What is the speed of Q in a vacuum? " }, { "type": "blank", "accept": ["300000000m s⁻¹", "300000000 m s⁻¹", "300000000", "300000000 m/s", "300000000 ms-1", "3\xD710^8 m s^-1", "3\xD710^(8) m s^(-1)", "3\xD710^8 m/s", "3 x 10^8 m s^-1", "3 x 10^8 m s-1", "3 x 10^8 m/s", "3\xD710^8 ms-1", "3\xD710^8 ms^-1", "3\xD710^(8) ms^(-1)", "3 x 10^8 ms^-1"] }] }, { "segments": [{ "type": "text", "value": "(d) Name P: " }, { "type": "blank", "accept": ["infrared", "infra-red", "infrared radiation", "infra-red radiation", "infared", "infared radiation"] }, { "type": "text", "value": " ; Name S: " }, { "type": "blank", "accept": ["ultraviolet", "ultra-violet", "ultraviolet radiation", "ultra-violet radiation"] }] }], "hint": "All EM waves travel at the same speed c in vacuum. Wavelength increases toward the red end of the diagram.", "image": { "src": "./assets/ch4-q20.png", "alt": "Diagram for ch4-q20", "caption": "Fig - ch4-q20" } },
+    { "id": "ch4-q20", "section": "em-waves", "difficulty": "Standard", "stem": "Figure below shows part of the electromagnetic spectrum.", "format": "fill", "lines": [{ "segments": [{ "type": "text", "value": "(a) Which one has the longest wavelength, P, Q, R or S? " }, { "type": "blank", "accept": ["P"] }] }, { "segments": [{ "type": "text", "value": "(b) Which one has the highest speed in a vacuum? " }, { "type": "blank", "accept": ["same", "Same", "the same"] }] }, { "segments": [{ "type": "text", "value": "(c) What is the speed of Q in a vacuum? " }, { "type": "blank", "accept": ["300000000m s⁻¹", "300000000 m s⁻¹", "300000000", "300000000 m/s", "300000000 ms-1", "3\xD710^8 m s^-1", "3\xD710^(8) m s^(-1)", "3\xD710^8 m/s", "3 x 10^8 m s^-1", "3 x 10^8 m s-1", "3 x 10^8 m/s", "3\xD710^8 ms-1", "3\xD710^8 ms^-1", "3\xD710^(8) ms^(-1)", "3 x 10^8 ms^-1"] }] }, { "segments": [{ "type": "text", "value": "(d) Name P: " }, { "type": "blank", "accept": ["infrared", "infra-red", "infrared radiation", "infra-red radiation", "infared", "infared radiation"] }, { "type": "text", "value": " ; Name S: " }, { "type": "blank", "accept": ["ultraviolet", "ultra-violet", "ultraviolet radiation", "ultra-violet radiation"] }] }], "hint": "All EM waves travel at the same speed c in vacuum. Wavelength increases toward the red end of the diagram.", "modelAnswer": "(a) P | (b) same | (c) 300000000m s<sup>−1</sup> | (d) infrared ; ultraviolet", "image": { "src": "./assets/ch4-q20.png", "alt": "Diagram for ch4-q20", "caption": "Fig - ch4-q20" } },
     { "id": "ch4-q21", "section": "em-waves", "difficulty": "Standard", "stem": "The electromagnetic spectrum is shown in the figure (radio waves, X, infra-red, visible light, Y, X-rays, Z).", "format": "fill", "lines": [{ "segments": [{ "type": "text", "value": "(a) X = " }, { "type": "blank", "accept": ["microwave", "microwaves"] }, { "type": "text", "value": " ; Y = " }, { "type": "blank", "accept": ["ultraviolet", "ultra-violet", "ultraviolet radiation"] }, { "type": "text", "value": " ; Z = " }, { "type": "blank", "accept": ["gamma rays", "gamma ray", "gamma radiation", "gamma"] }] }, { "segments": [{ "type": "text", "value": "(b)(i) Shortest wavelength: " }, { "type": "blank", "accept": ["gamma rays", "gamma", "Z", "gamma radiation"] }] }, { "segments": [{ "type": "text", "value": "(b)(ii) Lowest frequency: " }, { "type": "blank", "accept": ["radio waves", "radio wave", "radio"] }] }, { "segments": [{ "type": "text", "value": "(c) One application of Z: " }, { "type": "blank", "accept": ["killing cancer cells", "radiotherapy"] }] }], "hint": "Frequency increases toward the gamma-ray end; radio waves have the longest wavelength and lowest frequency.", "image": { "src": "./assets/ch4-q21.png", "alt": "Diagram for ch4-q21", "caption": "Fig - ch4-q21" } }
   ];
 
@@ -115,6 +115,20 @@
   }
   function escHtml(s) {
     return String(s).replace(/&/g, "&amp;").replace(/</g, "&lt;").replace(/>/g, "&gt;").replace(/"/g, "&quot;");
+  }
+  function escHtmlQuizText(s) {
+    const placeholders = [];
+    let marked = String(s);
+    marked = marked.replace(/<sup>([^<]+)<\/sup>/g, (_, content) => {
+      const token = `\u0000TAG${placeholders.length}\u0000`;
+      placeholders.push(`<sup>${content}</sup>`);
+      return token;
+    });
+    let out = escHtml(marked);
+    placeholders.forEach((tag, i) => {
+      out = out.replace(`\u0000TAG${i}\u0000`, tag);
+    });
+    return out;
   }
   function questionFormat(q) {
     return q.format || "mcq";
@@ -210,6 +224,7 @@
       return { en: `${word}.`, zh: `${wordZh}\u3002` };
     }
     if (f === "fill") {
+      if (q.modelAnswer) return { en: q.modelAnswer, zh: q.modelAnswerZh || "" };
       const lines = getFillLines(q);
       if (lines.length) {
         return { en: lines.map((line) => fillLineAnswerText(line)).join(" | "), zh: "" };
@@ -1187,7 +1202,7 @@
         const showModelAnswer = () => {
           const ma = modelAnswerText(q);
           fb.className = "mt-3 text-body-sm p-3 rounded-xl bg-tertiary/10 text-tertiary border border-tertiary/25";
-          fb.innerHTML = `<strong>${escHtml(t("modelPrefix"))}</strong> ${escHtml(ma.en)}${ma.zh ? `<span class="block mt-1 text-on-surface-variant">${escHtml(ma.zh)}</span>` : ""}`;
+          fb.innerHTML = `<strong>${escHtml(t("modelPrefix"))}</strong> ${escHtmlQuizText(ma.en)}${ma.zh ? `<span class="block mt-1 text-on-surface-variant">${escHtml(ma.zh)}</span>` : ""}`;
         };
         btn.addEventListener("click", () => {
           const state = attemptMap.get(q.id) || { wrong: 0, solved: false, selected: null };

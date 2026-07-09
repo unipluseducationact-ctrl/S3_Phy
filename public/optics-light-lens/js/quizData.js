@@ -1,4 +1,4 @@
-import { QUIZ_EXERCISES } from "./quizExercises.js?v=20260709a";
+import { QUIZ_EXERCISES } from "./quizExercises.js?v=20260709b";
 
 export const QUIZ_SECTIONS = [
   {

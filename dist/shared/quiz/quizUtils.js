@@ -76,17 +76,23 @@ export function escHtml(s) {
     .replace(/"/g, "&quot;");
 }
 
-/** Escape HTML but preserve safe <sub>letter</sub> tags from formatPhysicsSymbols. */
+/** Escape HTML but preserve safe <sub> and <sup> tags from formatPhysicsSymbols/units. */
 export function escHtmlQuizText(s) {
   const placeholders = [];
-  const marked = String(s).replace(/<sub>([a-zA-Z0-9])<\/sub>/g, (_, ch) => {
-    const token = `\u0000SUB${placeholders.length}\u0000`;
+  let marked = String(s);
+  marked = marked.replace(/<sub>([a-zA-Z0-9])<\/sub>/g, (_, ch) => {
+    const token = `\u0000TAG${placeholders.length}\u0000`;
     placeholders.push(`<sub>${ch}</sub>`);
+    return token;
+  });
+  marked = marked.replace(/<sup>([^<]+)<\/sup>/g, (_, content) => {
+    const token = `\u0000TAG${placeholders.length}\u0000`;
+    placeholders.push(`<sup>${content}</sup>`);
     return token;
   });
   let out = escHtml(marked);
   placeholders.forEach((tag, i) => {
-    out = out.replace(`\u0000SUB${i}\u0000`, tag);
+    out = out.replace(`\u0000TAG${i}\u0000`, tag);
   });
   return out;
 }
@@ -115,7 +121,7 @@ export function formatPhysicsUnits(s) {
   t = t.replace(/℃\s*[−–-]\s*1/gi, "°C⁻¹");
   t = t.replace(/L\s*[−–-]\s*1/gi, "L⁻¹");
   t = t.replace(/min\s*[−–-]\s*1/gi, "min⁻¹");
-  t = t.replace(/m\s+s\s*[−–-]\s*1/gi, "m s⁻¹");
+  t = t.replace(/m\s+s\s*[−–-]\s*1/gi, "m s<sup>−1</sup>");
   t = t.replace(/m\s*[−–-]\s*3/gi, "m³");
   return formatPhysicsSymbols(t);
 }
@@ -402,6 +408,9 @@ export function modelAnswerText(q) {
     return { en: `${word}.`, zh: `${wordZh}。` };
   }
   if (f === "fill") {
+    if (q.modelAnswer) {
+      return { en: q.modelAnswer, zh: q.modelAnswerZh || "" };
+    }
     const lines = getFillLines(q);
     if (lines.length) {
       return { en: lines.map((line) => fillLineAnswerText(line, q.answer)).join(" | "), zh: "" };

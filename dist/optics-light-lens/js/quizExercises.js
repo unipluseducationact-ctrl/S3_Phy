@@ -50,7 +50,7 @@ export const QUIZ_EXERCISES = [
     "format": "tf",
     "section": "reflection",
     "difficulty": "Standard",
-    "stem": "When a plane mirror moves towards an observer at 1 m s−1, the image moves towards the observer at 2 m s−1.",
+    "stem": "When a plane mirror moves towards an observer at 1 m s<sup>−1</sup>, the image moves towards the observer at 2 m s<sup>−1</sup>.",
     "options": [
       {
         "key": "T",
@@ -266,7 +266,7 @@ export const QUIZ_EXERCISES = [
         "segments": [
           {
             "type": "text",
-            "value": "When a plane mirror moves towards a girl at 1 m s−1, her image moves towards her at "
+            "value": "When a plane mirror moves towards a girl at 1 m s<sup>−1</sup>, her image moves towards her at "
           },
           {
             "type": "blank",
@@ -279,7 +279,7 @@ export const QUIZ_EXERCISES = [
           },
           {
             "type": "text",
-            "value": " m s−1."
+            "value": " m s<sup>−1</sup>."
           }
         ]
       }
