@@ -621,7 +621,7 @@ export function initQuiz() {
             if (seg.type === "text") {
               const span = document.createElement("span");
               span.className = "fill-line-text whitespace-pre-wrap";
-              span.textContent = seg.value || "";
+              span.textContent = formatQuizText(seg.value || "");
               row.appendChild(span);
               return;
             }

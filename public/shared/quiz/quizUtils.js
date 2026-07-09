@@ -115,6 +115,7 @@ export function formatPhysicsUnits(s) {
   t = t.replace(/℃\s*[−–-]\s*1/gi, "°C⁻¹");
   t = t.replace(/L\s*[−–-]\s*1/gi, "L⁻¹");
   t = t.replace(/min\s*[−–-]\s*1/gi, "min⁻¹");
+  t = t.replace(/m\s+s\s*[−–-]\s*1/gi, "m s⁻¹");
   t = t.replace(/m\s*[−–-]\s*3/gi, "m³");
   return formatPhysicsSymbols(t);
 }

@@ -416,6 +416,7 @@ export function initQuiz() {
       wrap.className =
         "q-block p-5 md:p-6 rounded-2xl bg-surface border border-outline-variant/25 shadow-sm";
       wrap.id = "q-block-" + q.id;
+      wrap.dataset.startTime = String(Date.now());
 
       const head = document.createElement("div");
       head.className = "text-[11px] font-label-bold uppercase tracking-wide text-on-surface-variant mb-3";
@@ -473,7 +474,7 @@ export function initQuiz() {
             if (seg.type === "text") {
               const span = document.createElement("span");
               span.className = "fill-line-text whitespace-pre-wrap";
-              span.textContent = seg.value || "";
+              span.textContent = formatQuizText(seg.value || "");
               row.appendChild(span);
               return;
             }
@@ -600,12 +601,32 @@ export function initQuiz() {
           if (!selected) return;
           ok = selected === q.answer;
         }
-
         fb.classList.remove("hidden");
 
         if (ok) {
           state.solved = true;
           attemptMap.set(q.id, state);
+          try {
+            const _startTime = parseInt(wrap.dataset.startTime || String(Date.now()));
+            const _selOpt = q.options?.find(o => o.key === state.selected);
+            const _corOpt = q.options?.find(o => o.key === q.answer);
+            window.parent.postMessage({
+              type: 'uniplus:quizAnswer',
+              subject: 'PHY',
+              quizId: 'heat-ch1',
+              questionId: q.id,
+              section: q.section,
+              difficulty: q.difficulty,
+              stem: q.stem || null,
+              selectedAnswer: fmt === 'fill' ? fillInputs.map(i => i.value).join('|') : (state.selected || null),
+              selectedAnswerText: fmt === 'fill' ? fillInputs.map(i => i.value).join('|') : (_selOpt?.text || null),
+              correctAnswer: q.answer,
+              correctAnswerText: fmt === 'fill' ? null : (_corOpt?.text || null),
+              isCorrect: true,
+              attemptNumber: (state.wrong || 0) + 1,
+              msTaken: Date.now() - _startTime
+            }, '*');
+          } catch (_) {}
           fb.className = "mt-3 text-body-sm p-3 rounded-xl bg-secondary/10 text-secondary font-label-bold";
           fb.textContent = t("correct");
           btn.disabled = true;
@@ -635,6 +656,27 @@ export function initQuiz() {
 
         state.solved = true;
         attemptMap.set(q.id, state);
+        try {
+          const _startTime = parseInt(wrap.dataset.startTime || String(Date.now()));
+          const _selOpt = q.options?.find(o => o.key === state.selected);
+          const _corOpt = q.options?.find(o => o.key === q.answer);
+          window.parent.postMessage({
+            type: 'uniplus:quizAnswer',
+            subject: 'PHY',
+            quizId: 'heat-ch1',
+            questionId: q.id,
+            section: q.section,
+            difficulty: q.difficulty,
+            stem: q.stem || null,
+            selectedAnswer: fmt === 'fill' ? fillInputs.map(i => i.value).join('|') : (state.selected || null),
+            selectedAnswerText: fmt === 'fill' ? fillInputs.map(i => i.value).join('|') : (_selOpt?.text || null),
+            correctAnswer: q.answer,
+            correctAnswerText: fmt === 'fill' ? null : (_corOpt?.text || null),
+            isCorrect: false,
+            attemptNumber: state.wrong,
+            msTaken: Date.now() - _startTime
+          }, '*');
+        } catch (_) {}
         showModelAnswer();
         btn.disabled = true;
         optionButtons.forEach((b) => {

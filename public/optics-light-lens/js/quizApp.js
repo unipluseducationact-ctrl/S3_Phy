@@ -6,6 +6,9 @@ import {
   difficultyLevel,
   seededShuffle,
   escHtml,
+  escHtmlQuizText,
+  formatQuizText,
+  formatStemHtml,
   modelAnswerText,
   resolveQuizLang,
   isChineseUI,
@@ -534,10 +537,10 @@ export function initQuiz() {
         wrap.appendChild(fig);
       }
 
-      const stem = document.createElement("p");
+      const stem = document.createElement("div");
       stem.className =
-        "split-text-target font-headline-lg-mobile text-headline-lg-mobile text-on-surface mb-1 leading-tight whitespace-pre-line";
-      stem.textContent = q.stem;
+        "split-text-target font-headline-lg-mobile text-headline-lg-mobile text-on-surface mb-1 leading-tight";
+      stem.innerHTML = formatStemHtml(q.stem);
       wrap.appendChild(stem);
 
       if (q.stemZh) {
@@ -605,7 +608,7 @@ export function initQuiz() {
             if (seg.type === "text") {
               const span = document.createElement("span");
               span.className = "fill-line-text whitespace-pre-wrap";
-              span.textContent = seg.value || "";
+              span.textContent = formatQuizText(seg.value || "");
               row.appendChild(span);
               return;
             }
@@ -652,7 +655,7 @@ export function initQuiz() {
 
           const text = document.createElement("span");
           text.className = "font-body-md text-on-surface flex-1 text-left";
-          text.innerHTML = `${escHtml(opt.text)}${
+          text.innerHTML = `${escHtmlQuizText(formatQuizText(opt.text))}${
             opt.textZh ? `<span class="block text-body-sm text-on-surface-variant mt-1">${escHtml(opt.textZh)}</span>` : ""
           }`;
 
@@ -712,7 +715,7 @@ export function initQuiz() {
       const showModelAnswer = () => {
         const ma = modelAnswerText(q);
         fb.className = "mt-3 text-body-sm p-3 rounded-xl bg-tertiary/10 text-tertiary border border-tertiary/25";
-        fb.innerHTML = `<strong>${escHtml(t("modelPrefix"))}</strong> ${escHtml(ma.en)}${
+        fb.innerHTML = `<strong>${escHtml(t("modelPrefix"))}</strong> ${escHtmlQuizText(formatQuizText(ma.en))}${
           ma.zh ? `<span class="block mt-1 text-on-surface-variant">${escHtml(ma.zh)}</span>` : ""
         }`;
       };

@@ -348,6 +348,7 @@ function createWorldView(canvas, opts = {}) {
     gridStep,
     worldBounds: opts.worldBounds ?? { xMin: -1, xMax: 5, yMin: 0, yMax: 3 },
     pxPerM: opts.pxPerM ?? null,
+    zoomFactor: opts.zoomFactor ?? 1,
     showGrid: opts.showGrid !== false,
     horizontalGridScale: opts.horizontalGridScale ?? 1,
   };
@@ -359,13 +360,16 @@ function getCanvasLayout(canvas) {
   return { w: rect.width, h: rect.height, rect };
 }
 
-function resizeCanvasToDisplay(canvas) {
+function resizeCanvasToDisplay(canvas, opts = {}) {
+  const maxHeight = opts.maxHeight ?? 520;
+  const minHeight = opts.minHeight ?? 400;
+  const aspect = opts.aspect ?? 0.62;
   const parent = canvas.parentElement;
   const parentRect = parent
     ? parent.getBoundingClientRect()
     : { width: canvas.clientWidth || 600, height: canvas.clientHeight || 400 };
   const w = Math.max(600, Math.floor(parentRect.width - 20));
-  const h = Math.max(400, Math.min(520, Math.floor(w * 0.62)));
+  const h = Math.max(minHeight, Math.min(maxHeight, Math.floor(w * aspect)));
   const dpr = window.devicePixelRatio || 1;
   canvas.style.flex = 'none';
   canvas.style.width = `${w}px`;
@@ -401,7 +405,9 @@ function computeTransform(view, canvasW, canvasH) {
   const plotH = canvasH - margin.top - margin.bottom;
   const worldW = worldBounds.xMax - worldBounds.xMin;
   const worldH = worldBounds.yMax - worldBounds.yMin;
-  const pxPerM = view.pxPerM ?? Math.min(plotW / worldW, plotH / worldH);
+  const fitPxPerM = view.pxPerM ?? Math.min(plotW / worldW, plotH / worldH);
+  const zoom = view.zoomFactor ?? 1;
+  const pxPerM = fitPxPerM * zoom;
   const usedW = worldW * pxPerM;
   const usedH = worldH * pxPerM;
   /* Centre world bounds in plot area when aspect ratios differ */
@@ -943,6 +949,10 @@ const STRINGS = {
     wedgeOrientation: '旋轉 φ',
     wedgeHintObject: '拖曳物件移動',
     wedgeClearSketch: '清除作圖',
+    zoomIn: '放大',
+    zoomOut: '縮小',
+    zoomFit: '適配',
+    zoomScrollHint: '滾輪縮放',
     showRays: '顯示光線',
     showImages: '顯示虛像',
     addObject: '新增物件',
@@ -1059,6 +1069,10 @@ const STRINGS = {
     wedgeOrientation: 'Rotation φ',
     wedgeHintObject: 'Drag object to move',
     wedgeClearSketch: 'Clear sketches',
+    zoomIn: 'Zoom in',
+    zoomOut: 'Zoom out',
+    zoomFit: 'Fit',
+    zoomScrollHint: 'Scroll to zoom',
     showRays: 'Show rays',
     showImages: 'Show virtual images',
     addObject: 'Add object',
@@ -1862,6 +1876,9 @@ function createSeeBackObjectScenario() {
 const MIRROR_LEN = 3.5;
 const HIT_PX = 18;
 const THETA_VALUES = [30, 36, 40, 45, 60, 72, 90];
+const ZOOM_MIN = 0.5;
+const ZOOM_MAX = 3.0;
+const ZOOM_STEP = 1.15;
 
 const SKETCH_TOOLS = ['object', 'observer', 'realRay', 'virtualRay'];
 const SKETCH_TOOL_META = {
@@ -1972,21 +1989,21 @@ function resolveHighlightMirror(step, set, c) {
 function drawMirrorHighlight(ctx, txf, a, b, { virtual, pulse }) {
   const s0 = { x: txf.ox + a.x * txf.pxPerM, y: txf.oy - a.y * txf.pxPerM };
   const s1 = { x: txf.ox + b.x * txf.pxPerM, y: txf.oy - b.y * txf.pxPerM };
-  const glowW = 16 + 10 * pulse;
-  const coreW = 5 + 5 * pulse;
+  const glowW = 8 + 4 * pulse;
+  const coreW = 3 + 2 * pulse;
   ctx.save();
   ctx.lineCap = 'round';
-  ctx.shadowColor = 'rgba(255,220,80,0.95)';
-  ctx.shadowBlur = 8 + 14 * pulse;
-  ctx.strokeStyle = `rgba(255,255,255,${0.35 + 0.45 * pulse})`;
-  ctx.lineWidth = glowW + 6;
+  ctx.shadowColor = 'rgba(255,220,80,0.55)';
+  ctx.shadowBlur = 3 + 5 * pulse;
+  ctx.strokeStyle = `rgba(255,255,255,${0.2 + 0.25 * pulse})`;
+  ctx.lineWidth = glowW + 3;
   ctx.setLineDash([]);
   ctx.beginPath();
   ctx.moveTo(s0.x, s0.y);
   ctx.lineTo(s1.x, s1.y);
   ctx.stroke();
   ctx.shadowBlur = 0;
-  ctx.strokeStyle = `rgba(255,204,0,${0.55 + 0.45 * pulse})`;
+  ctx.strokeStyle = `rgba(255,204,0,${0.35 + 0.35 * pulse})`;
   ctx.lineWidth = glowW;
   if (virtual) ctx.setLineDash([8, 6]);
   ctx.beginPath();
@@ -2002,15 +2019,23 @@ function drawMirrorHighlight(ctx, txf, a, b, { virtual, pulse }) {
   ctx.lineTo(s1.x, s1.y);
   ctx.stroke();
   ctx.setLineDash([]);
-  const tipR = 6 + 5 * pulse;
-  ctx.fillStyle = `rgba(255,204,0,${0.5 + 0.5 * pulse})`;
+  const tipR = 4 + 2 * pulse;
+  ctx.fillStyle = `rgba(255,204,0,${0.35 + 0.35 * pulse})`;
   ctx.beginPath();
   ctx.arc(s1.x, s1.y, tipR, 0, Math.PI * 2);
   ctx.fill();
   ctx.strokeStyle = '#fff';
-  ctx.lineWidth = 2;
+  ctx.lineWidth = 1.5;
   ctx.stroke();
   ctx.restore();
+}
+
+/** Short mirror endpoint for fit bounds (avoids zooming out for full MIRROR_LEN). */
+function mirrorFitPoint(pt) {
+  const dist = Math.hypot(pt.x, pt.y);
+  if (dist < 1e-6) return { ...pt };
+  const len = Math.min(MIRROR_LEN, dist * 0.6);
+  return { x: (pt.x / dist) * len, y: (pt.y / dist) * len };
 }
 
 function defaultObjectInWedge(index, orientationDeg) {
@@ -2061,7 +2086,10 @@ function createAngledMirrorsScenario() {
   let nextSketchId = 1;
   let cursorWorld = null;
   let refreshToolbarRef = null;
+  let refreshZoomLabelRef = null;
   let highlightRaf = null;
+  let zoomFactor = 1;
+  let pointerHandlers = null;
   const animator = new RayAnimator();
   animator.rayCount = 1;
 
@@ -2172,14 +2200,36 @@ function createAngledMirrorsScenario() {
     return { theta, half, phi, m1, m2, objectSets, nFormula };
   }
 
+  function clampZoom(z) {
+    return clamp(z, ZOOM_MIN, ZOOM_MAX);
+  }
+
+  function setZoom(next) {
+    zoomFactor = clampZoom(next);
+    if (view) view.zoomFactor = zoomFactor;
+    refreshZoomLabelRef?.();
+    canvasRef && draw(canvasRef);
+  }
+
+  function resetZoom() {
+    zoomFactor = 1;
+    if (view) view.zoomFactor = 1;
+    refreshZoomLabelRef?.();
+  }
+
+  function adjustZoom(direction) {
+    setZoom(direction > 0 ? zoomFactor * ZOOM_STEP : zoomFactor / ZOOM_STEP);
+  }
+
   function fitBounds(c) {
+    const pad = Math.max(0.45, 1.0 - c.nFormula * 0.08);
     const pts = [{ x: 0, y: 0 }];
     c.objectSets.forEach((set) => {
       pts.push(set.object);
       set.images.forEach((im, idx) => {
         pts.push(im.pt);
-        if (idx >= 2) pts.push(im.mirror.b);
-        if (im.altConstruction) pts.push(im.altConstruction.mirror.b);
+        if (idx >= 2) pts.push(mirrorFitPoint(im.pt));
+        if (im.altConstruction) pts.push(mirrorFitPoint(im.pt));
       });
     });
     observers.forEach((o) => pts.push(o.pt));
@@ -2193,10 +2243,10 @@ function createAngledMirrorsScenario() {
       yMax = Math.max(yMax, p.y);
     });
     view.worldBounds = {
-      xMin: xMin - 0.8,
-      xMax: xMax + 0.8,
-      yMin: yMin - 0.8,
-      yMax: yMax + 0.8,
+      xMin: xMin - pad,
+      xMax: xMax + pad,
+      yMin: yMin - pad,
+      yMax: yMax + pad,
     };
   }
 
@@ -2230,6 +2280,7 @@ function createAngledMirrorsScenario() {
     sketchTool = 'object';
     clearSketch();
     nextSketchId = 1;
+    resetZoom();
     resetObjects();
     resetAnimation();
     refreshToolbarRef?.();
@@ -2245,6 +2296,7 @@ function createAngledMirrorsScenario() {
         obj.x = p.x;
         obj.y = p.y;
       });
+      resetZoom();
       resetAnimation();
       return;
     }
@@ -2276,6 +2328,19 @@ function createAngledMirrorsScenario() {
     }
     if (id === 'clearSketch') {
       clearSketch();
+      canvasRef && draw(canvasRef);
+      return;
+    }
+    if (id === 'zoomIn') {
+      adjustZoom(1);
+      return;
+    }
+    if (id === 'zoomOut') {
+      adjustZoom(-1);
+      return;
+    }
+    if (id === 'zoomFit') {
+      resetZoom();
       canvasRef && draw(canvasRef);
     }
   }
@@ -2482,12 +2547,36 @@ function createAngledMirrorsScenario() {
     canvas.addEventListener('pointermove', onMove);
     canvas.addEventListener('pointerup', onUp);
     canvas.addEventListener('pointercancel', onUp);
+
+    const onWheel = (e) => {
+      e.preventDefault();
+      adjustZoom(e.deltaY < 0 ? 1 : -1);
+    };
+    canvas.addEventListener('wheel', onWheel, { passive: false });
+    pointerHandlers = { canvas, onDown, onMove, onUp, onWheel };
+  }
+
+  function unbindPointer() {
+    if (!pointerHandlers) return;
+    const { canvas, onDown, onMove, onUp, onWheel } = pointerHandlers;
+    canvas.removeEventListener('pointerdown', onDown);
+    canvas.removeEventListener('pointermove', onMove);
+    canvas.removeEventListener('pointerup', onUp);
+    canvas.removeEventListener('pointercancel', onUp);
+    canvas.removeEventListener('wheel', onWheel);
+    pointerHandlers = null;
   }
 
   function init(canvas) {
     canvasRef = canvas;
     if (!objects.length) resetObjects();
-    view = createWorldView(canvas, { worldBounds: { xMin: -1, xMax: 5, yMin: -0.5, yMax: 4.5 }, gridStep: 1 });
+    view = createWorldView(canvas, {
+      worldBounds: { xMin: -1, xMax: 5, yMin: -0.5, yMax: 4.5 },
+      gridStep: 1,
+      margin: { left: 40, right: 24, top: 24, bottom: 40 },
+      zoomFactor: 1,
+    });
+    zoomFactor = 1;
     animator.onUpdate = () => draw(canvas);
     resetAnimation();
     bindPointer(canvas);
@@ -2495,6 +2584,7 @@ function createAngledMirrorsScenario() {
 
   function teardown() {
     cancelHighlightRaf();
+    unbindPointer();
     canvasRef = null;
     dragTarget = null;
     draggingObjectId = null;
@@ -2588,8 +2678,43 @@ function createAngledMirrorsScenario() {
     });
     root.appendChild(clearBtn);
 
+    const zoomRow = document.createElement('div');
+    zoomRow.className = 'zoom-toolbar';
+    const zoomOutBtn = document.createElement('button');
+    zoomOutBtn.type = 'button';
+    zoomOutBtn.className = 'btn btn-compact';
+    zoomOutBtn.dataset.i18n = 'zoomOut';
+    zoomOutBtn.title = '−';
+    zoomOutBtn.textContent = '−';
+    zoomOutBtn.addEventListener('click', () => handleAction('zoomOut'));
+    const zoomLabel = document.createElement('span');
+    zoomLabel.className = 'zoom-label';
+    zoomLabel.textContent = '100%';
+    const zoomInBtn = document.createElement('button');
+    zoomInBtn.type = 'button';
+    zoomInBtn.className = 'btn btn-compact';
+    zoomInBtn.dataset.i18n = 'zoomIn';
+    zoomInBtn.title = '+';
+    zoomInBtn.textContent = '+';
+    zoomInBtn.addEventListener('click', () => handleAction('zoomIn'));
+    const zoomFitBtn = document.createElement('button');
+    zoomFitBtn.type = 'button';
+    zoomFitBtn.className = 'btn btn-compact';
+    zoomFitBtn.dataset.i18n = 'zoomFit';
+    zoomFitBtn.addEventListener('click', () => handleAction('zoomFit'));
+    zoomRow.appendChild(zoomOutBtn);
+    zoomRow.appendChild(zoomLabel);
+    zoomRow.appendChild(zoomInBtn);
+    zoomRow.appendChild(zoomFitBtn);
+    root.appendChild(zoomRow);
+
     container.appendChild(root);
     applyI18n(root);
+
+    refreshZoomLabelRef = () => {
+      zoomLabel.textContent = `${Math.round(zoomFactor * 100)}%`;
+    };
+    refreshZoomLabelRef();
 
     function refreshToolbar() {
       const meta = SKETCH_TOOL_META[sketchTool];
@@ -2603,10 +2728,12 @@ function createAngledMirrorsScenario() {
   }
 
   function draw(canvas) {
-    const { w, h, ctx } = resizeCanvasToDisplay(canvas);
     const c = compute();
+    const maxHeight = Math.min(720, 460 + c.nFormula * 36);
+    const { w, h, ctx } = resizeCanvasToDisplay(canvas, { maxHeight });
     syncAnimator(c);
     if (dragTarget?.type !== 'object') fitBounds(c);
+    if (view) view.zoomFactor = zoomFactor;
     const txf = computeTransform(view, w, h);
     const apexWorld = { x: 0, y: 0 };
     clear(ctx, w, h);
@@ -2644,9 +2771,9 @@ function createAngledMirrorsScenario() {
     drawMirror(ctx, view, txf, c.m1.a, c.m1.b, 'M₁');
     drawMirror(ctx, view, txf, c.m2.a, c.m2.b, 'M₂');
 
-    ctx.fillStyle = 'rgba(255,204,0,0.25)';
+    ctx.fillStyle = 'rgba(255,204,0,0.12)';
     ctx.beginPath();
-    ctx.arc(ax0.x, ax0.y, 8, 0, Math.PI * 2);
+    ctx.arc(ax0.x, ax0.y, 5, 0, Math.PI * 2);
     ctx.fill();
 
     const stepIndex = animator.stepIndex;
@@ -2672,7 +2799,14 @@ function createAngledMirrorsScenario() {
     const highlight = primarySet
       ? resolveHighlightMirror(activeStep, primarySet, c)
       : null;
-    const pulse = highlight ? 0.5 + 0.5 * Math.sin(performance.now() / 180) : 0;
+    const pulse = highlight ? 0.5 + 0.5 * Math.sin(performance.now() / 260) : 0;
+
+    if (highlight) {
+      drawMirrorHighlight(ctx, txf, highlight.a, highlight.b, {
+        virtual: highlight.virtual,
+        pulse,
+      });
+    }
 
     if (params.showImages) {
       c.objectSets.forEach((set) => {
@@ -2717,13 +2851,6 @@ function createAngledMirrorsScenario() {
 
     drawSketchPreview(ctx, view, txf);
 
-    if (highlight) {
-      drawMirrorHighlight(ctx, txf, highlight.a, highlight.b, {
-        virtual: highlight.virtual,
-        pulse,
-      });
-    }
-
     const angM1 = Math.atan2(-c.m1.b.y, c.m1.b.x);
     const angM2 = Math.atan2(-c.m2.b.y, c.m2.b.x);
     ctx.strokeStyle = 'rgba(255,204,0,0.3)';
@@ -2742,6 +2869,7 @@ function createAngledMirrorsScenario() {
     } else {
       drawLabel(ctx, 12, 22, t('wedgeHintObject'), COLORS.mirrorNeed);
     }
+    drawLabel(ctx, 12, h - 12, t('zoomScrollHint'), 'rgba(228,228,231,0.45)');
 
     if (highlight && !showAll && canvasRef) {
       scheduleHighlightPulse(canvas);
