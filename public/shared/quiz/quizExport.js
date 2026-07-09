@@ -6,7 +6,7 @@ import {
   getFillLines,
   splitNumberedStatements,
   formatQuizText,
-} from "./quizUtils.js";
+} from "./quizUtils.js?v=20260709a";
 
 const EXPORT_FIG_STYLE = "page-break-inside:avoid;break-inside:avoid-page;margin:0.75rem 0";
 const EXPORT_HEAD_STYLE =

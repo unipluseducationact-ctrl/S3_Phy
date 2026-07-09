@@ -1,5 +1,5 @@
-import { QUIZ_SECTIONS } from "./quizData.js?v=20260629-6";
-import { escHtml, isChineseUI } from "./quizUtils.js?v=20260629-6";
+import { QUIZ_SECTIONS } from "./quizData.js?v=20260709a";
+import { escHtml, isChineseUI } from "./quizUtils.js?v=20260709a";
 
 export function sectionLabel(id, lang) {
   const row = QUIZ_SECTIONS.find((s) => s.id === id);
