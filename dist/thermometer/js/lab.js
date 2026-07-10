@@ -517,6 +517,32 @@ export function createThermometerLab(t, options = {}) {
     return gy + gh - ((v - minV) / (maxV - minV)) * gh;
   }
 
+  /** Temperature span where R(T) stays inside the visible y-axis range. */
+  function getVisibleResistanceLineRange(minT, maxT, minR, maxR) {
+    const r0 = state.resistanceR0;
+    const slope = (state.resistanceR100 - state.resistanceR0) / 100;
+    let tStart = minT;
+    let tEnd = maxT;
+
+    if (Math.abs(slope) > 1e-9) {
+      const tAtMinR = (minR - r0) / slope;
+      const tAtMaxR = (maxR - r0) / slope;
+      const tLow = Math.min(tAtMinR, tAtMaxR);
+      const tHigh = Math.max(tAtMinR, tAtMaxR);
+      tStart = Math.max(minT, tLow);
+      tEnd = Math.min(maxT, tHigh);
+    } else if (r0 < minR || r0 > maxR) {
+      return null;
+    }
+
+    if (tEnd <= tStart) {
+      tStart = minT;
+      tEnd = Math.min(100, maxT);
+    }
+
+    return { tStart, tEnd };
+  }
+
   function drawGraphAxes(ctx, layout, minT, maxT, tStep, yTicks, activeTemp = null) {
     const { gx, gy, gw, gh, tickFont, axisFont, yLabelX, xLabelY } = layout;
 
@@ -1466,21 +1492,27 @@ export function createThermometerLab(t, options = {}) {
     ctx.fillText('temperature / °C', gx + gw / 2, xLabelY);
 
     const { minT, maxT } = tempScale;
-    const px0 = mapGraphX(0, minT, maxT, gx, gw);
-    const py0 = mapGraphY(state.resistanceR0, minR, maxR, gy, gh);
-    const px100 = mapGraphX(100, minT, maxT, gx, gw);
-    const py100 = mapGraphY(state.resistanceR100, minR, maxR, gy, gh);
-    const pxEnd = mapGraphX(maxT, minT, maxT, gx, gw);
-    const pyEnd = mapGraphY(resistanceAtTemp(maxT), minR, maxR, gy, gh);
+    const lineRange = getVisibleResistanceLineRange(minT, maxT, minR, maxR);
 
-    // Linear calibration line (ice point -> steam point, extended across axis range)
-    ctx.strokeStyle = '#6366f1';
-    ctx.lineWidth = 3;
-    ctx.beginPath();
-    ctx.moveTo(px0, py0);
-    ctx.lineTo(px100, py100);
-    if (maxT > 100) ctx.lineTo(pxEnd, pyEnd);
-    ctx.stroke();
+    // Linear calibration line, clipped to visible graph area
+    if (lineRange) {
+      const pxStart = mapGraphX(lineRange.tStart, minT, maxT, gx, gw);
+      const pyStart = mapGraphY(resistanceAtTemp(lineRange.tStart), minR, maxR, gy, gh);
+      const pxEndLine = mapGraphX(lineRange.tEnd, minT, maxT, gx, gw);
+      const pyEndLine = mapGraphY(resistanceAtTemp(lineRange.tEnd), minR, maxR, gy, gh);
+
+      ctx.save();
+      ctx.beginPath();
+      ctx.rect(gx, gy, gw, gh);
+      ctx.clip();
+      ctx.strokeStyle = '#6366f1';
+      ctx.lineWidth = 3;
+      ctx.beginPath();
+      ctx.moveTo(pxStart, pyStart);
+      ctx.lineTo(pxEndLine, pyEndLine);
+      ctx.stroke();
+      ctx.restore();
+    }
 
     const currentT = state.thermometerTemp;
     const currentR = state.currentResistance;
