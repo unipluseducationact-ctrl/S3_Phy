@@ -3,7 +3,7 @@ import { getLang } from '../i18n.js';
 export function createLabIframe(t, opts) {
   const { slug, titleKey, className, entry = 'index.html', langParam = true, extraParams = () => '' } = opts;
   const wrap = document.createElement('div');
-  wrap.className = className;
+  wrap.className = `${className} tool-lab-embed`;
   const iframe = document.createElement('iframe');
   const base = import.meta.env.BASE_URL || '/';
   const root = base.endsWith('/') ? base : `${base}/`;

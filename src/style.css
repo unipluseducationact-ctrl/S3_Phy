@@ -905,16 +905,22 @@ a {
 }
 
 /* Fullscreen — iframe lab wrappers */
+.tool-stage:fullscreen .tool-lab-embed,
 .tool-stage:fullscreen .tool-lens-simulator,
 .tool-stage:fullscreen .tool-tir-escape,
 .tool-stage:fullscreen .tool-plane-mirror-lab,
+.tool-stage:fullscreen .tool-rotating-mirror-lab,
+.tool-stage:fullscreen .tool-rgb-color-mixer,
+.tool-stage:fullscreen .tool-thermometer-lab,
 .tool-stage:fullscreen .tool-em-spectrum,
 .tool-stage:fullscreen .tool-specific-heat,
 .tool-stage:fullscreen .tool-thermal-mixing,
 .tool-stage:fullscreen .tool-change-of-state,
 .tool-stage:fullscreen .tool-heat-transfer,
+.tool-stage.tool-stage--overlay-fullscreen .tool-lab-embed,
 .tool-stage.tool-stage--overlay-fullscreen .tool-change-of-state,
 .tool-stage.tool-stage--overlay-fullscreen .tool-heat-transfer,
+#app.is-lab-fullscreen .tool-lab-embed,
 #app.is-lab-fullscreen .tool-change-of-state,
 #app.is-lab-fullscreen .tool-heat-transfer,
 #app.is-lab-fullscreen .tool-specific-heat,
@@ -1170,9 +1176,13 @@ a {
   display: none;
 }
 
+.tool-lab-embed,
 .tool-lens-simulator,
 .tool-tir-escape,
 .tool-plane-mirror-lab,
+.tool-rotating-mirror-lab,
+.tool-rgb-color-mixer,
+.tool-thermometer-lab,
 .tool-em-spectrum,
 .tool-optics-light-lens-quiz,
 .tool-optics-ch3-quiz,
@@ -1190,11 +1200,17 @@ a {
   flex-direction: column;
 }
 
+.tool-lab-embed iframe,
 .tool-lens-simulator iframe,
 .tool-tir-escape iframe,
 .tool-plane-mirror-lab iframe,
+.tool-rotating-mirror-lab iframe,
+.tool-rgb-color-mixer iframe,
+.tool-thermometer-lab iframe,
 .tool-em-spectrum iframe,
 .tool-optics-light-lens-quiz iframe,
+.tool-optics-ch3-quiz iframe,
+.tool-optics-ch4-em-quiz iframe,
 .tool-heat-final-exam-quiz iframe,
 .tool-heat-ch1-quiz iframe,
 .tool-specific-heat iframe,

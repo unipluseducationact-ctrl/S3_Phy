@@ -312,6 +312,160 @@ html.s3phy-embed .app-root {
   cursor: grabbing;
 }
 
+/* Hub iframe — standalone labs (rotating-mirror, rgb, thermometer) */
+html.s3phy-embed:has(#app > .rml),
+html.s3phy-embed:has(#app > .rgb-mixer),
+html.s3phy-embed:has(#app > .tl-wrap) {
+  height: 100%;
+}
+
+html.s3phy-embed body:has(#app > .rml),
+html.s3phy-embed body:has(#app > .rgb-mixer),
+html.s3phy-embed body:has(#app > .tl-wrap) {
+  height: 100%;
+  min-height: 0 !important;
+  display: flex;
+  flex-direction: column;
+  overflow: hidden;
+}
+
+html.s3phy-embed body:has(#app > .rml) #app,
+html.s3phy-embed body:has(#app > .rgb-mixer) #app,
+html.s3phy-embed body:has(#app > .tl-wrap) #app {
+  flex: 1 1 auto;
+  min-height: 0;
+  height: 100%;
+  display: flex;
+  flex-direction: column;
+  box-sizing: border-box;
+}
+
+html.s3phy-embed .rml,
+html.s3phy-embed .rgb-mixer,
+html.s3phy-embed .tl-wrap {
+  flex: 1 1 auto;
+  min-height: 0;
+  height: 100%;
+  width: 100%;
+  overflow: auto;
+}
+
+html.s3phy-embed .rml .rml-head,
+html.s3phy-embed .tl-wrap .tl-head {
+  display: none;
+}
+
+html.s3phy-embed .rml {
+  display: flex;
+  flex-direction: column;
+}
+
+html.s3phy-embed .rml .rml-dash {
+  flex: 1 1 auto;
+  min-height: 0;
+  align-items: stretch;
+  flex-wrap: nowrap;
+  max-width: none;
+  width: 100%;
+  margin: 0;
+}
+
+html.s3phy-embed .rml .rml-viz {
+  flex: 1 1 auto;
+  min-height: 0;
+  min-width: 0;
+  display: flex;
+  align-items: stretch;
+}
+
+html.s3phy-embed .rml .rml-canvas {
+  width: 100%;
+  height: 100%;
+  max-width: none;
+  flex: 1;
+  object-fit: contain;
+}
+
+html.s3phy-embed .rml .rml-controls {
+  flex: 0 0 auto;
+  max-height: 100%;
+  overflow-y: auto;
+}
+
+html.s3phy-embed .tl-wrap {
+  display: flex;
+  flex-direction: column;
+}
+
+html.s3phy-embed .tl-wrap .tl-dash,
+html.s3phy-embed .tl-wrap .tl-dash--faulty {
+  flex: 1 1 auto;
+  min-height: 0 !important;
+  height: 100%;
+}
+
+html.s3phy-embed .tl-wrap--faulty-cal .tl-faulty-hero {
+  flex: 1 1 auto;
+  min-height: 0 !important;
+}
+
+html.s3phy-embed .tl-wrap--faulty-cal .tl-faulty-hero-viz {
+  flex: 1 1 auto;
+  min-height: 0;
+}
+
+html.s3phy-embed .tl-wrap--faulty-cal .tl-dash--faulty {
+  display: grid;
+  grid-template-columns: 1fr minmax(260px, 360px);
+  grid-template-rows: 1fr;
+  align-items: stretch;
+  gap: 14px;
+}
+
+html.s3phy-embed .tl-wrap--faulty-cal .tl-faulty-hero {
+  grid-column: 1;
+  grid-row: 1;
+}
+
+html.s3phy-embed .tl-wrap--faulty-cal .tl-faulty-live {
+  grid-column: 2;
+  grid-row: 1;
+  overflow-y: auto;
+  min-height: 0;
+}
+
+html.s3phy-embed .tl-wrap--faulty-cal .tl-controls {
+  grid-column: 1 / -1;
+}
+
+html.s3phy-embed .rgb-mixer {
+  display: flex;
+  flex-direction: column;
+}
+
+html.s3phy-embed .rgb-mixer-body {
+  flex: 1 1 auto;
+  min-height: 0 !important;
+  height: auto;
+  max-height: none;
+  align-items: stretch;
+}
+
+html.s3phy-embed .rgb-mixer-stage {
+  min-height: 0 !important;
+  height: 100%;
+}
+
+html.s3phy-embed .rgb-mixer-canvas {
+  width: 100%;
+  height: 100%;
+}
+
+html.s3phy-embed .rgb-mixer-controls {
+  overflow-y: auto;
+  max-height: 100%;
+}
+
 /* Lens simulator embed compact chrome */
 html.s3phy-embed .controls-panel,
 html.s3phy-embed .control-panel {
