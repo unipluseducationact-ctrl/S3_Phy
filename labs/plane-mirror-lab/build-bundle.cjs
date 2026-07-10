@@ -13,6 +13,7 @@ const jsDir = path.join(__dirname, 'js');
 const scenarioDir = path.join(jsDir, 'scenarios');
 const files = [
   ['geometry.js', jsDir],
+  ['rayColors.js', jsDir],
   ['canvasView.js', jsDir],
   ['rayAnimator.js', jsDir],
   ['planeMirrorSight.js', jsDir],
@@ -24,6 +25,7 @@ const files = [
   ['angledMirrors.js', scenarioDir],
   ['sketchValidation.js', jsDir],
   ['raySketch.js', scenarioDir],
+  ['rayColorControls.js', jsDir],
   ['app.js', jsDir],
 ];
 

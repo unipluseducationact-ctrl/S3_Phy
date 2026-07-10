@@ -309,8 +309,36 @@ function formatLength(m, lang = 'zh') {
 }
 
 
+/* --- rayColors.js --- */
+/** @file Session-wide ray colour preferences and per-ray resolution. */
+
+const RAY_COLOR_PRESETS = [
+  '#00e676', '#a78bfa', '#22d3ee', '#ffcc00',
+  '#ff5252', '#fb923c', '#e4e4e7', '#f472b6',
+];
+
+const prefs = { real: '#00e676', virtual: '#a78bfa' };
+
+function getRayColor(kind) {
+  return prefs[kind];
+}
+
+function setRayColor(kind, hex) {
+  prefs[kind] = hex;
+}
+
+function getRayColors() {
+  return { ...prefs };
+}
+
+function resolveRayColor(ray) {
+  return ray.color ?? getRayColor(ray.kind);
+}
+
+
 /* --- canvasView.js --- */
 /** @file Canvas drawing helpers — colours map 1:1 to styles.css legend & SVG icons. */
+
 
 /**
  * Optical colour semantics (HKDSE ray diagrams):
@@ -570,12 +598,12 @@ function drawLabel(ctx, x, y, text, color = COLORS.label, align = 'left') {
 
 function drawArrow(ctx, view, t, from, to, opts = {}) {
   const {
-    color = COLORS.rayReal,
     width = 2,
     dashed = false,
     progress = 1,
     head = true,
   } = opts;
+  const color = opts.color ?? (dashed ? getRayColor('virtual') : getRayColor('real'));
   const end = progress >= 1 ? to : Vec2.lerp(from, to, progress);
   const s0 = toScreen(view, t, from);
   const s1 = toScreen(view, t, end);
@@ -817,6 +845,7 @@ class RayAnimator {
 
 
 /* --- planeMirrorSight.js --- */
+/** @file Shared 7-step plane-mirror sight-ray animation (Image Formation, Min. Length). */
 
 const PLANE_MIRROR_SIGHT_STEPS = 7;
 
@@ -982,6 +1011,10 @@ const STRINGS = {
     sketchHintVirtualRay: '點擊兩點，畫一條虛線（每段獨立繪製）',
     sketchSelected: '已選取',
     sketchNothingSelected: '未選取任何元素',
+    rayColorTitle: '光線顏色',
+    rayColorReal: '實際光線',
+    rayColorVirtual: '虛線光線',
+    rayColorEditHint: '已選取光線 — 點色板可改顏色',
   },
   en: {
     title: 'Plane Mirror Reflection Lab',
@@ -1102,6 +1135,10 @@ const STRINGS = {
     sketchHintVirtualRay: 'Click two points for one virtual ray segment',
     sketchSelected: 'Selected',
     sketchNothingSelected: 'Nothing selected',
+    rayColorTitle: 'Ray colours',
+    rayColorReal: 'Real ray',
+    rayColorVirtual: 'Virtual ray',
+    rayColorEditHint: 'Ray selected — tap a swatch to change colour',
   },
 };
 
@@ -1153,6 +1190,7 @@ function toggleLang() {
 
 
 /* --- imageFormation.js --- */
+
 
 
 
@@ -1247,8 +1285,8 @@ function createImageFormationScenario() {
     drawPlaneMirrorSightRays(ctx, view, txf, c, imgX, params.H, params.hEye, animator.stepIndex);
 
     drawLegend(ctx, 12, 12, [
-      { color: COLORS.rayReal, text: t('legendReal') },
-      { color: COLORS.rayVirtual, text: t('legendVirtual'), dashed: true },
+      { color: getRayColor('real'), text: t('legendReal') },
+      { color: getRayColor('virtual'), text: t('legendVirtual'), dashed: true },
     ]);
   }
 
@@ -1590,6 +1628,7 @@ function createMinMirrorHeightScenario() {
 
 
 
+
 const CONSTRUCTION_STEPS = 2;
 
 function drawRightTriangle(ctx, view, txf, a, b, c, fill, stroke) {
@@ -1833,7 +1872,7 @@ function createSeeBackObjectScenario() {
     const stepIndex = animator.stepIndex;
     const helpers = {
       drawArrow: (from, to, opts) => drawArrow(ctx, view, txf, from, to, opts),
-      drawImageLine: (from, to) => drawArrow(ctx, view, txf, from, to, { dashed: true, color: COLORS.rayVirtual, width: 1 }),
+      drawImageLine: (from, to) => drawArrow(ctx, view, txf, from, to, { dashed: true, color: getRayColor('virtual'), width: 1 }),
       drawPoint: (p, col) => drawPoint(ctx, view, txf, p, 5, col),
     };
 
@@ -1869,6 +1908,7 @@ function createSeeBackObjectScenario() {
 
 
 /* --- angledMirrors.js --- */
+
 
 
 
@@ -2405,6 +2445,7 @@ function createAngledMirrorsScenario() {
       sketchRays.push({
         id: nid(),
         kind: sketchTool === 'realRay' ? 'real' : 'virtual',
+        color: getRayColor(sketchTool === 'realRay' ? 'real' : 'virtual'),
         from: rayPending.clicks[0],
         to: p,
       });
@@ -2628,9 +2669,9 @@ function createAngledMirrorsScenario() {
     const clicks = rayPending.clicks;
     ctx.globalAlpha = 0.45;
     if (rayPending.kind === 'realRay') {
-      drawArrow(ctx, view, txf, clicks[0], p, { color: COLORS.rayReal, width: 2 });
+      drawArrow(ctx, view, txf, clicks[0], p, { color: getRayColor('real'), width: 2 });
     } else if (rayPending.kind === 'virtualRay') {
-      drawArrow(ctx, view, txf, clicks[0], p, { color: COLORS.rayVirtual, width: 2, dashed: true });
+      drawArrow(ctx, view, txf, clicks[0], p, { color: getRayColor('virtual'), width: 2, dashed: true });
     }
     ctx.globalAlpha = 1;
   }
@@ -2817,11 +2858,11 @@ function createAngledMirrorsScenario() {
           }
           if (params.showRays && vis.rays.has(i)) {
             const from = img.parentIdx < 0 ? set.object : img.parentPt;
-            drawArrow(ctx, view, txf, from, img.pt, { dashed: true, color: COLORS.rayVirtual, width: 1 });
+            drawArrow(ctx, view, txf, from, img.pt, { dashed: true, color: getRayColor('virtual'), width: 1 });
           }
           if (params.showRays && vis.altRays.has(i) && img.altConstruction) {
             drawArrow(ctx, view, txf, img.altConstruction.parentPt, img.pt, {
-              dashed: true, color: COLORS.rayVirtual, width: 1,
+              dashed: true, color: getRayColor('virtual'), width: 1,
             });
           }
         });
@@ -2841,7 +2882,7 @@ function createAngledMirrorsScenario() {
 
     sketchRays.forEach((r) => {
       const active = dragTarget?.type === 'ray' && dragTarget.id === r.id;
-      const color = r.kind === 'real' ? COLORS.rayReal : COLORS.rayVirtual;
+      const color = resolveRayColor(r);
       drawArrow(ctx, view, txf, r.from, r.to, {
         color: active ? COLORS.mirrorNeed : color,
         width: active ? 3 : 2,
@@ -2893,6 +2934,8 @@ function createAngledMirrorsScenario() {
       { id: 'removeObject', labelKey: 'removeObject', action: 'click' },
       { id: 'placeMode', labelKey: 'placeObject', toggle: true },
     ],
+    getSelectedRays: () => [],
+    setSelectedRayColors: () => {},
     get params() { return { ...params, placeMode }; },
   };
 }
@@ -3082,6 +3125,8 @@ function runAllValidations(state) {
 
 
 /* --- raySketch.js --- */
+/** @file Free ray-sketch practice mode with validation. */
+
 
 
 
@@ -3190,6 +3235,25 @@ function createRaySketchScenario() {
   function updateParams(id, v) {
     if (id === 'gridSnap') state.gridSnap = v;
     else if (TOOLS.includes(id)) state.tool = id;
+  }
+
+  function hasSelectedRays() {
+    return [...state.selected].some((key) => parseSelKey(key).type === 'ray');
+  }
+
+  function getSelectedRays() {
+    const rays = [];
+    for (const key of state.selected) {
+      const { type, id } = parseSelKey(key);
+      if (type !== 'ray') continue;
+      const r = state.rays.find((x) => x.id === id);
+      if (r) rays.push(r);
+    }
+    return rays;
+  }
+
+  function setSelectedRayColors(hex) {
+    getSelectedRays().forEach((r) => { r.color = hex; });
   }
 
   function selectionSummary() {
@@ -3548,9 +3612,11 @@ function createRaySketchScenario() {
         return;
       }
       const from = state.pending.clicks[0];
+      const kind = tool === 'realRay' ? 'real' : 'virtual';
       state.rays.push({
         id: nid(),
-        kind: tool === 'realRay' ? 'real' : 'virtual',
+        kind,
+        color: getRayColor(kind),
         from,
         to: p,
       });
@@ -3756,9 +3822,9 @@ function createRaySketchScenario() {
         head: state.pending.kind !== 'mirror',
       });
     } else if (state.pending.kind === 'realRay') {
-      drawArrow(ctx, viewRef, txf, clicks[0], p, { color: COLORS.rayReal, width: 2 });
+      drawArrow(ctx, viewRef, txf, clicks[0], p, { color: getRayColor('real'), width: 2 });
     } else if (state.pending.kind === 'virtualRay') {
-      drawArrow(ctx, viewRef, txf, clicks[0], p, { color: COLORS.rayVirtual, width: 2, dashed: true });
+      drawArrow(ctx, viewRef, txf, clicks[0], p, { color: getRayColor('virtual'), width: 2, dashed: true });
     }
     ctx.globalAlpha = 1;
   }
@@ -3816,7 +3882,7 @@ function createRaySketchScenario() {
 
     state.rays.forEach((r) => {
       const sel = isSelected('ray', r.id);
-      const color = r.kind === 'real' ? COLORS.rayReal : COLORS.rayVirtual;
+      const color = resolveRayColor(r);
       drawArrow(ctx, view, txf, r.from, r.to, {
         color: sel ? COLORS.mirrorNeed : color,
         width: sel ? 3 : 2,
@@ -3930,7 +3996,8 @@ function createRaySketchScenario() {
     applyI18n(root);
 
     function refreshToolbar() {
-      const hintKey = state.tool === 'select' ? 'sketchHintMarquee' : TOOL_META[state.tool]?.hintKey;
+      let hintKey = state.tool === 'select' ? 'sketchHintMarquee' : TOOL_META[state.tool]?.hintKey;
+      if (hasSelectedRays()) hintKey = 'rayColorEditHint';
       hintEl.textContent = t(hintKey || 'sketchHintSelect');
       Object.entries(toolBtns).forEach(([id, btn]) => {
         btn.classList.toggle('active', state.tool === id);
@@ -3986,6 +4053,8 @@ function createRaySketchScenario() {
     getDescription,
     getStats,
     getFormula,
+    getSelectedRays,
+    setSelectedRayColors,
     get params() {
       const p = { gridSnap: state.gridSnap };
       TOOLS.forEach((tid) => { p[tid] = state.tool === tid; });
@@ -3995,7 +4064,100 @@ function createRaySketchScenario() {
 }
 
 
+/* --- rayColorControls.js --- */
+/** @file Shared ray colour swatch panel for controls sidebar. */
+
+
+let refreshRayColorPanelRef = null;
+
+function refreshRayColorPanel() {
+  refreshRayColorPanelRef?.();
+}
+
+function buildRayColorControls(container, { getSelectedRays, setSelectedRayColors, onChange }) {
+  const panel = document.createElement('div');
+  panel.className = 'ray-color-panel control-group';
+
+  const title = document.createElement('p');
+  title.className = 'ray-color-title';
+  title.dataset.i18n = 'rayColorTitle';
+  panel.appendChild(title);
+
+  const swatchMap = { real: [], virtual: [] };
+
+  function makeRow(kind, labelKey) {
+    const row = document.createElement('div');
+    row.className = 'ray-color-row';
+
+    const label = document.createElement('span');
+    label.className = 'ray-color-label';
+    label.dataset.i18n = labelKey;
+    row.appendChild(label);
+
+    const swatches = document.createElement('div');
+    swatches.className = 'ray-color-swatches';
+    swatches.setAttribute('role', 'group');
+    swatches.setAttribute('aria-label', t(labelKey));
+
+    RAY_COLOR_PRESETS.forEach((hex) => {
+      const btn = document.createElement('button');
+      btn.type = 'button';
+      btn.className = 'ray-color-swatch';
+      btn.style.backgroundColor = hex;
+      btn.dataset.color = hex;
+      btn.dataset.kind = kind;
+      btn.title = hex;
+      btn.addEventListener('click', () => {
+        const selected = getSelectedRays?.() || [];
+        if (selected.length) {
+          setSelectedRayColors?.(hex);
+        } else {
+          setRayColor(kind, hex);
+        }
+        refresh();
+        onChange?.();
+      });
+      swatches.appendChild(btn);
+      swatchMap[kind].push(btn);
+    });
+
+    row.appendChild(swatches);
+    panel.appendChild(row);
+  }
+
+  makeRow('real', 'rayColorReal');
+  makeRow('virtual', 'rayColorVirtual');
+
+  function refresh() {
+    const colors = getRayColors();
+    const selected = getSelectedRays?.() || [];
+
+    ['real', 'virtual'].forEach((kind) => {
+      swatchMap[kind].forEach((btn) => {
+        const hex = btn.dataset.color;
+        let active = false;
+        if (selected.length) {
+          active = selected.every((r) => (r.color ?? getRayColor(r.kind)) === hex);
+        } else {
+          active = colors[kind] === hex;
+        }
+        btn.classList.toggle('active', active);
+        btn.setAttribute('aria-pressed', active ? 'true' : 'false');
+      });
+    });
+  }
+
+  container.appendChild(panel);
+  applyI18n(panel);
+  refresh();
+  refreshRayColorPanelRef = refresh;
+  return refresh;
+}
+
+
 /* --- app.js --- */
+
+
 
 
 
@@ -4250,6 +4412,21 @@ function setupCanvas() {
   }
 }
 
+function syncLegendRayColors() {
+  const colors = getRayColors();
+  document.getElementById('legendRealStroke')?.setAttribute('stroke', colors.real);
+  document.getElementById('legendRealFill')?.setAttribute('fill', colors.real);
+  document.getElementById('legendVirtualStroke')?.setAttribute('stroke', colors.virtual);
+}
+
+function handleRayColorChange() {
+  syncLegendRayColors();
+  refreshRayColorPanel();
+  getScenario()._refreshToolbar?.();
+  updateResults();
+  render();
+}
+
 function rebuildControls() {
   const sc = getScenario();
   els.controls.innerHTML = '';
@@ -4261,6 +4438,12 @@ function rebuildControls() {
     controlsTitle.dataset.i18n = key;
     controlsTitle.textContent = t(key);
   }
+
+  sc._refreshRayColors = buildRayColorControls(els.controls, {
+    getSelectedRays: () => sc.getSelectedRays?.() || [],
+    setSelectedRayColors: (hex) => sc.setSelectedRayColors?.(hex),
+    onChange: handleRayColorChange,
+  });
 
   sc.getControls().forEach((ctrl) => {
     const g = document.createElement('div');
@@ -4313,6 +4496,7 @@ function rebuildControls() {
 
   if (sc.buildToolbar) {
     sc._refreshToolbar = sc.buildToolbar(els.controls, () => {
+      refreshRayColorPanel();
       updateResults();
       render();
     });
@@ -4372,6 +4556,7 @@ function rebuildControls() {
   }
 
   applyI18n(els.controls);
+  syncLegendRayColors();
 }
 
 function updateSceneBadge() {
@@ -4511,6 +4696,7 @@ function init() {
   updateResultsPanel();
   bindAnim();
   bindReset();
+  syncLegendRayColors();
   render();
 
   window.addEventListener('resize', () => render());

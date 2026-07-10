@@ -5,6 +5,7 @@ import {
 } from '../canvasView.js';
 import { RayAnimator } from '../rayAnimator.js';
 import { t, getLang } from '../i18n.js';
+import { getRayColor } from '../rayColors.js';
 
 const DEFAULT_OBJECTS = [
   { id: 'I', x: 2, y: 2.5, visible: true },
@@ -139,7 +140,7 @@ export function createFieldOfViewScenario() {
         if (progress > 0.4) {
           drawArrow(ctx, view, txf, viewer, obj.image, {
             dashed: true,
-            color: obj.visible ? COLORS.rayVirtual : COLORS.mirrorFail,
+            color: obj.visible ? getRayColor('virtual') : COLORS.mirrorFail,
             progress: Math.min(1, (progress - 0.4) * 2),
           });
         }

@@ -120,6 +120,10 @@ const STRINGS = {
     sketchHintVirtualRay: '點擊兩點，畫一條虛線（每段獨立繪製）',
     sketchSelected: '已選取',
     sketchNothingSelected: '未選取任何元素',
+    rayColorTitle: '光線顏色',
+    rayColorReal: '實際光線',
+    rayColorVirtual: '虛線光線',
+    rayColorEditHint: '已選取光線 — 點色板可改顏色',
   },
   en: {
     title: 'Plane Mirror Reflection Lab',
@@ -240,6 +244,10 @@ const STRINGS = {
     sketchHintVirtualRay: 'Click two points for one virtual ray segment',
     sketchSelected: 'Selected',
     sketchNothingSelected: 'Nothing selected',
+    rayColorTitle: 'Ray colours',
+    rayColorReal: 'Real ray',
+    rayColorVirtual: 'Virtual ray',
+    rayColorEditHint: 'Ray selected — tap a swatch to change colour',
   },
 };
 

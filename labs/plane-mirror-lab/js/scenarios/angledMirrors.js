@@ -5,6 +5,7 @@ import {
 } from '../canvasView.js';
 import { RayAnimator } from '../rayAnimator.js';
 import { t, getLang, applyI18n } from '../i18n.js';
+import { getRayColor, resolveRayColor } from '../rayColors.js';
 
 const MIRROR_LEN = 3.5;
 const HIT_PX = 18;
@@ -538,6 +539,7 @@ export function createAngledMirrorsScenario() {
       sketchRays.push({
         id: nid(),
         kind: sketchTool === 'realRay' ? 'real' : 'virtual',
+        color: getRayColor(sketchTool === 'realRay' ? 'real' : 'virtual'),
         from: rayPending.clicks[0],
         to: p,
       });
@@ -761,9 +763,9 @@ export function createAngledMirrorsScenario() {
     const clicks = rayPending.clicks;
     ctx.globalAlpha = 0.45;
     if (rayPending.kind === 'realRay') {
-      drawArrow(ctx, view, txf, clicks[0], p, { color: COLORS.rayReal, width: 2 });
+      drawArrow(ctx, view, txf, clicks[0], p, { color: getRayColor('real'), width: 2 });
     } else if (rayPending.kind === 'virtualRay') {
-      drawArrow(ctx, view, txf, clicks[0], p, { color: COLORS.rayVirtual, width: 2, dashed: true });
+      drawArrow(ctx, view, txf, clicks[0], p, { color: getRayColor('virtual'), width: 2, dashed: true });
     }
     ctx.globalAlpha = 1;
   }
@@ -950,11 +952,11 @@ export function createAngledMirrorsScenario() {
           }
           if (params.showRays && vis.rays.has(i)) {
             const from = img.parentIdx < 0 ? set.object : img.parentPt;
-            drawArrow(ctx, view, txf, from, img.pt, { dashed: true, color: COLORS.rayVirtual, width: 1 });
+            drawArrow(ctx, view, txf, from, img.pt, { dashed: true, color: getRayColor('virtual'), width: 1 });
           }
           if (params.showRays && vis.altRays.has(i) && img.altConstruction) {
             drawArrow(ctx, view, txf, img.altConstruction.parentPt, img.pt, {
-              dashed: true, color: COLORS.rayVirtual, width: 1,
+              dashed: true, color: getRayColor('virtual'), width: 1,
             });
           }
         });
@@ -974,7 +976,7 @@ export function createAngledMirrorsScenario() {
 
     sketchRays.forEach((r) => {
       const active = dragTarget?.type === 'ray' && dragTarget.id === r.id;
-      const color = r.kind === 'real' ? COLORS.rayReal : COLORS.rayVirtual;
+      const color = resolveRayColor(r);
       drawArrow(ctx, view, txf, r.from, r.to, {
         color: active ? COLORS.mirrorNeed : color,
         width: active ? 3 : 2,
@@ -1026,6 +1028,8 @@ export function createAngledMirrorsScenario() {
       { id: 'removeObject', labelKey: 'removeObject', action: 'click' },
       { id: 'placeMode', labelKey: 'placeObject', toggle: true },
     ],
+    getSelectedRays: () => [],
+    setSelectedRayColors: () => {},
     get params() { return { ...params, placeMode }; },
   };
 }

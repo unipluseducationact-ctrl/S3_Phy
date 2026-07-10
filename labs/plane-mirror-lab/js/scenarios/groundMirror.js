@@ -3,7 +3,7 @@ import {
   createWorldView, resizeCanvasToDisplay, computeTransform, clear, drawGrid, drawGround,
   drawHorizontalMirror, drawArrow, drawPoint, drawLabel, COLORS,
 } from '../canvasView.js';
-import { t, getLang } from '../i18n.js';
+import { getRayColor } from '../rayColors.js';
 
 export function createGroundMirrorScenario() {
   let params = { hEye: 1.5, mirrorWidth: 0.6, cloudHeight: 3000, time: 20 };
@@ -97,10 +97,10 @@ export function createGroundMirrorScenario() {
 
     const span = c.distance * animT;
     drawArrow(ctx, viewSide, txf, { x: -half, y: mirrorY + 0.02 }, { x: -half + span * 0.001, y: c.cloudHeight }, {
-      color: COLORS.rayVirtual, dashed: true, width: 1.5,
+      color: getRayColor('virtual'), dashed: true, width: 1.5,
     });
-    drawArrow(ctx, viewSide, txf, eye, { x: half, y: mirrorY + 0.02 }, { color: COLORS.rayReal, width: 1.5 });
-    drawArrow(ctx, viewSide, txf, eye, { x: -half, y: mirrorY + 0.02 }, { color: COLORS.rayReal, width: 1.5 });
+    drawArrow(ctx, viewSide, txf, eye, { x: half, y: mirrorY + 0.02 }, { color: getRayColor('real'), width: 1.5 });
+    drawArrow(ctx, viewSide, txf, eye, { x: -half, y: mirrorY + 0.02 }, { color: getRayColor('real'), width: 1.5 });
   }
 
   function drawTop(canvas) {

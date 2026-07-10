@@ -1,5 +1,6 @@
 /** @file Canvas drawing helpers — colours map 1:1 to styles.css legend & SVG icons. */
 import { Vec2 } from './geometry.js';
+import { getRayColor } from './rayColors.js';
 
 /**
  * Optical colour semantics (HKDSE ray diagrams):
@@ -259,12 +260,12 @@ export function drawLabel(ctx, x, y, text, color = COLORS.label, align = 'left')
 
 export function drawArrow(ctx, view, t, from, to, opts = {}) {
   const {
-    color = COLORS.rayReal,
     width = 2,
     dashed = false,
     progress = 1,
     head = true,
   } = opts;
+  const color = opts.color ?? (dashed ? getRayColor('virtual') : getRayColor('real'));
   const end = progress >= 1 ? to : Vec2.lerp(from, to, progress);
   const s0 = toScreen(view, t, from);
   const s1 = toScreen(view, t, end);

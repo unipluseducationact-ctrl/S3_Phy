@@ -7,6 +7,7 @@ import {
 } from '../canvasView.js';
 import { RayAnimator, STEPS_PER_RAY } from '../rayAnimator.js';
 import { getLang } from '../i18n.js';
+import { getRayColor } from '../rayColors.js';
 
 const CONSTRUCTION_STEPS = 2;
 
@@ -251,7 +252,7 @@ export function createSeeBackObjectScenario() {
     const stepIndex = animator.stepIndex;
     const helpers = {
       drawArrow: (from, to, opts) => drawArrow(ctx, view, txf, from, to, opts),
-      drawImageLine: (from, to) => drawArrow(ctx, view, txf, from, to, { dashed: true, color: COLORS.rayVirtual, width: 1 }),
+      drawImageLine: (from, to) => drawArrow(ctx, view, txf, from, to, { dashed: true, color: getRayColor('virtual'), width: 1 }),
       drawPoint: (p, col) => drawPoint(ctx, view, txf, p, 5, col),
     };
 

@@ -798,6 +798,73 @@ html.s3phy-embed .controls-panel {
   min-height: 0;
 }
 
+/* Ray colour swatches (controls panel) */
+.ray-color-panel {
+  margin-bottom: 12px;
+  padding-bottom: 12px;
+  border-bottom: 1px solid var(--border-color);
+}
+
+.ray-color-title {
+  margin: 0 0 8px;
+  font-size: 0.72rem;
+  font-weight: 700;
+  color: var(--text-muted);
+  text-transform: uppercase;
+  letter-spacing: 0.04em;
+}
+
+.ray-color-row {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  margin-bottom: 6px;
+}
+
+.ray-color-row:last-child {
+  margin-bottom: 0;
+}
+
+.ray-color-label {
+  flex: 0 0 4.2rem;
+  font-size: 0.7rem;
+  font-weight: 600;
+  color: var(--text-main);
+}
+
+.ray-color-swatches {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 4px;
+  flex: 1;
+}
+
+.ray-color-swatch {
+  width: 20px;
+  height: 20px;
+  padding: 0;
+  border: 2px solid transparent;
+  border-radius: 50%;
+  cursor: pointer;
+  transition: border-color 0.15s, transform 0.1s;
+  box-shadow: inset 0 0 0 1px rgba(0, 0, 0, 0.25);
+}
+
+.ray-color-swatch:hover {
+  transform: scale(1.1);
+  border-color: rgba(255, 255, 255, 0.35);
+}
+
+.ray-color-swatch.active {
+  border-color: #fff;
+  box-shadow: 0 0 0 1px rgba(255, 255, 255, 0.5);
+}
+
+.ray-color-swatch:focus-visible {
+  outline: 2px solid var(--accent-blue);
+  outline-offset: 2px;
+}
+
 html.s3phy-embed .viz-panel {
   min-height: 0;
   display: flex;

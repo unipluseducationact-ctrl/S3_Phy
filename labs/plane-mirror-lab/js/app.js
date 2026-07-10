@@ -1,4 +1,6 @@
 import { applyI18n, toggleLang, t, getLang, setLang, hubLangToLocal, initLangFromLocation } from './i18n.js';
+import { buildRayColorControls, refreshRayColorPanel } from './rayColorControls.js';
+import { getRayColors } from './rayColors.js';
 import { createImageFormationScenario } from './scenarios/imageFormation.js';
 import { createMinMirrorLengthScenario } from './scenarios/minMirrorLength.js';
 import { createMinMirrorHeightScenario } from './scenarios/minMirrorHeight.js';
@@ -253,6 +255,21 @@ function setupCanvas() {
   }
 }
 
+function syncLegendRayColors() {
+  const colors = getRayColors();
+  document.getElementById('legendRealStroke')?.setAttribute('stroke', colors.real);
+  document.getElementById('legendRealFill')?.setAttribute('fill', colors.real);
+  document.getElementById('legendVirtualStroke')?.setAttribute('stroke', colors.virtual);
+}
+
+function handleRayColorChange() {
+  syncLegendRayColors();
+  refreshRayColorPanel();
+  getScenario()._refreshToolbar?.();
+  updateResults();
+  render();
+}
+
 function rebuildControls() {
   const sc = getScenario();
   els.controls.innerHTML = '';
@@ -264,6 +281,12 @@ function rebuildControls() {
     controlsTitle.dataset.i18n = key;
     controlsTitle.textContent = t(key);
   }
+
+  sc._refreshRayColors = buildRayColorControls(els.controls, {
+    getSelectedRays: () => sc.getSelectedRays?.() || [],
+    setSelectedRayColors: (hex) => sc.setSelectedRayColors?.(hex),
+    onChange: handleRayColorChange,
+  });
 
   sc.getControls().forEach((ctrl) => {
     const g = document.createElement('div');
@@ -316,6 +339,7 @@ function rebuildControls() {
 
   if (sc.buildToolbar) {
     sc._refreshToolbar = sc.buildToolbar(els.controls, () => {
+      refreshRayColorPanel();
       updateResults();
       render();
     });
@@ -375,6 +399,7 @@ function rebuildControls() {
   }
 
   applyI18n(els.controls);
+  syncLegendRayColors();
 }
 
 function updateSceneBadge() {
@@ -514,6 +539,7 @@ function init() {
   updateResultsPanel();
   bindAnim();
   bindReset();
+  syncLegendRayColors();
   render();
 
   window.addEventListener('resize', () => render());

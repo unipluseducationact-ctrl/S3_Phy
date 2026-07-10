@@ -6,6 +6,7 @@ import {
 import { RayAnimator } from '../rayAnimator.js';
 import { PLANE_MIRROR_SIGHT_STEPS, drawPlaneMirrorSightRays } from '../planeMirrorSight.js';
 import { t, getLang } from '../i18n.js';
+import { getRayColor } from '../rayColors.js';
 
 const defaults = () => ({
   u: 2.0,
@@ -96,8 +97,8 @@ export function createImageFormationScenario() {
     drawPlaneMirrorSightRays(ctx, view, txf, c, imgX, params.H, params.hEye, animator.stepIndex);
 
     drawLegend(ctx, 12, 12, [
-      { color: COLORS.rayReal, text: t('legendReal') },
-      { color: COLORS.rayVirtual, text: t('legendVirtual'), dashed: true },
+      { color: getRayColor('real'), text: t('legendReal') },
+      { color: getRayColor('virtual'), text: t('legendVirtual'), dashed: true },
     ]);
   }
 
