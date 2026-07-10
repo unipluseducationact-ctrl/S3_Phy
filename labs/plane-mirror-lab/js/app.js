@@ -282,11 +282,13 @@ function rebuildControls() {
     controlsTitle.textContent = t(key);
   }
 
-  sc._refreshRayColors = buildRayColorControls(els.controls, {
-    getSelectedRays: () => sc.getSelectedRays?.() || [],
-    setSelectedRayColors: (hex) => sc.setSelectedRayColors?.(hex),
-    onChange: handleRayColorChange,
-  });
+  sc._refreshRayColors = sc.id !== 'raySketch'
+    ? buildRayColorControls(els.controls, {
+      getSelectedRays: () => sc.getSelectedRays?.() || [],
+      setSelectedRayColors: (hex) => sc.setSelectedRayColors?.(hex),
+      onChange: handleRayColorChange,
+    })
+    : null;
 
   sc.getControls().forEach((ctrl) => {
     const g = document.createElement('div');
