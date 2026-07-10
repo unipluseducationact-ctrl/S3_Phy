@@ -266,20 +266,21 @@ export const QUIZ_EXERCISES = [
         "segments": [
           {
             "type": "text",
-            "value": "When a plane mirror moves towards a girl at 1 m s−1, her image moves towards her at "
+            "value": "When a plane mirror moves towards a girl at 1 m s⁻¹, her image moves towards her at "
           },
           {
             "type": "blank",
             "accept": [
               "2",
               "2 m s-1",
+              "2 m s⁻¹",
               "2 m/s",
               "2 ms-1"
             ]
           },
           {
             "type": "text",
-            "value": " m s−1."
+            "value": " m s⁻¹."
           }
         ]
       }
