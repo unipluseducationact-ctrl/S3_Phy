@@ -601,13 +601,15 @@ export function createThermometerLab(t, options = {}) {
 
   function getResistanceBounds() {
     const { maxT } = getTempAxisScale();
-    const rMin = resistanceAtTemp(0);
-    const rMax = resistanceAtTemp(maxT);
-    const span = rMax - rMin;
+    const rAt0 = resistanceAtTemp(0);
+    const rAtMax = resistanceAtTemp(maxT);
+    const rLo = Math.min(rAt0, rAtMax);
+    const rHi = Math.max(rAt0, rAtMax);
+    const span = Math.max(rHi - rLo, 0.4);
     const pad = Math.max(0.2, span * 0.1);
-    const minR = Math.max(0, rMin - pad);
-    const maxR = rMax + pad;
-    const step = span <= 2 ? 0.5 : span <= 4 ? 1 : 2;
+    const minR = Math.max(0, Math.round((rLo - pad) * 10) / 10);
+    const maxR = Math.round((rHi + pad) * 10) / 10;
+    const step = span <= 2 ? 0.5 : span <= 4 ? 1 : span <= 20 ? 2 : 5;
     const ticks = [];
     const start = Math.ceil(minR / step) * step;
     for (let r = start; r <= maxR + 0.001; r += step) {
