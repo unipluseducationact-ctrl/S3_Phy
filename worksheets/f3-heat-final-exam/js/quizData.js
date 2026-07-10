@@ -2343,7 +2343,7 @@ export const QUIZ_ITEMS = [
     "section": "heat-internal-energy",
     "difficulty": "Applied",
     "stem": "A hot water system provides warm water to the users of a clubhouse for shower. It has an electric heater which, on average, supplies 10 000 kg of water at 50 °C per day. Suppose the temperature of water supplied to the heater is 15 °C. The specific heat capacity of water is 4200 J kg⁻¹ °C⁻¹.\n\n(b) How much is paid per day for the electricity used by the heater? (Given that electricity costs $0.9 per kW h)",
-    "answer": "$367.5",
+    "answer": "367.5",
     "lines": [
       {
         "segments": [
@@ -2369,7 +2369,7 @@ export const QUIZ_ITEMS = [
     "section": "heat-internal-energy",
     "difficulty": "Applied",
     "stem": "An iron wok of mass 2 kg containing cooking oil of mass 1 kg is heated by a stove. It takes 2 minutes to raise the temperature of the wok and the oil from 20 °C to 180 °C.\n\n(a) Find the energy absorbed by the wok and the oil in the 2 minutes.\n(Heat capacity of iron = 920 J °C⁻¹, specific heat capacity of cooking oil = 2000 J kg⁻¹ °C⁻¹)",
-    "answer": "467000 J",
+    "answer": "467000",
     "lines": [
       {
         "segments": [
@@ -2400,7 +2400,7 @@ export const QUIZ_ITEMS = [
     "section": "heat-internal-energy",
     "difficulty": "Applied",
     "stem": "A piece of aluminium of mass 0.1 kg, is heated to 280 °C and then lowered into a glass beaker of mass\n0.2 kg , containing 0.6 kg of water at 18 °C. The water temperature finally reaches 27 °C. Find the specific heat capacity of aluminium.\nGiven:\nThe specific heat capacity of water = 4200 J kg⁻¹ °C⁻¹\nThe specific heat capacity of glass = 800 J kg⁻¹ °C⁻¹",
-    "answer": "953 J kg⁻¹ °C⁻¹",
+    "answer": "953",
     "lines": [
       {
         "segments": [
@@ -2430,8 +2430,8 @@ export const QUIZ_ITEMS = [
     "format": "fill",
     "section": "heat-internal-energy",
     "difficulty": "Applied",
-    "stem": "A hot water system provides warm water for shower. The system has an electric heater of power 16 kW. The temperature of the cold water flowing into the system is 15 °C. The specific heat capacity of water is 4200 J kg⁻¹ °C⁻¹.\n\n(b) Suppose you want to take a shower with water at 42 °C. This can be done by mixing the hot water in",
-    "answer": "2.23 kg min⁻¹",
+    "stem": "A hot water system provides warm water for shower. The system has an electric heater of power 16 kW. The temperature of the cold water flowing into the system is 15 °C. The specific heat capacity of water is 4200 J kg⁻¹ °C⁻¹.\n\n(b) Suppose you want to take a shower with water at 42 °C. This can be done by mixing the hot water in (a) with some cold water at 15 °C. Find the flow rate of the cold water to give you water of the desired temperature.",
+    "answer": "2.23",
     "lines": [
       {
         "segments": [
@@ -2467,7 +2467,7 @@ export const QUIZ_ITEMS = [
     "section": "change-of-state",
     "difficulty": "Applied",
     "stem": "A metal block is first immersed in boiling water for several minutes as shown in figure 2.1. The block is transferred to a cup of cold water as shown in figure 2.2. After a while, after a while, the temperature of the water is measured.\n\n(a) The results of the experiment are as follow:\nMass of metal block = 0.8 kg\nMass of water in container Y = 0.5 kg\nInitial temperature of water in container Y = 25 °C\nFinal temperature of water in container Y = 35 °C\nSpecific heat capacity of water = 4200 J kg⁻¹ °C⁻¹\nFind the specific heat capacity of the metal using the results.",
-    "answer": "404 J kg⁻¹ °C⁻¹",
+    "answer": "404",
     "lines": [
       {
         "segments": [
@@ -2504,7 +2504,7 @@ export const QUIZ_ITEMS = [
     "section": "heat-internal-energy",
     "difficulty": "Standard",
     "stem": "Eileen is going to cook some vegetable. If she fries the vegetable, she will use 20 g of olive oil and heat the oil to about 200 °C before putting the vegetable into the wok. If she boils the vegetable, she will boil 1 kg of water and then add 10 g of olive oil before adding the vegetable to the water. The output power of her stove is 2 000 W. (Given: Specific heat capacity of olive oil = 1970 J kg⁻¹ °C⁻¹ Specific heat capacity of water = 4200 J kg⁻¹ °C⁻¹ )\n\n(a) If 300 kJ is required to cook the vegetable, how long will it take for the whole cooking process?",
-    "answer": "153 s",
+    "answer": "153",
     "lines": [
       {
         "segments": [
@@ -2535,7 +2535,7 @@ export const QUIZ_ITEMS = [
     "section": "heat-internal-energy",
     "difficulty": "Applied",
     "stem": "In the following experiment, a liquid of mass 0.3 kg is heated in the polystyrene cup by a 50-W heater.\n\n(b) After the heater is switched on, the temperature of the liquid increases from 25 °C to\n73 °C in 210 s. The specific heat capacity of the liquid is 570 J kg⁻¹ °C⁻¹. Find the heat lost in the experiment.",
-    "answer": "2292 J",
+    "answer": "2292",
     "lines": [
       {
         "segments": [
@@ -2571,7 +2571,7 @@ export const QUIZ_ITEMS = [
     "section": "heat-internal-energy",
     "difficulty": "Applied",
     "stem": "The following schematic diagram shows a part of a nuclear power station. Water at 220 °C flows into the steam generator and is heated to become steam. The steam then pushes a turbine to generate electricity and is cooled in the condenser to turn back into water. The water is specially treated so that its boiling point is raised to 280 °C.\n\n(a) The flow rate of the steam is 480 kg s⁻¹. Find the energy lost by the steam every second.\nGiven: c (steam) = 2000 J kg⁻¹ °C⁻¹",
-    "answer": "1.22×10⁹ J",
+    "answer": "1.22×10⁹",
     "lines": [
       {
         "segments": [
@@ -2622,7 +2622,7 @@ export const QUIZ_ITEMS = [
     "section": "heat-internal-energy",
     "difficulty": "Applied",
     "stem": "The following schematic diagram shows a part of a nuclear power station. Water at 220 °C flows into the steam generator and is heated to become steam. The steam then pushes a turbine to generate electricity and is cooled in the condenser to turn back into water. The water is specially treated so that its boiling point is raised to 280 °C.\n\nThe flow rate of the steam is 480 kg s⁻¹.\n(b) If the internal energy of the steam is transferred to the turbine at 5.5 × 10⁸ W, find the flow rate of the seawater.\nGiven: c (steam) = 2000 J kg⁻¹ °C⁻¹\nGiven: c (seawater) = 4000 J kg⁻¹ °C⁻¹",
-    "answer": "8440 kg s⁻¹",
+    "answer": "8440",
     "lines": [
       {
         "segments": [
@@ -2658,7 +2658,7 @@ export const QUIZ_ITEMS = [
     "section": "change-of-state",
     "difficulty": "Applied",
     "stem": "Karl adds 2 kg of water at 20 °C into a hot wok after cooking and steam is formed.\n\n(b) After the water and the wok have reached thermal equilibrium, the mass and the temperature of the water are 1.98 kg and 40 °C respectively. Estimate the initial temperature of the wok. Assume that the energy lost to the surroundings and the effect of evaporation are negligible.\nHeat capacity of wok = 1200 J °C⁻¹\nSpecific heat capacity of water = 4200 J kg⁻¹ °C⁻¹\nSpecific latent heat of vaporization of water = 2.26 × 10⁶ J kg⁻¹",
-    "answer": "222 °C",
+    "answer": "222",
     "lines": [
       {
         "segments": [
@@ -2690,7 +2690,7 @@ export const QUIZ_ITEMS = [
     "section": "change-of-state",
     "difficulty": "Applied",
     "stem": "Calculate the amount of energy required to heat up 3 kg of ice at 0 °C to steam at 100 °C.\nSpecific heat capacity of water = 4200 J kg⁻¹ °C⁻¹\nSpecific latent heat of fusion of ice = 3.34 × 10⁵ J kg⁻¹\nSpecific latent heat of vaporization of water = 2.26 × 10⁶ J kg⁻¹",
-    "answer": "9.04×10⁶ J",
+    "answer": "9.04×10⁶",
     "lines": [
       {
         "segments": [
@@ -2736,7 +2736,7 @@ export const QUIZ_ITEMS = [
     "section": "change-of-state",
     "difficulty": "Applied",
     "stem": "An ice-tray consists of 12 compartments, each for making an ice cube of 30 g.\n\n(a) If the ice-tray is filled with water at room temperature (20 °C), how much energy should be removed from the water so that 12 ice cubes at −10 °C can be made?\nSpecific heat capacity of water = 4200 J kg⁻¹ °C⁻¹\nSpecific latent heat of fusion of ice = 3.34 × 10⁵ J kg⁻¹\nSpecific heat capacity of ice = 2100 J kg⁻¹ °C⁻¹",
-    "answer": "1.58×10⁵ J",
+    "answer": "1.58×10⁵",
     "lines": [
       {
         "segments": [
@@ -2795,7 +2795,7 @@ export const QUIZ_ITEMS = [
     "section": "heat-internal-energy",
     "difficulty": "Applied",
     "stem": "The following diagram shows a steam oven. When the oven operates, it turns water at 25 °C into steam at 105 °C and passes the steam into the cooking chamber to cook food. Given:\nspecific heat capacity of water = 4200 J kg⁻¹ °C⁻¹ specific latent heat of vaporization of water = 2.26 × 10⁶ J kg⁻¹ specific heat capacity of steam = 1900 J kg⁻¹ °C⁻¹\n\n(a) How much energy is required to heat up 1 kg of water at 25 °C to steam at 105 °C?",
-    "answer": "2.58×10⁶ J",
+    "answer": "2.58×10⁶",
     "lines": [
       {
         "segments": [
@@ -2846,7 +2846,7 @@ export const QUIZ_ITEMS = [
     "section": "heat-internal-energy",
     "difficulty": "Applied",
     "stem": "The following diagram shows a steam oven. When the oven operates, it turns water at 25 °C into steam at 105 °C and passes the steam into the cooking chamber to cook food. Given:\nspecific heat capacity of water = 4200 J kg⁻¹ °C⁻¹ specific latent heat of vaporization of water = 2.26 × 10⁶ J kg⁻¹ specific heat capacity of steam = 1900 J kg⁻¹ °C⁻¹\n\n(b) If the maximum rate of ejection of steam is 0.001 kg s⁻¹, estimate the maximum power of the heater in the steam oven.",
-    "answer": "2580 W",
+    "answer": "2580",
     "lines": [
       {
         "segments": [
@@ -2882,7 +2882,7 @@ export const QUIZ_ITEMS = [
     "section": "heat-internal-energy",
     "difficulty": "Applied",
     "stem": "Sometimes milk foam is added into coffee to change its texture and favour. Matthew uses the steamer on a coffee machine to make milk foam by pumping steam at 100 °C into 600 g of milk until the temperature of the mixture reaches 65 °C. Given:\nspecific heat capacity of milk = 3930 J kg⁻¹ °C⁻¹ specific heat capacity of water = 4200 J kg⁻¹ °C⁻¹ specific latent heat of vaporization of water = 2.26 × 10⁶ J kg⁻¹\n\n(a) The milk is initially at 4 °C. Estimate the mass of steam pumped into the milk. Assume that all the steam condenses and stays in the mixture.",
-    "answer": "0.0598 kg",
+    "answer": "0.0598",
     "lines": [
       {
         "segments": [
@@ -2912,8 +2912,8 @@ export const QUIZ_ITEMS = [
     "format": "fill",
     "section": "heat-internal-energy",
     "difficulty": "Applied",
-    "stem": "Sometimes milk foam is added into coffee to change its texture and favour. Matthew uses the steamer on a coffee machine to make milk foam by pumping steam at 100 °C into 600 g of milk until the temperature of the mixture reaches 65 °C. Given:\nspecific heat capacity of milk = 3930 J kg⁻¹ °C⁻¹ specific heat capacity of water = 4200 J kg⁻¹ °C⁻¹ specific latent heat of vaporization of water = 2.26 × 10⁶ J kg⁻¹\n\n(b) The steamer produces steam at 100 °C using water at 20 °C at a rate of 0.18 g s–1. Estimate the power of the steamer.",
-    "answer": "467 W",
+    "stem": "Sometimes milk foam is added into coffee to change its texture and favour. Matthew uses the steamer on a coffee machine to make milk foam by pumping steam at 100 °C into 600 g of milk until the temperature of the mixture reaches 65 °C. Given:\nspecific heat capacity of milk = 3930 J kg⁻¹ °C⁻¹ specific heat capacity of water = 4200 J kg⁻¹ °C⁻¹ specific latent heat of vaporization of water = 2.26 × 10⁶ J kg⁻¹\n\n(b) The steamer produces steam at 100 °C using water at 20 °C at a rate of 0.18 g s⁻¹. Estimate the power of the steamer.",
+    "answer": "467",
     "lines": [
       {
         "segments": [
@@ -2936,7 +2936,7 @@ export const QUIZ_ITEMS = [
         ]
       }
     ],
-    "hint": "The steamer produces steam at 100 °C using water at 20 °C at a rate of 0.18 g s–1."
+    "hint": "The steamer produces steam at 100 °C using water at 20 °C at a rate of 0.18 g s⁻¹."
   },
   {
     "id": "heat-lq-capacity-q2b",
@@ -2944,7 +2944,7 @@ export const QUIZ_ITEMS = [
     "section": "heat-internal-energy",
     "difficulty": "Applied",
     "stem": "A hot water system is used to heat up 20 L of water from 60 °C to 90 °C. Find\n\n(b) the time required if energy is transferred to the water at a rate of 1200 W.   \n(The specific heat capacity of water is 4200 J kg⁻¹ °C⁻¹. The density of water is 1 kg L⁻¹.)",
-    "answer": "2100 s",
+    "answer": "2100",
     "lines": [
       {
         "segments": [
@@ -2975,7 +2975,7 @@ export const QUIZ_ITEMS = [
     "section": "change-of-state",
     "difficulty": "Applied",
     "stem": "A student carries out an experiment to determine the specific heat capacity of copper. He heats the copper block to 100 °C with boiling water (Figure a). Then, he places the block in a cup of water and measures the temperature rise of the water (Figure b).\nThe following results are obtained:\nmass of the copper block = 80 g mass of water inside the polystyrene cup = 150 g initial water temperature = 18 °C final water temperature = 21.5 °C\nFind the specific heat capacity of copper assuming that the polystyrene cup has a negligible mass.\nCompare the experimental value with the standard value and account for any differences between them.\n(6 marks) (The specific heat capacity of water is 4200 J kg⁻¹ °C⁻¹. The standard value of the specific heat capacity of copper is 390 J kg⁻¹ °C⁻¹.)",
-    "answer": "351 J kg⁻¹ °C⁻¹",
+    "answer": "351",
     "lines": [
       {
         "segments": [
@@ -3011,7 +3011,7 @@ export const QUIZ_ITEMS = [
     "section": "heat-internal-energy",
     "difficulty": "Applied",
     "stem": "An iron wok of mass 2 kg containing cooking oil of mass 1 kg is heated by a stove. It takes 2 minutes to raise the temperature of the wok and the oil from 20 °C to 180 °C.\n\n(a) Find the energy absorbed by the wok and the oil in the 2 minutes.\n(Heat capacity of iron = 920 J°C⁻¹, specific heat capacity of cooking oil = 2000 J kg⁻¹ °C⁻¹)",
-    "answer": "467000 J",
+    "answer": "467000",
     "lines": [
       {
         "segments": [
@@ -3042,7 +3042,7 @@ export const QUIZ_ITEMS = [
     "section": "heat-internal-energy",
     "difficulty": "Applied",
     "stem": "A student turns on the three identical air conditioners in a classroom of dimensions 9 m × 8 m × 3 m. The mass of air in every cubic metre is 1.15 kg. The specific heat capacity of air is 1000 J kg⁻¹ °C⁻¹.\n\n(b) If the temperature of the classroom drops from 33 °C to 25 °C, how much energy is removed from the air in the classroom?",
-    "answer": "1990000 J",
+    "answer": "1990000",
     "lines": [
       {
         "segments": [
@@ -3073,7 +3073,7 @@ export const QUIZ_ITEMS = [
     "section": "heat-internal-energy",
     "difficulty": "Applied",
     "stem": "A student turns on the three identical air conditioners in a classroom of dimensions 9 m × 8 m × 3 m. The mass of air in every cubic metre is 1.15 kg. The specific heat capacity of air is 1000 J kg⁻¹ °C⁻¹.\n\n(c) If the power of each air conditioner is 2000 W, how long does it take to cool the classroom from 33 °C to 25 °C?",
-    "answer": "331 s",
+    "answer": "331",
     "lines": [
       {
         "segments": [
@@ -3103,8 +3103,8 @@ export const QUIZ_ITEMS = [
     "format": "fill",
     "section": "heat-internal-energy",
     "difficulty": "Applied",
-    "stem": "A hot water system provides warm water for shower. The system has an electric heater of power 8 kW. The temperature of the cold water flowing into the system is 15 °C. The specific heat capacity of water is 4200 J kg⁻¹ °C⁻¹.\n\n(b) Suppose you want to take a shower with water at 42 °C. This can be done by mixing the hot water in",
-    "answer": "2.23 kg min⁻¹",
+    "stem": "A hot water system provides warm water for shower. The system has an electric heater of power 8 kW. The temperature of the cold water flowing into the system is 15 °C. The specific heat capacity of water is 4200 J kg⁻¹ °C⁻¹.\n\n(b) Suppose you want to take a shower with water at 42 °C. This can be done by mixing the hot water in (a) with some cold water at 15 °C. Find the flow rate of the cold water to give you water of the desired temperature.",
+    "answer": "2.23",
     "lines": [
       {
         "segments": [
@@ -3140,7 +3140,7 @@ export const QUIZ_ITEMS = [
     "section": "heat-internal-energy",
     "difficulty": "Applied",
     "stem": "A hot water system provides warm water to the users of a clubhouse for shower. It has an electric heater which, on average, supplies 10 000 kg of water at 50 °C per day. Suppose the temperature of water supplied to the heater is 15 °C. The specific heat capacity of water is 4200 J kg⁻¹ °C⁻¹.\n\n(b) How much is paid per day for the electricity used by the heater? (Given that electricity costs $0.9 per kW h)",
-    "answer": "$367.5",
+    "answer": "367.5",
     "lines": [
       {
         "segments": [
@@ -3166,7 +3166,7 @@ export const QUIZ_ITEMS = [
     "section": "heat-internal-energy",
     "difficulty": "Applied",
     "stem": "Mr. Chan is enjoying Japanese hot pot. Initially, the pot contains 3 kg of water at 20 °C. When the water starts to boil, Mr. Chan puts a piece of meat at 10 °C into the water.\n\n(a) Find the energy required to raise the temperature of the water from 20 °C to 100°C.",
-    "answer": "1.01×10⁶ J",
+    "answer": "1.01×10⁶",
     "lines": [
       {
         "segments": [
@@ -3217,7 +3217,7 @@ export const QUIZ_ITEMS = [
     "section": "heat-internal-energy",
     "difficulty": "Applied",
     "stem": "Mr. Chan is enjoying Japanese hot pot. Initially, the pot contains 3 kg of water at 20 °C. When the water starts to boil, Mr. Chan puts a piece of meat at 10 °C into the water.\n\n(b) The power of the gas stove is 4000 W. Suppose 70% of the energy is lost to the surroundings, find the time required for heating the soup from 20 °C to 100°C.",
-    "answer": "840 W",
+    "answer": "840",
     "lines": [
       {
         "segments": [
@@ -3253,7 +3253,7 @@ export const QUIZ_ITEMS = [
     "section": "heat-internal-energy",
     "difficulty": "Applied",
     "stem": "Mr. Chan is enjoying Japanese hot pot. Initially, the pot contains 3 kg of water at 20 °C. When the water starts to boil, Mr. Chan puts a piece of meat at 10 °C into the water.\n\n(d) Shortly after putting the meat into the pot, the temperature of the water and the meat comes to the same temperature of 98 °C. Calculate the mass of the meat.\n(Take the specific heat capacity of the meat to be 3500 J kg⁻¹ °C⁻¹. The specific heat capacity of water is\n4200 J kg⁻¹ °C⁻¹.)",
-    "answer": "8.18×10⁻² kg",
+    "answer": "8.18×10⁻²",
     "lines": [
       {
         "segments": [
@@ -3307,7 +3307,7 @@ export const QUIZ_ITEMS = [
     "section": "heat-internal-energy",
     "difficulty": "Applied",
     "stem": "A secondary school is currently using an electrical hot water system to provide warm water to students for shower. A salesman is persuading this school to replace the old system with a new solar hot water system. He does a simple research to convince the school the advantage of the replacement. The following information about the current water heating system is extracted from his research: Average volume of water consumed for shower (per day) = 36 000 L Average volume of hot water heated for shower (per day) = 8000 L Temperature of the hot water that left the system = 80 °C Average temperature of tap water = 20 °C Average operation time of the system (per annum) = 220 days Cost of electricity = $1.08 per kW h\n\n(b) Calculate the average cost for the electricity in one year, assuming that all energy consumed by the electrical hot water system is transferred to the water.\n\nThe information about the solar hot water system is as shown below:\nMass of hot water supplied by one unit (per day) = 120 L\nTemperature of the water heated by the system = 55 °C\nPrice of one unit = $12 000",
-    "answer": "$133056",
+    "answer": "133056",
     "lines": [
       {
         "segments": [
