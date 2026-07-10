@@ -3130,6 +3130,7 @@ function runAllValidations(state) {
 
 
 
+
 const SKETCH_HIT_PX = 14;
 const SKETCH_LINE_HIT_PX = 10;
 const MARQUEE_MIN_PX = 4;
@@ -3899,7 +3900,7 @@ function createRaySketchScenario() {
   }
 
   function buildToolbar(container, onChange) {
-    container.innerHTML = '';
+    container.querySelectorAll('.sketch-toolbar').forEach((el) => el.remove());
     const root = document.createElement('div');
     root.className = 'sketch-toolbar';
 
@@ -3954,6 +3955,20 @@ function createRaySketchScenario() {
     makeGroup('sketchGroupPlace', ['mirror', 'object', 'image', 'observer']);
     makeGroup('sketchGroupRays', ['realRay', 'virtualRay']);
 
+    const colorGroup = document.createElement('div');
+    colorGroup.className = 'sketch-tool-group ray-color-sketch-group';
+    const colorTitle = document.createElement('p');
+    colorTitle.className = 'sketch-tool-group-title';
+    colorTitle.dataset.i18n = 'rayColorTitle';
+    colorGroup.appendChild(colorTitle);
+    const refreshColors = mountRayColorUI(colorGroup, {
+      getSelectedRays,
+      setSelectedRayColors,
+      onChange,
+    }, { wrapPanel: false, showTitle: false });
+    root.appendChild(colorGroup);
+    setRayColorRefresh(refreshColors);
+
     const actions = document.createElement('div');
     actions.className = 'sketch-tool-group';
     const actTitle = document.createElement('p');
@@ -4003,6 +4018,8 @@ function createRaySketchScenario() {
         btn.classList.toggle('active', state.tool === id);
       });
       snapToggle.classList.toggle('on', state.gridSnap);
+
+      refreshColors();
 
       const summary = selectionSummary();
       if (summary) {
@@ -4070,18 +4087,34 @@ function createRaySketchScenario() {
 
 let refreshRayColorPanelRef = null;
 
+function setRayColorRefresh(fn) {
+  refreshRayColorPanelRef = fn;
+}
+
 function refreshRayColorPanel() {
   refreshRayColorPanelRef?.();
 }
 
-function buildRayColorControls(container, { getSelectedRays, setSelectedRayColors, onChange }) {
-  const panel = document.createElement('div');
-  panel.className = 'ray-color-panel control-group';
+/**
+ * @param {HTMLElement} parent
+ * @param {{ getSelectedRays?: () => object[], setSelectedRayColors?: (hex: string) => void, onChange?: () => void }} handlers
+ * @param {{ wrapPanel?: boolean, showTitle?: boolean }} [opts]
+ * @returns {() => void} refresh
+ */
+function mountRayColorUI(parent, handlers, opts = {}) {
+  const { wrapPanel = true, showTitle = true } = opts;
+  const host = wrapPanel ? document.createElement('div') : parent;
+  if (wrapPanel) {
+    host.className = 'ray-color-panel control-group';
+    parent.appendChild(host);
+  }
 
-  const title = document.createElement('p');
-  title.className = 'ray-color-title';
-  title.dataset.i18n = 'rayColorTitle';
-  panel.appendChild(title);
+  if (showTitle) {
+    const title = document.createElement('p');
+    title.className = wrapPanel ? 'ray-color-title' : 'sketch-tool-group-title';
+    title.dataset.i18n = 'rayColorTitle';
+    host.appendChild(title);
+  }
 
   const swatchMap = { real: [], virtual: [] };
 
@@ -4108,21 +4141,21 @@ function buildRayColorControls(container, { getSelectedRays, setSelectedRayColor
       btn.dataset.kind = kind;
       btn.title = hex;
       btn.addEventListener('click', () => {
-        const selected = getSelectedRays?.() || [];
+        const selected = handlers.getSelectedRays?.() || [];
         if (selected.length) {
-          setSelectedRayColors?.(hex);
+          handlers.setSelectedRayColors?.(hex);
         } else {
           setRayColor(kind, hex);
         }
         refresh();
-        onChange?.();
+        handlers.onChange?.();
       });
       swatches.appendChild(btn);
       swatchMap[kind].push(btn);
     });
 
     row.appendChild(swatches);
-    panel.appendChild(row);
+    host.appendChild(row);
   }
 
   makeRow('real', 'rayColorReal');
@@ -4130,7 +4163,7 @@ function buildRayColorControls(container, { getSelectedRays, setSelectedRayColor
 
   function refresh() {
     const colors = getRayColors();
-    const selected = getSelectedRays?.() || [];
+    const selected = handlers.getSelectedRays?.() || [];
 
     ['real', 'virtual'].forEach((kind) => {
       swatchMap[kind].forEach((btn) => {
@@ -4147,10 +4180,14 @@ function buildRayColorControls(container, { getSelectedRays, setSelectedRayColor
     });
   }
 
-  container.appendChild(panel);
-  applyI18n(panel);
+  if (wrapPanel || showTitle) applyI18n(host);
   refresh();
-  refreshRayColorPanelRef = refresh;
+  return refresh;
+}
+
+function buildRayColorControls(container, handlers) {
+  const refresh = mountRayColorUI(container, handlers);
+  setRayColorRefresh(refresh);
   return refresh;
 }
 
@@ -4439,11 +4476,13 @@ function rebuildControls() {
     controlsTitle.textContent = t(key);
   }
 
-  sc._refreshRayColors = buildRayColorControls(els.controls, {
-    getSelectedRays: () => sc.getSelectedRays?.() || [],
-    setSelectedRayColors: (hex) => sc.setSelectedRayColors?.(hex),
-    onChange: handleRayColorChange,
-  });
+  sc._refreshRayColors = sc.id !== 'raySketch'
+    ? buildRayColorControls(els.controls, {
+      getSelectedRays: () => sc.getSelectedRays?.() || [],
+      setSelectedRayColors: (hex) => sc.setSelectedRayColors?.(hex),
+      onChange: handleRayColorChange,
+    })
+    : null;
 
   sc.getControls().forEach((ctrl) => {
     const g = document.createElement('div');
@@ -4500,6 +4539,10 @@ function rebuildControls() {
       updateResults();
       render();
     });
+    const colorPanel = els.controls.querySelector('.ray-color-panel');
+    if (colorPanel && colorPanel !== els.controls.firstElementChild) {
+      els.controls.insertBefore(colorPanel, els.controls.firstElementChild);
+    }
   } else if (sc.extraToggles) {
     const row = document.createElement('div');
     row.className = 'btn-row';
