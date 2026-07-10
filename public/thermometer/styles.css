@@ -886,60 +886,95 @@ html.s3phy-embed #app {
   }
 }
 
-/* Hub iframe — keep viz/graph aspect ratio when height is constrained (window mode) */
+/* Hub iframe — preserve viz/graph scale in constrained window mode */
 html.s3phy-embed .tl-wrap {
   overflow: hidden;
   display: flex;
   flex-direction: column;
   height: 100%;
   min-height: 0;
+  padding: 8px;
 }
 
 html.s3phy-embed .tl-wrap .tl-dash {
   flex: 1 1 auto;
   min-height: 0;
+  height: 100%;
+  overflow: hidden;
+}
+
+html.s3phy-embed .tl-wrap .tl-viz-phys,
+html.s3phy-embed .tl-wrap .tl-viz-graph {
+  min-height: clamp(150px, 24vh, 280px);
   overflow: hidden;
 }
 
 html.s3phy-embed .tl-wrap .tl-canvas-phys,
 html.s3phy-embed .tl-wrap .tl-canvas-graph {
-  flex-shrink: 0;
-  width: auto !important;
-  height: auto !important;
+  display: block;
+  flex: 1 1 auto;
+  min-height: 0;
+  width: 100% !important;
+  height: 100% !important;
   max-width: 100%;
-}
-
-html.s3phy-embed .tl-wrap .tl-canvas-phys {
-  aspect-ratio: 460 / 340;
-  max-height: calc(100% - 2.5rem);
-}
-
-html.s3phy-embed .tl-wrap .tl-canvas-graph {
-  aspect-ratio: 640 / 420;
   max-height: 100%;
+  object-fit: contain;
+  aspect-ratio: unset;
+}
+
+html.s3phy-embed .tl-wrap .tl-viz-phys .tl-btn {
+  flex-shrink: 0;
+  margin-top: 4px;
+}
+
+html.s3phy-embed .tl-wrap .tl-live-calculations {
+  min-height: 0;
+  overflow-y: auto;
+  padding: 10px 14px;
+}
+
+html.s3phy-embed .tl-wrap .tl-live-calculations .tl-math-formula {
+  font-size: 1.15rem;
+  padding: 8px 10px;
+  margin: 4px 0;
+  min-height: unset !important;
+}
+
+html.s3phy-embed .tl-wrap .tl-live-calculations .tl-worked-solution {
+  padding: 10px 14px;
+}
+
+html.s3phy-embed .tl-wrap .tl-live-calculations .tl-worked-solution p {
+  font-size: 0.92rem;
+}
+
+html.s3phy-embed .tl-wrap .tl-live-calculations .tl-info-label {
+  font-size: 0.88rem;
+}
+
+html.s3phy-embed .tl-wrap .tl-live-calculations .tl-live-value {
+  font-size: 1rem;
 }
 
 @media (min-width: 1024px) {
   html.s3phy-embed .tl-wrap .tl-dash {
-    grid-template-rows: minmax(0, 1fr) auto auto;
+    grid-template-rows: minmax(clamp(200px, 34vh, 420px), 1fr) auto minmax(0, min(34vh, 240px));
     height: 100%;
   }
 
   html.s3phy-embed .tl-wrap .tl-viz-phys,
   html.s3phy-embed .tl-wrap .tl-viz-graph {
     min-height: 0;
-    overflow: hidden;
+    height: 100%;
+    display: flex;
+    flex-direction: column;
     justify-content: center;
-    align-items: center;
+    align-items: stretch;
+    overflow: hidden;
   }
 
   html.s3phy-embed .tl-wrap .tl-viz-phys {
     padding-top: var(--tl-viz-top-reserve);
-    align-items: center;
-  }
-
-  html.s3phy-embed .tl-wrap .tl-live-calculations {
-    min-height: 0;
-    overflow-y: auto;
+    justify-content: flex-end;
   }
 }

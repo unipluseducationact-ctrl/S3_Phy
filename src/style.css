@@ -1177,6 +1177,10 @@ a {
   display: none;
 }
 
+.tool-thermometer-lab {
+  --tool-viewport-min-h: clamp(560px, calc(100dvh - var(--nav-offset) - 72px - var(--s3-safe-bottom)), 1600px);
+}
+
 .tool-lab-embed,
 .tool-lens-simulator,
 .tool-tir-escape,

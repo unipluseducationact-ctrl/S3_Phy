@@ -2194,15 +2194,21 @@ export function createThermometerLab(t, options = {}) {
     });
   }
 
+  if (typeof ResizeObserver !== 'undefined' && dash) {
+    const ro = new ResizeObserver(() => drawVisuals());
+    ro.observe(dash);
+    wrap._thermometerLabCleanup = () => {
+      ro.disconnect();
+      if (animationFrameId) cancelAnimationFrame(animationFrameId);
+    };
+  } else {
+    wrap._thermometerLabCleanup = () => {
+      if (animationFrameId) cancelAnimationFrame(animationFrameId);
+    };
+  }
+
   // Start loop
   animationFrameId = requestAnimationFrame(simulationLoop);
-
-  // Cleanup handler
-  wrap._thermometerLabCleanup = () => {
-    if (animationFrameId) {
-      cancelAnimationFrame(animationFrameId);
-    }
-  };
 
   return wrap;
 }
