@@ -600,14 +600,17 @@ export function createThermometerLab(t, options = {}) {
   }
 
   function getResistanceBounds() {
-    const { maxT } = getTempAxisScale();
-    const rMin = resistanceAtTemp(0);
-    const rMax = resistanceAtTemp(maxT);
-    const span = rMax - rMin;
-    const pad = Math.max(0.2, span * 0.1);
-    const minR = Math.max(0, rMin - pad);
-    const maxR = rMax + pad;
-    const step = span <= 2 ? 0.5 : span <= 4 ? 1 : 2;
+    const rAt0 = state.resistanceR0;
+    const rAt100 = state.resistanceR100;
+    const rCur = state.currentResistance;
+    const rLo = Math.min(rAt0, rAt100, rCur);
+    const rHi = Math.max(rAt0, rAt100, rCur);
+    const span = Math.max(rHi - rLo, 0.4);
+    const pad = Math.max(0.2, span * 0.12);
+    let minR = Math.max(0, Math.floor((rLo - pad) * 10) / 10);
+    let maxR = Math.ceil((rHi + pad) * 10) / 10;
+    if (maxR <= minR) maxR = minR + Math.max(span, 0.5);
+    const step = span <= 2 ? 0.5 : span <= 4 ? 1 : span <= 20 ? 2 : 5;
     const ticks = [];
     const start = Math.ceil(minR / step) * step;
     for (let r = start; r <= maxR + 0.001; r += step) {
@@ -1463,18 +1466,20 @@ export function createThermometerLab(t, options = {}) {
     ctx.fillText('temperature / °C', gx + gw / 2, xLabelY);
 
     const { minT, maxT } = tempScale;
-    const tEnd = maxT;
     const px0 = mapGraphX(0, minT, maxT, gx, gw);
-    const py0 = mapGraphY(resistanceAtTemp(0), minR, maxR, gy, gh);
-    const pxEnd = mapGraphX(tEnd, minT, maxT, gx, gw);
-    const pyEnd = mapGraphY(resistanceAtTemp(tEnd), minR, maxR, gy, gh);
+    const py0 = mapGraphY(state.resistanceR0, minR, maxR, gy, gh);
+    const px100 = mapGraphX(100, minT, maxT, gx, gw);
+    const py100 = mapGraphY(state.resistanceR100, minR, maxR, gy, gh);
+    const pxEnd = mapGraphX(maxT, minT, maxT, gx, gw);
+    const pyEnd = mapGraphY(resistanceAtTemp(maxT), minR, maxR, gy, gh);
 
-    // Linear line
+    // Linear calibration line (ice point -> steam point, extended across axis range)
     ctx.strokeStyle = '#6366f1';
     ctx.lineWidth = 3;
     ctx.beginPath();
     ctx.moveTo(px0, py0);
-    ctx.lineTo(pxEnd, pyEnd);
+    ctx.lineTo(px100, py100);
+    if (maxT > 100) ctx.lineTo(pxEnd, pyEnd);
     ctx.stroke();
 
     const currentT = state.thermometerTemp;
