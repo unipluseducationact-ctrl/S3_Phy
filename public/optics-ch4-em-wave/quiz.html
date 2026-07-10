@@ -1,8 +1,12 @@
 <!DOCTYPE html>
 <html class="scroll-smooth" lang="en">
 <head>
-<meta charset="utf-8"/>
-<meta content="width=device-width, initial-scale=1.0" name="viewport"/>
+<meta content="no-cache" http-equiv="Cache-Control"/>
+<meta content="width=device-width, initial-scale=1.0, viewport-fit=cover" name="viewport"/>
+<link rel="stylesheet" href="../shared/s3phy-tokens.css">
+<link rel="stylesheet" href="../shared/s3phy-embed.css">
+<link rel="stylesheet" href="../shared/quiz-shell.css">
+<script src="../shared/s3phy-embed-init.js"></script>
 <title>S3 · Optics Ch.4 · Electromagnetic Waves</title>
 <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600;700&family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&display=swap" rel="stylesheet"/>
 <script src="https://cdn.tailwindcss.com?plugins=forms,container-queries"></script>
@@ -86,10 +90,37 @@ tailwind.config = {
 .quiz-bank-matrix .cell-zero { color: #727784; }
 .quiz-bank-matrix .cell-hit { font-weight: 700; color: #004e9f; }
 @media print {
-  body * { visibility: hidden; }
-  #quiz-pdf-sheet, #quiz-pdf-sheet * { visibility: visible; }
-  #quiz-pdf-sheet { display: block !important; position: absolute; left: 0; top: 0; width: 100%; padding: 1rem; }
-  #settings-panel { display: none !important; }
+  html, body {
+    height: auto !important;
+    min-height: 0 !important;
+    margin: 0 !important;
+    padding: 0 !important;
+    overflow: visible !important;
+    background: #fff !important;
+  }
+  body > *:not(#quiz-pdf-sheet) {
+    display: none !important;
+  }
+  #quiz-pdf-sheet {
+    display: block !important;
+    visibility: visible !important;
+    position: static !important;
+    width: 100% !important;
+    padding: 0 !important;
+    margin: 0 !important;
+  }
+  #quiz-pdf-sheet * {
+    visibility: visible !important;
+  }
+  #quiz-pdf-sheet .export-q {
+    page-break-inside: avoid;
+    break-inside: avoid-page;
+    margin-bottom: 1rem;
+  }
+  #quiz-pdf-sheet .export-fig img {
+    max-width: 100%;
+    height: auto;
+  }
 }
 </style>
 </head>
@@ -155,6 +186,6 @@ tailwind.config = {
 </main>
 
 <div aria-hidden="true" id="quiz-pdf-sheet"></div>
-<script src="./js/quiz.bundle.js" defer></script>
+<script src="./js/quiz.bundle.js?v=20260709c" defer></script>
 </body>
 </html>

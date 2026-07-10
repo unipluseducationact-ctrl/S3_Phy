@@ -1,25 +1,18 @@
-name: Deploy to GitHub Pages
+name: Deploy site
 
 on:
   push:
     branches: [main]
   workflow_dispatch:
-    inputs:
-      auto_retry:
-        description: 'Triggered by auto-retry workflow after a prior failure'
-        required: false
-        default: 'false'
-        type: boolean
 
 permissions:
   contents: read
   pages: write
   id-token: write
 
-# Wait for in-flight deploys instead of cancelling (avoids "Deployment failed, try again later").
 concurrency:
-  group: pages
-  cancel-in-progress: false
+  group: production-deploy
+  cancel-in-progress: true
 
 jobs:
   build:
@@ -39,73 +32,41 @@ jobs:
           npm ci
           npm run build
 
-      - name: Upload Pages artifact
+      - name: Upload GitHub Pages artifact
         uses: actions/upload-pages-artifact@v3
         with:
           path: dist
 
-  deploy:
+      - name: Upload dist for Cloudflare
+        uses: actions/upload-artifact@v4
+        with:
+          name: dist
+          path: dist
+
+  deploy-github-pages:
     needs: build
     runs-on: ubuntu-latest
-    timeout-minutes: 15
     environment:
       name: github-pages
       url: ${{ steps.deployment.outputs.page_url }}
     steps:
-      - name: Deploy to GitHub Pages (attempt 1)
+      - name: Deploy to GitHub Pages
         id: deployment
-        continue-on-error: true
         uses: actions/deploy-pages@v4
 
-      - name: Wait 45s before retry
-        if: steps.deployment.outcome == 'failure'
-        run: sleep 45
+  deploy-cloudflare:
+    needs: build
+    runs-on: ubuntu-latest
+    steps:
+      - name: Download dist
+        uses: actions/download-artifact@v4
+        with:
+          name: dist
+          path: dist
 
-      - name: Deploy to GitHub Pages (attempt 2)
-        id: deployment_retry
-        if: steps.deployment.outcome == 'failure'
-        continue-on-error: true
-        uses: actions/deploy-pages@v4
-
-      - name: Wait 60s before retry
-        if: steps.deployment.outcome == 'failure' && steps.deployment_retry.outcome == 'failure'
-        run: sleep 60
-
-      - name: Deploy to GitHub Pages (attempt 3)
-        id: deployment_retry2
-        if: steps.deployment.outcome == 'failure' && steps.deployment_retry.outcome == 'failure'
-        continue-on-error: true
-        uses: actions/deploy-pages@v4
-
-      - name: Wait 90s before retry
-        if: steps.deployment.outcome == 'failure' && steps.deployment_retry.outcome == 'failure' && steps.deployment_retry2.outcome == 'failure'
-        run: sleep 90
-
-      - name: Deploy to GitHub Pages (attempt 4)
-        id: deployment_retry3
-        if: steps.deployment.outcome == 'failure' && steps.deployment_retry.outcome == 'failure' && steps.deployment_retry2.outcome == 'failure'
-        continue-on-error: true
-        uses: actions/deploy-pages@v4
-
-      - name: Wait 120s before retry
-        if: steps.deployment.outcome == 'failure' && steps.deployment_retry.outcome == 'failure' && steps.deployment_retry2.outcome == 'failure' && steps.deployment_retry3.outcome == 'failure'
-        run: sleep 120
-
-      - name: Deploy to GitHub Pages (attempt 5)
-        id: deployment_retry4
-        if: steps.deployment.outcome == 'failure' && steps.deployment_retry.outcome == 'failure' && steps.deployment_retry2.outcome == 'failure' && steps.deployment_retry3.outcome == 'failure'
-        continue-on-error: true
-        uses: actions/deploy-pages@v4
-
-      - name: Fail if all deploy attempts failed
-        if: >-
-          steps.deployment.outcome == 'failure' &&
-          steps.deployment_retry.outcome == 'failure' &&
-          steps.deployment_retry2.outcome == 'failure' &&
-          steps.deployment_retry3.outcome == 'failure' &&
-          steps.deployment_retry4.outcome == 'failure'
-        run: |
-          echo "GitHub Pages deploy failed after 5 attempts (transient API error)."
-          echo "The auto-retry workflow will dispatch another deploy in ~3 minutes."
-          echo "If this persists, check Settings → Pages uses GitHub Actions only (not branch /dist)."
-          exit 1
+      - name: Deploy to Cloudflare Pages
+        uses: cloudflare/wrangler-action@v3
+        with:
+          apiToken: ${{ secrets.CLOUDFLARE_API_TOKEN }}
+          accountId: ${{ secrets.CLOUDFLARE_ACCOUNT_ID }}
+          command: pages deploy dist --project-name=uni-s3-phy --commit-dirty=true

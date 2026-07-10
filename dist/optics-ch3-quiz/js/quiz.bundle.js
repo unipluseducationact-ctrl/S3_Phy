@@ -331,14 +331,12 @@
       if (!byType.has(sid)) byType.set(sid, { total: 0, correct: 0, firstTry: 0 });
       const agg = byType.get(sid);
       agg.total += 1;
-      if (st.solved && st.wrong < 2) {
+      if (st.solved && st.wrong === 0) {
         correct += 1;
         agg.correct += 1;
-        if (st.wrong === 0) {
-          firstTry += 1;
-          agg.firstTry += 1;
-        }
-      } else if (st.solved && st.wrong >= 2) {
+        firstTry += 1;
+        agg.firstTry += 1;
+      } else if (st.solved && st.wrong >= 1) {
         failed.push({ n, q });
       } else {
         incomplete.push(n);
@@ -396,14 +394,98 @@
   }
 
   // ../js/quizExport.js
-  function figureExportCaptions(q) {
-    if (q.images?.length) {
-      return q.images.map((img) => img.caption || img.alt || "see notes");
+  const EXPORT_Q_STYLE = "page-break-inside:avoid;break-inside:avoid-page;mso-page-break-inside:avoid;margin-bottom:1rem";
+  const EXPORT_FIG_STYLE = "page-break-inside:avoid;break-inside:avoid-page;margin:0.75rem 0";
+  const EXPORT_HEAD_STYLE = "<style>.export-q{page-break-inside:avoid;break-inside:avoid-page;mso-page-break-inside:avoid;margin-bottom:1rem}.export-q h2{margin-top:0}.export-fig img{max-width:100%;height:auto;display:block}</style>";
+  function resolveExportAssetUrl(src) {
+    if (!src) return "";
+    try {
+      return new URL(src, window.location.href).href;
+    } catch {
+      return src;
     }
-    if (q.image?.src) {
-      return [q.image.caption || q.image.alt || "see notes"];
+  }
+  function buildExportFigureHtml(fig) {
+    const src = resolveExportAssetUrl(fig.src);
+    if (!src) return "";
+    const alt = escHtml(fig.alt || fig.caption || "Diagram");
+    const caption = fig.caption ? `<figcaption>${escHtml(fig.caption)}</figcaption>` : "";
+    return `<figure class="export-fig" style="${EXPORT_FIG_STYLE}"><img src="${escHtml(src)}" alt="${alt}" style="max-width:100%;height:auto;display:block" />${caption}</figure>`;
+  }
+  function buildExportFiguresHtml(q) {
+    const figs = q.images?.length ? q.images : q.image?.src ? [q.image] : [];
+    return figs.map(buildExportFigureHtml).join("");
+  }
+  function collectImageUrlsFromHtml(html) {
+    const urls = [];
+    const re = /<img[^>]+src="([^"]+)"/gi;
+    let match;
+    while ((match = re.exec(html)) !== null) urls.push(match[1]);
+    return urls;
+  }
+  function preloadImageUrls(urls) {
+    const unique = [...new Set(urls.filter(Boolean))];
+    if (!unique.length) return Promise.resolve();
+    return Promise.all(
+      unique.map(
+        (url) =>
+          new Promise((resolve) => {
+            const img = new Image();
+            img.onload = () => resolve();
+            img.onerror = () => resolve();
+            img.src = url;
+          })
+      )
+    );
+  }
+  function waitForExportImages(container) {
+    const imgs = [...container.querySelectorAll("img")];
+    if (!imgs.length) return Promise.resolve();
+    return Promise.all(
+      imgs.map(
+        (img) =>
+          new Promise((resolve) => {
+            if (img.complete && img.naturalWidth > 0) {
+              resolve();
+              return;
+            }
+            img.addEventListener("load", () => resolve(), { once: true });
+            img.addEventListener("error", () => resolve(), { once: true });
+          })
+      )
+    );
+  }
+  const PRINT_DOC_STYLE = "html,body{margin:0;padding:0;min-height:0!important;height:auto!important;background:#fff}body{font-family:Inter,'Segoe UI',sans-serif;font-size:12pt;line-height:1.45;margin:12mm;color:#191c1e}h1{font-size:18pt;margin:0 0 1rem}h2{font-size:13pt;margin:0 0 .5rem}p,ul,ol{margin:.35em 0}ul,ol{padding-left:1.25rem}.export-q{page-break-inside:avoid;break-inside:avoid-page;margin-bottom:1rem}.export-fig{page-break-inside:avoid;break-inside:avoid-page;margin:.75rem 0}.export-fig img{max-width:100%;height:auto;display:block}figcaption{font-size:10pt;color:#414753;margin-top:.25rem}table{border-collapse:collapse;width:100%;margin:.5rem 0}th,td{border:1px solid #c1c6d5;padding:6px;text-align:left}";
+  function getPrintFrame() {
+    let frame = document.getElementById("quiz-print-frame");
+    if (!frame) {
+      frame = document.createElement("iframe");
+      frame.id = "quiz-print-frame";
+      frame.setAttribute("aria-hidden", "true");
+      frame.title = "Print preview";
+      frame.style.cssText = "position:fixed;width:0;height:0;border:0;opacity:0;pointer-events:none;left:-9999px;top:0";
+      document.body.appendChild(frame);
     }
-    return [];
+    return frame;
+  }
+  async function printStandaloneHtml(titleEn, bodyHtml) {
+    await preloadImageUrls(collectImageUrlsFromHtml(bodyHtml));
+    const frame = getPrintFrame();
+    const win = frame.contentWindow;
+    const doc = win.document;
+    doc.open();
+    doc.write(`<!DOCTYPE html><html lang="en"><head><meta charset="utf-8"><title>${escHtml(titleEn)}</title><style>${PRINT_DOC_STYLE}</style></head><body>${bodyHtml}</body></html>`);
+    doc.close();
+    await waitForExportImages(doc.body);
+    await new Promise((resolve) => {
+      const cleanup = () => {
+        win.removeEventListener("afterprint", cleanup);
+        resolve();
+      };
+      win.addEventListener("afterprint", cleanup);
+      win.focus();
+      win.print();
+    });
   }
   function fillLineExportHtml(line, answersMode) {
     let html = "";
@@ -424,14 +506,11 @@
     let body = "";
     questions.forEach((q, i) => {
       const fmt = questionFormat(q);
+      body += `<div class="export-q" style="${EXPORT_Q_STYLE}">`;
       body += `<h2>Q${i + 1} \xB7 ${escHtml(q.section)} \xB7 ${escHtml(q.difficulty)} \xB7 ${escHtml(fmt.toUpperCase())}</h2>`;
       body += `<div class="stem"><b>EN:</b> ${formatStemHtml(q.stem)}</div>`;
       if (q.stemZh) body += `<p><b>\u4E2D\u6587\uFF1A</b> ${escHtml(q.stemZh)}</p>`;
-      if (!answersMode) {
-        figureExportCaptions(q).forEach((caption) => {
-          body += `<p><i>[Diagram: ${escHtml(caption)}]</i></p>`;
-        });
-      }
+      body += buildExportFiguresHtml(q);
       if (!answersMode) {
         if (fmt === "fill" && getFillLines(q).length) {
           if (q.wordBank?.length) {
@@ -442,6 +521,21 @@
             body += `<li>${fillLineExportHtml(line, answersMode)}</li>`;
           });
           body += "</ol>";
+        } else if (q.optionsLayout === "table" && q.optionTable?.rows?.length) {
+          const headers = q.optionTable.headers || [];
+          body += "<table border='1' cellpadding='6' cellspacing='0' style='border-collapse:collapse;width:100%;max-width:100%'><tr><th></th>";
+          headers.forEach((h) => {
+            body += `<th>${escHtml(h)}</th>`;
+          });
+          body += "</tr>";
+          q.optionTable.rows.forEach((row) => {
+            body += `<tr><td><b>${escHtml(row.key)}</b></td>`;
+            (row.cells || []).forEach((cell) => {
+              body += `<td>${escHtml(cell)}</td>`;
+            });
+            body += "</tr>";
+          });
+          body += "</table>";
         } else if (q.options?.length) {
           body += "<ul>";
           q.options.forEach((opt) => {
@@ -455,8 +549,8 @@
         const ma = modelAnswerText(q);
         body += `<p><b>Answer / \u7B54\u6848\uFF1A</b> ${escHtml(ma.en)}</p>`;
         if (ma.zh) body += `<p>${escHtml(ma.zh)}</p>`;
-        body += `<p><i>Hint / \u63D0\u793A:</i> ${escHtml(q.hint || "")}</p>`;
       }
+      body += "</div>";
     });
     return body;
   }
@@ -468,7 +562,7 @@
     const titleEn = answersMode ? "S3 Optics Ch.3 \u2014 Light & Lens \u2014 Answers" : "S3 Optics Ch.3 \u2014 Light & Lens \u2014 Questions";
     const titleZh = answersMode ? "S3 \u5149\u5B78 \u7B2C\u4E09\u7AE0 \u2014 \u7B54\u6848" : "S3 \u5149\u5B78 \u7B2C\u4E09\u7AE0 \u2014 \u8A66\u984C";
     const body = buildDocBody(questions, answersMode);
-    const html = `<html xmlns:o="urn:schemas-microsoft-com:office:office" xmlns:w="urn:schemas-microsoft-com:office:word" xmlns="http://www.w3.org/TR/REC-html40"><head><meta charset="utf-8"><title>${escHtml(titleEn)}</title></head><body><h1>${escHtml(titleEn)}</h1><h2 style="font-size:14pt">${escHtml(titleZh)}</h2>${body}</body></html>`;
+    const html = `<html xmlns:o="urn:schemas-microsoft-com:office:office" xmlns:w="urn:schemas-microsoft-com:office:word" xmlns="http://www.w3.org/TR/REC-html40"><head><meta charset="utf-8"><title>${escHtml(titleEn)}</title>${EXPORT_HEAD_STYLE}</head><body><h1>${escHtml(titleEn)}</h1><h2 style="font-size:14pt">${escHtml(titleZh)}</h2>${body}</body></html>`;
     const blob = new Blob(["\uFEFF", html], { type: "application/msword" });
     const a = document.createElement("a");
     const ts = (/* @__PURE__ */ new Date()).toISOString().slice(0, 19).replace(/[:T]/g, "-");
@@ -477,18 +571,14 @@
     a.click();
     URL.revokeObjectURL(a.href);
   }
-  function printSheet(questions, answersMode, lang) {
+  async function printSheet(questions, answersMode, lang) {
     if (!questions.length) {
       alert(noQuizAlertMessage(lang));
       return;
     }
-    const sheet = document.getElementById("quiz-pdf-sheet");
-    if (!sheet) return;
     const titleEn = answersMode ? "S3 Optics Ch.3 \u2014 Light & Lens (Answers)" : "S3 Optics Ch.3 \u2014 Light & Lens (Questions)";
-    let html = `<h1>${escHtml(titleEn)}</h1>`;
-    html += buildDocBody(questions, answersMode);
-    sheet.innerHTML = html;
-    window.print();
+    const bodyHtml = `<h1>${escHtml(titleEn)}</h1>${buildDocBody(questions, answersMode)}`;
+    await printStandaloneHtml(titleEn, bodyHtml);
   }
 
   // ../js/quizEffects.js
@@ -540,10 +630,10 @@
     const readOpen = () => {
       try {
         const v = sessionStorage.getItem(storageKey);
-        return v === null ? true : v === "1";
+        if (v !== null) return v === "1";
       } catch {
-        return true;
       }
+      return !window.matchMedia("(max-width: 1100px)").matches;
     };
     let open = readOpen();
     function apply() {
@@ -590,7 +680,6 @@
       btnDocA: "Word \u2014 Answers",
       btnPrint: "Print / Save as PDF",
       hPractice: "On-screen practice",
-      txtPracticeHint: "First wrong: hint only. Second wrong: model answer.",
       btnSummary: "Session summary",
       quizCheck: "Check answer",
       empty: "Generate questions first.",
@@ -602,14 +691,13 @@
       progressNone: "No session yet",
       progressCompletedPrefix: "Completed ",
       correct: "Correct.",
-      hintPrefix: "Hint:",
       modelPrefix: "Model answer:",
       printConfirm: "Print ANSWER sheet? (Cancel = questions only)",
       summaryTitle: "Summary",
       summaryScoreLabel: "Score (correct / total)",
       summaryFirstTry: "Correct on first attempt",
-      summaryWrongTitle: "Wrong twice \u2014 review these",
-      summaryNoneWrong: "None \u2014 no questions failed after two attempts.",
+      summaryWrongTitle: "Incorrect \u2014 review these",
+      summaryNoneWrong: "None \u2014 all questions answered correctly.",
       summaryIncomplete: "Still in progress",
       summaryByTypeTitle: "Correct rate by topic",
       summaryByTypeColType: "Topic",
@@ -623,9 +711,9 @@
       revBandLow: "Several concepts need consolidation. Review reflection, Snell's law, total internal reflection, lens ray diagrams, and the lens formula before the next round.",
       revWeakOne: "Prioritise revision on {type} \u2014 you scored {c}/{t} ({pct}%) in that topic.",
       revStrongOne: "Strength: every {type} item correct ({n} questions).",
-      revTwoStrike: "Questions missed twice: study the model answers, then regenerate those topics.",
+      revTwoStrike: "Questions answered incorrectly: study the model answers, then regenerate those topics.",
       revIncomplete: "Finish questions still in progress for a fair measure of strengths and gaps.",
-      revFirstTryLow: "Many items needed two attempts. Read each stem carefully before answering.",
+      revFirstTryLow: "Many items were answered incorrectly. Read each stem carefully before answering.",
       revBalanced: "Errors spread across topics \u2014 continue balanced practice.",
       hideSettings: "Hide settings",
       showSettings: "Show settings"
@@ -651,7 +739,6 @@
       btnDocA: "Word \u2014 \u7B54\u6848",
       btnPrint: "\u6253\u5370\uFF0F\u53E6\u5B58 PDF",
       hPractice: "\u4E92\u52A8\u7EC3\u4E60",
-      txtPracticeHint: "\u7B2C\u4E00\u6B21\u7B54\u9519\u53EA\u663E\u793A\u63D0\u793A\uFF1B\u7B2C\u4E8C\u6B21\u7B54\u9519\u663E\u793A\u53C2\u8003\u7B54\u6848\u3002",
       btnSummary: "\u5B66\u4E60\u6458\u8981",
       quizCheck: "\u68C0\u67E5\u7B54\u6848",
       empty: "\u8BF7\u5148\u6309\u300C\u751F\u6210\u9898\u76EE\u300D\u3002",
@@ -663,14 +750,13 @@
       progressNone: "\u5C1A\u672A\u751F\u6210\u9898\u76EE",
       progressCompletedPrefix: "\u5DF2\u5B8C\u6210 ",
       correct: "\u6B63\u786E\u3002",
-      hintPrefix: "\u63D0\u793A\uFF1A",
       modelPrefix: "\u53C2\u8003\u7B54\u6848\uFF1A",
       printConfirm: "\u8981\u6253\u5370\u300C\u7B54\u6848\u7248\u300D\u5417\uFF1F\uFF08\u53D6\u6D88 = \u8BD5\u9898\u7248\uFF09",
       summaryTitle: "\u6458\u8981",
       summaryScoreLabel: "\u5F97\u5206\uFF08\u7B54\u5BF9\uFF0F\u603B\u9898\u6570\uFF09",
       summaryFirstTry: "\u9996\u6B21\u5373\u7B54\u5BF9",
-      summaryWrongTitle: "\u4E24\u6B21\u7686\u9519 \u2014 \u9700\u91CD\u6E29",
-      summaryNoneWrong: "\u6CA1\u6709\u6B64\u7C7B\u9898\u76EE\u3002",
+      summaryWrongTitle: "\u7B54\u9519 \u2014 \u9700\u91CD\u6E29",
+      summaryNoneWrong: "\u6CA1\u6709\u7B54\u9519\u7684\u9898\u76EE\u3002",
       summaryIncomplete: "\u5C1A\u672A\u7B54\u5BF9",
       summaryByTypeTitle: "\u5404\u8BFE\u9898\u7B54\u5BF9\u7387",
       summaryByTypeColType: "\u8BFE\u9898",
@@ -684,9 +770,9 @@
       revBandLow: "\u591A\u4E2A\u6982\u5FF5\u4ECD\u9700\u5DE9\u56FA\u3002\u8BF7\u5148\u6E29\u4E60\u6D41\u52A8\u9576\u5D4C\u3001\u6E17\u900F\u6027\u3001\u6E17\u900F\u4E0E\u4E3B\u52A8\u8FD0\u8F93\u3002",
       revWeakOne: "\u5EFA\u8BAE\u4F18\u5148\u6E29\u4E60\u300C{type}\u300D\uFF1A\u672C\u6B21 {c}/{t}\uFF08{pct}%\uFF09\u3002",
       revStrongOne: "\u5F3A\u9879\uFF1A\u300C{type}\u300D\u672C\u6B21\u5168\u5BF9\uFF08\u5171 {n} \u9898\uFF09\u3002",
-      revTwoStrike: "\u66FE\u4E24\u6B21\u7B54\u9519\u7684\u9898\u76EE\uFF1A\u8BF7\u7EC6\u8BFB\u53C2\u8003\u7B54\u6848\u540E\u518D\u7EC3\u3002",
+      revTwoStrike: "\u7B54\u9519\u7684\u9898\u76EE\uFF1A\u8BF7\u7EC6\u8BFB\u53C2\u8003\u7B54\u6848\u540E\u518D\u7EC3\u3002",
       revIncomplete: "\u5C1A\u6709\u672A\u7B54\u5BF9\u9898\u76EE\uFF0C\u5EFA\u8BAE\u5148\u5B8C\u6210\u3002",
-      revFirstTryLow: "\u4E0D\u5C11\u9898\u76EE\u9700\u7B2C\u4E8C\u6B21\u624D\u7B54\u5BF9\u3002\u4F5C\u7B54\u524D\u5B9C\u653E\u6162\u9605\u8BFB\u9898\u5E72\u3002",
+      revFirstTryLow: "\u4E0D\u5C11\u9898\u76EE\u7B54\u9519\u3002\u4F5C\u7B54\u524D\u5B9C\u653E\u6162\u9605\u8BFB\u9898\u5E72\u3002",
       revBalanced: "\u9519\u8BEF\u5206\u6563\u5728\u4E0D\u540C\u8BFE\u9898\uFF0C\u5B9C\u5747\u8861\u7EC3\u4E60\u3002",
       hideSettings: "\u9690\u85CF\u8BBE\u5B9A",
       showSettings: "\u663E\u793A\u8BBE\u5B9A"
@@ -712,7 +798,6 @@
       btnDocA: "Word \u2014 \u7B54\u6848",
       btnPrint: "\u5217\u5370\uFF0F\u53E6\u5B58 PDF",
       hPractice: "\u4E92\u52D5\u7DF4\u7FD2",
-      txtPracticeHint: "\u7B2C\u4E00\u6B21\u7B54\u932F\u53EA\u986F\u793A\u63D0\u793A\uFF1B\u7B2C\u4E8C\u6B21\u7B54\u932F\u986F\u793A\u53C3\u8003\u7B54\u6848\u3002",
       btnSummary: "\u5B78\u7FD2\u6458\u8981",
       quizCheck: "\u6AA2\u67E5\u7B54\u6848",
       empty: "\u8ACB\u5148\u6309\u300C\u7522\u751F\u984C\u76EE\u300D\u3002",
@@ -724,14 +809,13 @@
       progressNone: "\u5C1A\u672A\u7522\u751F\u984C\u76EE",
       progressCompletedPrefix: "\u5DF2\u5B8C\u6210 ",
       correct: "\u6B63\u78BA\u3002",
-      hintPrefix: "\u63D0\u793A\uFF1A",
       modelPrefix: "\u53C3\u8003\u7B54\u6848\uFF1A",
       printConfirm: "\u8981\u5217\u5370\u300C\u7B54\u6848\u7248\u300D\u55CE\uFF1F\uFF08\u53D6\u6D88 = \u8A66\u984C\u7248\uFF09",
       summaryTitle: "\u6458\u8981",
       summaryScoreLabel: "\u5F97\u5206\uFF08\u7B54\u5C0D\uFF0F\u7E3D\u984C\u6578\uFF09",
       summaryFirstTry: "\u9996\u6B21\u5373\u7B54\u5C0D",
-      summaryWrongTitle: "\u5169\u6B21\u7686\u932F \u2014 \u9700\u91CD\u6EAB",
-      summaryNoneWrong: "\u6C92\u6709\u6B64\u985E\u984C\u76EE\u3002",
+      summaryWrongTitle: "\u7B54\u932F \u2014 \u9700\u91CD\u6EAB",
+      summaryNoneWrong: "\u6C92\u6709\u7B54\u932F\u7684\u984C\u76EE\u3002",
       summaryIncomplete: "\u5C1A\u672A\u7B54\u5C0D",
       summaryByTypeTitle: "\u5404\u8AB2\u984C\u7B54\u5C0D\u7387",
       summaryByTypeColType: "\u8AB2\u984C",
@@ -745,9 +829,9 @@
       revBandLow: "\u591A\u500B\u6982\u5FF5\u4ECD\u9700\u978F\u56FA\u3002\u8ACB\u5148\u6EAB\u7FD2\u6D41\u52D5\u9472\u5D4C\u3001\u6EF2\u900F\u6027\u3001\u6EF2\u900F\u8207\u4E3B\u52D5\u904B\u8F38\u3002",
       revWeakOne: "\u5EFA\u8B70\u512A\u5148\u6EAB\u7FD2\u300C{type}\u300D\uFF1A\u672C\u6B21 {c}/{t}\uFF08{pct}%\uFF09\u3002",
       revStrongOne: "\u5F37\u9805\uFF1A\u300C{type}\u300D\u672C\u6B21\u5168\u5C0D\uFF08\u5171 {n} \u984C\uFF09\u3002",
-      revTwoStrike: "\u66FE\u5169\u6B21\u7B54\u932F\u7684\u984C\u76EE\uFF1A\u8ACB\u7D30\u8B80\u53C3\u8003\u7B54\u6848\u5F8C\u518D\u7DF4\u3002",
+      revTwoStrike: "\u7B54\u932F\u7684\u984C\u76EE\uFF1A\u8ACB\u7D30\u8B80\u53C3\u8003\u7B54\u6848\u5F8C\u518D\u7DF4\u3002",
       revIncomplete: "\u5C1A\u6709\u672A\u7B54\u5C0D\u984C\u76EE\uFF0C\u5EFA\u8B70\u5148\u5B8C\u6210\u3002",
-      revFirstTryLow: "\u4E0D\u5C11\u984C\u76EE\u9700\u7B2C\u4E8C\u6B21\u624D\u7B54\u5C0D\u3002\u4F5C\u7B54\u524D\u5B9C\u653E\u6162\u95B1\u8B80\u984C\u5E79\u3002",
+      revFirstTryLow: "\u4E0D\u5C11\u984C\u76EE\u7B54\u932F\u3002\u4F5C\u7B54\u524D\u5B9C\u653E\u6162\u95B1\u8B80\u984C\u5E79\u3002",
       revBalanced: "\u932F\u8AA4\u5206\u6563\u5728\u4E0D\u540C\u8AB2\u984C\uFF0C\u5B9C\u5747\u8861\u7DF4\u7FD2\u3002",
       hideSettings: "\u96B1\u85CF\u8A2D\u5B9A",
       showSettings: "\u986F\u793A\u8A2D\u5B9A"
@@ -929,6 +1013,7 @@
         const wrap = document.createElement("article");
         wrap.className = "q-block p-5 md:p-6 rounded-2xl bg-surface border border-outline-variant/25 shadow-sm";
         wrap.id = "q-block-" + q.id;
+        wrap.dataset.startTime = String(Date.now());
         const head = document.createElement("div");
         head.className = "text-[11px] font-label-bold uppercase tracking-wide text-on-surface-variant mb-3";
         head.textContent = "Q" + (idx + 1) + " \xB7 " + sectionLabel(q.section, lang).toUpperCase() + " \xB7 " + formatTypeLabel(q) + " \xB7 " + q.difficulty.toUpperCase();
@@ -1082,6 +1167,27 @@
           if (ok) {
             state.solved = true;
             attemptMap.set(q.id, state);
+            try {
+              const _startTime = parseInt(wrap.dataset.startTime || String(Date.now()));
+              const _selOpt = q.options?.find(o => o.key === state.selected);
+              const _corOpt = q.options?.find(o => o.key === q.answer);
+              window.parent.postMessage({
+                type: 'uniplus:quizAnswer',
+                subject: 'PHY',
+                quizId: 'optics-ch3-quiz',
+                questionId: q.id,
+                section: q.section,
+                difficulty: q.difficulty,
+                stem: q.stem || null,
+                selectedAnswer: fmt === 'fill' ? fillInputs.map(i => i.value).join('|') : (state.selected || null),
+                selectedAnswerText: fmt === 'fill' ? fillInputs.map(i => i.value).join('|') : (_selOpt?.text || null),
+                correctAnswer: q.answer,
+                correctAnswerText: fmt === 'fill' ? null : (_corOpt?.text || null),
+                isCorrect: true,
+                attemptNumber: 1,
+                msTaken: Date.now() - _startTime
+              }, '*');
+            } catch (_) {}
             fb.className = "mt-3 text-body-sm p-3 rounded-xl bg-secondary/10 text-secondary font-label-bold";
             fb.textContent = t("correct");
             btn.disabled = true;
@@ -1106,34 +1212,45 @@
           } else {
             fillInputs.forEach((inp) => inp.classList.add("border-tertiary"));
           }
-          if (state.wrong === 1) {
-            fb.className = "mt-3 text-body-sm p-3 rounded-xl bg-primary-fixed/50 text-on-surface border border-primary/20";
-            fb.innerHTML = `<strong>${escHtml(t("hintPrefix"))}</strong> ${escHtml(q.hint || "")}`;
-          } else {
-            state.solved = true;
-            attemptMap.set(q.id, state);
-            showModelAnswer();
-            btn.disabled = true;
-            optionButtons.forEach((b) => {
-              b.disabled = true;
-              if (b.dataset.key === q.answer) {
-                b.classList.add("border-tertiary", "bg-tertiary/10");
-              }
-            });
-            fillInputs.forEach((inp) => {
-              inp.disabled = true;
-            });
-            updateProgress();
-          }
+          state.solved = true;
+          attemptMap.set(q.id, state);
+          try {
+            const _startTime = parseInt(wrap.dataset.startTime || String(Date.now()));
+            const _selOpt = q.options?.find(o => o.key === state.selected);
+            const _corOpt = q.options?.find(o => o.key === q.answer);
+            window.parent.postMessage({
+              type: 'uniplus:quizAnswer',
+              subject: 'PHY',
+              quizId: 'optics-ch3-quiz',
+              questionId: q.id,
+              section: q.section,
+              difficulty: q.difficulty,
+              stem: q.stem || null,
+              selectedAnswer: fmt === 'fill' ? fillInputs.map(i => i.value).join('|') : (state.selected || null),
+              selectedAnswerText: fmt === 'fill' ? fillInputs.map(i => i.value).join('|') : (_selOpt?.text || null),
+              correctAnswer: q.answer,
+              correctAnswerText: fmt === 'fill' ? null : (_corOpt?.text || null),
+              isCorrect: false,
+              attemptNumber: 1,
+              msTaken: Date.now() - _startTime
+            }, '*');
+          } catch (_) {}
+          showModelAnswer();
+          btn.disabled = true;
+          optionButtons.forEach((b) => {
+            b.disabled = true;
+            if (b.dataset.key === q.answer) {
+              b.classList.add("border-tertiary", "bg-tertiary/10");
+            }
+          });
+          fillInputs.forEach((inp) => {
+            inp.disabled = true;
+          });
+          updateProgress();
         });
         wrap.appendChild(btn);
         wrap.appendChild(fb);
-        if (st.solved && st.wrong > 0 && st.wrong < 2) {
-          fb.classList.remove("hidden");
-          fb.className = "mt-3 text-body-sm p-3 rounded-xl bg-primary-fixed/50 text-on-surface border border-primary/20";
-          fb.innerHTML = `<strong>${escHtml(t("hintPrefix"))}</strong> ${escHtml(q.hint || "")}`;
-        }
-        if (st.solved && st.wrong >= 2) {
+        if (st.solved && st.wrong >= 1) {
           fb.classList.remove("hidden");
           showModelAnswer();
           btn.disabled = true;
@@ -1155,13 +1272,13 @@
     });
     document.getElementById("btn-doc-q")?.addEventListener("click", () => downloadWord(lastQuestions, false, lang));
     document.getElementById("btn-doc-a")?.addEventListener("click", () => downloadWord(lastQuestions, true, lang));
-    document.getElementById("btn-print")?.addEventListener("click", () => {
+    document.getElementById("btn-print")?.addEventListener("click", async () => {
       if (!lastQuestions.length) {
         alert(t("alertNoQuiz"));
         return;
       }
       const want = confirm(t("printConfirm"));
-      printSheet(lastQuestions, want, lang);
+      await printSheet(lastQuestions, want, lang);
     });
     function syncLangFromParent() {
       const next = resolveQuizLang();
