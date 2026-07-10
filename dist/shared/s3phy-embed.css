@@ -347,7 +347,7 @@ html.s3phy-embed .tl-wrap {
   min-height: 0;
   height: 100%;
   width: 100%;
-  overflow: auto;
+  overflow: hidden;
 }
 
 html.s3phy-embed .rml .rml-head,

@@ -885,3 +885,61 @@ html.s3phy-embed #app {
     width: min(380px, calc(100% - 24px));
   }
 }
+
+/* Hub iframe — keep viz/graph aspect ratio when height is constrained (window mode) */
+html.s3phy-embed .tl-wrap {
+  overflow: hidden;
+  display: flex;
+  flex-direction: column;
+  height: 100%;
+  min-height: 0;
+}
+
+html.s3phy-embed .tl-wrap .tl-dash {
+  flex: 1 1 auto;
+  min-height: 0;
+  overflow: hidden;
+}
+
+html.s3phy-embed .tl-wrap .tl-canvas-phys,
+html.s3phy-embed .tl-wrap .tl-canvas-graph {
+  flex-shrink: 0;
+  width: auto !important;
+  height: auto !important;
+  max-width: 100%;
+}
+
+html.s3phy-embed .tl-wrap .tl-canvas-phys {
+  aspect-ratio: 460 / 340;
+  max-height: calc(100% - 2.5rem);
+}
+
+html.s3phy-embed .tl-wrap .tl-canvas-graph {
+  aspect-ratio: 640 / 420;
+  max-height: 100%;
+}
+
+@media (min-width: 1024px) {
+  html.s3phy-embed .tl-wrap .tl-dash {
+    grid-template-rows: minmax(0, 1fr) auto auto;
+    height: 100%;
+  }
+
+  html.s3phy-embed .tl-wrap .tl-viz-phys,
+  html.s3phy-embed .tl-wrap .tl-viz-graph {
+    min-height: 0;
+    overflow: hidden;
+    justify-content: center;
+    align-items: center;
+  }
+
+  html.s3phy-embed .tl-wrap .tl-viz-phys {
+    padding-top: var(--tl-viz-top-reserve);
+    align-items: center;
+  }
+
+  html.s3phy-embed .tl-wrap .tl-live-calculations {
+    min-height: 0;
+    overflow-y: auto;
+  }
+}

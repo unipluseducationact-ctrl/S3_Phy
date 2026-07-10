@@ -921,6 +921,7 @@ a {
 .tool-stage.tool-stage--overlay-fullscreen .tool-change-of-state,
 .tool-stage.tool-stage--overlay-fullscreen .tool-heat-transfer,
 #app.is-lab-fullscreen .tool-lab-embed,
+#app.is-lab-fullscreen .tool-thermometer-lab,
 #app.is-lab-fullscreen .tool-change-of-state,
 #app.is-lab-fullscreen .tool-heat-transfer,
 #app.is-lab-fullscreen .tool-specific-heat,
