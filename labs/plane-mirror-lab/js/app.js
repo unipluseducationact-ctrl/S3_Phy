@@ -343,6 +343,10 @@ function rebuildControls() {
       updateResults();
       render();
     });
+    const colorPanel = els.controls.querySelector('.ray-color-panel');
+    if (colorPanel && colorPanel !== els.controls.firstElementChild) {
+      els.controls.insertBefore(colorPanel, els.controls.firstElementChild);
+    }
   } else if (sc.extraToggles) {
     const row = document.createElement('div');
     row.className = 'btn-row';
