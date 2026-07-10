@@ -1124,11 +1124,12 @@ a {
   grid-column: 1 / -1;
 }
 
-/* Fullscreen — compact live calculations */
+/* Fullscreen — compact live calculations (formula panel scrolls inside iframe embed CSS) */
 .tool-stage:fullscreen .tl-wrap .tl-live-calculations,
 .tool-stage.tool-stage--overlay-fullscreen .tl-wrap .tl-live-calculations,
 #app.is-lab-fullscreen .tl-wrap .tl-live-calculations {
   padding: 10px 14px;
+  max-height: min(42vh, 360px);
 }
 
 .tool-stage:fullscreen .tl-wrap .tl-live-calculations .tl-math-formula,

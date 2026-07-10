@@ -886,15 +886,16 @@ html.s3phy-embed #app {
   }
 }
 
-/* Hub iframe — preserve viz/graph scale; prioritise live calculations height */
+/* Hub iframe — balanced layout: viz grows, formula fits content */
 html.s3phy-embed .tl-wrap {
-  --tl-viz-top-reserve: 28px;
+  --tl-viz-top-reserve: 32px;
+  --tl-formula-max-h: min(38vh, 320px);
   overflow: hidden;
   display: flex;
   flex-direction: column;
   height: 100%;
   min-height: 0;
-  padding: 6px;
+  padding: 8px;
 }
 
 html.s3phy-embed .tl-wrap .tl-dash {
@@ -902,15 +903,17 @@ html.s3phy-embed .tl-wrap .tl-dash {
   min-height: 0;
   height: 100%;
   overflow: hidden;
-  gap: 10px;
+  gap: 12px;
+  display: flex;
+  flex-direction: column;
 }
 
 html.s3phy-embed .tl-wrap .tl-viz-phys,
 html.s3phy-embed .tl-wrap .tl-viz-graph {
-  min-height: 0;
-  max-height: clamp(120px, 20vh, 200px);
+  flex: 1 1 auto;
+  min-height: clamp(140px, 22vh, 240px);
   overflow: hidden;
-  padding: 8px;
+  padding: 10px;
 }
 
 html.s3phy-embed .tl-wrap .tl-canvas-phys,
@@ -928,72 +931,83 @@ html.s3phy-embed .tl-wrap .tl-canvas-graph {
 
 html.s3phy-embed .tl-wrap .tl-viz-phys .tl-btn {
   flex-shrink: 0;
-  margin-top: 2px;
-  padding: 4px 8px;
-  font-size: 0.68rem;
+  margin-top: 4px;
+  padding: 5px 10px;
+  font-size: 0.72rem;
 }
 
 html.s3phy-embed .tl-wrap .tl-bath-bar {
-  padding: 8px 12px;
-  gap: 6px;
+  flex: 0 0 auto;
+  padding: 10px 14px;
+  gap: 8px;
 }
 
 html.s3phy-embed .tl-wrap .tl-bath-bar-top {
-  font-size: 0.82rem;
+  font-size: 0.88rem;
 }
 
 html.s3phy-embed .tl-wrap .tl-temp-badge {
-  font-size: 1.1rem;
+  font-size: 1.2rem;
 }
 
 html.s3phy-embed .tl-wrap .tl-live-calculations {
-  flex: 1 1 auto;
+  flex: 0 0 auto;
   min-height: 0;
+  max-height: var(--tl-formula-max-h);
   overflow-y: auto;
-  padding: 8px 12px;
+  padding: 10px 14px;
 }
 
 html.s3phy-embed .tl-wrap .tl-live-calculations .tl-math-formula {
-  font-size: 1.05rem;
-  padding: 6px 8px;
-  margin: 2px 0;
+  font-size: 1.15rem;
+  padding: 8px 10px;
+  margin: 4px 0;
   min-height: unset !important;
 }
 
 html.s3phy-embed .tl-wrap .tl-live-calculations .tl-worked-solution {
-  padding: 8px 10px;
+  padding: 10px 12px;
 }
 
 html.s3phy-embed .tl-wrap .tl-live-calculations .tl-worked-solution p {
-  font-size: 0.86rem;
-  margin: 1px 0;
+  font-size: 0.95rem;
+  margin: 2px 0;
 }
 
 html.s3phy-embed .tl-wrap .tl-live-calculations .tl-info-label {
-  font-size: 0.82rem;
+  font-size: 0.9rem;
 }
 
 html.s3phy-embed .tl-wrap .tl-live-calculations .tl-info-label.tl-live-direction {
-  font-size: 0.8rem;
-  margin-bottom: 2px;
+  font-size: 0.88rem;
+  margin-bottom: 4px;
 }
 
 html.s3phy-embed .tl-wrap .tl-live-calculations .tl-live-value {
-  font-size: 0.92rem;
+  font-size: 1rem;
 }
 
 html.s3phy-embed .tl-wrap .tl-live-calculations .tl-worked-solution.tl-dual-direction {
-  gap: 10px;
+  gap: 12px;
+}
+
+@media (min-height: 800px) {
+  html.s3phy-embed .tl-wrap {
+    --tl-formula-max-h: min(42vh, 360px);
+  }
 }
 
 @media (min-width: 1024px) {
   html.s3phy-embed .tl-wrap .tl-dash {
-    grid-template-rows: minmax(0, clamp(130px, 22vh, 210px)) auto minmax(0, 1fr);
+    display: grid;
+    grid-template-columns: minmax(0, 1fr) minmax(0, 1.1fr);
+    grid-template-rows: minmax(0, 1fr) auto auto;
     height: 100%;
   }
 
   html.s3phy-embed .tl-wrap .tl-viz-phys,
   html.s3phy-embed .tl-wrap .tl-viz-graph {
+    flex: unset;
     min-height: 0;
     max-height: none;
     height: 100%;
@@ -1009,7 +1023,11 @@ html.s3phy-embed .tl-wrap .tl-live-calculations .tl-worked-solution.tl-dual-dire
     justify-content: flex-end;
   }
 
+  html.s3phy-embed .tl-wrap .tl-bath-bar {
+    grid-column: 1 / -1;
+  }
+
   html.s3phy-embed .tl-wrap .tl-live-calculations {
-    overflow-y: auto;
+    grid-column: 1 / -1;
   }
 }
