@@ -151,30 +151,48 @@ Place files under `public/notes/` (see `public/notes/README.txt` for naming conv
 ```
 S3_Phy/
 ├── .github/workflows/deploy-pages.yml  # GitHub Pages CI deploy
-├── package.json                        # Vite scripts and dependencies
+├── package.json                        # npm scripts (dev, build, build:content, exports)
 ├── index.html                          # Dev entry + GitHub Pages redirect
 ├── vite.config.js                      # base: './'
 ├── dist/                               # Committed production build
-├── labs/
-│   └── plane-mirror-lab/               # Plane Mirror Lab source (build → public/)
-├── public/                             # Static labs, quizzes, notes, summary posters
+├── labs/                               # Interactive lab source packages
+│   ├── */manifest.json                 # slug, build script, sync rules → public/
+│   └── plane-mirror-lab/               # Bundled separately (build:plane-mirror-lab)
+├── quizzes/                            # Embedded quiz source packages
+│   └── */manifest.json                 # build + sync → public/*-quiz/
+├── worksheets/                         # Worksheet source packages
+│   └── */manifest.json                 # build + sync → public/
+├── content/
+│   └── flashcards/
+│       └── data/                       # flashcards-*.json decks (imported by src/)
+├── public/                             # Static assets served by Vite / GitHub Pages
 │   ├── notes/                          # Bilingual PDF notes
 │   ├── summary/                        # Bilingual summary posters
-│   └── *-quiz/                         # Embedded worksheet/quiz apps
-├── scripts/                            # Build, sync, and flashcard export
-├── src/
+│   ├── flashcards/                     # Flashcard image assets
+│   └── */                              # Labs, quizzes, worksheets (from build:content)
+├── scripts/
+│   ├── build-content.cjs               # Sync labs/, quizzes/, worksheets/ → public/
+│   └── export-*-flashcards.*           # Regenerate content/flashcards/data/
+├── src/                                # Hub app (Vite entry)
 │   ├── main.js                         # App entry and hash routing
 │   ├── hubShell.js                     # Shared hub navigation shell
 │   ├── strandHub.js                    # Strand picker after splash
 │   ├── i18n.js                         # English / Traditional Chinese
 │   ├── locales/                        # en.js, zhHant.js
 │   ├── strands/                        # opticsHub.js, heatHub.js
-│   ├── tools/                          # Interactive lab modules
-│   ├── worksheets/                     # Worksheet and quiz embeds
-│   ├── flashcards/                     # Study UI and session logic
-│   └── data/                           # flashcards-*.json decks
+│   ├── tools/                          # Lab iframe loaders (point at public/)
+│   ├── worksheets/                     # Worksheet and quiz embed wiring
+│   └── flashcards/                     # Study UI and session logic
 └── README.md
 ```
+
+### Build pipeline
+
+1. **`npm run build:content`** — reads `manifest.json` in each package under `labs/`, `quizzes/`, and `worksheets/`, runs optional build scripts, and copies output into matching folders under `public/`.
+2. **`npm run build`** — runs `build:content`, then `vite build` to produce `dist/` for deployment.
+3. **Flashcard decks** live in `content/flashcards/data/` and are imported directly by the Vite app (not copied by `build:content`).
+
+See [CONTRIBUTING.md](CONTRIBUTING.md) for setup and PR workflow.
 
 ---
 

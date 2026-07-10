@@ -1,0 +1,1 @@
+import{c as e}from"./createLabIframe-CYKLXyW-.js";import"./index-5_btlkhv.js";function t(r){return e(r,{slug:"plane-mirror-lab",titleKey:"tools.planeMirror.title",className:"tool-plane-mirror-lab"})}export{t as createPlaneMirrorLab};

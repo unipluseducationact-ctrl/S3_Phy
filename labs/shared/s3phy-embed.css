@@ -1,0 +1,329 @@
+/* S3_Phy embed mode — shared chrome for iframe labs inside Hub */
+
+html.s3phy-embed {
+  font-family: var(--s3-font);
+  font-size: var(--s3-font-size-base);
+  line-height: var(--s3-line-height);
+  -webkit-font-smoothing: antialiased;
+  touch-action: manipulation;
+}
+
+html.s3phy-embed:has(.lab-section) {
+  height: 100%;
+}
+
+html.s3phy-embed body {
+  font-family: var(--s3-font);
+  font-size: max(var(--s3-font-min), 1rem);
+  line-height: var(--s3-line-height);
+  margin: 0;
+}
+
+/* Interactive lab iframe — flex fill (not quiz/worksheet) */
+html.s3phy-embed body:has(.lab-section),
+html.s3phy-embed body.embed-mode:has(.sim-main-col),
+html.s3phy-embed body:has(.sim-main-col):not(:has(#quiz-layout)) {
+  height: 100%;
+  min-height: 0 !important;
+  display: flex;
+  flex-direction: column;
+  overflow: hidden;
+}
+
+html.s3phy-embed body:has(.lab-section) > main,
+html.s3phy-embed body.embed-mode main.flex-grow,
+html.s3phy-embed body:has(.sim-main-col):not(:has(#quiz-layout)) > main {
+  flex: 1 1 auto;
+  min-height: 0;
+  display: flex;
+  flex-direction: column;
+  width: 100%;
+  overflow: hidden;
+}
+
+/* Quiz / worksheet iframe — preserve two-column grid */
+html.s3phy-embed body:has(#quiz-layout) {
+  height: auto;
+  min-height: 100%;
+  display: block;
+  overflow: auto;
+}
+
+html.s3phy-embed #quiz-layout {
+  display: grid !important;
+  grid-template-columns: 1fr;
+  gap: 1.5rem;
+  max-width: none !important;
+  width: 100%;
+  margin: 0;
+  align-items: start;
+  box-sizing: border-box;
+}
+
+@media (min-width: 1101px) {
+  html.s3phy-embed #quiz-layout {
+    grid-template-columns: minmax(280px, 360px) minmax(0, 1fr);
+  }
+}
+
+@media (max-width: 1100px) {
+  html.s3phy-embed #quiz-layout > aside#settings-panel {
+    position: static;
+    max-height: min(42dvh, 420px);
+    overflow-y: auto;
+    -webkit-overflow-scrolling: touch;
+  }
+}
+
+html.s3phy-embed #quiz-layout > aside#settings-panel {
+  position: sticky;
+  top: 0.5rem;
+  align-self: start;
+  max-height: calc(100dvh - 1rem);
+  overflow-y: auto;
+}
+
+html.s3phy-embed #quiz-layout > .min-w-0 {
+  min-width: 0;
+  width: 100%;
+}
+
+html.s3phy-embed .lab-section {
+  flex: 1 1 auto;
+  min-height: 0 !important;
+  height: 100%;
+  align-content: stretch;
+  align-items: stretch;
+}
+
+html.s3phy-embed .lab-viz,
+html.s3phy-embed .lab-steps {
+  height: 100% !important;
+  min-height: 0;
+  max-height: none !important;
+}
+
+html.s3phy-embed .lab-viz {
+  display: flex;
+  flex-direction: column;
+}
+
+html.s3phy-embed .lab-viz-canvas {
+  flex: 1 1 auto;
+  min-height: 200px;
+  max-height: none !important;
+}
+
+html.s3phy-embed .lab-steps {
+  overflow-y: auto;
+}
+
+html.s3phy-embed .lab-viz.lab-viz-dual {
+  display: grid !important;
+  height: 100% !important;
+}
+
+html.s3phy-embed .lab-viz-dual {
+  max-height: none !important;
+  flex: 1 1 auto;
+  min-height: 0;
+  height: 100%;
+  grid-template-rows: minmax(0, 3fr) minmax(0, 2fr);
+  align-content: stretch;
+  overflow: hidden;
+}
+
+html.s3phy-embed .lab-viz-dual .lab-viz-panel-chart {
+  flex: 1 1 auto;
+  min-height: 0;
+  overflow: hidden;
+}
+
+html.s3phy-embed .lab-viz-dual .lab-viz-panel:first-child .lab-viz-canvas {
+  flex: 1 1 auto !important;
+  min-height: 120px !important;
+  max-height: none !important;
+  aspect-ratio: unset;
+  height: auto;
+}
+
+html.s3phy-embed .lab-viz-dual .lab-viz-panel-chart .lab-viz-chart-wrap {
+  flex: 1 1 auto;
+  min-height: 0;
+  height: auto !important;
+  margin-top: 0;
+  aspect-ratio: unset;
+}
+
+html.s3phy-embed .lab-viz-dual .lab-viz-panel {
+  flex: 1 1 auto;
+  min-height: 0;
+  overflow: hidden;
+  display: flex;
+  flex-direction: column;
+}
+
+html.s3phy-embed header,
+html.s3phy-embed footer {
+  flex-shrink: 0;
+}
+
+html.s3phy-embed .max-w-7xl {
+  max-width: none;
+  width: 100%;
+}
+
+html.s3phy-embed .sim-main-col,
+html.s3phy-embed .glass-panel.flex-grow {
+  flex: 1 1 auto;
+  min-height: 0;
+}
+
+html.s3phy-embed .canvas-container {
+  flex: 1 1 auto;
+  min-height: 0 !important;
+  height: auto !important;
+  max-height: none;
+}
+
+html.s3phy-embed .main-container,
+html.s3phy-embed .lab-wrap,
+html.s3phy-embed .dashboard,
+html.s3phy-embed .app-root {
+  max-width: none;
+  width: 100%;
+  margin: 0;
+}
+
+/* Floating controls panel (heat labs + shared script) */
+.lab-section {
+  position: relative;
+  min-height: 0;
+}
+
+@media (min-width: 900px) {
+  .lab-section.controls-floating .lab-viz {
+    grid-column: span 6 / span 6;
+  }
+  .lab-section.controls-floating .lab-steps {
+    grid-column: span 6 / span 6;
+  }
+}
+
+@media (max-width: 1024px) {
+  html.s3phy-embed .lab-section.controls-floating .lab-viz,
+  html.s3phy-embed .lab-section.controls-floating .lab-steps {
+    grid-column: 1 / -1;
+  }
+
+  html.s3phy-embed .lab-controls.lab-controls-float {
+    position: relative;
+    left: auto !important;
+    top: auto !important;
+    width: 100% !important;
+    max-width: none;
+    margin-bottom: 0.75rem;
+  }
+}
+
+.lab-controls.lab-controls-float {
+  position: absolute;
+  z-index: 40;
+  width: var(--s3-float-panel-w);
+  box-shadow: 0 8px 24px rgba(15, 23, 42, 0.12);
+}
+
+.lab-controls-body {
+  transition: max-height 0.25s ease, opacity 0.2s ease;
+}
+
+.lab-controls-desc {
+  transition: max-height 0.25s ease, opacity 0.2s ease;
+}
+
+.lab-controls.controls-collapsed .lab-controls-body,
+.lab-controls.controls-collapsed .lab-controls-desc {
+  max-height: 0;
+  opacity: 0;
+  overflow: hidden;
+  pointer-events: none;
+  margin: 0;
+  padding-top: 0;
+  padding-bottom: 0;
+}
+
+.lab-controls:not(.controls-collapsed) .lab-controls-body {
+  max-height: min(70vh, 520px);
+  opacity: 1;
+  overflow-y: auto;
+}
+
+.lab-controls:not(.controls-collapsed) .lab-controls-desc {
+  opacity: 1;
+  max-height: 4rem;
+}
+
+.lab-controls.controls-collapsed .lab-controls-title-text {
+  display: none;
+}
+
+.lab-controls-header {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+}
+
+.lab-controls-actions {
+  flex-direction: row;
+  gap: 0.5rem;
+}
+
+.lab-controls-actions button {
+  padding: 0.625rem 0.75rem;
+  justify-content: center;
+}
+
+.lab-controls-actions button.flex-1 {
+  white-space: nowrap;
+  min-width: 0;
+}
+
+.lab-controls-drag-handle {
+  display: none;
+  cursor: grab;
+  touch-action: none;
+  color: #94a3b8;
+  padding: 0.25rem;
+  border-radius: 0.375rem;
+  flex-shrink: 0;
+  background: none;
+  border: none;
+}
+
+@media (min-width: 900px) {
+  .lab-controls.lab-controls-float .lab-controls-drag-handle {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+  }
+}
+
+.lab-controls-drag-handle:active {
+  cursor: grabbing;
+}
+
+/* Lens simulator embed compact chrome */
+html.s3phy-embed .controls-panel,
+html.s3phy-embed .control-panel {
+  width: var(--s3-float-panel-w) !important;
+  max-width: var(--s3-float-panel-w) !important;
+}
+
+/* Minimum readable text in embed controls */
+html.s3phy-embed label,
+html.s3phy-embed .control label,
+html.s3phy-embed button,
+html.s3phy-embed input,
+html.s3phy-embed select {
+  font-size: max(var(--s3-font-min), 0.875rem);
+}

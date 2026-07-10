@@ -9,23 +9,27 @@ let heatCardsPromise = null;
 
 function loadLightCards() {
   if (!lightCardsPromise) {
-    lightCardsPromise = import('../data/flashcards-light-ch3.json').then((m) => m.default);
+    lightCardsPromise = import('../../content/flashcards/data/flashcards-light-ch3.json').then(
+      (m) => m.default,
+    );
   }
   return lightCardsPromise;
 }
 
 function loadDefinitionsCards() {
   if (!definitionsCardsPromise) {
-    definitionsCardsPromise = import('../data/flashcards-optics-definitions.json').then(
-      (m) => m.default,
-    );
+    definitionsCardsPromise = import(
+      '../../content/flashcards/data/flashcards-optics-definitions.json'
+    ).then((m) => m.default);
   }
   return definitionsCardsPromise;
 }
 
 function loadHeatCards() {
   if (!heatCardsPromise) {
-    heatCardsPromise = import('../data/flashcards-heat-ch1.json').then((m) => m.default);
+    heatCardsPromise = import('../../content/flashcards/data/flashcards-heat-ch1.json').then(
+      (m) => m.default,
+    );
   }
   return heatCardsPromise;
 }

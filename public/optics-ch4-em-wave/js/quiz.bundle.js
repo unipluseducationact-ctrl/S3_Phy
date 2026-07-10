@@ -353,99 +353,6 @@
   }
 
   // js/quizExport.js
-  const EXPORT_Q_STYLE = "page-break-inside:avoid;break-inside:avoid-page;mso-page-break-inside:avoid;margin-bottom:1rem";
-  const EXPORT_FIG_STYLE = "page-break-inside:avoid;break-inside:avoid-page;margin:0.75rem 0";
-  const EXPORT_HEAD_STYLE = "<style>.export-q{page-break-inside:avoid;break-inside:avoid-page;mso-page-break-inside:avoid;margin-bottom:1rem}.export-q h2{margin-top:0}.export-fig img{max-width:100%;height:auto;display:block}</style>";
-  function resolveExportAssetUrl(src) {
-    if (!src) return "";
-    try {
-      return new URL(src, window.location.href).href;
-    } catch {
-      return src;
-    }
-  }
-  function buildExportFigureHtml(fig) {
-    const src = resolveExportAssetUrl(fig.src);
-    if (!src) return "";
-    const alt = escHtml(fig.alt || fig.caption || "Diagram");
-    const caption = fig.caption ? `<figcaption>${escHtml(fig.caption)}</figcaption>` : "";
-    return `<figure class="export-fig" style="${EXPORT_FIG_STYLE}"><img src="${escHtml(src)}" alt="${alt}" style="max-width:100%;height:auto;display:block" />${caption}</figure>`;
-  }
-  function buildExportFiguresHtml(q) {
-    const figs = q.images?.length ? q.images : q.image?.src ? [q.image] : [];
-    return figs.map(buildExportFigureHtml).join("");
-  }
-  function collectImageUrlsFromHtml(html) {
-    const urls = [];
-    const re = /<img[^>]+src="([^"]+)"/gi;
-    let match;
-    while ((match = re.exec(html)) !== null) urls.push(match[1]);
-    return urls;
-  }
-  function preloadImageUrls(urls) {
-    const unique = [...new Set(urls.filter(Boolean))];
-    if (!unique.length) return Promise.resolve();
-    return Promise.all(
-      unique.map(
-        (url) =>
-          new Promise((resolve) => {
-            const img = new Image();
-            img.onload = () => resolve();
-            img.onerror = () => resolve();
-            img.src = url;
-          })
-      )
-    );
-  }
-  function waitForExportImages(container) {
-    const imgs = [...container.querySelectorAll("img")];
-    if (!imgs.length) return Promise.resolve();
-    return Promise.all(
-      imgs.map(
-        (img) =>
-          new Promise((resolve) => {
-            if (img.complete && img.naturalWidth > 0) {
-              resolve();
-              return;
-            }
-            img.addEventListener("load", () => resolve(), { once: true });
-            img.addEventListener("error", () => resolve(), { once: true });
-          })
-      )
-    );
-  }
-  const PRINT_DOC_STYLE = "html,body{margin:0;padding:0;min-height:0!important;height:auto!important;background:#fff}body{font-family:Inter,'Segoe UI',sans-serif;font-size:12pt;line-height:1.45;margin:12mm;color:#191c1e}h1{font-size:18pt;margin:0 0 1rem}h2{font-size:13pt;margin:0 0 .5rem}p,ul,ol{margin:.35em 0}ul,ol{padding-left:1.25rem}.export-q{page-break-inside:avoid;break-inside:avoid-page;margin-bottom:1rem}.export-fig{page-break-inside:avoid;break-inside:avoid-page;margin:.75rem 0}.export-fig img{max-width:100%;height:auto;display:block}figcaption{font-size:10pt;color:#414753;margin-top:.25rem}table{border-collapse:collapse;width:100%;margin:.5rem 0}th,td{border:1px solid #c1c6d5;padding:6px;text-align:left}";
-  function getPrintFrame() {
-    let frame = document.getElementById("quiz-print-frame");
-    if (!frame) {
-      frame = document.createElement("iframe");
-      frame.id = "quiz-print-frame";
-      frame.setAttribute("aria-hidden", "true");
-      frame.title = "Print preview";
-      frame.style.cssText = "position:fixed;width:0;height:0;border:0;opacity:0;pointer-events:none;left:-9999px;top:0";
-      document.body.appendChild(frame);
-    }
-    return frame;
-  }
-  async function printStandaloneHtml(titleEn, bodyHtml) {
-    await preloadImageUrls(collectImageUrlsFromHtml(bodyHtml));
-    const frame = getPrintFrame();
-    const win = frame.contentWindow;
-    const doc = win.document;
-    doc.open();
-    doc.write(`<!DOCTYPE html><html lang="en"><head><meta charset="utf-8"><title>${escHtml(titleEn)}</title><style>${PRINT_DOC_STYLE}</style></head><body>${bodyHtml}</body></html>`);
-    doc.close();
-    await waitForExportImages(doc.body);
-    await new Promise((resolve) => {
-      const cleanup = () => {
-        win.removeEventListener("afterprint", cleanup);
-        resolve();
-      };
-      win.addEventListener("afterprint", cleanup);
-      win.focus();
-      win.print();
-    });
-  }
   function fillLineExportHtml(line, answersMode) {
     let html = "";
     line.segments.forEach((seg) => {
@@ -465,11 +372,12 @@
     let body = "";
     questions.forEach((q, i) => {
       const fmt = questionFormat(q);
-      body += `<div class="export-q" style="${EXPORT_Q_STYLE}">`;
       body += `<h2>Q${i + 1} \xB7 ${escHtml(q.section)} \xB7 ${escHtml(q.difficulty)} \xB7 ${escHtml(fmt.toUpperCase())}</h2>`;
       body += `<p><b>EN:</b> ${escHtml(q.stem)}</p>`;
       if (q.stemZh) body += `<p><b>\u4E2D\u6587\uFF1A</b> ${escHtml(q.stemZh)}</p>`;
-      body += buildExportFiguresHtml(q);
+      if (q.image?.src && !answersMode) {
+        body += `<p><i>[Diagram: ${escHtml(q.image.caption || q.image.alt || "see notes")}]</i></p>`;
+      }
       if (!answersMode) {
         if (fmt === "fill" && getFillLines(q).length) {
           if (q.wordBank?.length) {
@@ -480,21 +388,6 @@
             body += `<li>${fillLineExportHtml(line, answersMode)}</li>`;
           });
           body += "</ol>";
-        } else if (q.optionsLayout === "table" && q.optionTable?.rows?.length) {
-          const headers = q.optionTable.headers || [];
-          body += "<table border='1' cellpadding='6' cellspacing='0' style='border-collapse:collapse;width:100%;max-width:100%'><tr><th></th>";
-          headers.forEach((h) => {
-            body += `<th>${escHtml(h)}</th>`;
-          });
-          body += "</tr>";
-          q.optionTable.rows.forEach((row) => {
-            body += `<tr><td><b>${escHtml(row.key)}</b></td>`;
-            (row.cells || []).forEach((cell) => {
-              body += `<td>${escHtml(cell)}</td>`;
-            });
-            body += "</tr>";
-          });
-          body += "</table>";
         } else if (q.options?.length) {
           body += "<ul>";
           q.options.forEach((opt) => {
@@ -510,7 +403,6 @@
         if (ma.zh) body += `<p>${escHtml(ma.zh)}</p>`;
         body += `<p><i>Hint / \u63D0\u793A:</i> ${escHtml(q.hint || "")}</p>`;
       }
-      body += "</div>";
     });
     return body;
   }
@@ -519,26 +411,30 @@
       alert(noQuizAlertMessage(lang));
       return;
     }
-    const titleEn = answersMode ? "S3 Optics Ch.4 \u2014 EM Waves \u2014 Answers" : "S3 Optics Ch.4 \u2014 EM Waves \u2014 Questions";
-    const titleZh = answersMode ? "S3 \u5149\u5B78 \u7B2C\u56DB\u7AE0 \u2014 \u96FB\u78C1\u6CE2 \u2014 \u7B54\u6848" : "S3 \u5149\u5B78 \u7B2C\u56DB\u7AE0 \u2014 \u96FB\u78C1\u6CE2 \u2014 \u8A66\u984C";
+    const titleEn = answersMode ? "Ch 3.7 Refraction \u2014 Answers" : "Ch 3.7 Refraction \u2014 Questions";
+    const titleZh = answersMode ? "\u7B2C\u4E09\u7AE0 3.7 \u6298\u5C04 \u2014 \u7B54\u6848" : "\u7B2C\u4E09\u7AE0 3.7 \u6298\u5C04 \u2014 \u8A66\u984C";
     const body = buildDocBody(questions, answersMode);
-    const html = `<html xmlns:o="urn:schemas-microsoft-com:office:office" xmlns:w="urn:schemas-microsoft-com:office:word" xmlns="http://www.w3.org/TR/REC-html40"><head><meta charset="utf-8"><title>${escHtml(titleEn)}</title>${EXPORT_HEAD_STYLE}</head><body><h1>${escHtml(titleEn)}</h1><h2 style="font-size:14pt">${escHtml(titleZh)}</h2>${body}</body></html>`;
+    const html = `<html xmlns:o="urn:schemas-microsoft-com:office:office" xmlns:w="urn:schemas-microsoft-com:office:word" xmlns="http://www.w3.org/TR/REC-html40"><head><meta charset="utf-8"><title>${escHtml(titleEn)}</title></head><body><h1>${escHtml(titleEn)}</h1><h2 style="font-size:14pt">${escHtml(titleZh)}</h2>${body}</body></html>`;
     const blob = new Blob(["\uFEFF", html], { type: "application/msword" });
     const a = document.createElement("a");
     const ts = (/* @__PURE__ */ new Date()).toISOString().slice(0, 19).replace(/[:T]/g, "-");
     a.href = URL.createObjectURL(blob);
-    a.download = (answersMode ? "optics_ch4_em_wave_answers_" : "optics_ch4_em_wave_questions_") + ts + ".doc";
+    a.download = (answersMode ? "refraction_answers_" : "refraction_questions_") + ts + ".doc";
     a.click();
     URL.revokeObjectURL(a.href);
   }
-  async function printSheet(questions, answersMode, lang) {
+  function printSheet(questions, answersMode, lang) {
     if (!questions.length) {
       alert(noQuizAlertMessage(lang));
       return;
     }
-    const titleEn = answersMode ? "S3 Optics Ch.4 \u2014 EM Waves (Answers)" : "S3 Optics Ch.4 \u2014 EM Waves (Questions)";
-    const bodyHtml = `<h1>${escHtml(titleEn)}</h1>${buildDocBody(questions, answersMode)}`;
-    await printStandaloneHtml(titleEn, bodyHtml);
+    const sheet = document.getElementById("quiz-pdf-sheet");
+    if (!sheet) return;
+    const titleEn = answersMode ? "Ch 3.7 Refraction (Answers)" : "Ch 3.7 Refraction (Questions)";
+    let html = `<h1>${escHtml(titleEn)}</h1>`;
+    html += buildDocBody(questions, answersMode);
+    sheet.innerHTML = html;
+    window.print();
   }
 
   // js/quizEffects.js
@@ -595,10 +491,10 @@
     const readOpen = () => {
       try {
         const v = sessionStorage.getItem(storageKey);
-        if (v !== null) return v === "1";
+        return v === null ? true : v === "1";
       } catch {
+        return true;
       }
-      return !window.matchMedia("(max-width: 1100px)").matches;
     };
     let open = readOpen();
     function apply() {
@@ -1279,13 +1175,13 @@
     });
     document.getElementById("btn-doc-q")?.addEventListener("click", () => downloadWord(lastQuestions, false, lang));
     document.getElementById("btn-doc-a")?.addEventListener("click", () => downloadWord(lastQuestions, true, lang));
-    document.getElementById("btn-print")?.addEventListener("click", async () => {
+    document.getElementById("btn-print")?.addEventListener("click", () => {
       if (!lastQuestions.length) {
         alert(t("alertNoQuiz"));
         return;
       }
       const want = confirm(t("printConfirm"));
-      await printSheet(lastQuestions, want, lang);
+      printSheet(lastQuestions, want, lang);
     });
     function syncLangFromParent() {
       const next = resolveQuizLang();

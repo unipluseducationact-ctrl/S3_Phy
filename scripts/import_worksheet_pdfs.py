@@ -13,14 +13,11 @@ from pathlib import Path
 import fitz
 from PIL import Image
 
-ROOT = Path(__file__).resolve().parents[1]
-OPTICS_PDF_DIR = Path("/Users/jeffcheung/Downloads")
-HEAT_PDF_DIR = Path(
-    r"C:\Users\UniplusUser02\Desktop\PHYS\S3\Heat\Final exam"
-)
-IMAGES_DIR = ROOT / "public" / "worksheet-images"
-IMPORTED_JSON = ROOT / "scripts" / "data" / "imported-questions.json"
-QUESTIONS_JSON = ROOT / "scripts" / "data" / "questions.json"
+REPO_ROOT = Path(__file__).resolve().parent.parent
+DEFAULT_HEAT_PDF_DIR = REPO_ROOT.parent / "Heat" / "Final exam"
+IMAGES_DIR = REPO_ROOT / "public" / "worksheet-images"
+IMPORTED_JSON = REPO_ROOT / "scripts" / "data" / "imported-questions.json"
+QUESTIONS_JSON = REPO_ROOT / "scripts" / "data" / "questions.json"
 
 MAX_IMAGE_WIDTH = 1200
 WEBP_QUALITY = 82
@@ -54,35 +51,35 @@ OPTICS_PDF_PAIRS: list[PdfPair] = [
         "F3 Final exam (Lens) MC 2024-25.pdf",
         "F3 Final exam (Lens) MC 2024-25 Ans.pdf",
         "Imported: F3 Lens MC 2024-25",
-        OPTICS_PDF_DIR,
+        Path(),  # resolved at runtime via --optics-dir
     ),
     PdfPair(
         "f3-light-mc-2425",
         "F3 Final exam (Light) MC 2024-25.pdf",
         "F3 Final exam (Light) MC 2024-25 Ans.pdf",
         "Imported: F3 Light MC 2024-25",
-        OPTICS_PDF_DIR,
+        Path(),  # resolved at runtime via --optics-dir
     ),
     PdfPair(
         "f3-light-mc2-2425",
         "F3 Final exam (Light) MC 2 2024-25.pdf",
         "F3 Final exam (Light) MC 2 2024-25 Ans.pdf",
         "Imported: F3 Light MC 2 2024-25",
-        OPTICS_PDF_DIR,
+        Path(),  # resolved at runtime via --optics-dir
     ),
     PdfPair(
         "s3-light-test5",
         "S3 Light Test 5.pdf",
         "S3 Light Test 5(ANS).pdf",
         "Imported: S3 Light Test 5",
-        OPTICS_PDF_DIR,
+        Path(),  # resolved at runtime via --optics-dir
     ),
     PdfPair(
         "s3-lens-mock-2122",
         "S3 PHY Mock Test Lens 2 MC - 2021-22.pdf",
         "S3 PHY Mock Test Lens 2 MC - 2021-22 (ANS).pdf",
         "Imported: S3 Lens Mock 2021-22",
-        OPTICS_PDF_DIR,
+        Path(),  # resolved at runtime via --optics-dir
     ),
 ]
 
@@ -92,14 +89,14 @@ HEAT_PDF_PAIRS: list[PdfPair] = [
         "F3 Final exam (heat) MC 2024-25.pdf",
         "F3 Final exam (heat) MC 2024-25 Ans.pdf",
         "Imported: F3 Heat MC 2024-25",
-        HEAT_PDF_DIR,
+        Path(),  # resolved at runtime via --heat-dir
     ),
     PdfPair(
         "f3-heat-mc3-2425",
         "F3 Final exam (heat) MC 3 2024-25.pdf",
         "F3 Final exam (heat) MC 3 2024-25 Ans.pdf",
         "Imported: F3 Heat MC 3 2024-25",
-        HEAT_PDF_DIR,
+        Path(),  # resolved at runtime via --heat-dir
     ),
 ]
 
@@ -825,14 +822,14 @@ LQ_PAIRS: list[PdfPair] = [
         "F3 Final exam (heat) LQ 2024-25.pdf",
         "F3 Final exam (heat) LQ 2024-25 Ans.pdf",
         "Imported: F3 Heat LQ 2024-25",
-        HEAT_PDF_DIR,
+        Path(),  # resolved at runtime via --heat-dir
     ),
     PdfPair(
         "f3-heat-lq-capacity",
         "F.3 Final exam Heat LQ (Heat capacity).pdf",
         "F.3 Final exam Heat LQ (Heat capacity)(ANS).pdf",
         "Imported: F3 Heat LQ (Heat capacity)",
-        HEAT_PDF_DIR,
+        Path(),  # resolved at runtime via --heat-dir
     ),
 ]
 
@@ -851,7 +848,7 @@ LQ_NUMERIC_RESULT_RE = re.compile(
     r"(?:^|\n)\s*(?:\([a-d]\)\s*)?(?:\([ivx]+\)\s*)?"
     r"([A-Za-z][\w\s]*=\s*.+?(?:J|W|kg|s|min|kJ|\$).+?)(?:\n|$)",
 )
-LQ_REVIEW = ROOT / "scripts" / "heat-lq-questions-review.md"
+LQ_REVIEW = REPO_ROOT / "scripts" / "heat-lq-questions-review.md"
 
 
 @dataclass
@@ -1143,14 +1140,14 @@ def parse_args() -> argparse.Namespace:
     parser.add_argument(
         "--heat-dir",
         type=Path,
-        default=HEAT_PDF_DIR,
-        help="Directory containing Heat Final exam PDFs",
+        default=DEFAULT_HEAT_PDF_DIR,
+        help="Directory containing Heat Final exam PDFs (default: sibling Heat/Final exam)",
     )
     parser.add_argument(
         "--optics-dir",
         type=Path,
-        default=OPTICS_PDF_DIR,
-        help="Directory containing Optics MC PDFs",
+        default=None,
+        help="Directory containing Optics MC PDFs (required for optics import; external asset)",
     )
     return parser.parse_args()
 
@@ -1162,6 +1159,14 @@ def pairs_for_run(args: argparse.Namespace) -> list[PdfPair]:
         pairs = OPTICS_PDF_PAIRS
     else:
         pairs = OPTICS_PDF_PAIRS + HEAT_PDF_PAIRS
+
+    needs_optics = any("heat" not in pair.source for pair in pairs)
+    if needs_optics and args.optics_dir is None:
+        print(
+            "Error: --optics-dir is required for optics PDF import (external asset outside repo).",
+            file=sys.stderr,
+        )
+        sys.exit(2)
 
     resolved: list[PdfPair] = []
     for pair in pairs:
@@ -1210,7 +1215,7 @@ def main() -> int:
 
     existing = load_existing_questions()
     if not existing:
-        sys.path.insert(0, str(ROOT / "scripts"))
+        sys.path.insert(0, str(REPO_ROOT / "scripts"))
         from build_worksheet_questions import ensure_hints, QUESTIONS
 
         existing = ensure_hints(QUESTIONS)

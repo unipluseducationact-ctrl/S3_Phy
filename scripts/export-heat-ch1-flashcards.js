@@ -1,12 +1,15 @@
 import fs from 'fs';
 import path from 'path';
 
-const ROOT = path.resolve(import.meta.dirname, '..');
-const DEFAULT_SOURCE = path.resolve(
-  'C:/Users/user/Desktop/Notes-20260629T084723Z-3-001/flashcards/heat/js/flashcardData.js',
-);
-const SOURCE = process.argv[2] ? path.resolve(process.argv[2]) : DEFAULT_SOURCE;
-const OUT = path.join(ROOT, 'src', 'data', 'flashcards-heat-ch1.json');
+const REPO_ROOT = path.resolve(import.meta.dirname, '..');
+const OUT = path.join(REPO_ROOT, 'src', 'data', 'flashcards-heat-ch1.json');
+
+if (!process.argv[2]) {
+  console.error('Usage: node export-heat-ch1-flashcards.js <flashcardData.js>');
+  console.error('  External asset — pass the path to the source flashcardData.js explicitly.');
+  process.exit(1);
+}
+const SOURCE = path.resolve(process.argv[2]);
 
 const SUBTOPIC_MAP = {
   'Thermometer & Temperature': 'thermometry',

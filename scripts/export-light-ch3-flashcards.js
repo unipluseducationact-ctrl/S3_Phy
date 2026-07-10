@@ -1,12 +1,15 @@
 import fs from 'fs';
 import path from 'path';
 
-const ROOT = path.resolve(import.meta.dirname, '..');
-const DEFAULT_SOURCE = path.resolve(
-  'C:/Users/UniplusUser02/Desktop/light flashcards v2-20260630T052438Z-3-001/light flashcards v2/flashcards/light/js/flashcardData.js',
-);
-const SOURCE = process.argv[2] ? path.resolve(process.argv[2]) : DEFAULT_SOURCE;
-const OUT = path.join(ROOT, 'src', 'data', 'flashcards-light-ch3.json');
+const REPO_ROOT = path.resolve(import.meta.dirname, '..');
+const OUT = path.join(REPO_ROOT, 'src', 'data', 'flashcards-light-ch3.json');
+
+if (!process.argv[2]) {
+  console.error('Usage: node export-light-ch3-flashcards.js <flashcardData.js>');
+  console.error('  External asset — pass the path to the source flashcardData.js explicitly.');
+  process.exit(1);
+}
+const SOURCE = path.resolve(process.argv[2]);
 
 const SUBTOPIC_MAP = {
   Reflection: 'reflection',

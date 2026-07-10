@@ -3,6 +3,7 @@
 
 from __future__ import annotations
 
+import argparse
 import json
 import re
 import sys
@@ -10,10 +11,10 @@ from pathlib import Path
 
 from pypdf import PdfReader
 
-ROOT = Path(__file__).resolve().parents[1]
-FLASH_SRC = Path(r"C:\Users\UniplusUser02\Desktop\PHYS\S3\Flashcards")
-OUT_JSON = ROOT / "scripts" / "data" / "flashcards.json"
-REPORT = ROOT / "scripts" / "flashcards-extraction-report.md"
+REPO_ROOT = Path(__file__).resolve().parent.parent
+DEFAULT_FLASH_SRC = REPO_ROOT.parent / "Optics" / "Flashcards"
+OUT_JSON = REPO_ROOT / "scripts" / "data" / "flashcards.json"
+REPORT = REPO_ROOT / "scripts" / "flashcards-extraction-report.md"
 
 TOPICS = [
     ("Reflection", "reflection"),
@@ -73,12 +74,24 @@ def find_pdf(folder: Path, lang: str) -> Path:
     return hits[0]
 
 
+def parse_args() -> argparse.Namespace:
+    parser = argparse.ArgumentParser(description=__doc__)
+    parser.add_argument(
+        "--src",
+        type=Path,
+        default=DEFAULT_FLASH_SRC,
+        help="Root folder containing topic flashcard PDF folders (default: sibling Optics/Flashcards)",
+    )
+    return parser.parse_args()
+
+
 def main() -> int:
+    flash_src = parse_args().src
     cards: list[dict] = []
     report_lines = ["# Flashcards extraction report\n"]
 
     for folder_name, topic in TOPICS:
-        folder = FLASH_SRC / folder_name
+        folder = flash_src / folder_name
         en_path = find_pdf(folder, "en")
         zh_path = find_pdf(folder, "zh")
         en_pairs = parse_en(read_pdf(en_path))

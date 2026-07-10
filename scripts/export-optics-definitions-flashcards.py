@@ -3,27 +3,24 @@
 
 from __future__ import annotations
 
+import argparse
 import importlib.util
 import json
 import shutil
 import sys
 from pathlib import Path
 
-ROOT = Path(__file__).resolve().parents[1]
-BUILD_DECKS = Path(
-    r"C:\Users\UniplusUser02\Desktop\PHYS\S3\Optics\Flashcards\scripts\build_decks.py"
-)
-ASSETS_SRC = Path(
-    r"C:\Users\UniplusUser02\Desktop\PHYS\S3\Optics\Flashcards\optics-definitions-zh\assets"
-)
-OUT_JSON = ROOT / "src" / "data" / "flashcards-optics-definitions.json"
-OUT_ASSETS = ROOT / "public" / "flashcards" / "optics-definitions"
+REPO_ROOT = Path(__file__).resolve().parent.parent
+DEFAULT_BUILD_DECKS = REPO_ROOT.parent / "Optics" / "Flashcards" / "scripts" / "build_decks.py"
+DEFAULT_ASSETS_SRC = REPO_ROOT.parent / "Optics" / "Flashcards" / "optics-definitions-zh" / "assets"
+OUT_JSON = REPO_ROOT / "src" / "data" / "flashcards-optics-definitions.json"
+OUT_ASSETS = REPO_ROOT / "public" / "flashcards" / "optics-definitions"
 
 
-def load_cards() -> list[dict]:
-    spec = importlib.util.spec_from_file_location("build_decks", BUILD_DECKS)
+def load_cards(build_decks: Path) -> list[dict]:
+    spec = importlib.util.spec_from_file_location("build_decks", build_decks)
     if spec is None or spec.loader is None:
-        raise RuntimeError(f"Cannot load {BUILD_DECKS}")
+        raise RuntimeError(f"Cannot load {build_decks}")
     mod = importlib.util.module_from_spec(spec)
     sys.modules["build_decks"] = mod
     spec.loader.exec_module(mod)
@@ -41,8 +38,26 @@ def image_rel(card: dict) -> str | None:
     return f"./flashcards/optics-definitions/{name}"
 
 
+def parse_args() -> argparse.Namespace:
+    parser = argparse.ArgumentParser(description=__doc__)
+    parser.add_argument(
+        "--build-decks",
+        type=Path,
+        default=DEFAULT_BUILD_DECKS,
+        help="Path to build_decks.py (default: sibling Optics/Flashcards/scripts)",
+    )
+    parser.add_argument(
+        "--assets-src",
+        type=Path,
+        default=DEFAULT_ASSETS_SRC,
+        help="Source assets directory (default: sibling Optics/Flashcards/optics-definitions-zh/assets)",
+    )
+    return parser.parse_args()
+
+
 def main() -> None:
-    cards = load_cards()
+    args = parse_args()
+    cards = load_cards(args.build_decks)
     out: list[dict] = []
     copied: set[str] = set()
 
@@ -57,7 +72,7 @@ def main() -> None:
             entry["backImage"] = rel
             entry["imageAlt"] = card.get("imageAlt", "diagram")
             name = Path(rel).name
-            src = ASSETS_SRC / name
+            src = args.assets_src / name
             if not src.is_file():
                 raise FileNotFoundError(f"Missing asset: {src}")
             OUT_ASSETS.mkdir(parents=True, exist_ok=True)

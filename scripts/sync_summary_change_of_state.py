@@ -3,23 +3,20 @@
 
 from __future__ import annotations
 
+import argparse
 import sys
 from pathlib import Path
 
 from PIL import Image
 
-ROOT = Path(__file__).resolve().parents[1]
-SRC_EN = Path(
-    r"C:\Users\UniplusUser02\Desktop\PHYS\S3\Heat\Summary\Change of State\EN-ChangeOfState-Summary-Poster.png"
+REPO_ROOT = Path(__file__).resolve().parent.parent
+DEFAULT_SRC_EN = (
+    REPO_ROOT.parent / "Heat" / "Summary" / "Change of State" / "EN-ChangeOfState-Summary-Poster.png"
 )
-SRC_ZH = Path(
-    r"C:\Users\UniplusUser02\Desktop\PHYS\S3\Heat\Summary\Change of State\ZH-ChangeOfState-Summary-Poster.png"
+DEFAULT_SRC_ZH = (
+    REPO_ROOT.parent / "Heat" / "Summary" / "Change of State" / "ZH-ChangeOfState-Summary-Poster.png"
 )
-POSTERS = {
-    "change-of-state-en.webp": SRC_EN,
-    "change-of-state-zhHant.webp": SRC_ZH,
-}
-OUT_DIR = ROOT / "public" / "summary"
+OUT_DIR = REPO_ROOT / "public" / "summary"
 MAX_WIDTH = 1400
 WEBP_QUALITY = 82
 
@@ -36,18 +33,31 @@ def resize_and_save(src: Path, dest: Path) -> tuple[int, int]:
         return im.size
 
 
+def parse_args() -> argparse.Namespace:
+    parser = argparse.ArgumentParser(description=__doc__)
+    parser.add_argument("--src-en", type=Path, default=DEFAULT_SRC_EN, help="English poster PNG")
+    parser.add_argument("--src-zh", type=Path, default=DEFAULT_SRC_ZH, help="Traditional Chinese poster PNG")
+    return parser.parse_args()
+
+
 def main() -> int:
-    missing = [name for name, src in POSTERS.items() if not src.is_file()]
+    args = parse_args()
+    posters = {
+        "change-of-state-en.webp": args.src_en,
+        "change-of-state-zhHant.webp": args.src_zh,
+    }
+
+    missing = [name for name, src in posters.items() if not src.is_file()]
     if missing:
         for name in missing:
-            print(f"Source not found for {name}: {POSTERS[name]}", file=sys.stderr)
+            print(f"Source not found for {name}: {posters[name]}", file=sys.stderr)
         return 1
 
     legacy = OUT_DIR / "change-of-state.webp"
     if legacy.is_file():
         legacy.unlink()
 
-    for out_name, src in POSTERS.items():
+    for out_name, src in posters.items():
         out = OUT_DIR / out_name
         w, h = resize_and_save(src, out)
         print(f"Wrote {out} ({w}x{h}) from {src.name}")

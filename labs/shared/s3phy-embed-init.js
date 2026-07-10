@@ -1,0 +1,7 @@
+(function () {
+  'use strict';
+  var params = new URLSearchParams(location.search);
+  if (params.get('embed') === '1' || params.get('embed') === 'true') {
+    document.documentElement.classList.add('s3phy-embed');
+  }
+})();
