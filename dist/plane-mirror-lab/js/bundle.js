@@ -402,9 +402,14 @@ function resizeCanvasToDisplay(canvas, opts = {}) {
   const minHeight = opts.minHeight ?? 400;
   const aspect = opts.aspect ?? 0.62;
   const parent = canvas.parentElement;
-  const parentRect = parent
-    ? parent.getBoundingClientRect()
-    : { width: canvas.clientWidth || 600, height: canvas.clientHeight || 400 };
+  let parentRect;
+  if (parent) {
+    const prevStyleHeight = canvas.style.height;
+    canvas.style.height = '10px';
+    parentRect = parent.getBoundingClientRect();
+  } else {
+    parentRect = { width: canvas.clientWidth || 600, height: canvas.clientHeight || 400 };
+  }
   const w = Math.max(600, Math.floor(parentRect.width - 20));
   let h;
   if (document.documentElement.classList.contains('s3phy-embed')) {
