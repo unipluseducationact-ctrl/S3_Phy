@@ -6,5 +6,6 @@ export function createRotatingMirrorLab(t) {
     slug: 'rotating-mirror',
     titleKey: 'tools.rotatingMirror.title',
     className: 'tool-rotating-mirror-lab',
+    extraParams: () => '&v=20260714',
   });
 }

@@ -129,6 +129,7 @@ const STRINGS = {
     presetLetterP: '字母 P 字形練習',
     presetGround: '地面鏡反射練習',
     presetEmpty: '全新畫布',
+    observerAsPoint: '以點表示觀察者',
   },
   en: {
     title: 'Plane Mirror Reflection Lab',
@@ -258,6 +259,7 @@ const STRINGS = {
     presetLetterP: 'Letter P Practice',
     presetGround: 'Ground Mirror Practice',
     presetEmpty: 'Empty Canvas',
+    observerAsPoint: 'Observer as point',
   },
 };
 

@@ -601,51 +601,70 @@ function drawEyeSideView(ctx, cx, cy, r = 12, facingRight = true) {
     ctx.scale(-1, 1);
   }
 
-  // Draw eyelid background (white/off-white)
-  ctx.fillStyle = '#ffffff';
-  ctx.strokeStyle = '#f472b6'; // COLORS.eye is pink
-  ctx.lineWidth = 2;
-  ctx.beginPath();
-  ctx.moveTo(-r, 0);
-  ctx.quadraticCurveTo(0, -r * 0.7, r, 0);
-  ctx.quadraticCurveTo(0, r * 0.7, -r, 0);
-  ctx.closePath();
-  ctx.fill();
-  ctx.stroke();
+  const strokeColor = '#f472b6'; // COLORS.eye (pink) for theme consistency
+  const eyelashColor = '#f472b6';
 
-  // Draw iris (blue/cyan)
-  ctx.fillStyle = '#2563eb';
-  ctx.beginPath();
-  ctx.arc(r * 0.15, 0, r * 0.45, 0, Math.PI * 2);
-  ctx.fill();
-
-  // Draw pupil (black)
+  // 1. Draw iris/pupil: black ellipse on the right
   ctx.fillStyle = '#000000';
   ctx.beginPath();
-  ctx.arc(r * 0.15, 0, r * 0.22, 0, Math.PI * 2);
+  ctx.ellipse(r * 0.35, 0, r * 0.35, r * 0.8, 0, 0, Math.PI * 2);
   ctx.fill();
 
-  // Draw highlight (white dot)
+  // 2. Draw white crescent highlight inside the iris
   ctx.fillStyle = '#ffffff';
   ctx.beginPath();
-  ctx.arc(r * 0.28, -r * 0.12, r * 0.08, 0, Math.PI * 2);
+  ctx.ellipse(r * 0.43, 0, r * 0.2, r * 0.6, 0, 0, Math.PI * 2);
   ctx.fill();
 
-  // Eyelashes/eyebrow curve
-  ctx.strokeStyle = '#f472b6';
-  ctx.lineWidth = 1.5;
+  ctx.fillStyle = '#000000';
   ctx.beginPath();
-  ctx.moveTo(-r - 2, -2);
-  ctx.quadraticCurveTo(0, -r * 1.1, r + 2, -2);
+  ctx.ellipse(r * 0.37, 0, r * 0.2, r * 0.6, 0, 0, Math.PI * 2);
+  ctx.fill();
+
+  // 3. Draw eyelids (top and bottom lines of the triangle)
+  ctx.strokeStyle = strokeColor;
+  ctx.lineWidth = 2.5;
+  ctx.lineCap = 'round';
+  ctx.lineJoin = 'round';
+
+  // Top eyelid: from apex to right
+  ctx.beginPath();
+  ctx.moveTo(-r * 1.2, 0);
+  ctx.quadraticCurveTo(0, -r * 0.3, r * 0.8, -r * 0.65);
   ctx.stroke();
+
+  // Bottom eyelid: from apex to right
+  ctx.beginPath();
+  ctx.moveTo(-r * 1.2, 0);
+  ctx.quadraticCurveTo(0, r * 0.3, r * 0.8, r * 0.65);
+  ctx.stroke();
+
+  // 4. Draw eyelashes (pointy, filled)
+  ctx.fillStyle = eyelashColor;
+
+  // Eyelash 1
+  ctx.beginPath();
+  ctx.moveTo(r * 0.2, -r * 0.45);
+  ctx.quadraticCurveTo(r * 0.25, -r * 0.8, r * 0.35, -r * 1.15);
+  ctx.quadraticCurveTo(r * 0.28, -r * 0.75, r * 0.26, -r * 0.47);
+  ctx.closePath();
+  ctx.fill();
+
+  // Eyelash 2
+  ctx.beginPath();
+  ctx.moveTo(r * 0.4, -r * 0.5);
+  ctx.quadraticCurveTo(r * 0.45, -r * 0.95, r * 0.55, -r * 1.3);
+  ctx.quadraticCurveTo(r * 0.48, -r * 0.9, r * 0.46, -r * 0.52);
+  ctx.closePath();
+  ctx.fill();
 
   ctx.restore();
 }
 
-function drawPoint(ctx, view, t, p, r = 5, color = COLORS.accent, label = '') {
+function drawPoint(ctx, view, t, p, r = 5, color = COLORS.accent, label = '', forcePoint = false) {
   const s = toScreen(view, t, p);
 
-  if (color === COLORS.eye || label === 'E' || label === 'E\'' || (label === 'A' && color === COLORS.eye)) {
+  if (!forcePoint && (color === COLORS.eye || label === 'E' || label === 'E\'' || (label === 'A' && color === COLORS.eye))) {
     const canvasW = ctx.canvas.width / (window.devicePixelRatio || 1);
     const facingRight = s.x < (canvasW / 2);
     drawEyeSideView(ctx, s.x, s.y, 14, facingRight);
@@ -1093,6 +1112,7 @@ const STRINGS = {
     presetLetterP: '字母 P 字形練習',
     presetGround: '地面鏡反射練習',
     presetEmpty: '全新畫布',
+    observerAsPoint: '以點表示觀察者',
   },
   en: {
     title: 'Plane Mirror Reflection Lab',
@@ -1222,6 +1242,7 @@ const STRINGS = {
     presetLetterP: 'Letter P Practice',
     presetGround: 'Ground Mirror Practice',
     presetEmpty: 'Empty Canvas',
+    observerAsPoint: 'Observer as point',
   },
 };
 
@@ -3243,6 +3264,7 @@ function emptyState() {
     pending: null,
     selected: new Set(),
     gridSnap: false,
+    observerAsPoint: false,
     nextId: 1,
   };
 }
@@ -3410,6 +3432,7 @@ function createRaySketchScenario() {
       }
     }
     if (id === 'gridSnap') state.gridSnap = !state.gridSnap;
+    if (id === 'observerAsPoint') state.observerAsPoint = !state.observerAsPoint;
   }
 
   function deleteSelected() {
@@ -3987,7 +4010,7 @@ function createRaySketchScenario() {
 
     state.observers.forEach((o) => {
       const sel = isSelected('observer', o.id);
-      drawPoint(ctx, view, txf, o.pt, 7, sel ? COLORS.mirrorNeed : COLORS.eye, 'E');
+      drawPoint(ctx, view, txf, o.pt, 7, sel ? COLORS.mirrorNeed : COLORS.eye, 'E', state.observerAsPoint);
     });
 
     state.rays.forEach((r) => {
@@ -4159,6 +4182,27 @@ function createRaySketchScenario() {
     snapRow.appendChild(snapLabel);
     snapRow.appendChild(snapToggle);
     actions.appendChild(snapRow);
+
+    const obsAsPointRow = document.createElement('div');
+    obsAsPointRow.className = 'sketch-action-row';
+    obsAsPointRow.style.marginTop = '8px';
+    const obsLabel = document.createElement('label');
+    obsLabel.dataset.i18n = 'observerAsPoint';
+    obsLabel.textContent = t('observerAsPoint');
+    const obsToggle = document.createElement('button');
+    obsToggle.type = 'button';
+    obsToggle.className = 'sketch-toggle' + (state.observerAsPoint ? ' on' : '');
+    obsToggle.setAttribute('aria-pressed', state.observerAsPoint ? 'true' : 'false');
+    obsToggle.addEventListener('click', () => {
+      handleAction('observerAsPoint');
+      obsToggle.classList.toggle('on', state.observerAsPoint);
+      obsToggle.setAttribute('aria-pressed', state.observerAsPoint ? 'true' : 'false');
+      onChange?.();
+    });
+    obsAsPointRow.appendChild(obsLabel);
+    obsAsPointRow.appendChild(obsToggle);
+    actions.appendChild(obsAsPointRow);
+
     root.appendChild(actions);
 
     container.appendChild(root);
@@ -4172,6 +4216,7 @@ function createRaySketchScenario() {
         btn.classList.toggle('active', state.tool === id);
       });
       snapToggle.classList.toggle('on', state.gridSnap);
+      obsToggle.classList.toggle('on', state.observerAsPoint);
       select.value = currentPresetName;
 
       refreshColors();
