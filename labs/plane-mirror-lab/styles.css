@@ -1,9 +1,9 @@
 :root {
   /* 光學語意色：與 canvasView.COLORS 一一對應，確保圖例與畫布一致 */
-  --bg-color: #0a0c12;
-  --bg-elevated: #12151c;
-  --panel-bg: #161a22;
-  --panel-border: #2a3040;
+  --bg-color: #121624;
+  --bg-elevated: #1c2136;
+  --panel-bg: #22293f;
+  --panel-border: #3f4a66;
   --accent-green: #00e676;
   --accent-blue: #4db8ff;
   --accent-cyan: #22d3ee;
@@ -11,14 +11,14 @@
   --accent-red: #ff5252;
   --accent-purple: #a78bfa;
   --accent-pink: #f472b6;
-  --text-main: #eef0f4;
-  --text-muted: #9aa3b5;
-  --glow-green: rgba(0, 230, 118, 0.15);
-  --glow-blue: rgba(77, 184, 255, 0.12);
+  --text-main: #ffffff;
+  --text-muted: #bac4d6;
+  --glow-green: rgba(0, 230, 118, 0.25);
+  --glow-blue: rgba(77, 184, 255, 0.22);
   --radius-lg: 16px;
   --radius-md: 10px;
-  --shadow-panel: 0 12px 40px rgba(0, 0, 0, 0.45);
-  --border-color: #2a3040;
+  --shadow-panel: 0 12px 40px rgba(0, 0, 0, 0.55);
+  --border-color: #3f4a66;
 }
 
 * { box-sizing: border-box; }
@@ -201,12 +201,12 @@ h1 {
 }
 
 canvas {
-  background: #0e1016;
+  background: #161a29;
   border-radius: 12px;
   width: 100%;
   display: block;
-  border: 1px solid rgba(42, 48, 64, 0.8);
-  box-shadow: inset 0 0 60px rgba(0, 0, 0, 0.35);
+  border: 1px solid rgba(63, 74, 102, 0.9);
+  box-shadow: inset 0 0 60px rgba(0, 0, 0, 0.45);
 }
 
 .controls-panel {

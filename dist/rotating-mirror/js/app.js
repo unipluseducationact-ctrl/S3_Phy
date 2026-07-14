@@ -200,6 +200,23 @@ export function initRotatingMirror(root, t) {
       ctx.fillStyle = '#00e676';
       ctx.fillText(t('tools.rotatingMirror.canvas.n'), onEnd.x + 6, onEnd.y - 4);
       ctx.restore();
+
+      // Right-angle indicator between original normal and horizontal mirror
+      ctx.save();
+      ctx.strokeStyle = '#00e676';
+      ctx.lineWidth = 1.5;
+      ctx.beginPath();
+      ctx.moveTo(CX + 15, CY);
+      ctx.lineTo(CX + 15, CY - 15);
+      ctx.lineTo(CX, CY - 15);
+      ctx.stroke();
+
+      ctx.font = 'bold 11px system-ui, sans-serif';
+      ctx.fillStyle = '#00e676';
+      ctx.textAlign = 'left';
+      ctx.textBaseline = 'bottom';
+      ctx.fillText('90°', CX + 18, CY - 2);
+      ctx.restore();
     }
     if (showOrigRay) {
       const origEnd = drawLine(CX, CY, origRefAng, RAY_LEN, '#00e676', 2, false);
@@ -232,6 +249,26 @@ export function initRotatingMirror(root, t) {
       ctx.lineTo(k - 5, 8);
     }
     ctx.stroke();
+
+    // Right-angle indicator between new normal and rotated mirror
+    if (showNewNormal) {
+      ctx.save();
+      ctx.strokeStyle = NEW_COLOR;
+      ctx.lineWidth = 1.5;
+      ctx.beginPath();
+      ctx.moveTo(15, 0);
+      ctx.lineTo(15, -15);
+      ctx.lineTo(0, -15);
+      ctx.stroke();
+
+      ctx.font = 'bold 11px system-ui, sans-serif';
+      ctx.fillStyle = NEW_COLOR;
+      ctx.textAlign = 'left';
+      ctx.textBaseline = 'bottom';
+      ctx.fillText('90°', 18, -2);
+      ctx.restore();
+    }
+
     ctx.restore();
 
     if (showNewNormal) {

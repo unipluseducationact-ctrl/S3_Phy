@@ -10,9 +10,9 @@ import { getRayColor } from './rayColors.js';
  * - mirrorNeed: minimum required mirror segment (exam highlight)
  */
 export const COLORS = {
-  bg: '#121214',
-  grid: '#2a2a30',
-  gridMajor: '#35353d',
+  bg: '#161a29',
+  grid: '#2d334d',
+  gridMajor: '#444d6b',
   mirror: '#22d3ee',
   mirrorNeed: '#ffcc00',
   mirrorFail: '#ff5252',
@@ -23,7 +23,7 @@ export const COLORS = {
   eye: '#f472b6',
   wall: '#71717a',
   ground: '#52525b',
-  label: '#e4e4e7',
+  label: '#ffffff',
   visible: '#00e676',
   hidden: '#52525b',
   accent: '#2979ff',
@@ -242,8 +242,67 @@ export function drawWall(ctx, view, t, x, y0, y1) {
   drawVerticalMirror(ctx, view, t, x, y0, y1, COLORS.wall, 3);
 }
 
+export function drawEyeSideView(ctx, cx, cy, r = 12, facingRight = true) {
+  ctx.save();
+  ctx.translate(cx, cy);
+  if (!facingRight) {
+    ctx.scale(-1, 1);
+  }
+
+  // Draw eyelid background (white/off-white)
+  ctx.fillStyle = '#ffffff';
+  ctx.strokeStyle = '#f472b6'; // COLORS.eye is pink
+  ctx.lineWidth = 2;
+  ctx.beginPath();
+  ctx.moveTo(-r, 0);
+  ctx.quadraticCurveTo(0, -r * 0.7, r, 0);
+  ctx.quadraticCurveTo(0, r * 0.7, -r, 0);
+  ctx.closePath();
+  ctx.fill();
+  ctx.stroke();
+
+  // Draw iris (blue/cyan)
+  ctx.fillStyle = '#2563eb';
+  ctx.beginPath();
+  ctx.arc(r * 0.15, 0, r * 0.45, 0, Math.PI * 2);
+  ctx.fill();
+
+  // Draw pupil (black)
+  ctx.fillStyle = '#000000';
+  ctx.beginPath();
+  ctx.arc(r * 0.15, 0, r * 0.22, 0, Math.PI * 2);
+  ctx.fill();
+
+  // Draw highlight (white dot)
+  ctx.fillStyle = '#ffffff';
+  ctx.beginPath();
+  ctx.arc(r * 0.28, -r * 0.12, r * 0.08, 0, Math.PI * 2);
+  ctx.fill();
+
+  // Eyelashes/eyebrow curve
+  ctx.strokeStyle = '#f472b6';
+  ctx.lineWidth = 1.5;
+  ctx.beginPath();
+  ctx.moveTo(-r - 2, -2);
+  ctx.quadraticCurveTo(0, -r * 1.1, r + 2, -2);
+  ctx.stroke();
+
+  ctx.restore();
+}
+
 export function drawPoint(ctx, view, t, p, r = 5, color = COLORS.accent, label = '') {
   const s = toScreen(view, t, p);
+
+  if (color === COLORS.eye || label === 'E' || label === 'E\'' || (label === 'A' && color === COLORS.eye)) {
+    const canvasW = ctx.canvas.width / (window.devicePixelRatio || 1);
+    const facingRight = s.x < (canvasW / 2);
+    drawEyeSideView(ctx, s.x, s.y, 14, facingRight);
+    if (label) {
+      drawLabel(ctx, s.x - 5, s.y - 18, label);
+    }
+    return;
+  }
+
   ctx.fillStyle = color;
   ctx.beginPath();
   ctx.arc(s.x, s.y, r, 0, Math.PI * 2);

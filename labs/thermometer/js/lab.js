@@ -1,9 +1,9 @@
 /* thermometerLab.js - Ported high-fidelity Thermometer Simulation Lab */
 
-const THERM_FLOAT_BREAKPOINT = 1024;
+const THERM_FLOAT_BREAKPOINT = 768;
 
 function initFloatingControlsPanel(options) {
-  const FLOAT_BREAKPOINT = 1024;
+  const FLOAT_BREAKPOINT = 768;
   const DEFAULT_POS = { x: 12, y: 12 };
   const LAYOUT_DEBOUNCE_MS = 200;
   const {
@@ -855,15 +855,15 @@ export function createThermometerLab(t, options = {}) {
     // Beaker shadow/background
     ctx.strokeStyle = '#4b5563';
     ctx.lineWidth = 2;
-    ctx.fillStyle = '#121214';
+    ctx.fillStyle = 'rgba(30, 30, 35, 0.6)';
     ctx.beginPath();
     ctx.roundRect(bx, by, bw, bh, [0, 0, 10, 10]);
     ctx.fill();
 
     // Water/Liquid
     const waterGrad = ctx.createLinearGradient(bx, waterY, bx, by + bh);
-    waterGrad.addColorStop(0, `rgba(${r}, ${g}, ${b}, 0.25)`);
-    waterGrad.addColorStop(1, `rgba(${r}, ${g}, ${b}, 0.55)`);
+    waterGrad.addColorStop(0, `rgba(${r}, ${g}, ${b}, 0.35)`);
+    waterGrad.addColorStop(1, `rgba(${r}, ${g}, ${b}, 0.65)`);
     ctx.fillStyle = waterGrad;
     ctx.beginPath();
     ctx.moveTo(bx, waterY);
@@ -932,7 +932,7 @@ export function createThermometerLab(t, options = {}) {
     }
 
     // Beaker Glass Outline (High Fidelity)
-    ctx.strokeStyle = '#9ca3af';
+    ctx.strokeStyle = '#cbd5e1';
     ctx.lineWidth = 3.5;
     ctx.beginPath();
     ctx.moveTo(bx - 1, by);
@@ -944,7 +944,7 @@ export function createThermometerLab(t, options = {}) {
     ctx.stroke();
 
     // Glass reflection highlights
-    ctx.strokeStyle = 'rgba(255, 255, 255, 0.4)';
+    ctx.strokeStyle = 'rgba(255, 255, 255, 0.7)';
     ctx.lineWidth = 1.5;
     ctx.beginPath();
     ctx.moveTo(bx + 4, by + 10);
@@ -1055,14 +1055,14 @@ export function createThermometerLab(t, options = {}) {
 
     // Glass Stem Shading (3D effect)
     const glassGrad = ctx.createLinearGradient(leftX, stemTop, rightX, stemTop);
-    glassGrad.addColorStop(0, 'rgba(209, 213, 219, 0.85)');
-    glassGrad.addColorStop(0.2, 'rgba(255, 255, 255, 0.95)');
-    glassGrad.addColorStop(0.5, 'rgba(243, 244, 246, 0.15)');
-    glassGrad.addColorStop(0.8, 'rgba(255, 255, 255, 0.95)');
-    glassGrad.addColorStop(1, 'rgba(156, 163, 175, 0.9)');
+    glassGrad.addColorStop(0, 'rgba(226, 232, 240, 0.9)');
+    glassGrad.addColorStop(0.2, 'rgba(255, 255, 255, 0.98)');
+    glassGrad.addColorStop(0.5, 'rgba(248, 250, 252, 0.35)');
+    glassGrad.addColorStop(0.8, 'rgba(255, 255, 255, 0.98)');
+    glassGrad.addColorStop(1, 'rgba(186, 200, 219, 0.95)');
 
     ctx.fillStyle = glassGrad;
-    ctx.strokeStyle = 'rgba(156, 163, 175, 0.8)';
+    ctx.strokeStyle = 'rgba(203, 213, 225, 0.85)';
     ctx.lineWidth = 1;
     ctx.beginPath();
     ctx.moveTo(leftX, stemBottom);
@@ -1079,10 +1079,10 @@ export function createThermometerLab(t, options = {}) {
       x - bulbRadius*0.2, bulbCenterY - bulbRadius*0.2, bulbRadius*0.1,
       x, bulbCenterY, bulbRadius
     );
-    bulbGrad.addColorStop(0, 'rgba(255, 255, 255, 0.8)');
-    bulbGrad.addColorStop(1, 'rgba(156, 163, 175, 0.35)');
+    bulbGrad.addColorStop(0, 'rgba(255, 255, 255, 0.95)');
+    bulbGrad.addColorStop(1, 'rgba(203, 213, 225, 0.45)');
     ctx.fillStyle = bulbGrad;
-    ctx.strokeStyle = '#6b7280';
+    ctx.strokeStyle = '#94a3b8';
     ctx.lineWidth = 0.8 + state.wallThickness * 0.6;
     ctx.beginPath();
     ctx.arc(x, bulbCenterY, bulbRadius + 0.5 + state.wallThickness * 0.5, 0, Math.PI * 2);
@@ -1095,8 +1095,8 @@ export function createThermometerLab(t, options = {}) {
     ctx.fillRect(x - boreWidth / 2, stemTop + 8, boreWidth, stemBottom - stemTop - 8);
 
     const isMercury = state.liquidType === 'mercury';
-    const color = isMercury ? '#a1a1aa' : '#ef4444';
-    const reflectionColor = isMercury ? '#f4f4f5' : '#fee2e2';
+    const color = isMercury ? '#d1d5db' : '#ff3b30';
+    const reflectionColor = '#ffffff';
 
     const zeroY = 210;
     const maxC = 220;
@@ -1124,15 +1124,15 @@ export function createThermometerLab(t, options = {}) {
       x, bulbCenterY, bulbCoreRadius
     );
     if (isMercury) {
-      liquidBulbGrad.addColorStop(0, '#f4f4f5');
-      liquidBulbGrad.addColorStop(0.3, '#d4d4d8');
-      liquidBulbGrad.addColorStop(0.8, '#71717a');
-      liquidBulbGrad.addColorStop(1, '#3f3f46');
+      liquidBulbGrad.addColorStop(0, '#ffffff');
+      liquidBulbGrad.addColorStop(0.3, '#e4e4e7');
+      liquidBulbGrad.addColorStop(0.8, '#a1a1aa');
+      liquidBulbGrad.addColorStop(1, '#52525b');
     } else {
-      liquidBulbGrad.addColorStop(0, '#fee2e2');
-      liquidBulbGrad.addColorStop(0.2, '#fca5a5');
-      liquidBulbGrad.addColorStop(0.7, '#ef4444');
-      liquidBulbGrad.addColorStop(1, '#991b1b');
+      liquidBulbGrad.addColorStop(0, '#ffffff');
+      liquidBulbGrad.addColorStop(0.25, '#ff4d4d');
+      liquidBulbGrad.addColorStop(0.75, '#ff0000');
+      liquidBulbGrad.addColorStop(1, '#990000');
     }
     ctx.fillStyle = liquidBulbGrad;
     ctx.beginPath();
@@ -1175,13 +1175,13 @@ export function createThermometerLab(t, options = {}) {
 
     // Metallic probe sheath
     const probeGrad = ctx.createLinearGradient(rx, probeTop, rx + width, probeTop);
-    probeGrad.addColorStop(0, '#71717a');
-    probeGrad.addColorStop(0.3, '#f4f4f5');
-    probeGrad.addColorStop(0.7, '#d4d4d8');
-    probeGrad.addColorStop(1, '#3f3f46');
+    probeGrad.addColorStop(0, '#94a3b8');
+    probeGrad.addColorStop(0.3, '#ffffff');
+    probeGrad.addColorStop(0.7, '#e2e8f0');
+    probeGrad.addColorStop(1, '#64748b');
 
     ctx.fillStyle = probeGrad;
-    ctx.strokeStyle = '#4b5563';
+    ctx.strokeStyle = '#94a3b8';
     ctx.lineWidth = 1;
     ctx.beginPath();
     ctx.roundRect(rx, probeTop, width, probeBottom - probeTop, [0, 0, 4, 4]);
@@ -1285,13 +1285,13 @@ export function createThermometerLab(t, options = {}) {
     const tx = x - tubeWidth / 2;
 
     const tubeGrad = ctx.createLinearGradient(tx, tubeTop, tx + tubeWidth, tubeTop);
-    tubeGrad.addColorStop(0, 'rgba(229, 231, 235, 0.4)');
-    tubeGrad.addColorStop(0.3, 'rgba(255, 255, 255, 0.8)');
-    tubeGrad.addColorStop(0.7, 'rgba(243, 244, 246, 0.5)');
-    tubeGrad.addColorStop(1, 'rgba(209, 213, 219, 0.6)');
+    tubeGrad.addColorStop(0, 'rgba(241, 245, 249, 0.5)');
+    tubeGrad.addColorStop(0.3, 'rgba(255, 255, 255, 0.95)');
+    tubeGrad.addColorStop(0.7, 'rgba(248, 250, 252, 0.6)');
+    tubeGrad.addColorStop(1, 'rgba(226, 232, 240, 0.75)');
 
     ctx.fillStyle = tubeGrad;
-    ctx.strokeStyle = 'rgba(156, 163, 175, 0.6)';
+    ctx.strokeStyle = 'rgba(203, 213, 225, 0.75)';
     ctx.lineWidth = 0.8;
     ctx.beginPath();
     ctx.roundRect(tx, tubeTop, tubeWidth, tubeBottom - tubeTop, [0, 0, 3, 3]);

@@ -124,6 +124,11 @@ const STRINGS = {
     rayColorReal: '實際光線',
     rayColorVirtual: '虛線光線',
     rayColorEditHint: '已選取光線 — 點色板可改顏色',
+    presetsTitle: '預設場景',
+    presetBasic: '基礎反射作圖',
+    presetLetterP: '字母 P 字形練習',
+    presetGround: '地面鏡反射練習',
+    presetEmpty: '全新畫布',
   },
   en: {
     title: 'Plane Mirror Reflection Lab',
@@ -248,6 +253,11 @@ const STRINGS = {
     rayColorReal: 'Real ray',
     rayColorVirtual: 'Virtual ray',
     rayColorEditHint: 'Ray selected — tap a swatch to change colour',
+    presetsTitle: 'Preset Scenario',
+    presetBasic: 'Basic Reflection',
+    presetLetterP: 'Letter P Practice',
+    presetGround: 'Ground Mirror Practice',
+    presetEmpty: 'Empty Canvas',
   },
 };
 
