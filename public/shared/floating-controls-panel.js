@@ -5,8 +5,8 @@
 (function () {
   'use strict';
 
-  const FLOAT_BREAKPOINT = 1024;
-  const HUB_FLOAT_BREAKPOINT = 900;
+  const FLOAT_BREAKPOINT = 768;
+  const HUB_FLOAT_BREAKPOINT = 768;
   const DEFAULT_POS = { x: 12, y: 12 };
   const LAYOUT_DEBOUNCE_MS = 200;
 
