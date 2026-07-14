@@ -1039,12 +1039,17 @@
             ctx.lineTo(centerX + radius + 50, centerY);
             ctx.stroke();
 
+            ctx.save();
+            ctx.textAlign = 'right';
             ctx.fillStyle = '#94a3b8';
             ctx.font = 'bold 16px system-ui, sans-serif';
-            ctx.fillText(t('canvasAir') + " n=" + n2.toFixed(2), centerX - radius - 40, centerY - 20);
+            ctx.fillText(t('canvasAir'), centerX - radius - 15, centerY - 30);
+            ctx.fillText("n=" + n2.toFixed(2), centerX - radius - 15, centerY - 10);
+
             ctx.fillStyle = '#60a5fa';
-            ctx.font = 'bold 16px system-ui, sans-serif';
-            ctx.fillText(t('canvasGlass') + " n=" + n1.toFixed(2), centerX - radius - 40, centerY + 30);
+            ctx.fillText(t('canvasGlass'), centerX - radius - 15, centerY + 20);
+            ctx.fillText("n=" + n1.toFixed(2), centerX - radius - 15, centerY + 40);
+            ctx.restore();
 
             const n_i = incidentFromBottom ? n1 : n2;
             const n_r = incidentFromBottom ? n2 : n1;
