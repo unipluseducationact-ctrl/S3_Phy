@@ -388,6 +388,15 @@ function getCanvasLayout(canvas) {
   return { w: rect.width, h: rect.height, rect };
 }
 
+function isFullscreen() {
+  try {
+    if (document.fullscreenElement || document.webkitFullscreenElement) return true;
+    if (window.parent && (window.parent.document.fullscreenElement || window.parent.document.webkitFullscreenElement)) return true;
+    if (window.parent && window.parent.document.getElementById('app')?.classList.contains('is-lab-fullscreen')) return true;
+  } catch (e) {}
+  return window.innerHeight > 650 && document.documentElement.classList.contains('s3phy-embed');
+}
+
 function resizeCanvasToDisplay(canvas, opts = {}) {
   const maxHeight = opts.maxHeight ?? 520;
   const minHeight = opts.minHeight ?? 400;
@@ -397,7 +406,12 @@ function resizeCanvasToDisplay(canvas, opts = {}) {
     ? parent.getBoundingClientRect()
     : { width: canvas.clientWidth || 600, height: canvas.clientHeight || 400 };
   const w = Math.max(600, Math.floor(parentRect.width - 20));
-  const h = Math.max(minHeight, Math.min(maxHeight, Math.floor(w * aspect)));
+  let h;
+  if (isFullscreen()) {
+    h = Math.max(minHeight, Math.floor(parentRect.height - 10));
+  } else {
+    h = Math.max(minHeight, Math.min(maxHeight, Math.floor(w * aspect)));
+  }
   const dpr = window.devicePixelRatio || 1;
   canvas.style.flex = 'none';
   canvas.style.width = `${w}px`;
@@ -3316,7 +3330,7 @@ function createRaySketchScenario() {
       state.objects.push({ id: nid(), a: { x: 0.5, y: 1.5 }, b: { x: 0.5, y: 2.5 } });
       state.observers.push({ id: nid(), pt: { x: 4.5, y: 1.5 } });
     }
-    state.gridSnap = true;
+    state.gridSnap = false;
     notifyChange();
   }
 

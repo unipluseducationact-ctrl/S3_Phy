@@ -50,6 +50,15 @@ export function getCanvasLayout(canvas) {
   return { w: rect.width, h: rect.height, rect };
 }
 
+export function isFullscreen() {
+  try {
+    if (document.fullscreenElement || document.webkitFullscreenElement) return true;
+    if (window.parent && (window.parent.document.fullscreenElement || window.parent.document.webkitFullscreenElement)) return true;
+    if (window.parent && window.parent.document.getElementById('app')?.classList.contains('is-lab-fullscreen')) return true;
+  } catch (e) {}
+  return window.innerHeight > 650 && document.documentElement.classList.contains('s3phy-embed');
+}
+
 export function resizeCanvasToDisplay(canvas, opts = {}) {
   const maxHeight = opts.maxHeight ?? 520;
   const minHeight = opts.minHeight ?? 400;
@@ -59,7 +68,12 @@ export function resizeCanvasToDisplay(canvas, opts = {}) {
     ? parent.getBoundingClientRect()
     : { width: canvas.clientWidth || 600, height: canvas.clientHeight || 400 };
   const w = Math.max(600, Math.floor(parentRect.width - 20));
-  const h = Math.max(minHeight, Math.min(maxHeight, Math.floor(w * aspect)));
+  let h;
+  if (isFullscreen()) {
+    h = Math.max(minHeight, Math.floor(parentRect.height - 10));
+  } else {
+    h = Math.max(minHeight, Math.min(maxHeight, Math.floor(w * aspect)));
+  }
   const dpr = window.devicePixelRatio || 1;
   canvas.style.flex = 'none';
   canvas.style.width = `${w}px`;
