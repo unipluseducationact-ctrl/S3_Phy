@@ -407,10 +407,18 @@ function resizeCanvasToDisplay(canvas, opts = {}) {
     : { width: canvas.clientWidth || 600, height: canvas.clientHeight || 400 };
   const w = Math.max(600, Math.floor(parentRect.width - 20));
   let h;
-  if (isFullscreen()) {
-    h = Math.max(minHeight, Math.floor(parentRect.height - 10));
+  if (document.documentElement.classList.contains('s3phy-embed')) {
+    if (isFullscreen()) {
+      h = Math.max(minHeight, Math.floor(parentRect.height - 10));
+    } else {
+      h = Math.max(280, Math.min(maxHeight, Math.floor(parentRect.height - 12)));
+    }
   } else {
-    h = Math.max(minHeight, Math.min(maxHeight, Math.floor(w * aspect)));
+    if (isFullscreen()) {
+      h = Math.max(minHeight, Math.floor(parentRect.height - 10));
+    } else {
+      h = Math.max(minHeight, Math.min(maxHeight, Math.floor(w * aspect)));
+    }
   }
   const dpr = window.devicePixelRatio || 1;
   canvas.style.flex = 'none';
@@ -3337,20 +3345,20 @@ function createRaySketchScenario() {
     currentPresetName = name;
     state = emptyState();
     if (name === 'basic') {
-      state.mirrors.push({ id: nid(), a: { x: 2.5, y: -1.0 }, b: { x: 2.5, y: 3.0 } });
-      state.objects.push({ id: nid(), a: { x: 1.0, y: 1.0 }, b: { x: 1.0, y: 2.0 } });
-      state.observers.push({ id: nid(), pt: { x: 0.5, y: 0.0 } });
+      state.mirrors.push({ id: nid(), a: { x: 2.0, y: -1.0 }, b: { x: 2.0, y: 3.0 } });
+      state.objects.push({ id: nid(), a: { x: 0.5, y: 1.0 }, b: { x: 0.5, y: 2.0 } });
+      state.observers.push({ id: nid(), pt: { x: 0.0, y: 0.0 } });
     } else if (name === 'letterP') {
-      state.mirrors.push({ id: nid(), a: { x: 2.5, y: -1.0 }, b: { x: 2.5, y: 3.0 } });
-      state.objects.push({ id: nid(), a: { x: 1.0, y: 0.5 }, b: { x: 1.0, y: 2.5 } });
-      state.objects.push({ id: nid(), a: { x: 1.0, y: 2.5 }, b: { x: 1.6, y: 2.5 } });
-      state.objects.push({ id: nid(), a: { x: 1.6, y: 2.5 }, b: { x: 1.6, y: 1.5 } });
-      state.objects.push({ id: nid(), a: { x: 1.6, y: 1.5 }, b: { x: 1.0, y: 1.5 } });
-      state.observers.push({ id: nid(), pt: { x: 0.5, y: 0.0 } });
+      state.mirrors.push({ id: nid(), a: { x: 2.0, y: -1.0 }, b: { x: 2.0, y: 3.0 } });
+      state.objects.push({ id: nid(), a: { x: 0.5, y: 0.5 }, b: { x: 0.5, y: 2.5 } });
+      state.objects.push({ id: nid(), a: { x: 0.5, y: 2.5 }, b: { x: 1.1, y: 2.5 } });
+      state.objects.push({ id: nid(), a: { x: 1.1, y: 2.5 }, b: { x: 1.1, y: 1.5 } });
+      state.objects.push({ id: nid(), a: { x: 1.1, y: 1.5 }, b: { x: 0.5, y: 1.5 } });
+      state.observers.push({ id: nid(), pt: { x: 0.0, y: 0.0 } });
     } else if (name === 'ground') {
-      state.mirrors.push({ id: nid(), a: { x: 0.0, y: 0.0 }, b: { x: 5.0, y: 0.0 } });
-      state.objects.push({ id: nid(), a: { x: 0.5, y: 1.5 }, b: { x: 0.5, y: 2.5 } });
-      state.observers.push({ id: nid(), pt: { x: 4.5, y: 1.5 } });
+      state.mirrors.push({ id: nid(), a: { x: -0.5, y: 0.0 }, b: { x: 4.5, y: 0.0 } });
+      state.objects.push({ id: nid(), a: { x: 0.0, y: 1.5 }, b: { x: 0.0, y: 2.5 } });
+      state.observers.push({ id: nid(), pt: { x: 4.0, y: 1.5 } });
     }
     state.gridSnap = false;
     notifyChange();
@@ -3921,7 +3929,7 @@ function createRaySketchScenario() {
   function init(canvas) {
     canvasRef = canvas;
     view = createWorldView(canvas, {
-      worldBounds: { xMin: -1.5, xMax: 6.5, yMin: -1.5, yMax: 3.5 },
+      worldBounds: { xMin: -2.0, xMax: 6.0, yMin: -2.0, yMax: 3.0 },
       gridStep: 1.0,
       margin: { left: 40, right: 40, top: 40, bottom: 40 },
     });

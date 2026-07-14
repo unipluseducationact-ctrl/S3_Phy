@@ -69,10 +69,18 @@ export function resizeCanvasToDisplay(canvas, opts = {}) {
     : { width: canvas.clientWidth || 600, height: canvas.clientHeight || 400 };
   const w = Math.max(600, Math.floor(parentRect.width - 20));
   let h;
-  if (isFullscreen()) {
-    h = Math.max(minHeight, Math.floor(parentRect.height - 10));
+  if (document.documentElement.classList.contains('s3phy-embed')) {
+    if (isFullscreen()) {
+      h = Math.max(minHeight, Math.floor(parentRect.height - 10));
+    } else {
+      h = Math.max(280, Math.min(maxHeight, Math.floor(parentRect.height - 12)));
+    }
   } else {
-    h = Math.max(minHeight, Math.min(maxHeight, Math.floor(w * aspect)));
+    if (isFullscreen()) {
+      h = Math.max(minHeight, Math.floor(parentRect.height - 10));
+    } else {
+      h = Math.max(minHeight, Math.min(maxHeight, Math.floor(w * aspect)));
+    }
   }
   const dpr = window.devicePixelRatio || 1;
   canvas.style.flex = 'none';
