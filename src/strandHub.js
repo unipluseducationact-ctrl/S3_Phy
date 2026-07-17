@@ -4,6 +4,7 @@ const STRANDS = [
   { id: 'optics', titleKey: 'strand.optics.title', descKey: 'strand.optics.desc' },
   { id: 'heat', titleKey: 'strand.heat.title', descKey: 'strand.heat.desc' },
   { id: 'mechanics', titleKey: 'strand.mechanics.title', descKey: 'strand.mechanics.desc' },
+  { id: 'gas', titleKey: 'strand.gas.title', descKey: 'strand.gas.desc' },
 ];
 
 export function mountStrandHub(root) {

@@ -13,6 +13,7 @@ const STRAND_LOADERS = {
   optics: () => import('./strands/opticsHub.js').then((m) => m.mountOpticsHub),
   heat: () => import('./strands/heatHub.js').then((m) => m.mountHeatHub),
   mechanics: () => import('./strands/mechanicsHub.js').then((m) => m.mountMechanicsHub),
+  gas: () => import('./strands/gasHub.js').then((m) => m.mountGasHub),
 };
 
 let unmountActive = null;
