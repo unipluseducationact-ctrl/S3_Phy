@@ -7,12 +7,20 @@ const WAVES_TOPICS = [
     titleKey: 'topic.waveMotion',
   },
   {
-    id: 'wavePhenomena',
-    titleKey: 'topic.wavePhenomena',
+    id: 'waveProperties',
+    titleKey: 'topic.waveProperties',
   },
   {
-    id: 'soundWaves',
-    titleKey: 'topic.soundWaves',
+    id: 'stationaryWave',
+    titleKey: 'topic.stationaryWave',
+  },
+  {
+    id: 'lightWave',
+    titleKey: 'topic.lightWave',
+  },
+  {
+    id: 'soundWave',
+    titleKey: 'topic.soundWave',
   },
 ];
 
