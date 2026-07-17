@@ -1,0 +1,1 @@
+import{c as t}from"./createLabIframe-C_OrcpEg.js";import"./index-CrmRTGbQ.js";function i(e){return t(e,{slug:"tir-escape",titleKey:"tools.refractionTir.title",className:"tool-tir-escape"})}export{i as createTirEscapeLab};

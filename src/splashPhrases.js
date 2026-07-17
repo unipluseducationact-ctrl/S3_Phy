@@ -29,6 +29,9 @@ export const SPLASH_PHRASES = {
     'Total internal reflection',
     'Convex lens',
     'Electromagnetic waves',
+    'Mechanics',
+    'Force and motion',
+    'Acceleration',
   ],
   zhHant: [
     'F = ma',
@@ -51,5 +54,8 @@ export const SPLASH_PHRASES = {
     '\u51f8\u900f\u93e1',
     '\u51f9\u900f\u93e1',
     '\u96fb\u78c1\u6ce2',
+    '力學',
+    '力與運動',
+    '加速度',
   ],
 };
