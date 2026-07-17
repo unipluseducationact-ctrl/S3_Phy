@@ -236,12 +236,12 @@ export const zhHant = {
   'tools.faultyCalibration.invalidInterval': 'C<sub>u</sub> \u8207 C<sub>f</sub> \u4e0d\u53ef\u76f8\u540c\uff08\u5340\u9593\u4e0d\u53ef\u70ba\u96f6\uff09\u3002',
   // Mechanics translations
   'strand.mechanics.title': '力學',
-  'strand.mechanics.desc': '力與運動：位置、速率、加速度及牛頓運動定律。',
+  'strand.mechanics.desc': '力與運動：位置、速率、加速度及牛頓運動定律（即將推出）。',
   'strand.mechanics.subtitle': '力學 — 力與運動',
   'mechanics.section.empty': '力學單元內容即將推出。',
   // Gas and kinetic theory translations
   'strand.gas.title': '\u6c23\u9ad4\u8207\u5206\u5b50\u904b\u52d5\u8ad6',
-  'strand.gas.desc': '\u6c23\u9ad4\u5b9a\u5f8b\u3001\u5206\u5b50\u904b\u52d5\u8ad6\u3001\u589a\u529b\u8207\u5206\u5b50\u904b\u52d5\uff08\u4e92\u52d5\u6a21\u64ec\u3001\u7b46\u8a18\u53ca\u5de5\u4f5c\u7d19\uff09\u3002',
+  'strand.gas.desc': '\u6c23\u9ad4\u5b9a\u5f8b\u3001\u5206\u5b50\u904b\u52d5\u8ad6\u3001\u589a\u529b\u8207\u5206\u5b50\u904b\u52d5\uff08\u5373\u5c07\u63a8\u51fa\uff09\u3002',
   'strand.gas.subtitle': '\u6c23\u9ad4\u8207\u5206\u5b50\u904b\u52d5\u8ad6 \u2014 \u6c23\u9ad4\u5b9a\u5f8b\u8207\u5206\u5b50\u52d5\u80fd',
   'gas.section.empty': '\u6c23\u9ad4\u55ae\u5143\u5167\u5bb9\u5373\u5c07\u63a8\u51fa\u3002',
   'topic.gasLaws': '\u6c23\u9ad4\u5b9a\u5f8b',
@@ -292,7 +292,7 @@ export const zhHant = {
   'flashcards.comingSoon': '力學單元的閃卡將於日後推出。',
   // Waves translations
   'strand.waves.title': '波動',
-  'strand.waves.desc': '波動運動、波動現象、聲波及波動特性（互動模擬、筆記及工作紙）。',
+  'strand.waves.desc': '波動運動、波動現象、聲波及波動特性（即將推出）。',
   'strand.waves.subtitle': '波動 — 波動運動與波動現象',
   'waves.section.empty': '波動單元內容即將推出。',
   'topic.waveMotion': '波動運動',

@@ -236,12 +236,12 @@ export const en = {
   'tools.faultyCalibration.invalidInterval': 'C_u must differ from C_f (interval cannot be zero).',
   // Mechanics translations
   'strand.mechanics.title': 'Mechanics',
-  'strand.mechanics.desc': 'Force and motion: position, speed, acceleration, and Newton\'s laws of motion.',
+  'strand.mechanics.desc': 'Force and motion: position, speed, acceleration, and Newton\'s laws of motion (Coming soon).',
   'strand.mechanics.subtitle': 'Mechanics — force and motion',
   'mechanics.section.empty': 'Mechanics strand content is coming soon.',
   // Gas and kinetic theory translations
   'strand.gas.title': 'Gas & Kinetic Theory',
-  'strand.gas.desc': 'Gas laws, kinetic theory, pressure, and molecular motion (interactive simulations, notes, and worksheets).',
+  'strand.gas.desc': 'Gas laws, kinetic theory, pressure, and molecular motion (Coming soon).',
   'strand.gas.subtitle': 'Gas & Kinetic Theory — gas laws and molecular kinetic energy',
   'gas.section.empty': 'Gas strand content is coming soon.',
   'topic.gasLaws': 'Gas laws',
@@ -292,7 +292,7 @@ export const en = {
   'flashcards.comingSoon': 'Flashcards for Mechanics are coming soon.',
   // Waves translations
   'strand.waves.title': 'Waves',
-  'strand.waves.desc': 'Wave motion, wave phenomena, sound, and wave properties (interactive simulations, notes, and worksheets).',
+  'strand.waves.desc': 'Wave motion, wave phenomena, sound, and wave properties (Coming soon).',
   'strand.waves.subtitle': 'Waves — wave motion and wave phenomena',
   'waves.section.empty': 'Waves strand content is coming soon.',
   'topic.waveMotion': 'Wave motion',

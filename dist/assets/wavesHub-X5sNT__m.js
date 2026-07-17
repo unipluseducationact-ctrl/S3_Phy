@@ -1,4 +1,4 @@
-import{t}from"./index-5UWgsAi1.js";import{m as p}from"./hubShell-x3lyquCb.js";const m=[{id:"waveMotion",titleKey:"topic.waveMotion"},{id:"wavePhenomena",titleKey:"topic.wavePhenomena"},{id:"soundWaves",titleKey:"topic.soundWaves"}];function b(a){let n="topics",e=null,i={main:null};function r(){i.main&&(n==="topics"?i.main.innerHTML=l():i.main.innerHTML=`
+import{t}from"./index-BayKZv6X.js";import{m as p}from"./hubShell-n3Yq7oqC.js";const m=[{id:"waveMotion",titleKey:"topic.waveMotion"},{id:"wavePhenomena",titleKey:"topic.wavePhenomena"},{id:"soundWaves",titleKey:"topic.soundWaves"}];function b(a){let n="topics",e=null,i={main:null};function r(){i.main&&(n==="topics"?i.main.innerHTML=l():i.main.innerHTML=`
         <section class="panel">
           <h2>${t(`nav.${n}`)}</h2>
           <div class="card" style="padding: 2rem; text-align: center; background: var(--bg-card); border-radius: 8px; border: 1px solid var(--border);">
