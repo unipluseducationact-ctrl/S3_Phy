@@ -1,4 +1,4 @@
-import{t}from"./index-BYZ1jLPw.js";import{m as p}from"./hubShell-BUhJ1yKU.js";const u=[{id:"gasLaws",titleKey:"topic.gasLaws"},{id:"kineticTheory",titleKey:"topic.kineticTheory"},{id:"gasPressure",titleKey:"topic.gasPressure"}];function v(r){let i="topics",e=null,n={main:null};function a(){n.main&&(i==="topics"?n.main.innerHTML=l():n.main.innerHTML=`
+import{t}from"./index-5UWgsAi1.js";import{m as p}from"./hubShell-x3lyquCb.js";const u=[{id:"gasLaws",titleKey:"topic.gasLaws"},{id:"kineticTheory",titleKey:"topic.kineticTheory"},{id:"gasPressure",titleKey:"topic.gasPressure"}];function v(r){let i="topics",e=null,n={main:null};function a(){n.main&&(i==="topics"?n.main.innerHTML=l():n.main.innerHTML=`
         <section class="panel">
           <h2>${t(`nav.${i}`)}</h2>
           <div class="card" style="padding: 2rem; text-align: center; background: var(--bg-card); border-radius: 8px; border: 1px solid var(--border);">
