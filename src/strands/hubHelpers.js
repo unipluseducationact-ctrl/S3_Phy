@@ -17,6 +17,7 @@ export function cleanupLabInstance(inst) {
 }
 
 export async function assetExists(folder, name) {
+  if (!name) return false;
   const url = `${import.meta.env.BASE_URL}${folder}/${name}`;
   if (assetExistsCache.has(url)) {
     return assetExistsCache.get(url);

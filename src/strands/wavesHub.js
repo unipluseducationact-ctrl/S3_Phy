@@ -1,14 +1,19 @@
 import { t } from '../i18n.js';
 import { mountHubShell } from '../hubShell.js';
+import { hydrateNoteCards } from './hubHelpers.js';
 
 const WAVES_TOPICS = [
   {
     id: 'waveMotion',
     titleKey: 'topic.waveMotion',
+    fileEn: 'wave-motion-en.pdf',
+    fileZh: 'wave-motion-zhHant.pdf',
   },
   {
     id: 'waveProperties',
     titleKey: 'topic.waveProperties',
+    fileEn: 'wave-properties-en.pdf',
+    fileZh: 'wave-properties-zhHant.pdf',
   },
   {
     id: 'stationaryWave',
@@ -34,6 +39,8 @@ export function mountWavesHub(root) {
 
     if (section === 'topics') {
       el.main.innerHTML = renderTopics();
+    } else if (section === 'notes') {
+      el.main.innerHTML = renderNotesShell();
     } else {
       el.main.innerHTML = `
         <section class="panel">
@@ -44,6 +51,8 @@ export function mountWavesHub(root) {
         </section>
       `;
     }
+
+    if (section === 'notes') void hydrateNotes();
   }
 
   function onLangChange() {
@@ -77,7 +86,7 @@ export function mountWavesHub(root) {
           ${WAVES_TOPICS.map((topic) => `
             <div class="card">
               <h3>${t(topic.titleKey)}</h3>
-              <p style="color: var(--text-muted); font-size: 0.9rem; margin-top: 0.5rem;">${t('waves.section.empty')}</p>
+              <button class="btn primary" type="button" data-go-section="notes">${t('topic.viewNotes')}</button>
             </div>
           `).join('')}
         </div>
@@ -85,9 +94,41 @@ export function mountWavesHub(root) {
     `;
   }
 
+  function renderNotesShell() {
+    return `
+      <section class="panel">
+        <h2>${t('notes.title')}</h2>
+        <p class="lead">${t('notes.intro')}</p>
+        <p class="lead">${t('notes.embedHint')}</p>
+        <div class="grid cols-3" data-notes-grid>
+          ${WAVES_TOPICS.map(
+            (r) => `
+            <div class="card" data-note-card="${r.id}">
+              <h3>${t(`notes.card.${r.id}`)}</h3>
+              <div data-note-body></div>
+            </div>`,
+          ).join('')}
+        </div>
+      </section>`;
+  }
+
+  async function hydrateNotes() {
+    const rows = WAVES_TOPICS.map((r) => ({
+      key: r.id,
+      fileEn: r.fileEn,
+      fileZh: r.fileZh,
+    }));
+    await hydrateNoteCards(root, rows);
+  }
+
   root.addEventListener('click', onMainClick);
   function onMainClick(ev) {
-    // Handle clicks if we add navigation buttons inside topics later
+    const notesBtn = ev.target.closest('[data-go-section]');
+    if (notesBtn?.getAttribute('data-go-section') === 'notes') {
+      section = 'notes';
+      shell.updateSection(section);
+      renderMain();
+    }
   }
 
   render();
