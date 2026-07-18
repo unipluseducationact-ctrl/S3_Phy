@@ -60,7 +60,7 @@ function drawCeilingLargeTriangle(ctx, view, txf, c) {
   drawArrow(ctx, view, txf, underImage, image, dash);
 
   const lang = getLang();
-  drawDimLabel(ctx, txf, eye, underImage, lang === 'zh' ? `d眼+d燈` : `dE+dL`, { x: 0, y: -12 });
+  drawDimLabel(ctx, txf, eye, underImage, lang === 'zh' ? `d眼+d燈` : `dₑ+dₗ`, { x: 0, y: 14 });
   drawDimLabel(ctx, txf, underImage, image, `Δh=${dh.toFixed(2)}`, { x: 14, y: 0 });
 }
 
@@ -91,7 +91,7 @@ function drawSpiderLargeTriangle(ctx, view, txf, c) {
   drawArrow(ctx, view, txf, underImage, image, dash);
 
   const lang = getLang();
-  drawDimLabel(ctx, txf, eye, underImage, lang === 'zh' ? `2d眼+牆距` : `2d+dW`, { x: 0, y: -12 });
+  drawDimLabel(ctx, txf, eye, underImage, lang === 'zh' ? `2d眼+牆距` : `2d+dW`, { x: 0, y: 14 });
   drawDimLabel(ctx, txf, underImage, image, lang === 'zh' ? `h−眼高` : `h−eye`, { x: 14, y: 0 });
 }
 
@@ -208,7 +208,7 @@ export function createSeeBackObjectScenario() {
     if (c.mode === 'ceiling') {
       return getLang() === 'zh'
         ? 'h/d眼 = 1/(d眼+d燈)\nh = 0.33 m\n鏡高 = 1.5+0.33 = 1.83 m'
-        : 'h/dE = 1/(dE+dL) → mirror at 1.83 m';
+        : 'h/dₑ = 1/(dₑ+dₗ) → mirror at 1.83 m';
     }
     return getLang() === 'zh'
       ? '0.2/1 = (h−1.6)/5\nh = 2.6 m'
