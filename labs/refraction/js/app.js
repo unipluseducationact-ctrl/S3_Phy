@@ -1,0 +1,401 @@
+/** Interactive refraction lab — Snell's law, media, light speed. */
+
+const MEDIA = {
+  air: { id: 'air', n: 1.0 },
+  water: { id: 'water', n: 1.33 },
+  glass: { id: 'glass', n: 1.5 },
+};
+
+const C_VACUUM = 3.0; // × 10⁸ m s⁻¹
+
+/**
+ * @param {(key: string) => string} t
+ */
+export function initRefractionLab(root, t) {
+  const wrap = document.createElement('div');
+  wrap.className = 'reflab';
+  wrap.innerHTML = `
+    <div class="reflab-head">
+      <h2 class="reflab-title">${t('tools.refraction.title')}</h2>
+      <div class="reflab-sub">${t('tools.refraction.subtitle')}</div>
+    </div>
+    <div class="reflab-dash">
+      <div class="reflab-viz">
+        <canvas class="reflab-canvas" width="720" height="440" aria-label="${t('tools.refraction.title')}"></canvas>
+      </div>
+      <div class="reflab-controls">
+        <div class="reflab-medium-block">
+          <div class="reflab-label">${t('tools.refraction.n1')}</div>
+          <div class="reflab-chips" data-side="1">
+            ${mediumChips('1')}
+          </div>
+          <div class="reflab-readout">
+            <span>${t('tools.refraction.nLabel')}₁ = <strong data-n="1">1.00</strong></span>
+            <span>${t('tools.refraction.speedLabel')}₁ = <strong data-v="1">3.00</strong> ${t('tools.refraction.speedUnit')}</span>
+          </div>
+        </div>
+        <div class="reflab-medium-block">
+          <div class="reflab-label">${t('tools.refraction.n2')}</div>
+          <div class="reflab-chips" data-side="2">
+            ${mediumChips('2')}
+          </div>
+          <div class="reflab-readout">
+            <span>${t('tools.refraction.nLabel')}₂ = <strong data-n="2">1.33</strong></span>
+            <span>${t('tools.refraction.speedLabel')}₂ = <strong data-v="2">2.26</strong> ${t('tools.refraction.speedUnit')}</span>
+          </div>
+        </div>
+        <div class="reflab-cg">
+          <div class="reflab-lr">
+            <span>${t('tools.refraction.angleI')}</span>
+            <span class="reflab-badge" data-disp="theta1">40.0°</span>
+          </div>
+          <input type="range" data-theta1 min="0" max="89" step="0.5" value="40" />
+        </div>
+        <div class="reflab-cg">
+          <div class="reflab-lr">
+            <span>${t('tools.refraction.angleR')}</span>
+            <span class="reflab-badge" data-disp="theta2">29.0°</span>
+          </div>
+          <input type="range" data-theta2 min="0" max="89" step="0.5" value="29" />
+        </div>
+        <div class="reflab-formula">${t('tools.refraction.snell')}</div>
+        <div class="reflab-stats">
+          <div class="reflab-sr" data-critical-row hidden>
+            <span class="reflab-sl">${t('tools.refraction.critical')}</span>
+            <span class="reflab-sv" data-critical>—</span>
+          </div>
+        </div>
+        <div class="reflab-tir" data-tir hidden>${t('tools.refraction.tir')}</div>
+        <button type="button" class="reflab-reset" data-reset>${t('tools.refraction.reset')}</button>
+      </div>
+    </div>
+  `;
+
+  function mediumChips(side) {
+    return ['air', 'water', 'glass']
+      .map(
+        (id) => `
+      <button type="button" class="reflab-chip" data-medium="${id}" data-for="${side}">
+        ${t(`tools.refraction.medium.${id}`)}
+      </button>`,
+      )
+      .join('');
+  }
+
+  const canvas = /** @type {HTMLCanvasElement} */ (wrap.querySelector('.reflab-canvas'));
+  const ctx = /** @type {CanvasRenderingContext2D} */ (canvas.getContext('2d'));
+  const slider1 = /** @type {HTMLInputElement} */ (wrap.querySelector('[data-theta1]'));
+  const slider2 = /** @type {HTMLInputElement} */ (wrap.querySelector('[data-theta2]'));
+  const disp1 = wrap.querySelector('[data-disp="theta1"]');
+  const disp2 = wrap.querySelector('[data-disp="theta2"]');
+  const n1El = wrap.querySelector('[data-n="1"]');
+  const n2El = wrap.querySelector('[data-n="2"]');
+  const v1El = wrap.querySelector('[data-v="1"]');
+  const v2El = wrap.querySelector('[data-v="2"]');
+  const tirEl = wrap.querySelector('[data-tir]');
+  const critRow = wrap.querySelector('[data-critical-row]');
+  const critEl = wrap.querySelector('[data-critical]');
+
+  let medium1 = 'air';
+  let medium2 = 'water';
+  let theta1Deg = 40;
+  let isTir = false;
+
+  function n1() {
+    return MEDIA[medium1].n;
+  }
+  function n2() {
+    return MEDIA[medium2].n;
+  }
+
+  function formatN(n) {
+    return n.toFixed(2);
+  }
+
+  function formatV(n) {
+    return (C_VACUUM / n).toFixed(2);
+  }
+
+  function toRad(deg) {
+    return (deg * Math.PI) / 180;
+  }
+
+  function toDeg(rad) {
+    return (rad * 180) / Math.PI;
+  }
+
+  function criticalDeg() {
+    if (n1() <= n2()) return null;
+    const s = n2() / n1();
+    if (s >= 1) return null;
+    return toDeg(Math.asin(s));
+  }
+
+  /** @returns {{ tir: boolean, theta2: number | null }} */
+  function solveFromTheta1(t1) {
+    const s2 = (n1() / n2()) * Math.sin(toRad(t1));
+    if (s2 > 1 + 1e-9) return { tir: true, theta2: null };
+    if (s2 < -1) return { tir: true, theta2: null };
+    return { tir: false, theta2: toDeg(Math.asin(Math.min(1, Math.max(-1, s2)))) };
+  }
+
+  /** @returns {{ tir: boolean, theta1: number | null }} */
+  function solveFromTheta2(t2) {
+    const s1 = (n2() / n1()) * Math.sin(toRad(t2));
+    if (s1 > 1 + 1e-9) return { tir: true, theta1: null };
+    return { tir: false, theta1: toDeg(Math.asin(Math.min(1, Math.max(-1, s1)))) };
+  }
+
+  function paintMediumChips() {
+    wrap.querySelectorAll('.reflab-chip[data-for="1"]').forEach((btn) => {
+      btn.classList.toggle('active', btn.getAttribute('data-medium') === medium1);
+    });
+    wrap.querySelectorAll('.reflab-chip[data-for="2"]').forEach((btn) => {
+      btn.classList.toggle('active', btn.getAttribute('data-medium') === medium2);
+    });
+  }
+
+  function updateReadouts() {
+    n1El.textContent = formatN(n1());
+    n2El.textContent = formatN(n2());
+    v1El.textContent = formatV(n1());
+    v2El.textContent = formatV(n2());
+
+    const tc = criticalDeg();
+    if (tc != null) {
+      critRow.hidden = false;
+      critEl.textContent = `${tc.toFixed(1)}°`;
+    } else {
+      critRow.hidden = true;
+    }
+
+    tirEl.hidden = !isTir;
+    slider2.disabled = isTir;
+    slider2.classList.toggle('reflab-disabled', isTir);
+
+    disp1.textContent = `${theta1Deg.toFixed(1)}°`;
+    if (isTir) {
+      disp2.textContent = '—';
+    } else {
+      const r = solveFromTheta1(theta1Deg);
+      disp2.textContent = r.theta2 != null ? `${r.theta2.toFixed(1)}°` : '—';
+    }
+  }
+
+  function syncSlidersFromState() {
+    slider1.value = String(theta1Deg);
+    const r = solveFromTheta1(theta1Deg);
+    if (!r.tir && r.theta2 != null) {
+      slider2.value = String(Math.min(89, Math.max(0, r.theta2)));
+    }
+  }
+
+  function applyFromTheta1() {
+    const r = solveFromTheta1(theta1Deg);
+    isTir = r.tir;
+    updateReadouts();
+    syncSlidersFromState();
+    draw();
+  }
+
+  function applyFromTheta2(t2) {
+    const r = solveFromTheta2(t2);
+    if (r.tir || r.theta1 == null) {
+      // Impossible from θ₂ side — keep θ₁-driven state
+      applyFromTheta1();
+      return;
+    }
+    theta1Deg = Math.min(89, Math.max(0, r.theta1));
+    isTir = false;
+    updateReadouts();
+    slider1.value = String(theta1Deg);
+    slider2.value = String(t2);
+    draw();
+  }
+
+  function drawArrow(x1, y1, x2, y2, color, width = 2.5) {
+    ctx.beginPath();
+    ctx.strokeStyle = color;
+    ctx.lineWidth = width;
+    ctx.moveTo(x1, y1);
+    ctx.lineTo(x2, y2);
+    ctx.stroke();
+    const dx = x2 - x1;
+    const dy = y2 - y1;
+    const len = Math.hypot(dx, dy);
+    if (len < 1) return;
+    const ux = dx / len;
+    const uy = dy / len;
+    const size = 12;
+    ctx.beginPath();
+    ctx.fillStyle = color;
+    ctx.moveTo(x2, y2);
+    ctx.lineTo(x2 - ux * size - uy * size * 0.45, y2 - uy * size + ux * size * 0.45);
+    ctx.lineTo(x2 - ux * size + uy * size * 0.45, y2 - uy * size - ux * size * 0.45);
+    ctx.closePath();
+    ctx.fill();
+  }
+
+  function drawAngleArc(cx, cy, startDeg, endDeg, color, label) {
+    const r = 42;
+    const a0 = toRad(startDeg);
+    const a1 = toRad(endDeg);
+    ctx.beginPath();
+    ctx.strokeStyle = color;
+    ctx.lineWidth = 1.5;
+    ctx.arc(cx, cy, r, a0, a1, endDeg < startDeg);
+    ctx.stroke();
+    const mid = (a0 + a1) / 2;
+    ctx.fillStyle = color;
+    ctx.font = 'bold 13px system-ui, sans-serif';
+    ctx.fillText(label, cx + Math.cos(mid) * (r + 14) - 10, cy + Math.sin(mid) * (r + 14) + 4);
+  }
+
+  function draw() {
+    const W = canvas.width;
+    const H = canvas.height;
+    ctx.clearRect(0, 0, W, H);
+
+    const cx = W / 2;
+    const cy = H / 2;
+    const rayLen = Math.min(W, H) * 0.42;
+
+    // Media tint: top = medium 1, bottom = medium 2
+    ctx.fillStyle = mediumFill(medium1, 0.22);
+    ctx.fillRect(0, 0, W, cy);
+    ctx.fillStyle = mediumFill(medium2, 0.28);
+    ctx.fillRect(0, cy, W, H - cy);
+
+    // Interface
+    ctx.beginPath();
+    ctx.strokeStyle = '#8b9bb8';
+    ctx.lineWidth = 2;
+    ctx.moveTo(40, cy);
+    ctx.lineTo(W - 40, cy);
+    ctx.stroke();
+    ctx.fillStyle = '#bac4d6';
+    ctx.font = '12px system-ui, sans-serif';
+    ctx.fillText(t('tools.refraction.canvas.interface'), W - 110, cy - 8);
+
+    // Normal (dashed vertical)
+    ctx.beginPath();
+    ctx.setLineDash([6, 5]);
+    ctx.strokeStyle = '#6b7a99';
+    ctx.lineWidth = 1.5;
+    ctx.moveTo(cx, 30);
+    ctx.lineTo(cx, H - 30);
+    ctx.stroke();
+    ctx.setLineDash([]);
+    ctx.fillStyle = '#8b9bb8';
+    ctx.fillText(t('tools.refraction.canvas.normal'), cx + 8, 44);
+
+    // Medium labels
+    ctx.font = 'bold 14px system-ui, sans-serif';
+    ctx.fillStyle = '#e8eef8';
+    ctx.fillText(
+      `${t(`tools.refraction.medium.${medium1}`)}  n₁=${formatN(n1())}`,
+      48,
+      36,
+    );
+    ctx.fillText(
+      `${t(`tools.refraction.medium.${medium2}`)}  n₂=${formatN(n2())}`,
+      48,
+      H - 24,
+    );
+
+    // Continuous ray path (not reflection):
+    // incident from UPPER LEFT → through interface → refracted to LOWER RIGHT.
+    // (Same-side endpoints reverse the horizontal direction and look like reflection.)
+    const iAngle = -Math.PI / 2 - toRad(theta1Deg);
+    const ix = cx + Math.cos(iAngle) * rayLen;
+    const iy = cy + Math.sin(iAngle) * rayLen;
+    drawArrow(ix, iy, cx, cy, '#00e676', 3);
+
+    if (isTir) {
+      // Reflection: bounce into UPPER RIGHT
+      const rAngle = -Math.PI / 2 + toRad(theta1Deg);
+      const rx = cx + Math.cos(rAngle) * rayLen;
+      const ry = cy + Math.sin(rAngle) * rayLen;
+      drawArrow(cx, cy, rx, ry, '#ff8a80', 3);
+      ctx.fillStyle = '#ff8a80';
+      ctx.font = 'bold 13px system-ui, sans-serif';
+      ctx.fillText(t('tools.refraction.canvas.reflected'), rx - 10, ry - 8);
+      drawAngleArc(cx, cy, -90, -90 - theta1Deg, '#00e676', 'θ₁');
+      drawAngleArc(cx, cy, -90, -90 + theta1Deg, '#ff8a80', 'θ₁');
+    } else {
+      const sol = solveFromTheta1(theta1Deg);
+      const t2 = sol.theta2 ?? 0;
+      // Refracted into LOWER RIGHT (bottom half of the diagram)
+      const tAngle = Math.PI / 2 - toRad(t2);
+      const tx = cx + Math.cos(tAngle) * rayLen;
+      const ty = cy + Math.sin(tAngle) * rayLen;
+      drawArrow(cx, cy, tx, ty, '#22d3ee', 3);
+      ctx.fillStyle = '#22d3ee';
+      ctx.font = 'bold 13px system-ui, sans-serif';
+      ctx.fillText(t('tools.refraction.canvas.refracted'), tx + 4, ty + 16);
+      drawAngleArc(cx, cy, -90, -90 - theta1Deg, '#00e676', 'θ₁');
+      drawAngleArc(cx, cy, 90, 90 - t2, '#22d3ee', 'θ₂');
+    }
+
+    ctx.fillStyle = '#00e676';
+    ctx.font = 'bold 13px system-ui, sans-serif';
+    ctx.fillText(t('tools.refraction.canvas.incident'), ix - 50, iy - 8);
+  }
+
+  function mediumFill(id, alpha) {
+    if (id === 'air') return `rgba(120, 160, 220, ${alpha})`;
+    if (id === 'water') return `rgba(40, 120, 200, ${alpha})`;
+    return `rgba(160, 200, 230, ${alpha})`;
+  }
+
+  // Events
+  wrap.querySelectorAll('.reflab-chip').forEach((btn) => {
+    btn.addEventListener('click', () => {
+      const side = btn.getAttribute('data-for');
+      const id = btn.getAttribute('data-medium');
+      if (!id || !MEDIA[id]) return;
+      if (side === '1') medium1 = id;
+      else medium2 = id;
+      paintMediumChips();
+      // Recalculate from current θ₁ when media change
+      applyFromTheta1();
+    });
+  });
+
+  slider1.addEventListener('input', () => {
+    theta1Deg = Number(slider1.value);
+    applyFromTheta1();
+  });
+
+  slider2.addEventListener('input', () => {
+    if (isTir) return;
+    applyFromTheta2(Number(slider2.value));
+  });
+
+  wrap.querySelector('[data-reset]')?.addEventListener('click', () => {
+    medium1 = 'air';
+    medium2 = 'water';
+    theta1Deg = 40;
+    paintMediumChips();
+    applyFromTheta1();
+  });
+
+  paintMediumChips();
+  applyFromTheta1();
+
+  root.appendChild(wrap);
+
+  // Fit canvas to container width
+  const ro = new ResizeObserver(() => {
+    const viz = wrap.querySelector('.reflab-viz');
+    if (!viz) return;
+    const w = Math.min(720, Math.max(320, viz.clientWidth - 20));
+    const h = Math.round(w * (440 / 720));
+    if (canvas.width !== w) {
+      canvas.width = w;
+      canvas.height = h;
+      draw();
+    }
+  });
+  ro.observe(wrap.querySelector('.reflab-viz'));
+}

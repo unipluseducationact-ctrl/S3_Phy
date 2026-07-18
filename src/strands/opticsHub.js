@@ -5,7 +5,7 @@ import { renderToolsShell, hydrateToolsShell } from '../tools/toolsShell.js';
 import { mountFlashcardStudy } from '../flashcards/flashcardStudy.js';
 import { buildOpticsDeck } from '../flashcards/flashcardDeck.js';
 
-const TOOL_ORDER = ['rotatingMirror', 'planeMirrorLab', 'refractionTir', 'lens', 'rgbMixer', 'em'];
+const TOOL_ORDER = ['rotatingMirror', 'planeMirrorLab', 'refraction', 'refractionTir', 'lens', 'rgbMixer', 'em'];
 const WORKSHEET_ORDER = ['lightLens', 'emWave'];
 const SUMMARY_ASSET_VERSION = '20260627-em-v2';
 
@@ -37,6 +37,7 @@ const WORKSHEET_LOADERS = {
 const TOOL_LOADERS = {
   rotatingMirror: () => import('../tools/rotatingMirrorLab.js').then((m) => m.createRotatingMirrorLab),
   planeMirrorLab: () => import('../tools/planeMirrorLab.js').then((m) => m.createPlaneMirrorLab),
+  refraction: () => import('../tools/refractionLab.js').then((m) => m.createRefractionLab),
   refractionTir: () => import('../tools/tirEscapeLab.js').then((m) => m.createTirEscapeLab),
   lens: () => import('../tools/lensLab.js').then((m) => m.createLensLab),
   rgbMixer: () => import('../tools/rgbColorMixerLab.js').then((m) => m.createRgbColorMixerLab),
@@ -47,6 +48,7 @@ function toolLabel(id) {
   const map = {
     rotatingMirror: 'tools.rotatingMirror.title',
     planeMirrorLab: 'tools.planeMirror.title',
+    refraction: 'tools.refraction.title',
     refractionTir: 'tools.refractionTir.title',
     lens: 'tools.lens.title',
     rgbMixer: 'tools.rgbMixer.title',
@@ -237,11 +239,13 @@ export function mountOpticsHub(root) {
               const tid =
                 id === 'convex' || id === 'concave'
                   ? 'lens'
-                  : id === 'refraction' || id === 'tir'
-                    ? 'refractionTir'
-                    : id === 'em'
-                      ? 'em'
-                      : id;
+                  : id === 'refraction'
+                    ? 'refraction'
+                    : id === 'tir'
+                      ? 'refractionTir'
+                      : id === 'em'
+                        ? 'em'
+                        : id;
               const lensKind =
                 id === 'convex' ? 'convex' : id === 'concave' ? 'concave' : '';
               return `
