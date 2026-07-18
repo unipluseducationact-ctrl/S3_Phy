@@ -18,6 +18,8 @@ const WAVES_TOPICS = [
   {
     id: 'stationaryWave',
     titleKey: 'topic.stationaryWave',
+    fileEn: 'stationary-wave-en.pdf',
+    fileZh: 'stationary-wave-zhHant.pdf',
   },
   {
     id: 'lightWave',
