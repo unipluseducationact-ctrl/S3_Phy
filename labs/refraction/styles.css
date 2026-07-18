@@ -148,6 +148,11 @@ html.s3phy-embed #app {
   color: var(--reflab-green);
   border-color: var(--reflab-green);
 }
+.reflab-chips[data-side="1"] .reflab-chip.active {
+  background: rgba(255, 234, 0, 0.15);
+  color: #ffea00;
+  border-color: #ffea00;
+}
 .reflab-chips[data-side="2"] .reflab-chip.active {
   background: rgba(34, 211, 238, 0.15);
   color: var(--reflab-cyan);

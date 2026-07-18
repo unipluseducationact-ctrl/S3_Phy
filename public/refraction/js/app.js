@@ -29,6 +29,9 @@ export function initRefractionLab(root, t) {
           <div class="reflab-chips" data-side="1">
             ${mediumChips('1')}
           </div>
+          <div style="margin-top: 8px; margin-bottom: 8px;">
+            <input type="range" data-n1-slider min="1.00" max="2.00" step="0.01" value="1.00" style="width: 100%; accent-color: #ffea00;" />
+          </div>
           <div class="reflab-readout">
             <span>${t('tools.refraction.nLabel')}₁ = <strong data-n="1">1.00</strong></span>
             <span>${t('tools.refraction.speedLabel')}₁ = <strong data-v="1">3.00</strong> ${t('tools.refraction.speedUnit')}</span>
@@ -38,6 +41,9 @@ export function initRefractionLab(root, t) {
           <div class="reflab-label">${t('tools.refraction.n2')}</div>
           <div class="reflab-chips" data-side="2">
             ${mediumChips('2')}
+          </div>
+          <div style="margin-top: 8px; margin-bottom: 8px;">
+            <input type="range" data-n2-slider min="1.00" max="2.00" step="0.01" value="1.33" style="width: 100%; accent-color: var(--reflab-cyan);" />
           </div>
           <div class="reflab-readout">
             <span>${t('tools.refraction.nLabel')}₂ = <strong data-n="2">1.33</strong></span>
@@ -86,6 +92,8 @@ export function initRefractionLab(root, t) {
   const ctx = /** @type {CanvasRenderingContext2D} */ (canvas.getContext('2d'));
   const slider1 = /** @type {HTMLInputElement} */ (wrap.querySelector('[data-theta1]'));
   const slider2 = /** @type {HTMLInputElement} */ (wrap.querySelector('[data-theta2]'));
+  const n1Slider = /** @type {HTMLInputElement} */ (wrap.querySelector('[data-n1-slider]'));
+  const n2Slider = /** @type {HTMLInputElement} */ (wrap.querySelector('[data-n2-slider]'));
   const disp1 = wrap.querySelector('[data-disp="theta1"]');
   const disp2 = wrap.querySelector('[data-disp="theta2"]');
   const n1El = wrap.querySelector('[data-n="1"]');
@@ -96,16 +104,23 @@ export function initRefractionLab(root, t) {
   const critRow = wrap.querySelector('[data-critical-row]');
   const critEl = wrap.querySelector('[data-critical]');
 
-  let medium1 = 'air';
-  let medium2 = 'water';
+  let n1Val = 1.00;
+  let n2Val = 1.33;
   let theta1Deg = 40;
   let isTir = false;
 
   function n1() {
-    return MEDIA[medium1].n;
+    return n1Val;
   }
   function n2() {
-    return MEDIA[medium2].n;
+    return n2Val;
+  }
+
+  function getActiveMedium(n) {
+    if (Math.abs(n - 1.0) < 0.005) return 'air';
+    if (Math.abs(n - 1.33) < 0.005) return 'water';
+    if (Math.abs(n - 1.5) < 0.005) return 'glass';
+    return null;
   }
 
   function formatN(n) {
@@ -147,11 +162,13 @@ export function initRefractionLab(root, t) {
   }
 
   function paintMediumChips() {
+    const active1 = getActiveMedium(n1Val);
+    const active2 = getActiveMedium(n2Val);
     wrap.querySelectorAll('.reflab-chip[data-for="1"]').forEach((btn) => {
-      btn.classList.toggle('active', btn.getAttribute('data-medium') === medium1);
+      btn.classList.toggle('active', btn.getAttribute('data-medium') === active1);
     });
     wrap.querySelectorAll('.reflab-chip[data-for="2"]').forEach((btn) => {
-      btn.classList.toggle('active', btn.getAttribute('data-medium') === medium2);
+      btn.classList.toggle('active', btn.getAttribute('data-medium') === active2);
     });
   }
 
@@ -160,6 +177,9 @@ export function initRefractionLab(root, t) {
     n2El.textContent = formatN(n2());
     v1El.textContent = formatV(n1());
     v2El.textContent = formatV(n2());
+
+    n1Slider.value = String(n1Val);
+    n2Slider.value = String(n2Val);
 
     const tc = criticalDeg();
     if (tc != null) {
@@ -260,10 +280,15 @@ export function initRefractionLab(root, t) {
     const cy = H / 2;
     const rayLen = Math.min(W, H) * 0.42;
 
+    const active1 = getActiveMedium(n1Val);
+    const active2 = getActiveMedium(n2Val);
+    const activeName1 = active1 ? t(`tools.refraction.medium.${active1}`) : t('tools.refraction.medium.custom');
+    const activeName2 = active2 ? t(`tools.refraction.medium.${active2}`) : t('tools.refraction.medium.custom');
+
     // Media tint: top = medium 1, bottom = medium 2
-    ctx.fillStyle = mediumFill(medium1, 0.22);
+    ctx.fillStyle = mediumFill(n1Val, 0.22);
     ctx.fillRect(0, 0, W, cy);
-    ctx.fillStyle = mediumFill(medium2, 0.28);
+    ctx.fillStyle = mediumFill(n2Val, 0.28);
     ctx.fillRect(0, cy, W, H - cy);
 
     // Interface
@@ -293,12 +318,12 @@ export function initRefractionLab(root, t) {
     ctx.font = 'bold 14px system-ui, sans-serif';
     ctx.fillStyle = '#e8eef8';
     ctx.fillText(
-      `${t(`tools.refraction.medium.${medium1}`)}  n₁=${formatN(n1())}`,
+      `${activeName1}  n₁=${formatN(n1())}`,
       48,
       36,
     );
     ctx.fillText(
-      `${t(`tools.refraction.medium.${medium2}`)}  n₂=${formatN(n2())}`,
+      `${activeName2}  n₂=${formatN(n2())}`,
       48,
       H - 24,
     );
@@ -309,7 +334,7 @@ export function initRefractionLab(root, t) {
     const iAngle = -Math.PI / 2 - toRad(theta1Deg);
     const ix = cx + Math.cos(iAngle) * rayLen;
     const iy = cy + Math.sin(iAngle) * rayLen;
-    drawArrow(ix, iy, cx, cy, '#00e676', 3);
+    drawArrow(ix, iy, cx, cy, '#ffea00', 3);
 
     if (isTir) {
       // Reflection: bounce into UPPER RIGHT
@@ -320,7 +345,7 @@ export function initRefractionLab(root, t) {
       ctx.fillStyle = '#ff8a80';
       ctx.font = 'bold 13px system-ui, sans-serif';
       ctx.fillText(t('tools.refraction.canvas.reflected'), rx - 10, ry - 8);
-      drawAngleArc(cx, cy, -90, -90 - theta1Deg, '#00e676', 'θ₁');
+      drawAngleArc(cx, cy, -90, -90 - theta1Deg, '#ffea00', 'θ₁');
       drawAngleArc(cx, cy, -90, -90 + theta1Deg, '#ff8a80', 'θ₁');
     } else {
       const sol = solveFromTheta1(theta1Deg);
@@ -333,18 +358,18 @@ export function initRefractionLab(root, t) {
       ctx.fillStyle = '#22d3ee';
       ctx.font = 'bold 13px system-ui, sans-serif';
       ctx.fillText(t('tools.refraction.canvas.refracted'), tx + 4, ty + 16);
-      drawAngleArc(cx, cy, -90, -90 - theta1Deg, '#00e676', 'θ₁');
+      drawAngleArc(cx, cy, -90, -90 - theta1Deg, '#ffea00', 'θ₁');
       drawAngleArc(cx, cy, 90, 90 - t2, '#22d3ee', 'θ₂');
     }
 
-    ctx.fillStyle = '#00e676';
+    ctx.fillStyle = '#ffea00';
     ctx.font = 'bold 13px system-ui, sans-serif';
     ctx.fillText(t('tools.refraction.canvas.incident'), ix - 50, iy - 8);
   }
 
-  function mediumFill(id, alpha) {
-    if (id === 'air') return `rgba(120, 160, 220, ${alpha})`;
-    if (id === 'water') return `rgba(40, 120, 200, ${alpha})`;
+  function mediumFill(n, alpha) {
+    if (n < 1.15) return `rgba(120, 160, 220, ${alpha})`;
+    if (n < 1.42) return `rgba(40, 120, 200, ${alpha})`;
     return `rgba(160, 200, 230, ${alpha})`;
   }
 
@@ -354,12 +379,24 @@ export function initRefractionLab(root, t) {
       const side = btn.getAttribute('data-for');
       const id = btn.getAttribute('data-medium');
       if (!id || !MEDIA[id]) return;
-      if (side === '1') medium1 = id;
-      else medium2 = id;
+      if (side === '1') n1Val = MEDIA[id].n;
+      else n2Val = MEDIA[id].n;
       paintMediumChips();
       // Recalculate from current θ₁ when media change
       applyFromTheta1();
     });
+  });
+
+  n1Slider.addEventListener('input', () => {
+    n1Val = Number(n1Slider.value);
+    paintMediumChips();
+    applyFromTheta1();
+  });
+
+  n2Slider.addEventListener('input', () => {
+    n2Val = Number(n2Slider.value);
+    paintMediumChips();
+    applyFromTheta1();
   });
 
   slider1.addEventListener('input', () => {
@@ -373,8 +410,8 @@ export function initRefractionLab(root, t) {
   });
 
   wrap.querySelector('[data-reset]')?.addEventListener('click', () => {
-    medium1 = 'air';
-    medium2 = 'water';
+    n1Val = 1.00;
+    n2Val = 1.33;
     theta1Deg = 40;
     paintMediumChips();
     applyFromTheta1();
