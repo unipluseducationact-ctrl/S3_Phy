@@ -91,6 +91,7 @@ html.s3phy-embed #app {
   flex-wrap: wrap;
 }
 .reflab-viz {
+  position: relative;
   flex: 2;
   min-width: min(100%, 320px);
   background: var(--reflab-panel);
@@ -101,11 +102,51 @@ html.s3phy-embed #app {
   justify-content: center;
   align-items: center;
 }
+
+.reflab-toggle-btn {
+  position: absolute;
+  top: 14px;
+  right: 14px;
+  z-index: 10;
+  background: rgba(30, 41, 59, 0.85);
+  border: 1px solid var(--reflab-border);
+  color: var(--reflab-muted);
+  padding: 6px 12px;
+  border-radius: 8px;
+  font-size: 0.8rem;
+  font-weight: 600;
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  transition: all 0.2s ease;
+  backdrop-filter: blur(4px);
+}
+
+.reflab-toggle-btn:hover {
+  background: rgba(51, 65, 85, 0.95);
+  color: #ffffff;
+  border-color: var(--reflab-cyan);
+}
+
+.reflab-toggle-btn:active {
+  transform: scale(0.95);
+}
+
+.reflab.reflab-collapsed .reflab-controls {
+  display: none !important;
+}
+
+.reflab.reflab-collapsed .reflab-viz {
+  flex: 1 1 100%;
+  max-width: 100%;
+}
+
 .reflab-canvas {
   background: #161a29;
   border-radius: 12px;
   width: 100%;
-  max-width: min(100%, 960px);
+  max-width: 100%;
   height: auto;
   display: block;
 }

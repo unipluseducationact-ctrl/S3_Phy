@@ -62,6 +62,8 @@ const STRINGS = {
     'tools.refraction.canvas.reflected': 'Reflected',
     'tools.refraction.canvas.normal': 'Normal',
     'tools.refraction.canvas.interface': 'Interface',
+    'tools.refraction.hideControls': 'Hide Controls',
+    'tools.refraction.showControls': 'Show Controls',
   },
   zh: {
     'tools.refraction.title': '折射 — 司乃耳定律',
@@ -86,6 +88,8 @@ const STRINGS = {
     'tools.refraction.canvas.reflected': '反射',
     'tools.refraction.canvas.normal': '法線',
     'tools.refraction.canvas.interface': '介面',
+    'tools.refraction.hideControls': '收合控制台',
+    'tools.refraction.showControls': '展開控制台',
   },
 };
 
