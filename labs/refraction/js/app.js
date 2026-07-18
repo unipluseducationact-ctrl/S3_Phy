@@ -21,6 +21,10 @@ export function initRefractionLab(root, t) {
     </div>
     <div class="reflab-dash">
       <div class="reflab-viz">
+        <button type="button" class="reflab-toggle-btn" data-toggle-controls>
+          <span class="reflab-toggle-icon">➡️</span>
+          <span class="reflab-toggle-text">${t('tools.refraction.hideControls')}</span>
+        </button>
         <canvas class="reflab-canvas" width="720" height="440" aria-label="${t('tools.refraction.title')}"></canvas>
       </div>
       <div class="reflab-controls">
@@ -108,6 +112,7 @@ export function initRefractionLab(root, t) {
   let n2Val = 1.33;
   let theta1Deg = 40;
   let isTir = false;
+  let isCollapsed = false;
 
   function n1() {
     return n1Val;
@@ -417,6 +422,33 @@ export function initRefractionLab(root, t) {
     applyFromTheta1();
   });
 
+  wrap.querySelector('[data-toggle-controls]')?.addEventListener('click', () => {
+    isCollapsed = !isCollapsed;
+    wrap.classList.toggle('reflab-collapsed', isCollapsed);
+    const toggleBtn = wrap.querySelector('[data-toggle-controls]');
+    if (toggleBtn) {
+      const icon = toggleBtn.querySelector('.reflab-toggle-icon');
+      const text = toggleBtn.querySelector('.reflab-toggle-text');
+      if (isCollapsed) {
+        icon.textContent = '⬅️';
+        text.textContent = t('tools.refraction.showControls');
+      } else {
+        icon.textContent = '➡️';
+        text.textContent = t('tools.refraction.hideControls');
+      }
+    }
+    // Force ResizeObserver to run immediately
+    const viz = wrap.querySelector('.reflab-viz');
+    if (viz) {
+      const maxW = isCollapsed ? 1100 : 720;
+      const w = Math.min(maxW, Math.max(320, viz.clientWidth - 20));
+      const h = Math.round(w * (440 / 720));
+      canvas.width = w;
+      canvas.height = h;
+      draw();
+    }
+  });
+
   paintMediumChips();
   applyFromTheta1();
 
@@ -426,7 +458,8 @@ export function initRefractionLab(root, t) {
   const ro = new ResizeObserver(() => {
     const viz = wrap.querySelector('.reflab-viz');
     if (!viz) return;
-    const w = Math.min(720, Math.max(320, viz.clientWidth - 20));
+    const maxW = isCollapsed ? 1100 : 720;
+    const w = Math.min(maxW, Math.max(320, viz.clientWidth - 20));
     const h = Math.round(w * (440 / 720));
     if (canvas.width !== w) {
       canvas.width = w;
