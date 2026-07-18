@@ -24,6 +24,8 @@ const WAVES_TOPICS = [
   {
     id: 'lightWave',
     titleKey: 'topic.lightWave',
+    fileEn: 'light-wave-en.pdf',
+    fileZh: 'light-wave-zhHant.pdf',
   },
   {
     id: 'soundWave',
