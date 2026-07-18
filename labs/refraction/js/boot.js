@@ -1,5 +1,5 @@
-import { initRefractionLab } from './app.js';
-import { createT, hubLangToLocal, initLangFromUrl, setLang, getLang } from './i18n.js';
+import { initRefractionLab } from './app.js?v=20260718_yellow_sliders';
+import { createT, hubLangToLocal, initLangFromUrl, setLang, getLang } from './i18n.js?v=20260718_yellow_sliders';
 
 const root = document.getElementById('app');
 
