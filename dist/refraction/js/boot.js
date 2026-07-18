@@ -1,5 +1,5 @@
-import { initRefractionLab } from './app.js?v=20260718_smooth_sliders_v3';
-import { createT, hubLangToLocal, initLangFromUrl, setLang, getLang } from './i18n.js?v=20260718_smooth_sliders_v3';
+import { initRefractionLab } from './app.js?v=20260718_snells_law_bottom_v4';
+import { createT, hubLangToLocal, initLangFromUrl, setLang, getLang } from './i18n.js?v=20260718_snells_law_bottom_v4';
 
 const root = document.getElementById('app');
 

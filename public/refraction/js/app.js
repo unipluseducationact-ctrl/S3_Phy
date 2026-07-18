@@ -107,6 +107,7 @@ export function initRefractionLab(root, t) {
   const tirEl = wrap.querySelector('[data-tir]');
   const critRow = wrap.querySelector('[data-critical-row]');
   const critEl = wrap.querySelector('[data-critical]');
+  const formulaEl = wrap.querySelector('.reflab-formula');
 
   let n1Val = 1.00;
   let n2Val = 1.33;
@@ -204,6 +205,35 @@ export function initRefractionLab(root, t) {
     } else {
       const r = solveFromTheta1(theta1Deg);
       disp2.textContent = r.theta2 != null ? `${r.theta2.toFixed(1)}°` : '—';
+    }
+
+    if (formulaEl) {
+      const r = solveFromTheta1(theta1Deg);
+      if (isTir) {
+        const lhs = (n1Val * Math.sin(toRad(theta1Deg))).toFixed(3);
+        formulaEl.innerHTML = `
+          <div style="font-size: 0.82rem; opacity: 0.85; margin-bottom: 4px; font-weight: 600;">n₁ sin θ₁ &gt; n₂</div>
+          <div style="font-size: 0.95rem; color: #ff8a80; font-family: monospace; font-weight: bold; line-height: 1.4;">
+            ${formatN(n1Val)} &times; sin(${theta1Deg.toFixed(1)}&deg;) &gt; ${formatN(n2Val)}<br>
+            <span style="font-size: 0.85rem; font-weight: bold;">
+              ${lhs} &gt; ${formatN(n2Val)} (${t('tools.refraction.canvas.reflected')})
+            </span>
+          </div>
+        `;
+      } else {
+        const t2 = r.theta2 != null ? r.theta2 : 0;
+        const lhs = (n1Val * Math.sin(toRad(theta1Deg))).toFixed(3);
+        const rhs = (n2Val * Math.sin(toRad(t2))).toFixed(3);
+        formulaEl.innerHTML = `
+          <div style="font-size: 0.82rem; opacity: 0.85; margin-bottom: 4px; font-weight: 600;">n₁ sin θ₁ = n₂ sin θ₂</div>
+          <div style="font-size: 0.95rem; color: #a5f3fc; font-family: monospace; font-weight: bold; line-height: 1.4;">
+            ${formatN(n1Val)} &times; sin(${theta1Deg.toFixed(1)}&deg;) = ${formatN(n2Val)} &times; sin(${t2.toFixed(1)}&deg;)<br>
+            <span style="font-size: 0.85rem; font-weight: bold;">
+              ${lhs} &approx; ${rhs}
+            </span>
+          </div>
+        `;
+      }
     }
   }
 

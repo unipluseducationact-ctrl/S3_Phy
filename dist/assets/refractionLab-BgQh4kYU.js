@@ -1,1 +1,0 @@
-import{c as t}from"./createLabIframe-B9kfZR6M.js";import"./index-CYuwRdqn.js";function o(r){return t(r,{slug:"refraction",titleKey:"tools.refraction.title",className:"tool-refraction-lab",extraParams:()=>"&v=20260718_smooth_sliders_v3"})}export{o as createRefractionLab};
