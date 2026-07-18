@@ -11,6 +11,7 @@ const SPLASH_KEY = 's3phy_splash_seen';
 
 const STRAND_LOADERS = {
   optics: () => import('./strands/opticsHub.js').then((m) => m.mountOpticsHub),
+  refraction: () => import('./strands/refractionHub.js').then((m) => m.mountRefractionHub),
   heat: () => import('./strands/heatHub.js').then((m) => m.mountHeatHub),
   mechanics: () => import('./strands/mechanicsHub.js').then((m) => m.mountMechanicsHub),
   gas: () => import('./strands/gasHub.js').then((m) => m.mountGasHub),
