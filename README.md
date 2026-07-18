@@ -28,6 +28,7 @@ Topics: reflection, refraction, total internal reflection, convex and concave le
 | --- | --- |
 | **Rotating Mirror** | Explore image rotation with a rotating plane mirror |
 | **Plane Mirror Lab** | Interactive image formation with a plane mirror |
+| **3D Reflection Lab** | 3D simulation of regular and diffuse reflection with filling medium |
 | **Refraction / TIR** | Snell's law and a total-internal-reflection escape challenge |
 | **Lens Lab** | Convex and concave lens ray diagrams |
 | **RGB Color Mixer** | Additive colour mixing with red, green, and blue light |

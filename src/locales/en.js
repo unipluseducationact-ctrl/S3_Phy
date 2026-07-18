@@ -30,6 +30,7 @@ export const en = {
   'topics.title': 'Topic map',
   'topics.intro': 'Choose a strand to study. Each topic links to the interactive lab.',
   'topic.reflection': 'Reflection',
+  'topic.reflection3d': '3D Reflection Lab',
   'topic.rotatingMirror': 'Rotating plane mirror',
   'topic.refraction': 'Refraction',
   'topic.refractionSnell': 'Refraction and Snell\u2019s law',
@@ -61,6 +62,8 @@ export const en = {
   'tools.planeMirror.title': 'Plane mirror lab',
   'tools.planeMirror.subtitle':
     'Image formation, minimum mirror size, seeing behind objects, wedge mirrors, and ray sketching with live formulas.',
+  'tools.reflection3d.title': '3D Reflection Lab',
+  'tools.reflection3d.subtitle': '3D simulation of regular and diffuse reflection with filling medium.',
   'tools.rotatingMirror.toggle.origNormal': 'Orig. normal',
   'tools.rotatingMirror.toggle.origRay': 'Orig. reflected',
   'tools.rotatingMirror.toggle.newNormal': 'New normal',

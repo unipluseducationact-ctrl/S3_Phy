@@ -5,7 +5,7 @@ import { renderToolsShell, hydrateToolsShell } from '../tools/toolsShell.js';
 import { mountFlashcardStudy } from '../flashcards/flashcardStudy.js';
 import { buildOpticsDeck } from '../flashcards/flashcardDeck.js';
 
-const TOOL_ORDER = ['rotatingMirror', 'planeMirrorLab', 'refraction', 'refractionTir', 'lens', 'rgbMixer', 'em'];
+const TOOL_ORDER = ['rotatingMirror', 'planeMirrorLab', 'reflection3d', 'refraction', 'refractionTir', 'lens', 'rgbMixer', 'em'];
 const WORKSHEET_ORDER = ['lightLens', 'emWave'];
 const SUMMARY_ASSET_VERSION = '20260627-em-v2';
 
@@ -37,6 +37,7 @@ const WORKSHEET_LOADERS = {
 const TOOL_LOADERS = {
   rotatingMirror: () => import('../tools/rotatingMirrorLab.js').then((m) => m.createRotatingMirrorLab),
   planeMirrorLab: () => import('../tools/planeMirrorLab.js').then((m) => m.createPlaneMirrorLab),
+  reflection3d: () => import('../tools/reflection3dLab.js').then((m) => m.createReflection3dLab),
   refraction: () => import('../tools/refractionLab.js').then((m) => m.createRefractionLab),
   refractionTir: () => import('../tools/tirEscapeLab.js').then((m) => m.createTirEscapeLab),
   lens: () => import('../tools/lensLab.js').then((m) => m.createLensLab),
@@ -48,6 +49,7 @@ function toolLabel(id) {
   const map = {
     rotatingMirror: 'tools.rotatingMirror.title',
     planeMirrorLab: 'tools.planeMirror.title',
+    reflection3d: 'tools.reflection3d.title',
     refraction: 'tools.refraction.title',
     refractionTir: 'tools.refractionTir.title',
     lens: 'tools.lens.title',
@@ -223,6 +225,7 @@ export function mountOpticsHub(root) {
   function renderTopics() {
     const cards = [
       ['planeMirrorLab', 'topic.reflection'],
+      ['reflection3d', 'topic.reflection3d'],
       ['refraction', 'topic.refractionSnell'],
       ['tir', 'topic.tir'],
       ['convex', 'topic.convex'],

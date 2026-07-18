@@ -30,6 +30,7 @@ export const zhHant = {
   'topics.title': '\u8ab2\u984c\u5730\u5716',
   'topics.intro': '\u9078\u64c7\u5b78\u7fd2\u4e3b\u984c\u3002\u6bcf\u500b\u4e3b\u984c\u53ef\u9023\u5230\u4e92\u52d5\u5be6\u9a57\u5ba4\u3002',
   'topic.reflection': '\u53cd\u5c04',
+  'topic.reflection3d': '3D \u53cd\u5c04\u5be6\u9a57\u5ba4',
   'topic.rotatingMirror': '\u65cb\u8f49\u5e73\u9762\u93e1',
   'topic.refraction': '\u6298\u5c04',
   'topic.refractionSnell': '\u6298\u5c04\u8207\u53f8\u4e43\u8033\u5b9a\u5f8b',
@@ -61,6 +62,8 @@ export const zhHant = {
   'tools.planeMirror.title': '\u5e73\u9762\u93e1\u53cd\u5c04\u5be6\u9a57\u5ba4',
   'tools.planeMirror.subtitle':
     '\u50cf\u7684\u5f62\u6210\u3001\u6700\u5c0f\u93e1\u9577\uff0f\u93e1\u9ad8\u3001\u770b\u5f8c\u65b9\u7269\u4ef6\u3001\u593e\u89d2\u93e1\u8207\u7df4\u7fd2\u4f5c\u5716\uff0c\u914d\u5408\u5373\u6642\u516c\u5f0f\u3002',
+  'tools.reflection3d.title': '3D \u53cd\u5c04\u5be6\u9a57\u5ba4',
+  'tools.reflection3d.subtitle': '3D \u6a21\u64ec\u6f2b\u53cd\u5c04\u8207\u93e1\u9762\u53cd\u5c04\uff0c\u4ee5\u53ca\u586b\u5145\u4ecb\u8cea\u7684\u5e73\u6ed1\u5316\u904e\u7a0b\u3002',
   'tools.rotatingMirror.toggle.origNormal': '\u539f\u6cd5\u7dda',
   'tools.rotatingMirror.toggle.origRay': '\u539f\u53cd\u5c04\u5149',
   'tools.rotatingMirror.toggle.newNormal': '\u65b0\u6cd5\u7dda',
