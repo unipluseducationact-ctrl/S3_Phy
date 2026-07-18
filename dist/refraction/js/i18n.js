@@ -1,5 +1,6 @@
 /** Standalone i18n — flat locale keys for t(key). */
 export let currentLang = 'zh';
+const STORAGE_KEY = 's3phy.refraction.lang';
 
 export function hubLangToLocal(hubLang) {
   if (hubLang === 'zh-Hant' || hubLang === 'zh') return 'zh';
@@ -8,11 +9,27 @@ export function hubLangToLocal(hubLang) {
 
 export function initLangFromUrl() {
   const lang = new URLSearchParams(location.search).get('lang');
-  if (lang) currentLang = hubLangToLocal(lang);
+  if (lang) {
+    currentLang = hubLangToLocal(lang);
+  } else {
+    try {
+      const stored = localStorage.getItem(STORAGE_KEY);
+      if (stored === 'en' || stored === 'zh') {
+        currentLang = stored;
+      }
+    } catch (e) {
+      // ignore
+    }
+  }
 }
 
 export function setLang(lang) {
   currentLang = lang === 'en' ? 'en' : 'zh';
+  try {
+    localStorage.setItem(STORAGE_KEY, currentLang);
+  } catch (e) {
+    // ignore
+  }
   document.documentElement.lang = currentLang === 'zh' ? 'zh-HK' : 'en';
   return currentLang;
 }

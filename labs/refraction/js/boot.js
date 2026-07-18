@@ -3,10 +3,19 @@ import { createT, hubLangToLocal, initLangFromUrl, setLang, getLang } from './i1
 
 const root = document.getElementById('app');
 
+function updateLangButtons(activeLang) {
+  document.querySelectorAll('.lang-btn').forEach((btn) => {
+    const lang = btn.getAttribute('data-set-lang');
+    btn.classList.toggle('active', lang === activeLang);
+  });
+}
+
 function mount() {
   if (!root) return;
   root.replaceChildren();
-  initRefractionLab(root, createT(getLang()));
+  const current = getLang();
+  initRefractionLab(root, createT(current));
+  updateLangButtons(current);
 }
 
 function applyLang(lang) {
@@ -16,6 +25,13 @@ function applyLang(lang) {
 
 initLangFromUrl();
 applyLang(getLang());
+
+document.querySelectorAll('.lang-btn').forEach((btn) => {
+  btn.addEventListener('click', () => {
+    const lang = btn.getAttribute('data-set-lang');
+    if (lang) applyLang(lang);
+  });
+});
 
 window.addEventListener('message', (ev) => {
   if (ev.data?.type !== 's3phy:lang') return;
