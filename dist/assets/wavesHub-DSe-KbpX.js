@@ -1,4 +1,4 @@
-import{t as i}from"./index-B1EwcPHP.js";import{m as p}from"./hubShell-DPUu4Jkr.js";const v=[{id:"waveMotion",titleKey:"topic.waveMotion"},{id:"waveProperties",titleKey:"topic.waveProperties"},{id:"stationaryWave",titleKey:"topic.stationaryWave"},{id:"lightWave",titleKey:"topic.lightWave"},{id:"soundWave",titleKey:"topic.soundWave"}];function y(a){let t="topics",e=null,n={main:null};function r(){n.main&&(t==="topics"?n.main.innerHTML=l():n.main.innerHTML=`
+import{t as i}from"./index-CThOP4Fy.js";import{m as p}from"./hubShell-tv6atre-.js";const v=[{id:"waveMotion",titleKey:"topic.waveMotion"},{id:"waveProperties",titleKey:"topic.waveProperties"},{id:"stationaryWave",titleKey:"topic.stationaryWave"},{id:"lightWave",titleKey:"topic.lightWave"},{id:"soundWave",titleKey:"topic.soundWave"}];function y(a){let t="topics",e=null,n={main:null};function r(){n.main&&(t==="topics"?n.main.innerHTML=l():n.main.innerHTML=`
         <section class="panel">
           <h2>${i(`nav.${t}`)}</h2>
           <div class="card" style="padding: 2rem; text-align: center; background: var(--bg-card); border-radius: 8px; border: 1px solid var(--border);">

@@ -21,9 +21,9 @@ export function mountHubShell(root, { subtitleKey, activeSection, onSection, onL
   root.innerHTML = `
     <header class="site-header site-header--hub">
       <div class="site-header__brand">
-        <div class="brand-logo-wrap" aria-hidden="true">
+        <button type="button" class="brand-logo-wrap" aria-label="${t('strand.back')}">
           <img class="brand-logo-img" src="${import.meta.env.BASE_URL}images/uniplus-logo.png" alt="" width="220" height="52" decoding="async" />
-        </div>
+        </button>
         <div class="brand-text-block">
           <h1 class="site-title">${t('app.title')}</h1>
           <p class="site-subtitle" data-hub-subtitle>${t(subtitleKey)}</p>
@@ -85,6 +85,11 @@ export function mountHubShell(root, { subtitleKey, activeSection, onSection, onL
     window.dispatchEvent(new CustomEvent('s3phy:strand', { detail: null }));
   };
   backBtn.addEventListener('click', onBack);
+
+  const logoBtn = root.querySelector('.brand-logo-wrap');
+  if (logoBtn) {
+    logoBtn.addEventListener('click', onBack);
+  }
 
   paintNav(activeSection);
   paintLang();

@@ -13,9 +13,9 @@ export function mountStrandHub(root) {
     root.innerHTML = `
       <header class="site-header site-header--strand-picker">
         <div class="site-header__brand">
-          <div class="brand-logo-wrap" aria-hidden="true">
+          <button type="button" class="brand-logo-wrap" aria-label="${t('strand.back')}">
             <img class="brand-logo-img" src="${import.meta.env.BASE_URL}images/uniplus-logo.png" alt="" width="220" height="52" decoding="async" />
-          </div>
+          </button>
           <div class="brand-text-block">
             <h1 class="site-title">${t('app.title')}</h1>
             <p class="site-subtitle">${t('app.subtitle')}</p>
@@ -58,6 +58,10 @@ export function mountStrandHub(root) {
         const id = btn.getAttribute('data-strand');
         window.dispatchEvent(new CustomEvent('s3phy:strand', { detail: id }));
       });
+    });
+
+    root.querySelector('.brand-logo-wrap').addEventListener('click', () => {
+      window.dispatchEvent(new CustomEvent('s3phy:strand', { detail: null }));
     });
   }
 
