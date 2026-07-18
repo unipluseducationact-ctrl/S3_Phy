@@ -30,11 +30,13 @@ const WAVES_TOPICS = [
   {
     id: 'soundWave',
     titleKey: 'topic.soundWave',
+    fileEn: 'sound-wave-en.pdf',
+    fileZh: 'sound-wave-zhHant.pdf',
   },
 ];
 
 export function mountWavesHub(root) {
-  let section = 'topics';
+  let section = sessionStorage.getItem('s3phy.waves.section') || 'topics';
   let shell = null;
   let el = { main: null };
 
@@ -71,6 +73,7 @@ export function mountWavesHub(root) {
       activeSection: section,
       onSection: (id) => {
         section = id;
+        sessionStorage.setItem('s3phy.waves.section', id);
         shell.updateSection(section);
         renderMain();
       },
@@ -130,6 +133,7 @@ export function mountWavesHub(root) {
     const notesBtn = ev.target.closest('[data-go-section]');
     if (notesBtn?.getAttribute('data-go-section') === 'notes') {
       section = 'notes';
+      sessionStorage.setItem('s3phy.waves.section', 'notes');
       shell.updateSection(section);
       renderMain();
     }

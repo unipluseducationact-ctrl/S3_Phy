@@ -85,7 +85,7 @@ function toolLabel(id) {
 }
 
 export function mountHeatHub(root) {
-  let section = 'topics';
+  let section = sessionStorage.getItem('s3phy.heat.section') || 'topics';
   let toolId = 'liquid';
 
   let shell = null;
@@ -209,6 +209,7 @@ export function mountHeatHub(root) {
           cleanupActiveLab();
         }
         section = id;
+        sessionStorage.setItem('s3phy.heat.section', id);
         shell.updateSection(section);
         renderMain();
       },
@@ -256,6 +257,7 @@ export function mountHeatHub(root) {
     const notesBtn = ev.target.closest('[data-go-section]');
     if (notesBtn?.getAttribute('data-go-section') === 'notes') {
       section = 'notes';
+      sessionStorage.setItem('s3phy.heat.section', 'notes');
       shell.updateSection(section);
       renderMain();
     }

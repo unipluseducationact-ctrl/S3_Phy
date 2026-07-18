@@ -17,7 +17,7 @@ const GAS_TOPICS = [
 ];
 
 export function mountGasHub(root) {
-  let section = 'topics';
+  let section = sessionStorage.getItem('s3phy.gas.section') || 'topics';
   let shell = null;
   let el = { main: null };
 
@@ -50,6 +50,7 @@ export function mountGasHub(root) {
       activeSection: section,
       onSection: (id) => {
         section = id;
+        sessionStorage.setItem('s3phy.gas.section', id);
         shell.updateSection(section);
         renderMain();
       },

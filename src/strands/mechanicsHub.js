@@ -96,7 +96,7 @@ const MECHANICS_SUMMARY_ROWS = MECHANICS_TOPICS.map((r) => {
 });
 
 export function mountMechanicsHub(root) {
-  let section = 'topics';
+  let section = sessionStorage.getItem('s3phy.mechanics.section') || 'topics';
 
   let shell = null;
   let el = { main: null };
@@ -156,6 +156,7 @@ export function mountMechanicsHub(root) {
       activeSection: section,
       onSection: (id) => {
         section = id;
+        sessionStorage.setItem('s3phy.mechanics.section', id);
         shell.updateSection(section);
         renderMain();
       },
@@ -186,6 +187,7 @@ export function mountMechanicsHub(root) {
     const notesBtn = ev.target.closest('[data-go-section]');
     if (notesBtn?.getAttribute('data-go-section') === 'notes') {
       section = 'notes';
+      sessionStorage.setItem('s3phy.mechanics.section', 'notes');
       shell.updateSection(section);
       renderMain();
     }

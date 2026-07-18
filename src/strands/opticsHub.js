@@ -64,7 +64,7 @@ function worksheetLabel(id) {
 }
 
 export function mountOpticsHub(root) {
-  let section = 'topics';
+  let section = sessionStorage.getItem('s3phy.optics.section') || 'topics';
   let toolId = 'rotatingMirror';
   let worksheetId = 'lightLens';
   let lensDefaultKind = 'convex';
@@ -207,6 +207,7 @@ export function mountOpticsHub(root) {
           cleanupActiveLab();
         }
         section = id;
+        sessionStorage.setItem('s3phy.optics.section', id);
         shell.updateSection(section);
         renderMain();
       },
@@ -268,6 +269,7 @@ export function mountOpticsHub(root) {
     const b = ev.target.closest('[data-go-tool]');
     if (!b) return;
     section = 'tools';
+    sessionStorage.setItem('s3phy.optics.section', 'tools');
     toolId = b.getAttribute('data-go-tool');
     const lk = b.getAttribute('data-lens-kind');
     if (lk === 'convex' || lk === 'concave') lensDefaultKind = lk;
