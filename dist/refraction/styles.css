@@ -281,6 +281,6 @@ html.s3phy-embed #app {
   color: var(--reflab-cyan);
 }
 
-@media (max-width: 720px) {
-  .reflab-controls { max-width: 100%; }
+.reflab-controls input[type="range"] {
+  cursor: pointer;
 }

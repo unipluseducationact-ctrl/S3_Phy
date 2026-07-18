@@ -215,12 +215,22 @@ export function initRefractionLab(root, t) {
     }
   }
 
+  let drawPending = false;
+  function requestDraw() {
+    if (drawPending) return;
+    drawPending = true;
+    requestAnimationFrame(() => {
+      drawPending = false;
+      draw();
+    });
+  }
+
   function applyFromTheta1() {
     const r = solveFromTheta1(theta1Deg);
     isTir = r.tir;
     updateReadouts();
     syncSlidersFromState();
-    draw();
+    requestDraw();
   }
 
   function applyFromTheta2(t2) {
@@ -235,7 +245,7 @@ export function initRefractionLab(root, t) {
     updateReadouts();
     slider1.value = String(theta1Deg);
     slider2.value = String(t2);
-    draw();
+    requestDraw();
   }
 
   function drawArrow(x1, y1, x2, y2, color, width = 2.5) {
@@ -397,8 +407,18 @@ export function initRefractionLab(root, t) {
     paintMediumChips();
     applyFromTheta1();
   });
+  n1Slider.addEventListener('change', () => {
+    n1Val = Number(n1Slider.value);
+    paintMediumChips();
+    applyFromTheta1();
+  });
 
   n2Slider.addEventListener('input', () => {
+    n2Val = Number(n2Slider.value);
+    paintMediumChips();
+    applyFromTheta1();
+  });
+  n2Slider.addEventListener('change', () => {
     n2Val = Number(n2Slider.value);
     paintMediumChips();
     applyFromTheta1();
@@ -408,8 +428,16 @@ export function initRefractionLab(root, t) {
     theta1Deg = Number(slider1.value);
     applyFromTheta1();
   });
+  slider1.addEventListener('change', () => {
+    theta1Deg = Number(slider1.value);
+    applyFromTheta1();
+  });
 
   slider2.addEventListener('input', () => {
+    if (isTir) return;
+    applyFromTheta2(Number(slider2.value));
+  });
+  slider2.addEventListener('change', () => {
     if (isTir) return;
     applyFromTheta2(Number(slider2.value));
   });
@@ -445,7 +473,7 @@ export function initRefractionLab(root, t) {
       const h = Math.round(w * (440 / 720));
       canvas.width = w;
       canvas.height = h;
-      draw();
+      requestDraw();
     }
   });
 
@@ -464,7 +492,7 @@ export function initRefractionLab(root, t) {
     if (canvas.width !== w) {
       canvas.width = w;
       canvas.height = h;
-      draw();
+      requestDraw();
     }
   });
   ro.observe(wrap.querySelector('.reflab-viz'));
