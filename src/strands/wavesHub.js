@@ -86,7 +86,7 @@ export function mountWavesHub(root) {
           ${WAVES_TOPICS.map((topic) => `
             <div class="card">
               <h3>${t(topic.titleKey)}</h3>
-              <button class="btn primary" type="button" data-go-section="notes">${t('topic.viewNotes')}</button>
+              <button class="btn primary" type="button" disabled>${t('topic.openTool')}</button>
             </div>
           `).join('')}
         </div>
