@@ -351,7 +351,20 @@ export function initRefractionLab(root, t) {
     const mid = (a0 + a1) / 2;
     ctx.fillStyle = color;
     ctx.font = 'bold 13px system-ui, sans-serif';
-    ctx.fillText(label, cx + Math.cos(mid) * (r + 14) - 10, cy + Math.sin(mid) * (r + 14) + 4);
+    
+    // Calculate position based on the angle to avoid overlap with the normal line or rays
+    const dist = r + 18;
+    let textX = cx + Math.cos(mid) * dist - 18;
+    let textY = cy + Math.sin(mid) * dist + 4;
+    
+    // Adjust alignment based on which quadrant the label is in
+    if (Math.cos(mid) < -0.1) {
+      textX = cx + Math.cos(mid) * dist - 48; // Shift left for left-side labels
+    } else if (Math.cos(mid) > 0.1) {
+      textX = cx + Math.cos(mid) * dist + 4;  // Shift right for right-side labels
+    }
+    
+    ctx.fillText(label, textX, textY);
   }
 
   function draw() {
@@ -423,13 +436,13 @@ export function initRefractionLab(root, t) {
       // Reflection: bounce into UPPER RIGHT
       const rAngle = -Math.PI / 2 + toRad(theta1Deg);
       const rx = cx + Math.cos(rAngle) * rayLen;
-      const ry = cy + Math.sin(rAngle) * rayLen;
-      drawArrow(cx, cy, rx, ry, '#ff8a80', 3);
+      const ryReal = cy + Math.sin(rAngle) * rayLen;
+      drawArrow(cx, cy, rx, ryReal, '#ff8a80', 3);
       ctx.fillStyle = '#ff8a80';
       ctx.font = 'bold 13px system-ui, sans-serif';
-      ctx.fillText(t('tools.refraction.canvas.reflected'), rx - 10, ry - 8);
-      drawAngleArc(cx, cy, -90, -90 - theta1Deg, '#ffea00', 'θ₁');
-      drawAngleArc(cx, cy, -90, -90 + theta1Deg, '#ff8a80', 'θ₁');
+      ctx.fillText(t('tools.refraction.canvas.reflected'), rx - 10, ryReal - 8);
+      drawAngleArc(cx, cy, -90, -90 - theta1Deg, '#ffea00', `θ₁ = ${theta1Deg.toFixed(1)}°`);
+      drawAngleArc(cx, cy, -90, -90 + theta1Deg, '#ff8a80', `θ₁ = ${theta1Deg.toFixed(1)}°`);
     } else {
       const sol = solveFromTheta1(theta1Deg);
       const t2 = sol.theta2 ?? 0;
@@ -441,8 +454,8 @@ export function initRefractionLab(root, t) {
       ctx.fillStyle = '#22d3ee';
       ctx.font = 'bold 13px system-ui, sans-serif';
       ctx.fillText(t('tools.refraction.canvas.refracted'), tx + 4, ty + 16);
-      drawAngleArc(cx, cy, -90, -90 - theta1Deg, '#ffea00', 'θ₁');
-      drawAngleArc(cx, cy, 90, 90 - t2, '#22d3ee', 'θ₂');
+      drawAngleArc(cx, cy, -90, -90 - theta1Deg, '#ffea00', `θ₁ = ${theta1Deg.toFixed(1)}°`);
+      drawAngleArc(cx, cy, 90, 90 - t2, '#22d3ee', `θ₂ = ${t2.toFixed(1)}°`);
     }
 
     ctx.fillStyle = '#ffea00';
