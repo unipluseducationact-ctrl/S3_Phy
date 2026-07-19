@@ -525,27 +525,25 @@ export function initRefractionLab(root, t) {
     ctxP.setLineDash([]);
 
     // Draw background particles (molecules) jiggling
+    // Denser medium has WAY more particles packed together
     drawMediumParticles(0, cy, n1Val, 'rgba(255, 255, 255, 0.15)');
     drawMediumParticles(cy, H, n2Val, 'rgba(34, 211, 238, 0.18)');
 
-    // Wavefronts & Laser Beam
+    // Laser Beam Ray Paths
     const u1 = { x: Math.sin(toRad(theta1Deg)), y: Math.cos(toRad(theta1Deg)) };
-    const v1 = { x: -Math.cos(toRad(theta1Deg)), y: Math.sin(toRad(theta1Deg)) };
 
     const sol = solveFromTheta1(theta1Deg);
     const t2 = sol.theta2 ?? 0;
     const u2 = { x: Math.sin(toRad(t2)), y: Math.cos(toRad(t2)) };
-    const v2 = { x: -Math.cos(toRad(t2)), y: Math.sin(toRad(t2)) };
 
     const u_refl = { x: Math.sin(toRad(theta1Deg)), y: -Math.cos(toRad(theta1Deg)) };
-    const v_refl = { x: Math.cos(toRad(theta1Deg)), y: Math.sin(toRad(theta1Deg)) };
 
-    const beamW = 44;
+    const beamW = 10;
 
-    // Draw Laser Beam Backgrounds
+    // Draw Laser Beam Ray Paths
     ctxP.save();
     ctxP.beginPath();
-    ctxP.strokeStyle = 'rgba(255, 234, 0, 0.05)';
+    ctxP.strokeStyle = 'rgba(255, 234, 0, 0.15)';
     ctxP.lineWidth = beamW;
     ctxP.moveTo(cx - u1.x * rayLen, cy - u1.y * rayLen);
     ctxP.lineTo(cx, cy);
@@ -553,14 +551,14 @@ export function initRefractionLab(root, t) {
 
     if (isTir) {
       ctxP.beginPath();
-      ctxP.strokeStyle = 'rgba(255, 138, 128, 0.05)';
+      ctxP.strokeStyle = 'rgba(255, 138, 128, 0.15)';
       ctxP.lineWidth = beamW;
       ctxP.moveTo(cx, cy);
       ctxP.lineTo(cx + u_refl.x * rayLen, cy + u_refl.y * rayLen);
       ctxP.stroke();
     } else {
       ctxP.beginPath();
-      ctxP.strokeStyle = 'rgba(34, 211, 238, 0.05)';
+      ctxP.strokeStyle = 'rgba(34, 211, 238, 0.15)';
       ctxP.lineWidth = beamW;
       ctxP.moveTo(cx, cy);
       ctxP.lineTo(cx + u2.x * rayLen, cy + u2.y * rayLen);
@@ -568,92 +566,14 @@ export function initRefractionLab(root, t) {
     }
     ctxP.restore();
 
-    // Wavefront parameters
-    const lambda0 = 36;
-    const v0 = 0.8;
-    
-    const lambda1 = lambda0 / n1Val;
-    const speed1 = v0 / n1Val;
-    
-    const lambda2 = lambda0 / n2Val;
-    const speed2 = v0 / n2Val;
+    // Wavefront parameters and speeds
+    const speed1 = 1.0 / n1Val;
+    const speed2 = 1.0 / n2Val;
 
-    // 1. Medium 1 Wavefronts (Incident)
-    ctxP.save();
-    ctxP.beginPath();
-    ctxP.rect(0, 0, W, cy);
-    ctxP.clip();
-
-    ctxP.strokeStyle = 'rgba(255, 234, 0, 0.75)';
-    ctxP.lineWidth = 2.5;
-    
-    const numWaves = Math.ceil(rayLen / lambda1) + 2;
-    const shift1 = (animTime * speed1) % lambda1;
-    for (let k = -1; k < numWaves; k++) {
-      const dist = -(k * lambda1 + shift1);
-      if (dist < -rayLen || dist > 0) continue;
-      const px = cx + dist * u1.x;
-      const py = cy + dist * u1.y;
-      
-      ctxP.beginPath();
-      ctxP.moveTo(px - (beamW / 2) * v1.x, py - (beamW / 2) * v1.y);
-      ctxP.lineTo(px + (beamW / 2) * v1.x, py + (beamW / 2) * v1.y);
-      ctxP.stroke();
-    }
-    ctxP.restore();
-
-    // 2. Medium 2 Wavefronts (Refracted) or Reflected Wavefronts
-    if (isTir) {
-      ctxP.save();
-      ctxP.beginPath();
-      ctxP.rect(0, 0, W, cy);
-      ctxP.clip();
-
-      ctxP.strokeStyle = 'rgba(255, 138, 128, 0.75)';
-      ctxP.lineWidth = 2.5;
-
-      const shiftRefl = (animTime * speed1) % lambda1;
-      for (let k = -1; k < numWaves; k++) {
-        const dist = k * lambda1 + shiftRefl;
-        if (dist > rayLen || dist < 0) continue;
-        const px = cx + dist * u_refl.x;
-        const py = cy + dist * u_refl.y;
-
-        ctxP.beginPath();
-        ctxP.moveTo(px - (beamW / 2) * v_refl.x, py - (beamW / 2) * v_refl.y);
-        ctxP.lineTo(px + (beamW / 2) * v_refl.x, py + (beamW / 2) * v_refl.y);
-        ctxP.stroke();
-      }
-      ctxP.restore();
-    } else {
-      ctxP.save();
-      ctxP.beginPath();
-      ctxP.rect(0, cy, W, H - cy);
-      ctxP.clip();
-
-      ctxP.strokeStyle = 'rgba(34, 211, 238, 0.75)';
-      ctxP.lineWidth = 2.5;
-
-      const numWaves2 = Math.ceil(rayLen / lambda2) + 2;
-      const shift2 = (animTime * speed2) % lambda2;
-      for (let k = -1; k < numWaves2; k++) {
-        const dist = k * lambda2 + shift2;
-        if (dist > rayLen || dist < 0) continue;
-        const px = cx + dist * u2.x;
-        const py = cy + dist * u2.y;
-
-        ctxP.beginPath();
-        ctxP.moveTo(px - (beamW / 2) * v2.x, py - (beamW / 2) * v2.y);
-        ctxP.lineTo(px + (beamW / 2) * v2.x, py + (beamW / 2) * v2.y);
-        ctxP.stroke();
-      }
-      ctxP.restore();
-    }
-
-    // Draw Moving Photons
-    const photonSpacing = 70;
-    const numPhotons = 3;
-    const pShift1 = (animTime * speed1 * 1.5) % photonSpacing;
+    // Draw Moving Photons (Light travels harder and slower in denser medium)
+    const photonSpacing = 60;
+    const numPhotons = 4;
+    const pShift1 = (animTime * speed1 * 2.0) % photonSpacing;
     for (let k = 0; k < numPhotons; k++) {
       const dist = -(k * photonSpacing + pShift1);
       if (dist < -rayLen || dist > 0) continue;
@@ -663,7 +583,7 @@ export function initRefractionLab(root, t) {
     }
 
     if (isTir) {
-      const pShiftRefl = (animTime * speed1 * 1.5) % photonSpacing;
+      const pShiftRefl = (animTime * speed1 * 2.0) % photonSpacing;
       for (let k = 0; k < numPhotons; k++) {
         const dist = k * photonSpacing + pShiftRefl;
         if (dist > rayLen || dist < 0) continue;
@@ -672,7 +592,7 @@ export function initRefractionLab(root, t) {
         drawPhoton(px, py, '#ff8a80');
       }
     } else {
-      const pShift2 = (animTime * speed2 * 1.5) % photonSpacing;
+      const pShift2 = (animTime * speed2 * 2.0) % photonSpacing;
       for (let k = 0; k < numPhotons; k++) {
         const dist = k * photonSpacing + pShift2;
         if (dist > rayLen || dist < 0) continue;
@@ -684,17 +604,19 @@ export function initRefractionLab(root, t) {
 
     function drawPhoton(x, y, color) {
       ctxP.save();
-      ctxP.shadowBlur = 8;
+      ctxP.shadowBlur = 10;
       ctxP.shadowColor = color;
       ctxP.fillStyle = '#ffffff';
       ctxP.beginPath();
-      ctxP.arc(x, y, 4, 0, Math.PI * 2);
+      ctxP.arc(x, y, 5, 0, Math.PI * 2);
       ctxP.fill();
       ctxP.restore();
     }
 
     function drawMediumParticles(yMin, yMax, nVal, color) {
-      const spacing = 32 / Math.sqrt(nVal);
+      // Denser medium has WAY more particles packed together.
+      // We scale spacing directly with nVal to pack particles much tighter.
+      const spacing = 36 / (nVal * nVal);
       ctxP.fillStyle = color;
       
       const cols = Math.ceil(W / spacing) + 2;
@@ -706,10 +628,10 @@ export function initRefractionLab(root, t) {
           const gridY = yMin + r * spacing;
           
           const seed = (c * 17) + (r * 31);
-          const randX = seededRandom(seed) * 0.4 - 0.2;
-          const randY = seededRandom(seed + 1) * 0.4 - 0.2;
+          const randX = seededRandom(seed) * 0.3 - 0.15;
+          const randY = seededRandom(seed + 1) * 0.3 - 0.15;
           const jiggleSpeed = 0.04 + seededRandom(seed + 2) * 0.04;
-          const jiggleAmp = 1.0 + seededRandom(seed + 3) * 1.0;
+          const jiggleAmp = 0.8 + seededRandom(seed + 3) * 0.8;
           
           const jiggleX = Math.sin(animTime * jiggleSpeed + seed) * jiggleAmp;
           const jiggleY = Math.cos(animTime * jiggleSpeed + seed * 1.3) * jiggleAmp;

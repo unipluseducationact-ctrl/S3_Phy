@@ -1,0 +1,1 @@
+import{c as t}from"./createLabIframe-CW6TtPHc.js";import"./index-P7tz_fw_.js";function o(r){return t(r,{slug:"refraction",titleKey:"tools.refraction.title",className:"tool-refraction-lab",extraParams:()=>"&v=20260719_simple_particles_v9"})}export{o as createRefractionLab};

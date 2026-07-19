@@ -1,1 +1,0 @@
-import{c as t}from"./createLabIframe-CLtLRoba.js";import"./index-QnQnjdH3.js";function o(r){return t(r,{slug:"refraction",titleKey:"tools.refraction.title",className:"tool-refraction-lab",extraParams:()=>"&v=20260719_particle_model_v8"})}export{o as createRefractionLab};
