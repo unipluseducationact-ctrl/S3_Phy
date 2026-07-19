@@ -1,1 +1,0 @@
-import{c as r}from"./createLabIframe-BELIMtrK.js";import"./index-h2pXs1Aq.js";function o(t){return r(t,{slug:"refraction",titleKey:"tools.refraction.title",className:"tool-refraction-lab",extraParams:()=>"&v=20260718_snells_law_bottom_v4"})}export{o as createRefractionLab};
