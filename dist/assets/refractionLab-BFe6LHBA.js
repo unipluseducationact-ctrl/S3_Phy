@@ -1,1 +1,0 @@
-import{c as e}from"./createLabIframe-BzYC7TKZ.js";import"./index-Df2RDhXj.js";function o(r){return e(r,{slug:"refraction",titleKey:"tools.refraction.title",className:"tool-refraction-lab",extraParams:()=>"&v=20260719_three_rays_bounce_v11"})}export{o as createRefractionLab};

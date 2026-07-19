@@ -524,26 +524,26 @@ export function initRefractionLab(root, t) {
     drawBoxParticles(box2X, boxY, boxW, boxH, 1.10, 'rgba(34, 211, 238, 0.22)');
 
     // Draw 3 light rays in each box
-    // Rays enter from top of each box at an angle (40 degrees)
-    const angleRad = toRad(40);
+    // Rays enter from top of each box at an angle (18 degrees)
+    const angleRad = toRad(18);
     const rayLen = boxH / Math.cos(angleRad);
     const dx = rayLen * Math.sin(angleRad);
     const dy = boxH;
 
     // Box 1 Rays (Denser Medium - 2 rays bounce away, 1 passes through)
     const r1_1 = [
-      { x: box1X + boxW * 0.22, y: boxY },
-      { x: box1X + boxW * 0.22 + dx * 0.45, y: boxY + boxH * 0.45 },
-      { x: box1X + boxW * 0.22 + dx * 0.45 - dx * 0.35, y: boxY + boxH * 0.45 - boxH * 0.25 } // bounces back up-left
+      { x: box1X + boxW * 0.15, y: boxY },
+      { x: box1X + boxW * 0.15 + dx * 0.45, y: boxY + boxH * 0.45 },
+      { x: box1X + boxW * 0.15 + dx * 0.45 - dx * 0.25, y: boxY + boxH * 0.45 - boxH * 0.25 } // bounces back up-left
     ];
     const r1_2 = [
-      { x: box1X + boxW * 0.5, y: boxY },
-      { x: box1X + boxW * 0.5 + dx, y: boxY + boxH } // passes through
+      { x: box1X + boxW * 0.42, y: boxY },
+      { x: box1X + boxW * 0.42 + dx, y: boxY + boxH } // passes through
     ];
     const r1_3 = [
-      { x: box1X + boxW * 0.78, y: boxY },
-      { x: box1X + boxW * 0.78 + dx * 0.6, y: boxY + boxH * 0.6 },
-      { x: box1X + boxW * 0.78 + dx * 0.6 - dx * 0.4, y: boxY + boxH * 0.6 - boxH * 0.3 } // bounces back up-left
+      { x: box1X + boxW * 0.68, y: boxY },
+      { x: box1X + boxW * 0.68 + dx * 0.6, y: boxY + boxH * 0.6 },
+      { x: box1X + boxW * 0.68 + dx * 0.6 - dx * 0.3, y: boxY + boxH * 0.6 - boxH * 0.3 } // bounces back up-left
     ];
 
     // Draw Box 1 Rays
@@ -599,16 +599,16 @@ export function initRefractionLab(root, t) {
 
     // Box 2 Rays (Less Dense Medium - all 3 rays easily pass through)
     const r2_1 = [
-      { x: box2X + boxW * 0.22, y: boxY },
-      { x: box2X + boxW * 0.22 + dx, y: boxY + boxH }
+      { x: box2X + boxW * 0.15, y: boxY },
+      { x: box2X + boxW * 0.15 + dx, y: boxY + boxH }
     ];
     const r2_2 = [
-      { x: box2X + boxW * 0.5, y: boxY },
-      { x: box2X + boxW * 0.5 + dx, y: boxY + boxH }
+      { x: box2X + boxW * 0.42, y: boxY },
+      { x: box2X + boxW * 0.42 + dx, y: boxY + boxH }
     ];
     const r2_3 = [
-      { x: box2X + boxW * 0.78, y: boxY },
-      { x: box2X + boxW * 0.78 + dx, y: boxY + boxH }
+      { x: box2X + boxW * 0.68, y: boxY },
+      { x: box2X + boxW * 0.68 + dx, y: boxY + boxH }
     ];
 
     // Draw Box 2 Rays
