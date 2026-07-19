@@ -523,56 +523,152 @@ export function initRefractionLab(root, t) {
     drawBoxParticles(box1X, boxY, boxW, boxH, 1.80, 'rgba(255, 255, 255, 0.22)');
     drawBoxParticles(box2X, boxY, boxW, boxH, 1.10, 'rgba(34, 211, 238, 0.22)');
 
-    // Draw single light ray path in both boxes
-    // A single light ray enters from top-left of each box at an angle (e.g. 40 degrees)
+    // Draw 3 light rays in each box
+    // Rays enter from top of each box at an angle (40 degrees)
     const angleRad = toRad(40);
     const rayLen = boxH / Math.cos(angleRad);
     const dx = rayLen * Math.sin(angleRad);
     const dy = boxH;
 
-    // Box 1 Ray (Denser)
-    const r1Start = { x: box1X + boxW * 0.2, y: boxY };
-    const r1End = { x: r1Start.x + dx, y: boxY + dy };
+    // Box 1 Rays (Denser Medium - 2 rays bounce away, 1 passes through)
+    const r1_1 = [
+      { x: box1X + boxW * 0.22, y: boxY },
+      { x: box1X + boxW * 0.22 + dx * 0.45, y: boxY + boxH * 0.45 },
+      { x: box1X + boxW * 0.22 + dx * 0.45 - dx * 0.35, y: boxY + boxH * 0.45 - boxH * 0.25 } // bounces back up-left
+    ];
+    const r1_2 = [
+      { x: box1X + boxW * 0.5, y: boxY },
+      { x: box1X + boxW * 0.5 + dx, y: boxY + boxH } // passes through
+    ];
+    const r1_3 = [
+      { x: box1X + boxW * 0.78, y: boxY },
+      { x: box1X + boxW * 0.78 + dx * 0.6, y: boxY + boxH * 0.6 },
+      { x: box1X + boxW * 0.78 + dx * 0.6 - dx * 0.4, y: boxY + boxH * 0.6 - boxH * 0.3 } // bounces back up-left
+    ];
+
+    // Draw Box 1 Rays
+    ctxP.lineWidth = 2.5;
+    
+    // Ray 1 (Bounce)
     ctxP.beginPath();
-    ctxP.strokeStyle = 'rgba(255, 234, 0, 0.25)';
-    ctxP.lineWidth = 4;
-    ctxP.moveTo(r1Start.x, r1Start.y);
-    ctxP.lineTo(r1End.x, r1End.y);
+    ctxP.strokeStyle = '#ffea00';
+    ctxP.moveTo(r1_1[0].x, r1_1[0].y);
+    ctxP.lineTo(r1_1[1].x, r1_1[1].y);
     ctxP.stroke();
 
-    // Box 2 Ray (Less Dense)
-    const r2Start = { x: box2X + boxW * 0.2, y: boxY };
-    const r2End = { x: r2Start.x + dx, y: boxY + dy };
     ctxP.beginPath();
-    ctxP.strokeStyle = 'rgba(34, 211, 238, 0.25)';
-    ctxP.lineWidth = 4;
-    ctxP.moveTo(r2Start.x, r2Start.y);
-    ctxP.lineTo(r2End.x, r2End.y);
+    ctxP.strokeStyle = '#ff8a80'; // red/orange for bounce
+    ctxP.setLineDash([4, 4]);
+    ctxP.moveTo(r1_1[1].x, r1_1[1].y);
+    ctxP.lineTo(r1_1[2].x, r1_1[2].y);
     ctxP.stroke();
+    ctxP.setLineDash([]);
+
+    // Ray 2 (Pass through)
+    ctxP.beginPath();
+    ctxP.strokeStyle = '#ffea00';
+    ctxP.moveTo(r1_2[0].x, r1_2[0].y);
+    ctxP.lineTo(r1_2[1].x, r1_2[1].y);
+    ctxP.stroke();
+
+    // Ray 3 (Bounce)
+    ctxP.beginPath();
+    ctxP.strokeStyle = '#ffea00';
+    ctxP.moveTo(r1_3[0].x, r1_3[0].y);
+    ctxP.lineTo(r1_3[1].x, r1_3[1].y);
+    ctxP.stroke();
+
+    ctxP.beginPath();
+    ctxP.strokeStyle = '#ff8a80';
+    ctxP.setLineDash([4, 4]);
+    ctxP.moveTo(r1_3[1].x, r1_3[1].y);
+    ctxP.lineTo(r1_3[2].x, r1_3[2].y);
+    ctxP.stroke();
+    ctxP.setLineDash([]);
+
+    // Draw collision particles at bounce points in Box 1
+    [r1_1[1], r1_3[1]].forEach(pt => {
+      ctxP.beginPath();
+      ctxP.fillStyle = '#ff8a80';
+      ctxP.arc(pt.x, pt.y, 4.5, 0, Math.PI * 2);
+      ctxP.fill();
+      ctxP.strokeStyle = '#ffffff';
+      ctxP.lineWidth = 1;
+      ctxP.stroke();
+    });
+
+    // Box 2 Rays (Less Dense Medium - all 3 rays easily pass through)
+    const r2_1 = [
+      { x: box2X + boxW * 0.22, y: boxY },
+      { x: box2X + boxW * 0.22 + dx, y: boxY + boxH }
+    ];
+    const r2_2 = [
+      { x: box2X + boxW * 0.5, y: boxY },
+      { x: box2X + boxW * 0.5 + dx, y: boxY + boxH }
+    ];
+    const r2_3 = [
+      { x: box2X + boxW * 0.78, y: boxY },
+      { x: box2X + boxW * 0.78 + dx, y: boxY + boxH }
+    ];
+
+    // Draw Box 2 Rays
+    ctxP.strokeStyle = '#22d3ee';
+    [r2_1, r2_2, r2_3].forEach(ray => {
+      ctxP.beginPath();
+      ctxP.moveTo(ray[0].x, ray[0].y);
+      ctxP.lineTo(ray[1].x, ray[1].y);
+      ctxP.stroke();
+    });
 
     // Speed of light in both boxes
     // Denser medium speed is slower, Less dense is faster
     const speedDenser = 0.35;
     const speedLess = 0.85;
 
-    // Position of moving single photons
+    // Position of moving photons
     const progressDenser = (animTime * speedDenser * 0.015) % 1.0;
     const progressLess = (animTime * speedLess * 0.015) % 1.0;
 
-    const p1 = {
-      x: r1Start.x + (r1End.x - r1Start.x) * progressDenser,
-      y: r1Start.y + (r1End.y - r1Start.y) * progressDenser,
-    };
+    // Helper to get position along a multi-segment path
+    function getPathPos(path, progress) {
+      if (path.length === 2) {
+        return {
+          x: path[0].x + (path[1].x - path[0].x) * progress,
+          y: path[0].y + (path[1].y - path[0].y) * progress
+        };
+      }
+      if (progress < 0.6) {
+        const t = progress / 0.6;
+        return {
+          x: path[0].x + (path[1].x - path[0].x) * t,
+          y: path[0].y + (path[1].y - path[0].y) * t
+        };
+      } else {
+        const t = (progress - 0.6) / 0.4;
+        return {
+          x: path[1].x + (path[2].x - path[1].x) * t,
+          y: path[1].y + (path[2].y - path[1].y) * t
+        };
+      }
+    }
 
-    const p2 = {
-      x: r2Start.x + (r2End.x - r2Start.x) * progressLess,
-      y: r2Start.y + (r2End.y - r2Start.y) * progressLess,
-    };
+    // Draw Box 1 Photons
+    const p1_1 = getPathPos(r1_1, progressDenser);
+    const p1_2 = getPathPos(r1_2, progressDenser);
+    const p1_3 = getPathPos(r1_3, progressDenser);
 
-    // Draw Photon 1 (Denser - slower, struggles)
-    drawPhoton(p1.x, p1.y, '#ffea00');
-    // Draw Photon 2 (Less Dense - faster, smooth)
-    drawPhoton(p2.x, p2.y, '#22d3ee');
+    drawPhoton(p1_1.x, p1_1.y, progressDenser < 0.6 ? '#ffea00' : '#ff8a80');
+    drawPhoton(p1_2.x, p1_2.y, '#ffea00');
+    drawPhoton(p1_3.x, p1_3.y, progressDenser < 0.6 ? '#ffea00' : '#ff8a80');
+
+    // Draw Box 2 Photons
+    const p2_1 = getPathPos(r2_1, progressLess);
+    const p2_2 = getPathPos(r2_2, progressLess);
+    const p2_3 = getPathPos(r2_3, progressLess);
+
+    drawPhoton(p2_1.x, p2_1.y, '#22d3ee');
+    drawPhoton(p2_2.x, p2_2.y, '#22d3ee');
+    drawPhoton(p2_3.x, p2_3.y, '#22d3ee');
 
     // Draw labels above boxes
     ctxP.font = 'bold 13px system-ui, sans-serif';
