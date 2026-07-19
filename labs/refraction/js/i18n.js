@@ -64,6 +64,10 @@ const STRINGS = {
     'tools.refraction.canvas.interface': 'Interface',
     'tools.refraction.hideControls': 'Hide Controls',
     'tools.refraction.showControls': 'Show Controls',
+    'tools.refraction.particleModel.title': 'Microscopic Particle & Wave Model',
+    'tools.refraction.particleModel.denser': 'Denser (Packed Particles, Slower Light Speed)',
+    'tools.refraction.particleModel.lessDense': 'Less Dense (Sparse Particles, Faster Light Speed)',
+    'tools.refraction.particleModel.speed': 'Speed',
   },
   zh: {
     'tools.refraction.title': '折射 — 司乃耳定律',
@@ -90,6 +94,10 @@ const STRINGS = {
     'tools.refraction.canvas.interface': '介面',
     'tools.refraction.hideControls': '收合控制台',
     'tools.refraction.showControls': '展開控制台',
+    'tools.refraction.particleModel.title': '折射微觀粒子與波動模型',
+    'tools.refraction.particleModel.denser': '較密集（粒子緊密，光速較慢，折射角較小）',
+    'tools.refraction.particleModel.lessDense': '較稀疏（粒子鬆散，光速較快，折射角較大）',
+    'tools.refraction.particleModel.speed': '光速',
   },
 };
 

@@ -1,5 +1,5 @@
-import { initRefractionLab } from './app.js?v=20260719_exact_angles_graph_v7';
-import { createT, hubLangToLocal, initLangFromUrl, setLang, getLang } from './i18n.js?v=20260719_exact_angles_graph_v7';
+import { initRefractionLab } from './app.js?v=20260719_particle_model_v8';
+import { createT, hubLangToLocal, initLangFromUrl, setLang, getLang } from './i18n.js?v=20260719_particle_model_v8';
 
 const root = document.getElementById('app');
 
