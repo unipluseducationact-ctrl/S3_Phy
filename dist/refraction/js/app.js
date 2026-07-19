@@ -28,13 +28,6 @@ export function initRefractionLab(root, t) {
         <canvas class="reflab-canvas" width="720" height="380" aria-label="${t('tools.refraction.title')}"></canvas>
       </div>
 
-      <div class="reflab-viz-particle">
-        <div style="font-weight: bold; font-size: 0.95rem; color: #22d3ee; margin-bottom: 8px; text-align: center; display: flex; align-items: center; justify-content: center; gap: 6px;">
-          <span>🔬</span> ${t('tools.refraction.particleModel.title')}
-        </div>
-        <canvas class="reflab-particle-canvas" width="720" height="280" aria-label="Microscopic Particle Model"></canvas>
-      </div>
-
       <div class="reflab-controls">
         <!-- Column 1: Incident Medium -->
         <div class="reflab-control-col">
@@ -104,6 +97,13 @@ export function initRefractionLab(root, t) {
           <div class="reflab-tir" data-tir hidden>${t('tools.refraction.tir')}</div>
           <button type="button" class="reflab-reset" data-reset>${t('tools.refraction.reset')}</button>
         </div>
+      </div>
+
+      <div class="reflab-viz-particle">
+        <div style="font-weight: bold; font-size: 0.95rem; color: #22d3ee; margin-bottom: 8px; text-align: center; display: flex; align-items: center; justify-content: center; gap: 6px;">
+          <span>🔬</span> ${t('tools.refraction.particleModel.title')}
+        </div>
+        <canvas class="reflab-particle-canvas" width="720" height="280" aria-label="Microscopic Particle Model"></canvas>
       </div>
     </div>
   `;
@@ -496,138 +496,123 @@ export function initRefractionLab(root, t) {
     const H = particleCanvas.height;
     ctxP.clearRect(0, 0, W, H);
 
-    const cx = W / 2;
-    const cy = H / 2;
-    const rayLen = Math.min(W, H) * 0.45;
+    // Two boxes side-by-side: Left is Denser Medium, Right is Less Dense Medium
+    const boxW = W * 0.42;
+    const boxH = H * 0.72;
+    const boxY = H * 0.18;
 
-    // Media backgrounds
-    ctxP.fillStyle = mediumFill(n1Val, 0.22);
-    ctxP.fillRect(0, 0, W, cy);
-    ctxP.fillStyle = mediumFill(n2Val, 0.28);
-    ctxP.fillRect(0, cy, W, H - cy);
+    const box1X = W * 0.06; // Left Box (Denser)
+    const box2X = W * 0.52; // Right Box (Less Dense)
 
-    // Interface
+    // Draw Box 1 (Denser Medium)
+    ctxP.fillStyle = 'rgba(160, 200, 230, 0.25)'; // Denser tint (Glass-like)
+    ctxP.fillRect(box1X, boxY, boxW, boxH);
+    ctxP.strokeStyle = '#3f4a66';
+    ctxP.lineWidth = 2.5;
+    ctxP.strokeRect(box1X, boxY, boxW, boxH);
+
+    // Draw Box 2 (Less Dense Medium)
+    ctxP.fillStyle = 'rgba(120, 160, 220, 0.15)'; // Less dense tint (Air-like)
+    ctxP.fillRect(box2X, boxY, boxW, boxH);
+    ctxP.strokeStyle = '#3f4a66';
+    ctxP.lineWidth = 2.5;
+    ctxP.strokeRect(box2X, boxY, boxW, boxH);
+
+    // Draw background particles (molecules) jiggling in both boxes
+    // Denser medium has WAY more particles packed together (e.g. n = 1.80 vs n = 1.10)
+    drawBoxParticles(box1X, boxY, boxW, boxH, 1.80, 'rgba(255, 255, 255, 0.22)');
+    drawBoxParticles(box2X, boxY, boxW, boxH, 1.10, 'rgba(34, 211, 238, 0.22)');
+
+    // Draw single light ray path in both boxes
+    // A single light ray enters from top-left of each box at an angle (e.g. 40 degrees)
+    const angleRad = toRad(40);
+    const rayLen = boxH / Math.cos(angleRad);
+    const dx = rayLen * Math.sin(angleRad);
+    const dy = boxH;
+
+    // Box 1 Ray (Denser)
+    const r1Start = { x: box1X + boxW * 0.2, y: boxY };
+    const r1End = { x: r1Start.x + dx, y: boxY + dy };
     ctxP.beginPath();
-    ctxP.strokeStyle = '#8b9bb8';
-    ctxP.lineWidth = 2;
-    ctxP.moveTo(40, cy);
-    ctxP.lineTo(W - 40, cy);
+    ctxP.strokeStyle = 'rgba(255, 234, 0, 0.25)';
+    ctxP.lineWidth = 4;
+    ctxP.moveTo(r1Start.x, r1Start.y);
+    ctxP.lineTo(r1End.x, r1End.y);
     ctxP.stroke();
 
-    // Normal (dashed vertical)
+    // Box 2 Ray (Less Dense)
+    const r2Start = { x: box2X + boxW * 0.2, y: boxY };
+    const r2End = { x: r2Start.x + dx, y: boxY + dy };
     ctxP.beginPath();
-    ctxP.setLineDash([6, 5]);
-    ctxP.strokeStyle = '#6b7a99';
-    ctxP.lineWidth = 1.5;
-    ctxP.moveTo(cx, 15);
-    ctxP.lineTo(cx, H - 15);
-    ctxP.stroke();
-    ctxP.setLineDash([]);
-
-    // Draw background particles (molecules) jiggling
-    // Denser medium has WAY more particles packed together
-    drawMediumParticles(0, cy, n1Val, 'rgba(255, 255, 255, 0.15)');
-    drawMediumParticles(cy, H, n2Val, 'rgba(34, 211, 238, 0.18)');
-
-    // Laser Beam Ray Paths
-    const u1 = { x: Math.sin(toRad(theta1Deg)), y: Math.cos(toRad(theta1Deg)) };
-
-    const sol = solveFromTheta1(theta1Deg);
-    const t2 = sol.theta2 ?? 0;
-    const u2 = { x: Math.sin(toRad(t2)), y: Math.cos(toRad(t2)) };
-
-    const u_refl = { x: Math.sin(toRad(theta1Deg)), y: -Math.cos(toRad(theta1Deg)) };
-
-    const beamW = 10;
-
-    // Draw Laser Beam Ray Paths
-    ctxP.save();
-    ctxP.beginPath();
-    ctxP.strokeStyle = 'rgba(255, 234, 0, 0.15)';
-    ctxP.lineWidth = beamW;
-    ctxP.moveTo(cx - u1.x * rayLen, cy - u1.y * rayLen);
-    ctxP.lineTo(cx, cy);
+    ctxP.strokeStyle = 'rgba(34, 211, 238, 0.25)';
+    ctxP.lineWidth = 4;
+    ctxP.moveTo(r2Start.x, r2Start.y);
+    ctxP.lineTo(r2End.x, r2End.y);
     ctxP.stroke();
 
-    if (isTir) {
-      ctxP.beginPath();
-      ctxP.strokeStyle = 'rgba(255, 138, 128, 0.15)';
-      ctxP.lineWidth = beamW;
-      ctxP.moveTo(cx, cy);
-      ctxP.lineTo(cx + u_refl.x * rayLen, cy + u_refl.y * rayLen);
-      ctxP.stroke();
-    } else {
-      ctxP.beginPath();
-      ctxP.strokeStyle = 'rgba(34, 211, 238, 0.15)';
-      ctxP.lineWidth = beamW;
-      ctxP.moveTo(cx, cy);
-      ctxP.lineTo(cx + u2.x * rayLen, cy + u2.y * rayLen);
-      ctxP.stroke();
-    }
-    ctxP.restore();
+    // Speed of light in both boxes
+    // Denser medium speed is slower, Less dense is faster
+    const speedDenser = 0.35;
+    const speedLess = 0.85;
 
-    // Wavefront parameters and speeds
-    const speed1 = 1.0 / n1Val;
-    const speed2 = 1.0 / n2Val;
+    // Position of moving single photons
+    const progressDenser = (animTime * speedDenser * 0.015) % 1.0;
+    const progressLess = (animTime * speedLess * 0.015) % 1.0;
 
-    // Draw Moving Photons (Light travels harder and slower in denser medium)
-    const photonSpacing = 60;
-    const numPhotons = 4;
-    const pShift1 = (animTime * speed1 * 2.0) % photonSpacing;
-    for (let k = 0; k < numPhotons; k++) {
-      const dist = -(k * photonSpacing + pShift1);
-      if (dist < -rayLen || dist > 0) continue;
-      const px = cx + dist * u1.x;
-      const py = cy + dist * u1.y;
-      drawPhoton(px, py, '#ffea00');
-    }
+    const p1 = {
+      x: r1Start.x + (r1End.x - r1Start.x) * progressDenser,
+      y: r1Start.y + (r1End.y - r1Start.y) * progressDenser,
+    };
 
-    if (isTir) {
-      const pShiftRefl = (animTime * speed1 * 2.0) % photonSpacing;
-      for (let k = 0; k < numPhotons; k++) {
-        const dist = k * photonSpacing + pShiftRefl;
-        if (dist > rayLen || dist < 0) continue;
-        const px = cx + dist * u_refl.x;
-        const py = cy + dist * u_refl.y;
-        drawPhoton(px, py, '#ff8a80');
-      }
-    } else {
-      const pShift2 = (animTime * speed2 * 2.0) % photonSpacing;
-      for (let k = 0; k < numPhotons; k++) {
-        const dist = k * photonSpacing + pShift2;
-        if (dist > rayLen || dist < 0) continue;
-        const px = cx + dist * u2.x;
-        const py = cy + dist * u2.y;
-        drawPhoton(px, py, '#22d3ee');
-      }
-    }
+    const p2 = {
+      x: r2Start.x + (r2End.x - r2Start.x) * progressLess,
+      y: r2Start.y + (r2End.y - r2Start.y) * progressLess,
+    };
+
+    // Draw Photon 1 (Denser - slower, struggles)
+    drawPhoton(p1.x, p1.y, '#ffea00');
+    // Draw Photon 2 (Less Dense - faster, smooth)
+    drawPhoton(p2.x, p2.y, '#22d3ee');
+
+    // Draw labels above boxes
+    ctxP.font = 'bold 13px system-ui, sans-serif';
+    ctxP.fillStyle = '#ffea00';
+    ctxP.fillText(t('tools.refraction.particleModel.denser'), box1X + 4, boxY - 10);
+    
+    ctxP.fillStyle = '#22d3ee';
+    ctxP.fillText(t('tools.refraction.particleModel.lessDense'), box2X + 4, boxY - 10);
+
+    // Draw speed text inside boxes
+    ctxP.font = 'bold 12px system-ui, sans-serif';
+    ctxP.fillStyle = '#ffffff';
+    ctxP.fillText(`${t('tools.refraction.particleModel.speed')}: 0.55 c`, box1X + 12, boxY + 24);
+    ctxP.fillText(`${t('tools.refraction.particleModel.speed')}: 0.91 c`, box2X + 12, boxY + 24);
 
     function drawPhoton(x, y, color) {
       ctxP.save();
-      ctxP.shadowBlur = 10;
+      ctxP.shadowBlur = 12;
       ctxP.shadowColor = color;
       ctxP.fillStyle = '#ffffff';
       ctxP.beginPath();
-      ctxP.arc(x, y, 5, 0, Math.PI * 2);
+      ctxP.arc(x, y, 6, 0, Math.PI * 2);
       ctxP.fill();
       ctxP.restore();
     }
 
-    function drawMediumParticles(yMin, yMax, nVal, color) {
+    function drawBoxParticles(bx, by, bw, bh, nVal, color) {
       // Denser medium has WAY more particles packed together.
-      // We scale spacing directly with nVal to pack particles much tighter.
       const spacing = 36 / (nVal * nVal);
       ctxP.fillStyle = color;
       
-      const cols = Math.ceil(W / spacing) + 2;
-      const rows = Math.ceil((yMax - yMin) / spacing) + 2;
+      const cols = Math.ceil(bw / spacing) + 1;
+      const rows = Math.ceil(bh / spacing) + 1;
       
-      for (let c = -1; c < cols; c++) {
-        for (let r = -1; r < rows; r++) {
-          const gridX = c * spacing;
-          const gridY = yMin + r * spacing;
+      for (let c = 0; c < cols; c++) {
+        for (let r = 0; r < rows; r++) {
+          const gridX = bx + c * spacing;
+          const gridY = by + r * spacing;
           
-          const seed = (c * 17) + (r * 31);
+          const seed = (c * 17) + (r * 31) + (bx > W/2 ? 500 : 0);
           const randX = seededRandom(seed) * 0.3 - 0.15;
           const randY = seededRandom(seed + 1) * 0.3 - 0.15;
           const jiggleSpeed = 0.04 + seededRandom(seed + 2) * 0.04;
@@ -639,7 +624,7 @@ export function initRefractionLab(root, t) {
           const x = gridX + randX * spacing + jiggleX;
           const y = gridY + randY * spacing + jiggleY;
           
-          if (x >= 10 && x <= W - 10 && y >= yMin + 4 && y <= yMax - 4) {
+          if (x >= bx + 4 && x <= bx + bw - 4 && y >= by + 4 && y <= by + bh - 4) {
             ctxP.beginPath();
             ctxP.arc(x, y, 1.8, 0, Math.PI * 2);
             ctxP.fill();
@@ -647,35 +632,6 @@ export function initRefractionLab(root, t) {
         }
       }
     }
-
-    // Dynamic density and speed labels
-    ctxP.font = 'bold 12px system-ui, sans-serif';
-    
-    const active1 = getActiveMedium(n1Val);
-    const activeName1 = active1 ? t(`tools.refraction.medium.${active1}`) : t('tools.refraction.medium.custom');
-    const isDenser1 = n1Val > n2Val;
-    const isLighter1 = n1Val < n2Val;
-    
-    let densityLabel1 = '';
-    if (isDenser1) densityLabel1 = ` (${t('tools.refraction.particleModel.denser')})`;
-    else if (isLighter1) densityLabel1 = ` (${t('tools.refraction.particleModel.lessDense')})`;
-
-    ctxP.fillStyle = '#ffea00';
-    ctxP.fillText(`${activeName1}${densityLabel1}`, 24, 24);
-    ctxP.fillStyle = '#e8eef8';
-    ctxP.fillText(`${t('tools.refraction.speedLabel')}₁: ${(1.0 / n1Val).toFixed(2)} c`, 24, 42);
-
-    const active2 = getActiveMedium(n2Val);
-    const activeName2 = active2 ? t(`tools.refraction.medium.${active2}`) : t('tools.refraction.medium.custom');
-    
-    let densityLabel2 = '';
-    if (isDenser1) densityLabel2 = ` (${t('tools.refraction.particleModel.lessDense')})`;
-    else if (isLighter1) densityLabel2 = ` (${t('tools.refraction.particleModel.denser')})`;
-
-    ctxP.fillStyle = '#22d3ee';
-    ctxP.fillText(`${activeName2}${densityLabel2}`, 24, H - 38);
-    ctxP.fillStyle = '#e8eef8';
-    ctxP.fillText(`${t('tools.refraction.speedLabel')}₂: ${(1.0 / n2Val).toFixed(2)} c`, 24, H - 20);
   }
 
   function mediumFill(n, alpha) {
