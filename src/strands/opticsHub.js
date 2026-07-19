@@ -225,7 +225,6 @@ export function mountOpticsHub(root) {
   function renderTopics() {
     const cards = [
       ['planeMirrorLab', 'topic.reflection'],
-      ['reflection3d', 'topic.reflection3d'],
       ['refraction', 'topic.refractionSnell'],
       ['tir', 'topic.tir'],
       ['convex', 'topic.convex'],
