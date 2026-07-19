@@ -33,8 +33,9 @@ export function initRefractionLab(root, t) {
           <div class="reflab-chips" data-side="1">
             ${mediumChips('1')}
           </div>
-          <div style="margin-top: 8px; margin-bottom: 8px;">
-            <input type="range" data-n1-slider min="1.00" max="2.00" step="0.01" value="1.00" style="width: 100%; accent-color: #ffea00;" />
+          <div style="margin-top: 8px; margin-bottom: 8px; display: flex; gap: 8px; align-items: center;">
+            <input type="range" data-n1-slider min="1.00" max="2.00" step="0.01" value="1.00" style="flex: 1; accent-color: #ffea00; margin: 0;" />
+            <input type="number" data-n1-input min="1.00" max="2.00" step="0.01" value="1.00" style="width: 60px; background: #161a29; border: 1px solid var(--reflab-border); color: #fff; border-radius: 6px; padding: 4px; font-size: 0.85rem; text-align: center; font-weight: bold;" />
           </div>
           <div class="reflab-readout">
             <span>${t('tools.refraction.nLabel')}₁ = <strong data-n="1">1.00</strong></span>
@@ -46,8 +47,9 @@ export function initRefractionLab(root, t) {
           <div class="reflab-chips" data-side="2">
             ${mediumChips('2')}
           </div>
-          <div style="margin-top: 8px; margin-bottom: 8px;">
-            <input type="range" data-n2-slider min="1.00" max="2.00" step="0.01" value="1.33" style="width: 100%; accent-color: var(--reflab-cyan);" />
+          <div style="margin-top: 8px; margin-bottom: 8px; display: flex; gap: 8px; align-items: center;">
+            <input type="range" data-n2-slider min="1.00" max="2.00" step="0.01" value="1.33" style="flex: 1; accent-color: var(--reflab-cyan); margin: 0;" />
+            <input type="number" data-n2-input min="1.00" max="2.00" step="0.01" value="1.33" style="width: 60px; background: #161a29; border: 1px solid var(--reflab-border); color: #fff; border-radius: 6px; padding: 4px; font-size: 0.85rem; text-align: center; font-weight: bold;" />
           </div>
           <div class="reflab-readout">
             <span>${t('tools.refraction.nLabel')}₂ = <strong data-n="2">1.33</strong></span>
@@ -59,14 +61,20 @@ export function initRefractionLab(root, t) {
             <span>${t('tools.refraction.angleI')}</span>
             <span class="reflab-badge" data-disp="theta1">40.0°</span>
           </div>
-          <input type="range" data-theta1 min="0" max="89" step="0.5" value="40" />
+          <div style="display: flex; gap: 8px; align-items: center;">
+            <input type="range" data-theta1 min="0" max="89" step="0.5" value="40" style="flex: 1; margin: 0;" />
+            <input type="number" data-theta1-input min="0" max="89" step="0.1" value="40" style="width: 60px; background: #161a29; border: 1px solid var(--reflab-border); color: #fff; border-radius: 6px; padding: 4px; font-size: 0.85rem; text-align: center; font-weight: bold;" />
+          </div>
         </div>
         <div class="reflab-cg">
           <div class="reflab-lr">
             <span>${t('tools.refraction.angleR')}</span>
             <span class="reflab-badge" data-disp="theta2">29.0°</span>
           </div>
-          <input type="range" data-theta2 min="0" max="89" step="0.5" value="29" />
+          <div style="display: flex; gap: 8px; align-items: center;">
+            <input type="range" data-theta2 min="0" max="89" step="0.5" value="29" style="flex: 1; margin: 0;" />
+            <input type="number" data-theta2-input min="0" max="89" step="0.1" value="29" style="width: 60px; background: #161a29; border: 1px solid var(--reflab-border); color: #fff; border-radius: 6px; padding: 4px; font-size: 0.85rem; text-align: center; font-weight: bold;" />
+          </div>
         </div>
         <div class="reflab-formula">${t('tools.refraction.snell')}</div>
         <div class="reflab-stats">
@@ -98,6 +106,10 @@ export function initRefractionLab(root, t) {
   const slider2 = /** @type {HTMLInputElement} */ (wrap.querySelector('[data-theta2]'));
   const n1Slider = /** @type {HTMLInputElement} */ (wrap.querySelector('[data-n1-slider]'));
   const n2Slider = /** @type {HTMLInputElement} */ (wrap.querySelector('[data-n2-slider]'));
+  const n1Input = /** @type {HTMLInputElement} */ (wrap.querySelector('[data-n1-input]'));
+  const n2Input = /** @type {HTMLInputElement} */ (wrap.querySelector('[data-n2-input]'));
+  const theta1Input = /** @type {HTMLInputElement} */ (wrap.querySelector('[data-theta1-input]'));
+  const theta2Input = /** @type {HTMLInputElement} */ (wrap.querySelector('[data-theta2-input]'));
   const disp1 = wrap.querySelector('[data-disp="theta1"]');
   const disp2 = wrap.querySelector('[data-disp="theta2"]');
   const n1El = wrap.querySelector('[data-n="1"]');
@@ -186,6 +198,12 @@ export function initRefractionLab(root, t) {
 
     n1Slider.value = String(n1Val);
     n2Slider.value = String(n2Val);
+    if (n1Input && document.activeElement !== n1Input) {
+      n1Input.value = n1Val.toFixed(2);
+    }
+    if (n2Input && document.activeElement !== n2Input) {
+      n2Input.value = n2Val.toFixed(2);
+    }
 
     const tc = criticalDeg();
     if (tc != null) {
@@ -200,11 +218,25 @@ export function initRefractionLab(root, t) {
     slider2.classList.toggle('reflab-disabled', isTir);
 
     disp1.textContent = `${theta1Deg.toFixed(1)}°`;
+    if (theta1Input && document.activeElement !== theta1Input) {
+      theta1Input.value = theta1Deg.toFixed(1);
+    }
     if (isTir) {
       disp2.textContent = '—';
+      if (theta2Input) {
+        theta2Input.value = '';
+        theta2Input.disabled = true;
+      }
     } else {
       const r = solveFromTheta1(theta1Deg);
+      const t2 = r.theta2 != null ? r.theta2 : 0;
       disp2.textContent = r.theta2 != null ? `${r.theta2.toFixed(1)}°` : '—';
+      if (theta2Input) {
+        theta2Input.disabled = false;
+        if (document.activeElement !== theta2Input) {
+          theta2Input.value = t2.toFixed(1);
+        }
+      }
     }
 
     if (formulaEl) {
@@ -239,9 +271,15 @@ export function initRefractionLab(root, t) {
 
   function syncSlidersFromState() {
     slider1.value = String(theta1Deg);
+    if (theta1Input && document.activeElement !== theta1Input) {
+      theta1Input.value = theta1Deg.toFixed(1);
+    }
     const r = solveFromTheta1(theta1Deg);
     if (!r.tir && r.theta2 != null) {
       slider2.value = String(Math.min(89, Math.max(0, r.theta2)));
+      if (theta2Input && document.activeElement !== theta2Input) {
+        theta2Input.value = r.theta2.toFixed(1);
+      }
     }
   }
 
@@ -471,6 +509,82 @@ export function initRefractionLab(root, t) {
     if (isTir) return;
     applyFromTheta2(Number(slider2.value));
   });
+
+  if (n1Input) {
+    n1Input.addEventListener('input', () => {
+      let val = Number(n1Input.value);
+      if (isNaN(val)) return;
+      val = Math.min(2.00, Math.max(1.00, val));
+      n1Val = val;
+      paintMediumChips();
+      applyFromTheta1();
+    });
+    n1Input.addEventListener('change', () => {
+      let val = Number(n1Input.value);
+      if (isNaN(val)) val = 1.00;
+      val = Math.min(2.00, Math.max(1.00, val));
+      n1Val = val;
+      n1Input.value = val.toFixed(2);
+      paintMediumChips();
+      applyFromTheta1();
+    });
+  }
+
+  if (n2Input) {
+    n2Input.addEventListener('input', () => {
+      let val = Number(n2Input.value);
+      if (isNaN(val)) return;
+      val = Math.min(2.00, Math.max(1.00, val));
+      n2Val = val;
+      paintMediumChips();
+      applyFromTheta1();
+    });
+    n2Input.addEventListener('change', () => {
+      let val = Number(n2Input.value);
+      if (isNaN(val)) val = 1.33;
+      val = Math.min(2.00, Math.max(1.00, val));
+      n2Val = val;
+      n2Input.value = val.toFixed(2);
+      paintMediumChips();
+      applyFromTheta1();
+    });
+  }
+
+  if (theta1Input) {
+    theta1Input.addEventListener('input', () => {
+      let val = Number(theta1Input.value);
+      if (isNaN(val)) return;
+      val = Math.min(89, Math.max(0, val));
+      theta1Deg = val;
+      applyFromTheta1();
+    });
+    theta1Input.addEventListener('change', () => {
+      let val = Number(theta1Input.value);
+      if (isNaN(val)) val = 40;
+      val = Math.min(89, Math.max(0, val));
+      theta1Deg = val;
+      theta1Input.value = val.toFixed(1);
+      applyFromTheta1();
+    });
+  }
+
+  if (theta2Input) {
+    theta2Input.addEventListener('input', () => {
+      if (isTir) return;
+      let val = Number(theta2Input.value);
+      if (isNaN(val)) return;
+      val = Math.min(89, Math.max(0, val));
+      applyFromTheta2(val);
+    });
+    theta2Input.addEventListener('change', () => {
+      if (isTir) return;
+      let val = Number(theta2Input.value);
+      if (isNaN(val)) val = 29;
+      val = Math.min(89, Math.max(0, val));
+      applyFromTheta2(val);
+      theta2Input.value = val.toFixed(1);
+    });
+  }
 
   wrap.querySelector('[data-reset]')?.addEventListener('click', () => {
     n1Val = 1.00;

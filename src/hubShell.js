@@ -24,7 +24,7 @@ export function mountHubShell(root, { subtitleKey, activeSection, onSection, onL
         <button type="button" class="brand-logo-wrap" aria-label="${t('strand.back')}">
           <img class="brand-logo-img" src="${import.meta.env.BASE_URL}images/uniplus-logo.png" alt="" width="220" height="52" decoding="async" />
         </button>
-        <div class="brand-text-block">
+        <div class="brand-text-block" style="cursor: pointer;" data-brand-home>
           <h1 class="site-title">${t('app.title')}</h1>
           <p class="site-subtitle" data-hub-subtitle>${t(subtitleKey)}</p>
         </div>
@@ -90,6 +90,8 @@ export function mountHubShell(root, { subtitleKey, activeSection, onSection, onL
   if (logoBtn) {
     logoBtn.addEventListener('click', onBack);
   }
+
+  root.querySelector('[data-brand-home]')?.addEventListener('click', onBack);
 
   paintNav(activeSection);
   paintLang();
