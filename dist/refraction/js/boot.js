@@ -1,5 +1,5 @@
-import { initRefractionLab } from './app.js?v=20260719_two_boxes_particles_v10';
-import { createT, hubLangToLocal, initLangFromUrl, setLang, getLang } from './i18n.js?v=20260719_two_boxes_particles_v10';
+import { initRefractionLab } from './app.js?v=20260719_three_rays_bounce_v11';
+import { createT, hubLangToLocal, initLangFromUrl, setLang, getLang } from './i18n.js?v=20260719_three_rays_bounce_v11';
 
 const root = document.getElementById('app');
 
