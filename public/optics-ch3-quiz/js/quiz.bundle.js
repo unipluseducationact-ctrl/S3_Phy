@@ -759,8 +759,37 @@
     const attemptMap = /* @__PURE__ */ new Map();
 
     const QUIZ_META = { subject: "PHY", quizId: "phy-optics-ch3" };
+    function getOptionOrTableText(q, key) {
+      if (key === undefined || key === null) return null;
+      const opt = q.options?.find((o) => o.key === key);
+      if (opt) return opt.text || null;
+      const row = q.optionTable?.rows?.find((r) => r.key === key);
+      if (row) {
+        const cells = (row.cells || []).join(" ");
+        return cells ? `${row.key}. ${cells}` : row.key;
+      }
+      return null;
+    }
+
     function reportPhyAttempt(q, isCorrect, state) {
       try {
+        let selectedAnswerText = getOptionOrTableText(q, state.selected);
+        if (!selectedAnswerText) {
+          if (state.fillValues) {
+            selectedAnswerText = state.fillValues.filter(Boolean).join(" / ") || null;
+          } else if (state.typeinValue !== undefined && state.typeinValue !== null && state.typeinValue !== "") {
+            selectedAnswerText = String(state.typeinValue);
+          }
+        }
+
+        let correctAnswerText = getOptionOrTableText(q, q.answer);
+        if (!correctAnswerText) {
+          try {
+            const ma = modelAnswerText(q);
+            correctAnswerText = ma?.en || null;
+          } catch (_) {}
+        }
+
         const payload = {
           type: "uniplus:quizAnswer",
           subject: QUIZ_META.subject,
@@ -770,7 +799,9 @@
           difficulty: q.difficulty || null,
           stem: q.stem || null,
           selectedAnswer: state.selected !== undefined && state.selected !== null ? String(state.selected) : (state.fillValues ? JSON.stringify(state.fillValues) : null),
+          selectedAnswerText,
           correctAnswer: q.answer !== undefined ? String(q.answer) : null,
+          correctAnswerText,
           isCorrect: !!isCorrect,
           attemptNumber: state.wrong + 1,
           msTaken: 0

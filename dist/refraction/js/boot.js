@@ -1,5 +1,5 @@
-import { initRefractionLab } from './app.js?v=20260719_three_rays_inside_v12';
-import { createT, hubLangToLocal, initLangFromUrl, setLang, getLang } from './i18n.js?v=20260719_three_rays_inside_v12';
+import { initRefractionLab } from './app.js?v=20260721_projector_zoom_v13';
+import { createT, hubLangToLocal, initLangFromUrl, setLang, getLang } from './i18n.js?v=20260721_projector_zoom_v13';
 
 const root = document.getElementById('app');
 

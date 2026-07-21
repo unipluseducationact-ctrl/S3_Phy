@@ -1,0 +1,1 @@
+import{c as t}from"./createLabIframe-DZIE6PVp.js";import"./index-pEdNPDT8.js";function a(r){return t(r,{slug:"refraction",titleKey:"tools.refraction.title",className:"tool-refraction-lab",extraParams:()=>"&v=20260721_projector_zoom_v13"})}export{a as createRefractionLab};

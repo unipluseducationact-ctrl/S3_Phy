@@ -39,14 +39,15 @@ html.s3phy-embed .lang-bar {
 
 html.s3phy-embed,
 html.s3phy-embed body {
-  height: 100%;
-  overflow: hidden;
+  height: auto !important;
+  min-height: 100% !important;
+  overflow-y: auto !important;
   background: #121624;
 }
 html.s3phy-embed #app {
   padding: 4px;
-  height: 100%;
-  min-height: 0;
+  height: auto !important;
+  min-height: 100% !important;
   box-sizing: border-box;
 }
 

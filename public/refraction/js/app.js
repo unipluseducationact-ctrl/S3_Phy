@@ -25,7 +25,7 @@ export function initRefractionLab(root, t) {
           <span class="reflab-toggle-icon">➡️</span>
           <span class="reflab-toggle-text">${t('tools.refraction.hideControls')}</span>
         </button>
-        <canvas class="reflab-canvas" width="720" height="380" aria-label="${t('tools.refraction.title')}"></canvas>
+        <canvas class="reflab-canvas" width="720" height="440" aria-label="${t('tools.refraction.title')}"></canvas>
       </div>
 
       <div class="reflab-controls">
@@ -362,28 +362,28 @@ export function initRefractionLab(root, t) {
   }
 
   function drawAngleArc(cx, cy, startDeg, endDeg, color, label) {
-    const r = 42;
+    const r = 55; // Larger radius for projector clarity
     const a0 = toRad(startDeg);
     const a1 = toRad(endDeg);
     ctx.beginPath();
     ctx.strokeStyle = color;
-    ctx.lineWidth = 1.5;
+    ctx.lineWidth = 2.5; // Thicker line
     ctx.arc(cx, cy, r, a0, a1, endDeg < startDeg);
     ctx.stroke();
     const mid = (a0 + a1) / 2;
     ctx.fillStyle = color;
-    ctx.font = 'bold 13px system-ui, sans-serif';
+    ctx.font = 'bold 15px system-ui, sans-serif'; // Larger font
     
     // Calculate position based on the angle to avoid overlap with the normal line or rays
-    const dist = r + 18;
+    const dist = r + 22;
     let textX = cx + Math.cos(mid) * dist - 18;
-    let textY = cy + Math.sin(mid) * dist + 4;
+    let textY = cy + Math.sin(mid) * dist + 5;
     
     // Adjust alignment based on which quadrant the label is in
     if (Math.cos(mid) < -0.1) {
-      textX = cx + Math.cos(mid) * dist - 48; // Shift left for left-side labels
+      textX = cx + Math.cos(mid) * dist - 54; // Shift left for left-side labels
     } else if (Math.cos(mid) > 0.1) {
-      textX = cx + Math.cos(mid) * dist + 4;  // Shift right for right-side labels
+      textX = cx + Math.cos(mid) * dist + 6;  // Shift right for right-side labels
     }
     
     ctx.fillText(label, textX, textY);
@@ -396,7 +396,7 @@ export function initRefractionLab(root, t) {
 
     const cx = W / 2;
     const cy = H / 2;
-    const rayLen = Math.min(W, H) * 0.42;
+    const rayLen = Math.min(W, H) * 0.47; // Zoomed in from 0.42 to 0.47
 
     const active1 = getActiveMedium(n1Val);
     const active2 = getActiveMedium(n2Val);
@@ -412,57 +412,64 @@ export function initRefractionLab(root, t) {
     // Interface
     ctx.beginPath();
     ctx.strokeStyle = '#8b9bb8';
-    ctx.lineWidth = 2;
-    ctx.moveTo(40, cy);
-    ctx.lineTo(W - 40, cy);
+    ctx.lineWidth = 3; // Thicker interface line
+    ctx.moveTo(30, cy);
+    ctx.lineTo(W - 30, cy);
     ctx.stroke();
     ctx.fillStyle = '#bac4d6';
-    ctx.font = '12px system-ui, sans-serif';
-    ctx.fillText(t('tools.refraction.canvas.interface'), W - 110, cy - 8);
+    ctx.font = 'bold 14px system-ui, sans-serif'; // Larger font
+    ctx.fillText(t('tools.refraction.canvas.interface'), W - 130, cy - 10);
 
     // Normal (dashed vertical)
     ctx.beginPath();
-    ctx.setLineDash([6, 5]);
-    ctx.strokeStyle = '#6b7a99';
-    ctx.lineWidth = 1.5;
-    ctx.moveTo(cx, 30);
-    ctx.lineTo(cx, H - 30);
+    ctx.setLineDash([8, 6]); // Slightly larger dashes
+    ctx.strokeStyle = '#8b9bb8'; // Brighter normal line
+    ctx.lineWidth = 2.5; // Thicker normal line
+    ctx.moveTo(cx, 20);
+    ctx.lineTo(cx, H - 20);
     ctx.stroke();
     ctx.setLineDash([]);
-    ctx.fillStyle = '#8b9bb8';
-    ctx.fillText(t('tools.refraction.canvas.normal'), cx + 8, 44);
+    ctx.fillStyle = '#bac4d6';
+    ctx.fillText(t('tools.refraction.canvas.normal'), cx + 10, 48);
 
     // Medium labels
-    ctx.font = 'bold 14px system-ui, sans-serif';
-    ctx.fillStyle = '#e8eef8';
+    ctx.font = 'bold 17px system-ui, sans-serif'; // Larger font for projector readability
+    ctx.fillStyle = '#ffffff'; // Brighter white
     ctx.fillText(
-      `${activeName1}  n₁=${formatN(n1())}`,
-      48,
-      36,
+      `${activeName1}  (n₁ = ${formatN(n1())})`,
+      32,
+      40,
     );
     ctx.fillText(
-      `${activeName2}  n₂=${formatN(n2())}`,
-      48,
-      H - 24,
+      `${activeName2}  (n₂ = ${formatN(n2())})`,
+      32,
+      H - 28,
     );
 
     // Continuous ray path (not reflection):
     // incident from UPPER LEFT → through interface → refracted to LOWER RIGHT.
-    // (Same-side endpoints reverse the horizontal direction and look like reflection.)
     const iAngle = -Math.PI / 2 - toRad(theta1Deg);
     const ix = cx + Math.cos(iAngle) * rayLen;
     const iy = cy + Math.sin(iAngle) * rayLen;
-    drawArrow(ix, iy, cx, cy, '#ffea00', 3);
+    drawArrow(ix, iy, cx, cy, '#ffea00', 5); // Thicker ray (width 5)
+
+    // Calculate label positions along the rays (65% of the way) to prevent clipping at edges
+    const labelDist = rayLen * 0.65;
 
     if (isTir) {
       // Reflection: bounce into UPPER RIGHT
       const rAngle = -Math.PI / 2 + toRad(theta1Deg);
       const rx = cx + Math.cos(rAngle) * rayLen;
       const ryReal = cy + Math.sin(rAngle) * rayLen;
-      drawArrow(cx, cy, rx, ryReal, '#ff8a80', 3);
+      drawArrow(cx, cy, rx, ryReal, '#ff8a80', 5); // Thicker ray
+
+      // Label along the reflected ray
+      const lrx = cx + Math.cos(rAngle) * labelDist;
+      const lry = cy + Math.sin(rAngle) * labelDist;
       ctx.fillStyle = '#ff8a80';
-      ctx.font = 'bold 13px system-ui, sans-serif';
-      ctx.fillText(t('tools.refraction.canvas.reflected'), rx - 10, ryReal - 8);
+      ctx.font = 'bold 15px system-ui, sans-serif';
+      ctx.fillText(t('tools.refraction.canvas.reflected'), lrx - 15, lry - 12);
+
       drawAngleArc(cx, cy, -90, -90 - theta1Deg, '#ffea00', `θ₁ = ${theta1Deg.toFixed(1)}°`);
       drawAngleArc(cx, cy, -90, -90 + theta1Deg, '#ff8a80', `θ₁ = ${theta1Deg.toFixed(1)}°`);
     } else {
@@ -472,17 +479,25 @@ export function initRefractionLab(root, t) {
       const tAngle = Math.PI / 2 - toRad(t2);
       const tx = cx + Math.cos(tAngle) * rayLen;
       const ty = cy + Math.sin(tAngle) * rayLen;
-      drawArrow(cx, cy, tx, ty, '#22d3ee', 3);
+      drawArrow(cx, cy, tx, ty, '#22d3ee', 5); // Thicker ray
+
+      // Label along the refracted ray
+      const ltx = cx + Math.cos(tAngle) * labelDist;
+      const lty = cy + Math.sin(tAngle) * labelDist;
       ctx.fillStyle = '#22d3ee';
-      ctx.font = 'bold 13px system-ui, sans-serif';
-      ctx.fillText(t('tools.refraction.canvas.refracted'), tx + 4, ty + 16);
+      ctx.font = 'bold 15px system-ui, sans-serif';
+      ctx.fillText(t('tools.refraction.canvas.refracted'), ltx + 12, lty + 18);
+
       drawAngleArc(cx, cy, -90, -90 - theta1Deg, '#ffea00', `θ₁ = ${theta1Deg.toFixed(1)}°`);
       drawAngleArc(cx, cy, 90, 90 - t2, '#22d3ee', `θ₂ = ${t2.toFixed(1)}°`);
     }
 
+    // Label along the incident ray
+    const lix = cx + Math.cos(iAngle) * labelDist;
+    const liy = cy + Math.sin(iAngle) * labelDist;
     ctx.fillStyle = '#ffea00';
-    ctx.font = 'bold 13px system-ui, sans-serif';
-    ctx.fillText(t('tools.refraction.canvas.incident'), ix - 50, iy - 8);
+    ctx.font = 'bold 15px system-ui, sans-serif';
+    ctx.fillText(t('tools.refraction.canvas.incident'), lix - 45, liy - 12);
   }
 
   function seededRandom(s) {
@@ -893,7 +908,7 @@ export function initRefractionLab(root, t) {
     const viz = wrap.querySelector('.reflab-viz');
     if (viz) {
       const w = Math.max(320, viz.clientWidth - 20);
-      const h = Math.round(w * (380 / 720));
+      const h = Math.round(w * (440 / 720));
       canvas.width = w;
       canvas.height = h;
       requestDraw();
@@ -930,7 +945,7 @@ export function initRefractionLab(root, t) {
     const viz = wrap.querySelector('.reflab-viz');
     if (viz) {
       const w = Math.max(320, viz.clientWidth - 20);
-      const h = Math.round(w * (380 / 720));
+      const h = Math.round(w * (440 / 720));
       if (canvas.width !== w) {
         canvas.width = w;
         canvas.height = h;
