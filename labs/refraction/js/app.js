@@ -576,20 +576,24 @@ export function initRefractionLab(root, t) {
           bounces: [false, false, false]
         };
       } else if (nVal < 1.45) {
-        // 1 ray bounces, 2 rays pass through with 1 zig-zag deflection
+        // 1 ray bounces, 2 rays pass through with multiple zig-zag deflections
         const r1 = [
           { x: x1, y: by },
-          { x: x1 + dx * 0.45, y: by + bh * 0.45 },
-          { x: x1 + dx * 0.45 - dx * 0.25, y: by + bh * 0.20 }
+          { x: x1 + dx * 0.25 + 12, y: by + bh * 0.25 },
+          { x: x1 + dx * 0.10 - 8, y: by + bh * 0.50 },
+          { x: x1 + dx * 0.45, y: by + bh * 0.70 }, // bounce point
+          { x: x1 + dx * 0.45 - dx * 0.20, y: by + bh * 0.40 }
         ];
         const r2 = [
           { x: x2, y: by },
-          { x: x2 + dx * 0.40, y: by + bh * 0.40 },
+          { x: x2 + dx * 0.30 + 15, y: by + bh * 0.30 },
+          { x: x2 + dx * 0.15 - 15, y: by + bh * 0.65 },
           { x: x2 + dx, y: by + bh }
         ];
         const r3 = [
           { x: x3, y: by },
-          { x: x3 + dx * 0.60, y: by + bh * 0.60 },
+          { x: x3 + dx * 0.40 + 12, y: by + bh * 0.35 },
+          { x: x3 + dx * 0.20 - 12, y: by + bh * 0.70 },
           { x: x3 + dx, y: by + bh }
         ];
         return {
@@ -597,25 +601,28 @@ export function initRefractionLab(root, t) {
           bounces: [true, false, false]
         };
       } else {
-        // 2 rays bounce, 1 ray passes through with multiple zig-zags
+        // 2 rays bounce, 1 ray passes through with even more complex zig-zags
         const r1 = [
           { x: x1, y: by },
-          { x: x1 + dx * 0.22, y: by + bh * 0.22 },
-          { x: x1 + dx * 0.45, y: by + bh * 0.45 },
-          { x: x1 + dx * 0.45 - dx * 0.25, y: by + bh * 0.20 }
+          { x: x1 + dx * 0.20 + 15, y: by + bh * 0.20 },
+          { x: x1 + dx * 0.05 - 15, y: by + bh * 0.40 },
+          { x: x1 + dx * 0.25 + 15, y: by + bh * 0.60 },
+          { x: x1 + dx * 0.45, y: by + bh * 0.80 }, // bounce point
+          { x: x1 + dx * 0.45 - dx * 0.25, y: by + bh * 0.50 }
         ];
         const r2 = [
           { x: x2, y: by },
-          { x: x2 + dx * 0.20, y: by + bh * 0.20 },
-          { x: x2 + dx * 0.45, y: by + bh * 0.45 },
-          { x: x2 + dx * 0.70, y: by + bh * 0.70 },
+          { x: x2 + dx * 0.15 + 18, y: by + bh * 0.25 },
+          { x: x2 - dx * 0.05 - 18, y: by + bh * 0.50 },
+          { x: x2 + dx * 0.25 + 18, y: by + bh * 0.75 },
           { x: x2 + dx, y: by + bh }
         ];
         const r3 = [
           { x: x3, y: by },
-          { x: x3 + dx * 0.25, y: by + bh * 0.25 },
-          { x: x3 + dx * 0.55, y: by + bh * 0.55 },
-          { x: x3 + dx * 0.55 - dx * 0.30, y: by + bh * 0.38 }
+          { x: x3 + dx * 0.15 + 15, y: by + bh * 0.20 },
+          { x: x3 - dx * 0.05 - 15, y: by + bh * 0.45 },
+          { x: x3 + dx * 0.25 + 15, y: by + bh * 0.70 }, // bounce point
+          { x: x3 + dx * 0.25 - dx * 0.30, y: by + bh * 0.45 }
         ];
         return {
           rays: [r1, r2, r3],

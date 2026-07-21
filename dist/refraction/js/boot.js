@@ -1,5 +1,5 @@
-import { initRefractionLab } from './app.js?v=20260721_particle_fix_v17';
-import { createT, hubLangToLocal, initLangFromUrl, setLang, getLang } from './i18n.js?v=20260721_particle_fix_v17';
+import { initRefractionLab } from './app.js?v=20260721_more_zigzag_v18';
+import { createT, hubLangToLocal, initLangFromUrl, setLang, getLang } from './i18n.js?v=20260721_more_zigzag_v18';
 
 const root = document.getElementById('app');
 
