@@ -352,6 +352,9 @@ export function initRefractionLab(root, t) {
   }
 
   function drawArrow(x1, y1, x2, y2, color, width = 2.5) {
+    ctx.save();
+    ctx.shadowBlur = 8;
+    ctx.shadowColor = color;
     ctx.beginPath();
     ctx.strokeStyle = color;
     ctx.lineWidth = width;
@@ -361,17 +364,19 @@ export function initRefractionLab(root, t) {
     const dx = x2 - x1;
     const dy = y2 - y1;
     const len = Math.hypot(dx, dy);
-    if (len < 1) return;
-    const ux = dx / len;
-    const uy = dy / len;
-    const size = 12;
-    ctx.beginPath();
-    ctx.fillStyle = color;
-    ctx.moveTo(x2, y2);
-    ctx.lineTo(x2 - ux * size - uy * size * 0.45, y2 - uy * size + ux * size * 0.45);
-    ctx.lineTo(x2 - ux * size + uy * size * 0.45, y2 - uy * size - ux * size * 0.45);
-    ctx.closePath();
-    ctx.fill();
+    if (len >= 1) {
+      const ux = dx / len;
+      const uy = dy / len;
+      const size = 12;
+      ctx.beginPath();
+      ctx.fillStyle = color;
+      ctx.moveTo(x2, y2);
+      ctx.lineTo(x2 - ux * size - uy * size * 0.45, y2 - uy * size + ux * size * 0.45);
+      ctx.lineTo(x2 - ux * size + uy * size * 0.45, y2 - uy * size - ux * size * 0.45);
+      ctx.closePath();
+      ctx.fill();
+    }
+    ctx.restore();
   }
 
   function drawAngleArc(cx, cy, startDeg, endDeg, color, label) {
@@ -476,12 +481,17 @@ export function initRefractionLab(root, t) {
       const ryReal = cy + Math.sin(rAngle) * rayLen;
       drawArrow(cx, cy, rx, ryReal, '#ff8a80', 5); // Thicker ray
 
-      // Label along the reflected ray
-      const lrx = cx + Math.cos(rAngle) * labelDist;
-      const lry = cy + Math.sin(rAngle) * labelDist;
+      // Label along the reflected ray (perpendicular offset to prevent overlap)
+      const perpAngleR = rAngle + Math.PI / 2;
+      const lrx = cx + Math.cos(rAngle) * labelDist + Math.cos(perpAngleR) * 25;
+      const lry = cy + Math.sin(rAngle) * labelDist + Math.sin(perpAngleR) * 25;
+      ctx.save();
       ctx.fillStyle = '#ff8a80';
       ctx.font = 'bold 15px system-ui, sans-serif';
-      ctx.fillText(t('tools.refraction.canvas.reflected'), lrx - 15, lry - 12);
+      ctx.textAlign = 'center';
+      ctx.textBaseline = 'middle';
+      ctx.fillText(t('tools.refraction.canvas.reflected'), lrx, lry);
+      ctx.restore();
 
       drawAngleArc(cx, cy, -90, -90 - theta1Deg, '#ffea00', `θ₁ = ${theta1Deg.toFixed(1)}°`);
       drawAngleArc(cx, cy, -90, -90 + theta1Deg, '#ff8a80', `θ₁ = ${theta1Deg.toFixed(1)}°`);
@@ -494,23 +504,33 @@ export function initRefractionLab(root, t) {
       const ty = cy + Math.sin(tAngle) * rayLen;
       drawArrow(cx, cy, tx, ty, '#22d3ee', 5); // Thicker ray
 
-      // Label along the refracted ray
-      const ltx = cx + Math.cos(tAngle) * labelDist;
-      const lty = cy + Math.sin(tAngle) * labelDist;
+      // Label along the refracted ray (perpendicular offset to prevent overlap)
+      const perpAngleT = tAngle - Math.PI / 2;
+      const ltx = cx + Math.cos(tAngle) * labelDist + Math.cos(perpAngleT) * 25;
+      const lty = cy + Math.sin(tAngle) * labelDist + Math.sin(perpAngleT) * 25;
+      ctx.save();
       ctx.fillStyle = '#22d3ee';
       ctx.font = 'bold 15px system-ui, sans-serif';
-      ctx.fillText(t('tools.refraction.canvas.refracted'), ltx + 12, lty + 18);
+      ctx.textAlign = 'center';
+      ctx.textBaseline = 'middle';
+      ctx.fillText(t('tools.refraction.canvas.refracted'), ltx, lty);
+      ctx.restore();
 
       drawAngleArc(cx, cy, -90, -90 - theta1Deg, '#ffea00', `θ₁ = ${theta1Deg.toFixed(1)}°`);
       drawAngleArc(cx, cy, 90, 90 - t2, '#22d3ee', `θ₂ = ${t2.toFixed(1)}°`);
     }
 
-    // Label along the incident ray
-    const lix = cx + Math.cos(iAngle) * labelDist;
-    const liy = cy + Math.sin(iAngle) * labelDist;
+    // Label along the incident ray (perpendicular offset to prevent overlap)
+    const perpAngleI = iAngle - Math.PI / 2;
+    const lix = cx + Math.cos(iAngle) * labelDist + Math.cos(perpAngleI) * 25;
+    const liy = cy + Math.sin(iAngle) * labelDist + Math.sin(perpAngleI) * 25;
+    ctx.save();
     ctx.fillStyle = '#ffea00';
     ctx.font = 'bold 15px system-ui, sans-serif';
-    ctx.fillText(t('tools.refraction.canvas.incident'), lix - 45, liy - 12);
+    ctx.textAlign = 'center';
+    ctx.textBaseline = 'middle';
+    ctx.fillText(t('tools.refraction.canvas.incident'), lix, liy);
+    ctx.restore();
   }
 
   function seededRandom(s) {

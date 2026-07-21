@@ -6,6 +6,6 @@ export function createRefractionLab(t) {
     slug: 'refraction',
     titleKey: 'tools.refraction.title',
     className: 'tool-refraction-lab',
-    extraParams: () => '&v=20260721_micro_side_v21',
+    extraParams: () => '&v=20260721_glow_labels_v22',
   });
 }

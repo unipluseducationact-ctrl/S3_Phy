@@ -1,5 +1,5 @@
-import { initRefractionLab } from './app.js?v=20260721_micro_side_v21';
-import { createT, hubLangToLocal, initLangFromUrl, setLang, getLang } from './i18n.js?v=20260721_micro_side_v21';
+import { initRefractionLab } from './app.js?v=20260721_glow_labels_v22';
+import { createT, hubLangToLocal, initLangFromUrl, setLang, getLang } from './i18n.js?v=20260721_glow_labels_v22';
 
 const root = document.getElementById('app');
 
