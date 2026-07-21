@@ -82,6 +82,7 @@ export const en = {
   'tools.rotatingMirror.canvas.nPrime': 'n\u2032',
   'tools.rotatingMirror.canvas.shift': 'Shift',
   'tools.refractionTir.title': 'Prison Break lab — refraction, Snell & TIR',
+  'tools.dispersion.title': 'Dispersion of Light — Prism Lab',
   'tools.refraction.title': 'Refraction — Snell’s law',
   'tools.refraction.n1': 'Incident medium',
   'tools.refraction.n2': 'Refracted medium',

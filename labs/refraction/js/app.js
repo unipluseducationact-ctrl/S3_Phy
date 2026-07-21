@@ -100,7 +100,7 @@ export function initRefractionLab(root, t) {
       </div>
 
       <div class="reflab-viz-particle">
-        <div style="font-weight: bold; font-size: 0.95rem; color: #22d3ee; margin-bottom: 8px; text-align: center; display: flex; align-items: center; justify-content: center; gap: 6px;">
+        <div style="font-weight: 800; font-size: 1.25rem; color: #22d3ee; margin-bottom: 12px; text-align: center; display: flex; align-items: center; justify-content: center; gap: 8px;">
           <span>🔬</span> ${t('tools.refraction.particleModel.title')}
         </div>
         <canvas class="reflab-particle-canvas" width="720" height="280" aria-label="Microscopic Particle Model"></canvas>
@@ -538,30 +538,58 @@ export function initRefractionLab(root, t) {
     drawBoxParticles(box1X, boxY, boxW, boxH, 1.80, 'rgba(255, 255, 255, 0.22)');
     drawBoxParticles(box2X, boxY, boxW, boxH, 1.10, 'rgba(34, 211, 238, 0.22)');
 
-    // Draw 3 light rays in each box
-    // Rays enter from top of each box at an angle (18 degrees)
-    const angleRad = toRad(18);
-    const rayLen = boxH / Math.cos(angleRad);
-    const dx = rayLen * Math.sin(angleRad);
-    const dy = boxH;
+    // Helper to calculate jiggled positions for collision points
+    function getJiggledPt(pt, seed) {
+      const jiggleSpeed = 0.05;
+      const jiggleAmp = 1.2;
+      const jx = Math.sin(animTime * jiggleSpeed + seed) * jiggleAmp;
+      const jy = Math.cos(animTime * jiggleSpeed + seed * 1.3) * jiggleAmp;
+      return { x: pt.x + jx, y: pt.y + jy };
+    }
 
-    // Box 1 Rays (Denser Medium - 2 rays bounce away, 1 passes through)
-    const r1_1 = [
+    // Base coordinates for Denser Medium paths (Ray 1 and 3 bounce away, Ray 2 zig-zags all the way through)
+    const p1_1_base = [
       { x: box1X + boxW * 0.15, y: boxY },
-      { x: box1X + boxW * 0.15 + dx * 0.45, y: boxY + boxH * 0.45 },
-      { x: box1X + boxW * 0.15 + dx * 0.45 - dx * 0.25, y: boxY + boxH * 0.45 - boxH * 0.25 } // bounces back up-left
+      { x: box1X + boxW * 0.20, y: boxY + boxH * 0.22 },
+      { x: box1X + boxW * 0.10, y: boxY + boxH * 0.45 },
+      { x: box1X + boxW * 0.03, y: boxY + boxH * 0.30 } // bounces back up-left and exits
+    ];
+    const p1_2_base = [
+      { x: box1X + boxW * 0.42, y: boxY },
+      { x: box1X + boxW * 0.48, y: boxY + boxH * 0.20 },
+      { x: box1X + boxW * 0.36, y: boxY + boxH * 0.45 },
+      { x: box1X + boxW * 0.52, y: boxY + boxH * 0.70 },
+      { x: box1X + boxW * 0.45, y: boxY + boxH } // passes through to the bottom!
+    ];
+    const p1_3_base = [
+      { x: box1X + boxW * 0.68, y: boxY },
+      { x: box1X + boxW * 0.75, y: boxY + boxH * 0.25 },
+      { x: box1X + boxW * 0.62, y: boxY + boxH * 0.55 },
+      { x: box1X + boxW * 0.50, y: boxY + boxH * 0.38 } // bounces back up-left
+    ];
+
+    // Jiggled coordinates for Denser Medium paths (sync with background particle jiggle)
+    const r1_1 = [
+      p1_1_base[0],
+      getJiggledPt(p1_1_base[1], 101),
+      getJiggledPt(p1_1_base[2], 102),
+      getJiggledPt(p1_1_base[3], 103)
     ];
     const r1_2 = [
-      { x: box1X + boxW * 0.42, y: boxY },
-      { x: box1X + boxW * 0.42 + dx, y: boxY + boxH } // passes through
+      p1_2_base[0],
+      getJiggledPt(p1_2_base[1], 201),
+      getJiggledPt(p1_2_base[2], 202),
+      getJiggledPt(p1_2_base[3], 203),
+      p1_2_base[4]
     ];
     const r1_3 = [
-      { x: box1X + boxW * 0.68, y: boxY },
-      { x: box1X + boxW * 0.68 + dx * 0.6, y: boxY + boxH * 0.6 },
-      { x: box1X + boxW * 0.68 + dx * 0.6 - dx * 0.3, y: boxY + boxH * 0.6 - boxH * 0.3 } // bounces back up-left
+      p1_3_base[0],
+      getJiggledPt(p1_3_base[1], 301),
+      getJiggledPt(p1_3_base[2], 302),
+      getJiggledPt(p1_3_base[3], 303)
     ];
 
-    // Draw Box 1 Rays
+    // Draw Box 1 Rays (Denser Medium)
     ctxP.lineWidth = 2.5;
     
     // Ray 1 (Bounce)
@@ -569,21 +597,24 @@ export function initRefractionLab(root, t) {
     ctxP.strokeStyle = '#ffea00';
     ctxP.moveTo(r1_1[0].x, r1_1[0].y);
     ctxP.lineTo(r1_1[1].x, r1_1[1].y);
+    ctxP.lineTo(r1_1[2].x, r1_1[2].y);
     ctxP.stroke();
 
     ctxP.beginPath();
     ctxP.strokeStyle = '#ff8a80'; // red/orange for bounce
     ctxP.setLineDash([4, 4]);
-    ctxP.moveTo(r1_1[1].x, r1_1[1].y);
-    ctxP.lineTo(r1_1[2].x, r1_1[2].y);
+    ctxP.moveTo(r1_1[2].x, r1_1[2].y);
+    ctxP.lineTo(r1_1[3].x, r1_1[3].y);
     ctxP.stroke();
     ctxP.setLineDash([]);
 
-    // Ray 2 (Pass through)
+    // Ray 2 (Pass through zig-zag)
     ctxP.beginPath();
     ctxP.strokeStyle = '#ffea00';
     ctxP.moveTo(r1_2[0].x, r1_2[0].y);
-    ctxP.lineTo(r1_2[1].x, r1_2[1].y);
+    for (let i = 1; i < r1_2.length; i++) {
+      ctxP.lineTo(r1_2[i].x, r1_2[i].y);
+    }
     ctxP.stroke();
 
     // Ray 3 (Bounce)
@@ -591,28 +622,38 @@ export function initRefractionLab(root, t) {
     ctxP.strokeStyle = '#ffea00';
     ctxP.moveTo(r1_3[0].x, r1_3[0].y);
     ctxP.lineTo(r1_3[1].x, r1_3[1].y);
+    ctxP.lineTo(r1_3[2].x, r1_3[2].y);
     ctxP.stroke();
 
     ctxP.beginPath();
     ctxP.strokeStyle = '#ff8a80';
     ctxP.setLineDash([4, 4]);
-    ctxP.moveTo(r1_3[1].x, r1_3[1].y);
-    ctxP.lineTo(r1_3[2].x, r1_3[2].y);
+    ctxP.moveTo(r1_3[2].x, r1_3[2].y);
+    ctxP.lineTo(r1_3[3].x, r1_3[3].y);
     ctxP.stroke();
     ctxP.setLineDash([]);
 
-    // Draw collision particles at bounce points in Box 1
-    [r1_1[1], r1_3[1]].forEach(pt => {
+    // Draw highlighted collision particles at bounce points in Box 1
+    const collisionParticles = [
+      r1_1[1], r1_1[2],
+      r1_2[1], r1_2[2], r1_2[3],
+      r1_3[1], r1_3[2]
+    ];
+    collisionParticles.forEach(pt => {
       ctxP.beginPath();
-      ctxP.fillStyle = '#ff8a80';
+      ctxP.fillStyle = '#ff8a80'; // Highlight color
       ctxP.arc(pt.x, pt.y, 4.5, 0, Math.PI * 2);
       ctxP.fill();
       ctxP.strokeStyle = '#ffffff';
-      ctxP.lineWidth = 1;
+      ctxP.lineWidth = 1.2;
       ctxP.stroke();
     });
 
-    // Box 2 Rays (Less Dense Medium - all 3 rays easily pass through)
+    // Box 2 Rays (Less Dense Medium - all 3 rays easily pass straight through)
+    const angleRad = toRad(18);
+    const rayLen = boxH / Math.cos(angleRad);
+    const dx = rayLen * Math.sin(angleRad);
+
     const r2_1 = [
       { x: box2X + boxW * 0.15, y: boxY },
       { x: box2X + boxW * 0.15 + dx, y: boxY + boxH }
@@ -644,27 +685,37 @@ export function initRefractionLab(root, t) {
     const progressDenser = (animTime * speedDenser * 0.015) % 1.0;
     const progressLess = (animTime * speedLess * 0.015) % 1.0;
 
-    // Helper to get position along a multi-segment path
+    // Helper to get position along a multi-segment path of any length
     function getPathPos(path, progress) {
-      if (path.length === 2) {
-        return {
-          x: path[0].x + (path[1].x - path[0].x) * progress,
-          y: path[0].y + (path[1].y - path[0].y) * progress
-        };
+      if (path.length < 2) return path[0] || { x: 0, y: 0 };
+      
+      // Calculate total length of the path
+      const segmentLengths = [];
+      let totalLength = 0;
+      for (let i = 0; i < path.length - 1; i++) {
+        const d = Math.hypot(path[i+1].x - path[i].x, path[i+1].y - path[i].y);
+        segmentLengths.push(d);
+        totalLength += d;
       }
-      if (progress < 0.6) {
-        const t = progress / 0.6;
-        return {
-          x: path[0].x + (path[1].x - path[0].x) * t,
-          y: path[0].y + (path[1].y - path[0].y) * t
-        };
-      } else {
-        const t = (progress - 0.6) / 0.4;
-        return {
-          x: path[1].x + (path[2].x - path[1].x) * t,
-          y: path[1].y + (path[2].y - path[1].y) * t
-        };
+      
+      // Find which segment the progress falls into
+      const targetDist = progress * totalLength;
+      let accumulatedDist = 0;
+      for (let i = 0; i < segmentLengths.length; i++) {
+        const len = segmentLengths[i];
+        if (targetDist <= accumulatedDist + len || i === segmentLengths.length - 1) {
+          const segProgress = (targetDist - accumulatedDist) / len;
+          const pStart = path[i];
+          const pEnd = path[i+1];
+          return {
+            x: pStart.x + (pEnd.x - pStart.x) * segProgress,
+            y: pStart.y + (pEnd.y - pStart.y) * segProgress,
+            segmentIndex: i
+          };
+        }
+        accumulatedDist += len;
       }
+      return path[path.length - 1];
     }
 
     // Draw Box 1 Photons
@@ -672,9 +723,10 @@ export function initRefractionLab(root, t) {
     const p1_2 = getPathPos(r1_2, progressDenser);
     const p1_3 = getPathPos(r1_3, progressDenser);
 
-    drawPhoton(p1_1.x, p1_1.y, progressDenser < 0.6 ? '#ffea00' : '#ff8a80');
+    // Dynamic photon color: red/orange if it has bounced (segmentIndex >= 2)
+    drawPhoton(p1_1.x, p1_1.y, p1_1.segmentIndex >= 2 ? '#ff8a80' : '#ffea00');
     drawPhoton(p1_2.x, p1_2.y, '#ffea00');
-    drawPhoton(p1_3.x, p1_3.y, progressDenser < 0.6 ? '#ffea00' : '#ff8a80');
+    drawPhoton(p1_3.x, p1_3.y, p1_3.segmentIndex >= 2 ? '#ff8a80' : '#ffea00');
 
     // Draw Box 2 Photons
     const p2_1 = getPathPos(r2_1, progressLess);
@@ -686,18 +738,18 @@ export function initRefractionLab(root, t) {
     drawPhoton(p2_3.x, p2_3.y, '#22d3ee');
 
     // Draw labels above boxes
-    ctxP.font = 'bold 13px system-ui, sans-serif';
+    ctxP.font = 'bold 15px system-ui, sans-serif'; // Larger labels for projector
     ctxP.fillStyle = '#ffea00';
-    ctxP.fillText(t('tools.refraction.particleModel.denser'), box1X + 4, boxY - 10);
+    ctxP.fillText(t('tools.refraction.particleModel.denser'), box1X + 4, boxY - 12);
     
     ctxP.fillStyle = '#22d3ee';
-    ctxP.fillText(t('tools.refraction.particleModel.lessDense'), box2X + 4, boxY - 10);
+    ctxP.fillText(t('tools.refraction.particleModel.lessDense'), box2X + 4, boxY - 12);
 
     // Draw speed text inside boxes
-    ctxP.font = 'bold 12px system-ui, sans-serif';
+    ctxP.font = 'bold 13px system-ui, sans-serif'; // Larger speed text
     ctxP.fillStyle = '#ffffff';
-    ctxP.fillText(`${t('tools.refraction.particleModel.speed')}: 0.55 c`, box1X + 12, boxY + 24);
-    ctxP.fillText(`${t('tools.refraction.particleModel.speed')}: 0.91 c`, box2X + 12, boxY + 24);
+    ctxP.fillText(`${t('tools.refraction.particleModel.speed')}: 0.55 c`, box1X + 12, boxY + 26);
+    ctxP.fillText(`${t('tools.refraction.particleModel.speed')}: 0.91 c`, box2X + 12, boxY + 26);
 
     function drawPhoton(x, y, color) {
       ctxP.save();

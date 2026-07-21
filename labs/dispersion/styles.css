@@ -1,0 +1,332 @@
+html, body { margin: 0; padding: 0; background: #121624; }
+#app { padding: 8px; }
+
+.lang-bar {
+  display: flex;
+  justify-content: flex-end;
+  gap: 8px;
+  padding: 12px 24px;
+  background: #121624;
+  border-bottom: 1px solid #1e293b;
+}
+
+.lang-btn {
+  background: transparent;
+  border: 1px solid #334155;
+  color: #94a3b8;
+  padding: 6px 14px;
+  border-radius: 6px;
+  font-size: 0.85rem;
+  font-weight: 500;
+  cursor: pointer;
+  transition: all 0.2s ease;
+}
+
+.lang-btn:hover {
+  border-color: #64748b;
+  color: #f1f5f9;
+}
+
+.lang-btn.active {
+  background: #3b82f6;
+  border-color: #3b82f6;
+  color: #ffffff;
+}
+
+html.s3phy-embed .lang-bar {
+  display: none !important;
+}
+
+html.s3phy-embed,
+html.s3phy-embed body {
+  height: auto !important;
+  min-height: 100% !important;
+  overflow-y: auto !important;
+  background: #121624;
+}
+
+html.s3phy-embed #app {
+  padding: 4px;
+  height: auto !important;
+  min-height: 100% !important;
+  box-sizing: border-box;
+}
+
+.displab {
+  --displab-bg: #121624;
+  --displab-panel: #22293f;
+  --displab-border: #3f4a66;
+  --displab-green: #00e676;
+  --displab-cyan: #22d3ee;
+  --displab-yellow: #ffcc00;
+  --displab-text: #ffffff;
+  --displab-muted: #bac4d6;
+  font-family: system-ui, -apple-system, "Segoe UI", sans-serif;
+  color: var(--displab-text);
+  background: var(--displab-bg);
+  border-radius: 12px;
+  padding: 12px;
+  max-width: 100%;
+  box-sizing: border-box;
+}
+
+.displab * { box-sizing: border-box; }
+.displab-head { text-align: center; margin: 0 0 14px; }
+.displab-title {
+  margin: 0;
+  font-weight: 800;
+  font-size: 1.35rem;
+  background: linear-gradient(90deg, #4db8ff, #a855f7);
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+  background-clip: text;
+}
+.displab-sub { color: var(--displab-muted); font-size: 0.82rem; margin-top: 4px; }
+
+.displab-dash {
+  display: flex;
+  flex-direction: column;
+  gap: 16px;
+  width: 100%;
+  max-width: 960px;
+  margin: 0 auto;
+  align-items: stretch;
+}
+
+.displab-viz {
+  position: relative;
+  width: 100%;
+  max-width: 100%;
+  background: var(--displab-panel);
+  padding: 10px;
+  border-radius: 16px;
+  border: 1px solid var(--displab-border);
+  display: flex;
+  justify-content: center;
+  align-items: center;
+}
+
+.displab-canvas {
+  background: #090c15;
+  border-radius: 12px;
+  display: block;
+  max-width: 100%;
+  height: auto;
+  aspect-ratio: 720 / 440;
+}
+
+.displab-toggle-btn {
+  position: absolute;
+  top: 14px;
+  right: 14px;
+  background: rgba(30, 41, 59, 0.8);
+  border: 1px solid var(--displab-border);
+  color: #fff;
+  border-radius: 6px;
+  padding: 5px 10px;
+  font-size: 0.78rem;
+  font-weight: bold;
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  z-index: 10;
+  transition: all 0.2s ease;
+}
+
+.displab-toggle-btn:hover {
+  background: #334155;
+  border-color: #64748b;
+}
+
+.displab-controls {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+  gap: 16px;
+  width: 100%;
+}
+
+.displab-control-col {
+  background: var(--displab-panel);
+  border: 1px solid var(--displab-border);
+  border-radius: 14px;
+  padding: 14px;
+  display: flex;
+  flex-direction: column;
+  justify-content: flex-start;
+  gap: 12px;
+}
+
+.displab-label {
+  font-size: 0.85rem;
+  font-weight: 700;
+  color: #a5f3fc;
+  margin-bottom: 2px;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+}
+
+.displab-badge {
+  font-family: monospace;
+  background: #161a29;
+  border: 1px solid var(--displab-border);
+  color: #38bdf8;
+  padding: 2px 6px;
+  border-radius: 4px;
+  font-size: 0.8rem;
+  font-weight: bold;
+}
+
+.displab-group {
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+}
+
+.displab-group input[type="range"] {
+  width: 100%;
+  accent-color: #3b82f6;
+  cursor: pointer;
+  height: 6px;
+  background: #161a29;
+  border-radius: 4px;
+}
+
+.displab-group-row {
+  display: flex;
+  gap: 8px;
+  align-items: center;
+}
+
+.displab-num-input {
+  width: 64px;
+  background: #161a29;
+  border: 1px solid var(--displab-border);
+  color: #fff;
+  border-radius: 6px;
+  padding: 4px;
+  font-size: 0.85rem;
+  font-weight: bold;
+  text-align: center;
+}
+
+.displab-num-input:focus {
+  outline: none;
+  border-color: #3b82f6;
+}
+
+.displab-chips {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 6px;
+}
+
+.displab-chip {
+  background: #161a29;
+  border: 1px solid var(--displab-border);
+  color: var(--displab-muted);
+  border-radius: 6px;
+  padding: 5px 10px;
+  font-size: 0.78rem;
+  font-weight: 600;
+  cursor: pointer;
+  transition: all 0.15s ease;
+  flex: 1 1 calc(50% - 4px);
+  text-align: center;
+}
+
+.displab-chip:hover {
+  border-color: #64748b;
+  color: #fff;
+}
+
+.displab-chip.active {
+  background: #2563eb;
+  border-color: #3b82f6;
+  color: #fff;
+}
+
+.displab-reset {
+  background: #b91c1c;
+  border: 1px solid #ef4444;
+  color: #fff;
+  font-weight: bold;
+  font-size: 0.9rem;
+  padding: 10px;
+  border-radius: 8px;
+  cursor: pointer;
+  transition: all 0.15s ease;
+  width: 100%;
+}
+
+.displab-reset:hover {
+  background: #dc2626;
+  border-color: #f87171;
+}
+
+.displab-formula {
+  background: #10141e;
+  border: 1px solid var(--displab-border);
+  border-radius: 10px;
+  padding: 10px;
+  font-size: 0.82rem;
+  font-family: monospace;
+  text-align: center;
+  color: #f472b6;
+  line-height: 1.4;
+}
+
+.displab-tir-badge {
+  background: rgba(239, 68, 68, 0.2);
+  border: 1px solid #ef4444;
+  color: #fca5a5;
+  font-weight: 700;
+  padding: 6px;
+  border-radius: 8px;
+  font-size: 0.78rem;
+  text-align: center;
+  animation: displab-pulse 1.5s infinite;
+}
+
+.displab-mode-select {
+  display: flex;
+  gap: 8px;
+}
+
+.displab-mode-btn {
+  flex: 1;
+  background: #161a29;
+  border: 1px solid var(--displab-border);
+  color: var(--displab-muted);
+  font-weight: 600;
+  font-size: 0.8rem;
+  padding: 8px;
+  border-radius: 6px;
+  cursor: pointer;
+  text-align: center;
+  transition: all 0.15s ease;
+}
+
+.displab-mode-btn:hover {
+  border-color: #64748b;
+  color: #fff;
+}
+
+.displab-mode-btn.active {
+  background: #2563eb;
+  border-color: #3b82f6;
+  color: #fff;
+}
+
+@keyframes displab-pulse {
+  0% { opacity: 0.8; }
+  50% { opacity: 1; }
+  100% { opacity: 0.8; }
+}
+
+@media (max-width: 768px) {
+  .displab-controls {
+    grid-template-columns: 1fr;
+  }
+}

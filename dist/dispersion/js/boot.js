@@ -1,5 +1,5 @@
-import { initRefractionLab } from './app.js?v=20260721_zigzag_bounce_v14';
-import { createT, hubLangToLocal, initLangFromUrl, setLang, getLang } from './i18n.js?v=20260721_zigzag_bounce_v14';
+import { initDispersionLab } from './app.js?v=20260721_dispersion_v1';
+import { createT, hubLangToLocal, initLangFromUrl, setLang, getLang } from './i18n.js?v=20260721_dispersion_v1';
 
 const root = document.getElementById('app');
 
@@ -14,7 +14,7 @@ function mount() {
   if (!root) return;
   root.replaceChildren();
   const current = getLang();
-  initRefractionLab(root, createT(current));
+  initDispersionLab(root, createT(current));
   updateLangButtons(current);
 }
 
