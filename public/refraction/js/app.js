@@ -379,6 +379,21 @@ export function initRefractionLab(root, t) {
     ctx.restore();
   }
 
+  function drawTextWithOutline(text, x, y, textColor, align = 'center', baseline = 'middle', font = 'bold 15px system-ui, sans-serif') {
+    ctx.save();
+    ctx.font = font;
+    ctx.textAlign = align;
+    ctx.textBaseline = baseline;
+    ctx.strokeStyle = '#161a29';
+    ctx.lineWidth = 5;
+    ctx.lineJoin = 'round';
+    ctx.miterLimit = 2;
+    ctx.strokeText(text, x, y);
+    ctx.fillStyle = textColor;
+    ctx.fillText(text, x, y);
+    ctx.restore();
+  }
+
   function drawAngleArc(cx, cy, startDeg, endDeg, color, label) {
     const r = 55; // Larger radius for projector clarity
     const a0 = toRad(startDeg);
@@ -390,28 +405,17 @@ export function initRefractionLab(root, t) {
     ctx.stroke();
     
     const mid = (a0 + a1) / 2;
-    ctx.save();
-    ctx.fillStyle = color;
-    ctx.font = 'bold 15px system-ui, sans-serif'; // Larger font
-    ctx.textBaseline = 'middle';
     
     // Calculate position based on the angle to avoid overlap with the normal line or rays
     const dist = r + 15;
     const textX = cx + Math.cos(mid) * dist;
     const textY = cy + Math.sin(mid) * dist;
     
-    // Dynamically align text based on its quadrant to prevent overlap and clipping
+    // Dynamically align text strictly based on which side of the vertical normal it is on
     const cosMid = Math.cos(mid);
-    if (Math.abs(cosMid) < 0.1) {
-      ctx.textAlign = 'center';
-    } else if (cosMid < 0) {
-      ctx.textAlign = 'end';
-    } else {
-      ctx.textAlign = 'start';
-    }
+    const align = cosMid < 0 ? 'end' : 'start';
     
-    ctx.fillText(label, textX, textY);
-    ctx.restore();
+    drawTextWithOutline(label, textX, textY, color, align, 'middle', 'bold 15px system-ui, sans-serif');
   }
 
   function draw() {
@@ -441,9 +445,7 @@ export function initRefractionLab(root, t) {
     ctx.moveTo(30, cy);
     ctx.lineTo(W - 30, cy);
     ctx.stroke();
-    ctx.fillStyle = '#bac4d6';
-    ctx.font = 'bold 14px system-ui, sans-serif'; // Larger font
-    ctx.fillText(t('tools.refraction.canvas.interface'), W - 130, cy - 10);
+    drawTextWithOutline(t('tools.refraction.canvas.interface'), W - 130, cy - 12, '#bac4d6', 'start', 'bottom', 'bold 14px system-ui, sans-serif');
 
     // Normal (dashed vertical)
     ctx.beginPath();
@@ -454,8 +456,7 @@ export function initRefractionLab(root, t) {
     ctx.lineTo(cx, H - 20);
     ctx.stroke();
     ctx.setLineDash([]);
-    ctx.fillStyle = '#bac4d6';
-    ctx.fillText(t('tools.refraction.canvas.normal'), cx + 10, 48);
+    drawTextWithOutline(t('tools.refraction.canvas.normal'), cx + 10, 48, '#bac4d6', 'start', 'alphabetic', 'bold 14px system-ui, sans-serif');
 
     // Medium labels
     ctx.font = 'bold 17px system-ui, sans-serif'; // Larger font for projector readability
