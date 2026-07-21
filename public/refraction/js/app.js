@@ -769,6 +769,51 @@ export function initRefractionLab(root, t) {
     ctxP.fillStyle = '#ffffff';
     ctxP.fillText(`${t('tools.refraction.particleModel.speed')}: ${speed1.toFixed(2)} c`, box1X + 12, boxY + 26);
     ctxP.fillText(`${t('tools.refraction.particleModel.speed')}: ${speed2.toFixed(2)} c`, box2X + 12, boxY + 26);
+
+    function drawPhoton(x, y, color) {
+      ctxP.save();
+      ctxP.shadowBlur = 12;
+      ctxP.shadowColor = color;
+      ctxP.fillStyle = '#ffffff';
+      ctxP.beginPath();
+      ctxP.arc(x, y, 6, 0, Math.PI * 2);
+      ctxP.fill();
+      ctxP.restore();
+    }
+
+    function drawBoxParticles(bx, by, bw, bh, nVal, color) {
+      // Denser medium has WAY more particles packed together.
+      const spacing = 36 / (nVal * nVal);
+      ctxP.fillStyle = color;
+      
+      const cols = Math.ceil(bw / spacing) + 1;
+      const rows = Math.ceil(bh / spacing) + 1;
+      
+      for (let c = 0; c < cols; c++) {
+        for (let r = 0; r < rows; r++) {
+          const gridX = bx + c * spacing;
+          const gridY = by + r * spacing;
+          
+          const seed = (c * 17) + (r * 31) + (bx > W / 2 ? 500 : 0);
+          const randX = seededRandom(seed) * 0.3 - 0.15;
+          const randY = seededRandom(seed + 1) * 0.3 - 0.15;
+          const jiggleSpeed = 0.04 + seededRandom(seed + 2) * 0.04;
+          const jiggleAmp = 0.8 + seededRandom(seed + 3) * 0.8;
+          
+          const jiggleX = Math.sin(animTime * jiggleSpeed + seed) * jiggleAmp;
+          const jiggleY = Math.cos(animTime * jiggleSpeed + seed * 1.3) * jiggleAmp;
+          
+          const x = gridX + randX * spacing + jiggleX;
+          const y = gridY + randY * spacing + jiggleY;
+          
+          if (x >= bx + 4 && x <= bx + bw - 4 && y >= by + 4 && y <= by + bh - 4) {
+            ctxP.beginPath();
+            ctxP.arc(x, y, 1.8, 0, Math.PI * 2);
+            ctxP.fill();
+          }
+        }
+      }
+    }
   }
 
   function mediumFill(n, alpha) {
