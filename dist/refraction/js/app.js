@@ -491,15 +491,9 @@ export function initRefractionLab(root, t) {
 
       // Label along the reflected ray (perpendicular offset to prevent overlap)
       const perpAngleR = rAngle + Math.PI / 2;
-      const lrx = cx + Math.cos(rAngle) * labelDist + Math.cos(perpAngleR) * 25;
-      const lry = cy + Math.sin(rAngle) * labelDist + Math.sin(perpAngleR) * 25;
-      ctx.save();
-      ctx.fillStyle = '#ff8a80';
-      ctx.font = 'bold 15px system-ui, sans-serif';
-      ctx.textAlign = 'center';
-      ctx.textBaseline = 'middle';
-      ctx.fillText(t('tools.refraction.canvas.reflected'), lrx, lry);
-      ctx.restore();
+      const lrx = cx + Math.cos(rAngle) * labelDist + Math.cos(perpAngleR) * 38;
+      const lry = cy + Math.sin(rAngle) * labelDist + Math.sin(perpAngleR) * 38;
+      drawTextWithOutline(t('tools.refraction.canvas.reflected'), lrx, lry, '#ff8a80', 'center', 'middle', 'bold 15px system-ui, sans-serif');
 
       drawAngleArc(cx, cy, -90, -90 - theta1Deg, '#ffea00', `θ₁ = ${theta1Deg.toFixed(1)}°`);
       drawAngleArc(cx, cy, -90, -90 + theta1Deg, '#ff8a80', `θ₁ = ${theta1Deg.toFixed(1)}°`);
@@ -514,15 +508,9 @@ export function initRefractionLab(root, t) {
 
       // Label along the refracted ray (perpendicular offset to prevent overlap)
       const perpAngleT = tAngle - Math.PI / 2;
-      const ltx = cx + Math.cos(tAngle) * labelDist + Math.cos(perpAngleT) * 25;
-      const lty = cy + Math.sin(tAngle) * labelDist + Math.sin(perpAngleT) * 25;
-      ctx.save();
-      ctx.fillStyle = '#22d3ee';
-      ctx.font = 'bold 15px system-ui, sans-serif';
-      ctx.textAlign = 'center';
-      ctx.textBaseline = 'middle';
-      ctx.fillText(t('tools.refraction.canvas.refracted'), ltx, lty);
-      ctx.restore();
+      const ltx = cx + Math.cos(tAngle) * labelDist + Math.cos(perpAngleT) * 38;
+      const lty = cy + Math.sin(tAngle) * labelDist + Math.sin(perpAngleT) * 38;
+      drawTextWithOutline(t('tools.refraction.canvas.refracted'), ltx, lty, '#22d3ee', 'center', 'middle', 'bold 15px system-ui, sans-serif');
 
       drawAngleArc(cx, cy, -90, -90 - theta1Deg, '#ffea00', `θ₁ = ${theta1Deg.toFixed(1)}°`);
       drawAngleArc(cx, cy, 90, 90 - t2, '#22d3ee', `θ₂ = ${t2.toFixed(1)}°`);
@@ -530,15 +518,9 @@ export function initRefractionLab(root, t) {
 
     // Label along the incident ray (perpendicular offset to prevent overlap)
     const perpAngleI = iAngle - Math.PI / 2;
-    const lix = cx + Math.cos(iAngle) * labelDist + Math.cos(perpAngleI) * 25;
-    const liy = cy + Math.sin(iAngle) * labelDist + Math.sin(perpAngleI) * 25;
-    ctx.save();
-    ctx.fillStyle = '#ffea00';
-    ctx.font = 'bold 15px system-ui, sans-serif';
-    ctx.textAlign = 'center';
-    ctx.textBaseline = 'middle';
-    ctx.fillText(t('tools.refraction.canvas.incident'), lix, liy);
-    ctx.restore();
+    const lix = cx + Math.cos(iAngle) * labelDist + Math.cos(perpAngleI) * 38;
+    const liy = cy + Math.sin(iAngle) * labelDist + Math.sin(perpAngleI) * 38;
+    drawTextWithOutline(t('tools.refraction.canvas.incident'), lix, liy, '#ffea00', 'center', 'middle', 'bold 15px system-ui, sans-serif');
   }
 
   function seededRandom(s) {

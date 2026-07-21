@@ -1,5 +1,5 @@
-import { initRefractionLab } from './app.js?v=20260721_outline_labels_v25';
-import { createT, hubLangToLocal, initLangFromUrl, setLang, getLang } from './i18n.js?v=20260721_outline_labels_v25';
+import { initRefractionLab } from './app.js?v=20260721_increased_offset_v26';
+import { createT, hubLangToLocal, initLangFromUrl, setLang, getLang } from './i18n.js?v=20260721_increased_offset_v26';
 
 const root = document.getElementById('app');
 
