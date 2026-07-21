@@ -388,23 +388,30 @@ export function initRefractionLab(root, t) {
     ctx.lineWidth = 2.5; // Thicker line
     ctx.arc(cx, cy, r, a0, a1, endDeg < startDeg);
     ctx.stroke();
+    
     const mid = (a0 + a1) / 2;
+    ctx.save();
     ctx.fillStyle = color;
     ctx.font = 'bold 15px system-ui, sans-serif'; // Larger font
+    ctx.textBaseline = 'middle';
     
     // Calculate position based on the angle to avoid overlap with the normal line or rays
-    const dist = r + 22;
-    let textX = cx + Math.cos(mid) * dist - 18;
-    let textY = cy + Math.sin(mid) * dist + 5;
+    const dist = r + 15;
+    const textX = cx + Math.cos(mid) * dist;
+    const textY = cy + Math.sin(mid) * dist;
     
-    // Adjust alignment based on which quadrant the label is in
-    if (Math.cos(mid) < -0.1) {
-      textX = cx + Math.cos(mid) * dist - 54; // Shift left for left-side labels
-    } else if (Math.cos(mid) > 0.1) {
-      textX = cx + Math.cos(mid) * dist + 6;  // Shift right for right-side labels
+    // Dynamically align text based on its quadrant to prevent overlap and clipping
+    const cosMid = Math.cos(mid);
+    if (Math.abs(cosMid) < 0.1) {
+      ctx.textAlign = 'center';
+    } else if (cosMid < 0) {
+      ctx.textAlign = 'end';
+    } else {
+      ctx.textAlign = 'start';
     }
     
     ctx.fillText(label, textX, textY);
+    ctx.restore();
   }
 
   function draw() {

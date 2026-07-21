@@ -1,1 +1,0 @@
-import{c as r}from"./createLabIframe-BHOKlvre.js";import"./index-CQsOA-MK.js";function o(t){return r(t,{slug:"refraction",titleKey:"tools.refraction.title",className:"tool-refraction-lab",extraParams:()=>"&v=20260721_fast_photons_v23"})}export{o as createRefractionLab};

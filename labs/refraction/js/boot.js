@@ -1,5 +1,5 @@
-import { initRefractionLab } from './app.js?v=20260721_fast_photons_v23';
-import { createT, hubLangToLocal, initLangFromUrl, setLang, getLang } from './i18n.js?v=20260721_fast_photons_v23';
+import { initRefractionLab } from './app.js?v=20260721_perfect_labels_v24';
+import { createT, hubLangToLocal, initLangFromUrl, setLang, getLang } from './i18n.js?v=20260721_perfect_labels_v24';
 
 const root = document.getElementById('app');
 
