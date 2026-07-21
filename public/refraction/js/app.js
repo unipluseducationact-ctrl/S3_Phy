@@ -511,32 +511,31 @@ export function initRefractionLab(root, t) {
     const H = particleCanvas.height;
     ctxP.clearRect(0, 0, W, H);
 
-    // Two boxes side-by-side: Left is Denser Medium, Right is Less Dense Medium
+    // Two boxes side-by-side: Left is Medium 1, Right is Medium 2
     const boxW = W * 0.42;
     const boxH = H * 0.72;
     const boxY = H * 0.18;
 
-    const box1X = W * 0.06; // Left Box (Denser)
-    const box2X = W * 0.52; // Right Box (Less Dense)
+    const box1X = W * 0.06; // Left Box (Medium 1)
+    const box2X = W * 0.52; // Right Box (Medium 2)
 
-    // Draw Box 1 (Denser Medium)
-    ctxP.fillStyle = 'rgba(160, 200, 230, 0.25)'; // Denser tint (Glass-like)
+    // Draw Box 1 (Medium 1)
+    ctxP.fillStyle = mediumFill(n1Val, 0.22);
     ctxP.fillRect(box1X, boxY, boxW, boxH);
     ctxP.strokeStyle = '#3f4a66';
     ctxP.lineWidth = 2.5;
     ctxP.strokeRect(box1X, boxY, boxW, boxH);
 
-    // Draw Box 2 (Less Dense Medium)
-    ctxP.fillStyle = 'rgba(120, 160, 220, 0.15)'; // Less dense tint (Air-like)
+    // Draw Box 2 (Medium 2)
+    ctxP.fillStyle = mediumFill(n2Val, 0.28);
     ctxP.fillRect(box2X, boxY, boxW, boxH);
     ctxP.strokeStyle = '#3f4a66';
     ctxP.lineWidth = 2.5;
     ctxP.strokeRect(box2X, boxY, boxW, boxH);
 
     // Draw background particles (molecules) jiggling in both boxes
-    // Denser medium has WAY more particles packed together (e.g. n = 1.80 vs n = 1.10)
-    drawBoxParticles(box1X, boxY, boxW, boxH, 1.80, 'rgba(255, 255, 255, 0.22)');
-    drawBoxParticles(box2X, boxY, boxW, boxH, 1.10, 'rgba(34, 211, 238, 0.22)');
+    drawBoxParticles(box1X, boxY, boxW, boxH, n1Val, 'rgba(255, 255, 255, 0.22)');
+    drawBoxParticles(box2X, boxY, boxW, boxH, n2Val, 'rgba(34, 211, 238, 0.22)');
 
     // Helper to calculate jiggled positions for collision points
     function getJiggledPt(pt, seed) {
@@ -547,149 +546,165 @@ export function initRefractionLab(root, t) {
       return { x: pt.x + jx, y: pt.y + jy };
     }
 
-    // Base coordinates for Denser Medium paths (Ray 1 and 3 bounce away, Ray 2 zig-zags all the way through)
-    const p1_1_base = [
-      { x: box1X + boxW * 0.15, y: boxY },
-      { x: box1X + boxW * 0.20, y: boxY + boxH * 0.22 },
-      { x: box1X + boxW * 0.10, y: boxY + boxH * 0.45 },
-      { x: box1X + boxW * 0.03, y: boxY + boxH * 0.30 } // bounces back up-left and exits
-    ];
-    const p1_2_base = [
-      { x: box1X + boxW * 0.42, y: boxY },
-      { x: box1X + boxW * 0.48, y: boxY + boxH * 0.20 },
-      { x: box1X + boxW * 0.36, y: boxY + boxH * 0.45 },
-      { x: box1X + boxW * 0.52, y: boxY + boxH * 0.70 },
-      { x: box1X + boxW * 0.45, y: boxY + boxH } // passes through to the bottom!
-    ];
-    const p1_3_base = [
-      { x: box1X + boxW * 0.68, y: boxY },
-      { x: box1X + boxW * 0.75, y: boxY + boxH * 0.25 },
-      { x: box1X + boxW * 0.62, y: boxY + boxH * 0.55 },
-      { x: box1X + boxW * 0.50, y: boxY + boxH * 0.38 } // bounces back up-left
-    ];
-
-    // Jiggled coordinates for Denser Medium paths (sync with background particle jiggle)
-    const r1_1 = [
-      p1_1_base[0],
-      getJiggledPt(p1_1_base[1], 101),
-      getJiggledPt(p1_1_base[2], 102),
-      getJiggledPt(p1_1_base[3], 103)
-    ];
-    const r1_2 = [
-      p1_2_base[0],
-      getJiggledPt(p1_2_base[1], 201),
-      getJiggledPt(p1_2_base[2], 202),
-      getJiggledPt(p1_2_base[3], 203),
-      p1_2_base[4]
-    ];
-    const r1_3 = [
-      p1_3_base[0],
-      getJiggledPt(p1_3_base[1], 301),
-      getJiggledPt(p1_3_base[2], 302),
-      getJiggledPt(p1_3_base[3], 303)
-    ];
-
-    // Draw Box 1 Rays (Denser Medium)
-    ctxP.lineWidth = 2.5;
-    
-    // Ray 1 (Bounce)
-    ctxP.beginPath();
-    ctxP.strokeStyle = '#ffea00';
-    ctxP.moveTo(r1_1[0].x, r1_1[0].y);
-    ctxP.lineTo(r1_1[1].x, r1_1[1].y);
-    ctxP.lineTo(r1_1[2].x, r1_1[2].y);
-    ctxP.stroke();
-
-    ctxP.beginPath();
-    ctxP.strokeStyle = '#ff8a80'; // red/orange for bounce
-    ctxP.setLineDash([4, 4]);
-    ctxP.moveTo(r1_1[2].x, r1_1[2].y);
-    ctxP.lineTo(r1_1[3].x, r1_1[3].y);
-    ctxP.stroke();
-    ctxP.setLineDash([]);
-
-    // Ray 2 (Pass through zig-zag)
-    ctxP.beginPath();
-    ctxP.strokeStyle = '#ffea00';
-    ctxP.moveTo(r1_2[0].x, r1_2[0].y);
-    for (let i = 1; i < r1_2.length; i++) {
-      ctxP.lineTo(r1_2[i].x, r1_2[i].y);
+    // Helper to jiggle a whole path
+    function jigglePath(path, seedBase) {
+      return path.map((pt, idx) => {
+        if (idx === 0 || idx === path.length - 1) {
+          return pt; // Keep start and end points stable on edges
+        }
+        return getJiggledPt(pt, seedBase + idx);
+      });
     }
-    ctxP.stroke();
 
-    // Ray 3 (Bounce)
-    ctxP.beginPath();
-    ctxP.strokeStyle = '#ffea00';
-    ctxP.moveTo(r1_3[0].x, r1_3[0].y);
-    ctxP.lineTo(r1_3[1].x, r1_3[1].y);
-    ctxP.lineTo(r1_3[2].x, r1_3[2].y);
-    ctxP.stroke();
+    // Helper to generate ray paths dynamically based on refractive index
+    function generateBoxRays(bx, by, bw, bh, nVal) {
+      const angleRad = toRad(18);
+      const dx = bh * Math.tan(angleRad);
 
-    ctxP.beginPath();
-    ctxP.strokeStyle = '#ff8a80';
-    ctxP.setLineDash([4, 4]);
-    ctxP.moveTo(r1_3[2].x, r1_3[2].y);
-    ctxP.lineTo(r1_3[3].x, r1_3[3].y);
-    ctxP.stroke();
-    ctxP.setLineDash([]);
+      const x1 = bx + bw * 0.15;
+      const x2 = bx + bw * 0.42;
+      const x3 = bx + bw * 0.68;
 
-    // Draw highlighted collision particles at bounce points in Box 1
-    const collisionParticles = [
-      r1_1[1], r1_1[2],
-      r1_2[1], r1_2[2], r1_2[3],
-      r1_3[1], r1_3[2]
-    ];
-    collisionParticles.forEach(pt => {
-      ctxP.beginPath();
-      ctxP.fillStyle = '#ff8a80'; // Highlight color
-      ctxP.arc(pt.x, pt.y, 4.5, 0, Math.PI * 2);
-      ctxP.fill();
-      ctxP.strokeStyle = '#ffffff';
-      ctxP.lineWidth = 1.2;
-      ctxP.stroke();
-    });
+      if (nVal < 1.15) {
+        // All 3 rays pass straight through
+        return {
+          rays: [
+            [{ x: x1, y: by }, { x: x1 + dx, y: by + bh }],
+            [{ x: x2, y: by }, { x: x2 + dx, y: by + bh }],
+            [{ x: x3, y: by }, { x: x3 + dx, y: by + bh }]
+          ],
+          bounces: [false, false, false]
+        };
+      } else if (nVal < 1.45) {
+        // 1 ray bounces, 2 rays pass through with 1 zig-zag deflection
+        const r1 = [
+          { x: x1, y: by },
+          { x: x1 + dx * 0.45, y: by + bh * 0.45 },
+          { x: x1 + dx * 0.45 - dx * 0.25, y: by + bh * 0.20 }
+        ];
+        const r2 = [
+          { x: x2, y: by },
+          { x: x2 + dx * 0.40, y: by + bh * 0.40 },
+          { x: x2 + dx, y: by + bh }
+        ];
+        const r3 = [
+          { x: x3, y: by },
+          { x: x3 + dx * 0.60, y: by + bh * 0.60 },
+          { x: x3 + dx, y: by + bh }
+        ];
+        return {
+          rays: [r1, r2, r3],
+          bounces: [true, false, false]
+        };
+      } else {
+        // 2 rays bounce, 1 ray passes through with multiple zig-zags
+        const r1 = [
+          { x: x1, y: by },
+          { x: x1 + dx * 0.22, y: by + bh * 0.22 },
+          { x: x1 + dx * 0.45, y: by + bh * 0.45 },
+          { x: x1 + dx * 0.45 - dx * 0.25, y: by + bh * 0.20 }
+        ];
+        const r2 = [
+          { x: x2, y: by },
+          { x: x2 + dx * 0.20, y: by + bh * 0.20 },
+          { x: x2 + dx * 0.45, y: by + bh * 0.45 },
+          { x: x2 + dx * 0.70, y: by + bh * 0.70 },
+          { x: x2 + dx, y: by + bh }
+        ];
+        const r3 = [
+          { x: x3, y: by },
+          { x: x3 + dx * 0.25, y: by + bh * 0.25 },
+          { x: x3 + dx * 0.55, y: by + bh * 0.55 },
+          { x: x3 + dx * 0.55 - dx * 0.30, y: by + bh * 0.38 }
+        ];
+        return {
+          rays: [r1, r2, r3],
+          bounces: [true, false, true]
+        };
+      }
+    }
 
-    // Box 2 Rays (Less Dense Medium - all 3 rays easily pass straight through)
-    const angleRad = toRad(18);
-    const rayLen = boxH / Math.cos(angleRad);
-    const dx = rayLen * Math.sin(angleRad);
+    // Generate and jiggle paths for both boxes
+    const box1Data = generateBoxRays(box1X, boxY, boxW, boxH, n1Val);
+    const box2Data = generateBoxRays(box2X, boxY, boxW, boxH, n2Val);
 
-    const r2_1 = [
-      { x: box2X + boxW * 0.15, y: boxY },
-      { x: box2X + boxW * 0.15 + dx, y: boxY + boxH }
-    ];
-    const r2_2 = [
-      { x: box2X + boxW * 0.42, y: boxY },
-      { x: box2X + boxW * 0.42 + dx, y: boxY + boxH }
-    ];
-    const r2_3 = [
-      { x: box2X + boxW * 0.68, y: boxY },
-      { x: box2X + boxW * 0.68 + dx, y: boxY + boxH }
-    ];
+    const r1_1 = jigglePath(box1Data.rays[0], 100);
+    const r1_2 = jigglePath(box1Data.rays[1], 200);
+    const r1_3 = jigglePath(box1Data.rays[2], 300);
 
-    // Draw Box 2 Rays
-    ctxP.strokeStyle = '#22d3ee';
-    [r2_1, r2_2, r2_3].forEach(ray => {
-      ctxP.beginPath();
-      ctxP.moveTo(ray[0].x, ray[0].y);
-      ctxP.lineTo(ray[1].x, ray[1].y);
-      ctxP.stroke();
-    });
+    const r2_1 = jigglePath(box2Data.rays[0], 400);
+    const r2_2 = jigglePath(box2Data.rays[1], 500);
+    const r2_3 = jigglePath(box2Data.rays[2], 600);
+
+    // Helper to draw rays for a box
+    function drawBoxRays(rays, bounces, primaryColor) {
+      ctxP.lineWidth = 2.5;
+      rays.forEach((ray, rayIdx) => {
+        const hasBounce = bounces[rayIdx];
+        if (!hasBounce) {
+          ctxP.beginPath();
+          ctxP.strokeStyle = primaryColor;
+          ctxP.moveTo(ray[0].x, ray[0].y);
+          for (let i = 1; i < ray.length; i++) {
+            ctxP.lineTo(ray[i].x, ray[i].y);
+          }
+          ctxP.stroke();
+        } else {
+          ctxP.beginPath();
+          ctxP.strokeStyle = primaryColor;
+          ctxP.moveTo(ray[0].x, ray[0].y);
+          for (let i = 1; i < ray.length - 1; i++) {
+            ctxP.lineTo(ray[i].x, ray[i].y);
+          }
+          ctxP.stroke();
+
+          ctxP.beginPath();
+          ctxP.strokeStyle = '#ff8a80'; // Red/orange bounce
+          ctxP.setLineDash([4, 4]);
+          ctxP.moveTo(ray[ray.length - 2].x, ray[ray.length - 2].y);
+          ctxP.lineTo(ray[ray.length - 1].x, ray[ray.length - 1].y);
+          ctxP.stroke();
+          ctxP.setLineDash([]);
+        }
+      });
+    }
+
+    // Draw rays for both boxes
+    drawBoxRays([r1_1, r1_2, r1_3], box1Data.bounces, '#ffea00');
+    drawBoxRays([r2_1, r2_2, r2_3], box2Data.bounces, '#22d3ee');
+
+    // Helper to draw collision particles at intermediate points
+    function drawCollisionParticles(rays) {
+      rays.forEach(ray => {
+        for (let i = 1; i < ray.length - 1; i++) {
+          const pt = ray[i];
+          ctxP.beginPath();
+          ctxP.fillStyle = '#ff8a80';
+          ctxP.arc(pt.x, pt.y, 4.5, 0, Math.PI * 2);
+          ctxP.fill();
+          ctxP.strokeStyle = '#ffffff';
+          ctxP.lineWidth = 1.2;
+          ctxP.stroke();
+        }
+      });
+    }
+
+    // Draw collision particles for both boxes
+    drawCollisionParticles([r1_1, r1_2, r1_3]);
+    drawCollisionParticles([r2_1, r2_2, r2_3]);
 
     // Speed of light in both boxes
-    // Denser medium speed is slower, Less dense is faster
-    const speedDenser = 0.35;
-    const speedLess = 0.85;
+    const speed1 = 1.0 / n1Val;
+    const speed2 = 1.0 / n2Val;
 
     // Position of moving photons
-    const progressDenser = (animTime * speedDenser * 0.015) % 1.0;
-    const progressLess = (animTime * speedLess * 0.015) % 1.0;
+    const progress1 = (animTime * speed1 * 0.012) % 1.0;
+    const progress2 = (animTime * speed2 * 0.012) % 1.0;
 
     // Helper to get position along a multi-segment path of any length
     function getPathPos(path, progress) {
       if (path.length < 2) return path[0] || { x: 0, y: 0 };
       
-      // Calculate total length of the path
       const segmentLengths = [];
       let totalLength = 0;
       for (let i = 0; i < path.length - 1; i++) {
@@ -698,7 +713,6 @@ export function initRefractionLab(root, t) {
         totalLength += d;
       }
       
-      // Find which segment the progress falls into
       const targetDist = progress * totalLength;
       let accumulatedDist = 0;
       for (let i = 0; i < segmentLengths.length; i++) {
@@ -719,37 +733,88 @@ export function initRefractionLab(root, t) {
     }
 
     // Draw Box 1 Photons
-    const p1_1 = getPathPos(r1_1, progressDenser);
-    const p1_2 = getPathPos(r1_2, progressDenser);
-    const p1_3 = getPathPos(r1_3, progressDenser);
+    const p1_1 = getPathPos(r1_1, progress1);
+    const p1_2 = getPathPos(r1_2, progress1);
+    const p1_3 = getPathPos(r1_3, progress1);
 
-    // Dynamic photon color: red/orange if it has bounced (segmentIndex >= 2)
-    drawPhoton(p1_1.x, p1_1.y, p1_1.segmentIndex >= 2 ? '#ff8a80' : '#ffea00');
+    drawPhoton(p1_1.x, p1_1.y, p1_1.segmentIndex >= r1_1.length - 2 && box1Data.bounces[0] ? '#ff8a80' : '#ffea00');
     drawPhoton(p1_2.x, p1_2.y, '#ffea00');
-    drawPhoton(p1_3.x, p1_3.y, p1_3.segmentIndex >= 2 ? '#ff8a80' : '#ffea00');
+    drawPhoton(p1_3.x, p1_3.y, p1_3.segmentIndex >= r1_3.length - 2 && box1Data.bounces[2] ? '#ff8a80' : '#ffea00');
 
     // Draw Box 2 Photons
-    const p2_1 = getPathPos(r2_1, progressLess);
-    const p2_2 = getPathPos(r2_2, progressLess);
-    const p2_3 = getPathPos(r2_3, progressLess);
+    const p2_1 = getPathPos(r2_1, progress2);
+    const p2_2 = getPathPos(r2_2, progress2);
+    const p2_3 = getPathPos(r2_3, progress2);
 
-    drawPhoton(p2_1.x, p2_1.y, '#22d3ee');
+    drawPhoton(p2_1.x, p2_1.y, p2_1.segmentIndex >= r2_1.length - 2 && box2Data.bounces[0] ? '#ff8a80' : '#22d3ee');
     drawPhoton(p2_2.x, p2_2.y, '#22d3ee');
-    drawPhoton(p2_3.x, p2_3.y, '#22d3ee');
+    drawPhoton(p2_3.x, p2_3.y, p2_3.segmentIndex >= r2_3.length - 2 && box2Data.bounces[2] ? '#ff8a80' : '#22d3ee');
+
+    // Get active medium names
+    const active1 = getActiveMedium(n1Val);
+    const active2 = getActiveMedium(n2Val);
+    const activeName1 = active1 ? t(`tools.refraction.medium.${active1}`) : t('tools.refraction.medium.custom');
+    const activeName2 = active2 ? t(`tools.refraction.medium.${active2}`) : t('tools.refraction.medium.custom');
 
     // Draw labels above boxes
-    ctxP.font = 'bold 15px system-ui, sans-serif'; // Larger labels for projector
+    ctxP.font = 'bold 15px system-ui, sans-serif';
     ctxP.fillStyle = '#ffea00';
-    ctxP.fillText(t('tools.refraction.particleModel.denser'), box1X + 4, boxY - 12);
+    ctxP.fillText(`${t('tools.refraction.n1')}: ${activeName1} (n₁ = ${formatN(n1Val)})`, box1X + 4, boxY - 12);
     
     ctxP.fillStyle = '#22d3ee';
-    ctxP.fillText(t('tools.refraction.particleModel.lessDense'), box2X + 4, boxY - 12);
+    ctxP.fillText(`${t('tools.refraction.n2')}: ${activeName2} (n₂ = ${formatN(n2Val)})`, box2X + 4, boxY - 12);
 
     // Draw speed text inside boxes
-    ctxP.font = 'bold 13px system-ui, sans-serif'; // Larger speed text
+    ctxP.font = 'bold 13px system-ui, sans-serif';
     ctxP.fillStyle = '#ffffff';
-    ctxP.fillText(`${t('tools.refraction.particleModel.speed')}: 0.55 c`, box1X + 12, boxY + 26);
-    ctxP.fillText(`${t('tools.refraction.particleModel.speed')}: 0.91 c`, box2X + 12, boxY + 26);
+    ctxP.fillText(`${t('tools.refraction.particleModel.speed')}: ${speed1.toFixed(2)} c`, box1X + 12, boxY + 26);
+    ctxP.fillText(`${t('tools.refraction.particleModel.speed')}: ${speed2.toFixed(2)} c`, box2X + 12, boxY + 26);
+
+    function drawPhoton(x, y, color) {
+      ctxP.save();
+      ctxP.shadowBlur = 12;
+      ctxP.shadowColor = color;
+      ctxP.fillStyle = '#ffffff';
+      ctxP.beginPath();
+      ctxP.arc(x, y, 6, 0, Math.PI * 2);
+      ctxP.fill();
+      ctxP.restore();
+    }
+
+    function drawBoxParticles(bx, by, bw, bh, nVal, color) {
+      // Denser medium has WAY more particles packed together.
+      const spacing = 36 / (nVal * nVal);
+      ctxP.fillStyle = color;
+      
+      const cols = Math.ceil(bw / spacing) + 1;
+      const rows = Math.ceil(bh / spacing) + 1;
+      
+      for (let c = 0; c < cols; c++) {
+        for (let r = 0; r < rows; r++) {
+          const gridX = bx + c * spacing;
+          const gridY = by + r * spacing;
+          
+          const seed = (c * 17) + (r * 31) + (bx > W/2 ? 500 : 0);
+          const randX = seededRandom(seed) * 0.3 - 0.15;
+          const randY = seededRandom(seed + 1) * 0.3 - 0.15;
+          const jiggleSpeed = 0.04 + seededRandom(seed + 2) * 0.04;
+          const jiggleAmp = 0.8 + seededRandom(seed + 3) * 0.8;
+          
+          const jiggleX = Math.sin(animTime * jiggleSpeed + seed) * jiggleAmp;
+          const jiggleY = Math.cos(animTime * jiggleSpeed + seed * 1.3) * jiggleAmp;
+          
+          const x = gridX + randX * spacing + jiggleX;
+          const y = gridY + randY * spacing + jiggleY;
+          
+          if (x >= bx + 4 && x <= bx + bw - 4 && y >= by + 4 && y <= by + bh - 4) {
+            ctxP.beginPath();
+            ctxP.arc(x, y, 1.8, 0, Math.PI * 2);
+            ctxP.fill();
+          }
+        }
+      }
+    }
+  }
 
     function drawPhoton(x, y, color) {
       ctxP.save();

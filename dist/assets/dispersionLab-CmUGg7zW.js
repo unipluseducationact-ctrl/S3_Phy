@@ -1,0 +1,1 @@
+import{c as r}from"./createLabIframe-CXl1h2lH.js";import"./index-BewhL0-e.js";function o(e){return r(e,{slug:"dispersion",titleKey:"tools.dispersion.title",className:"tool-dispersion-lab",extraParams:()=>"&v=20260721_dispersion_v1"})}export{o as createDispersionLab};
