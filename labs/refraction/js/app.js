@@ -403,19 +403,28 @@ export function initRefractionLab(root, t) {
     ctx.lineWidth = 2.5; // Thicker line
     ctx.arc(cx, cy, r, a0, a1, endDeg < startDeg);
     ctx.stroke();
-    
+
+    // Place label near the light ray (end of arc) and offset into the open angle,
+    // so it always moves with the ray — same idea as Incident / Refracted labels.
     const mid = (a0 + a1) / 2;
-    
-    // Calculate position based on the angle to avoid overlap with the normal line or rays
-    const dist = r + 15;
-    const textX = cx + Math.cos(mid) * dist;
-    const textY = cy + Math.sin(mid) * dist;
-    
-    // Dynamically align text strictly based on which side of the vertical normal it is on
-    const cosMid = Math.cos(mid);
-    const align = cosMid < 0 ? 'end' : 'start';
-    
-    drawTextWithOutline(label, textX, textY, color, align, 'middle', 'bold 15px system-ui, sans-serif');
+    const along = r + 18;
+    const bx = cx + Math.cos(a1) * along;
+    const by = cy + Math.sin(a1) * along;
+
+    // Perpendicular to the ray; flip so the offset points into the angle wedge (toward mid)
+    let px = Math.cos(a1 + Math.PI / 2);
+    let py = Math.sin(a1 + Math.PI / 2);
+    const towardMidX = Math.cos(mid);
+    const towardMidY = Math.sin(mid);
+    if (px * towardMidX + py * towardMidY < 0) {
+      px = -px;
+      py = -py;
+    }
+
+    const offset = 42;
+    const textX = bx + px * offset;
+    const textY = by + py * offset;
+    drawTextWithOutline(label, textX, textY, color, 'center', 'middle', 'bold 15px system-ui, sans-serif');
   }
 
   function draw() {
