@@ -89,10 +89,22 @@ html.s3phy-embed #app {
   margin: 0 auto;
   align-items: stretch;
 }
+.reflab-graphs {
+  display: flex;
+  flex-direction: row;
+  gap: 16px;
+  width: 100%;
+  align-items: stretch;
+}
+@media (max-width: 768px) {
+  .reflab-graphs {
+    flex-direction: column;
+  }
+}
 .reflab-viz {
   position: relative;
-  width: 100%;
-  max-width: 100%;
+  flex: 1.8;
+  min-width: 0;
   background: var(--reflab-panel);
   padding: 10px;
   border-radius: 16px;
@@ -102,21 +114,29 @@ html.s3phy-embed #app {
   align-items: center;
 }
 
+.reflab-micro-side {
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  gap: 16px;
+  min-width: 0;
+}
+
 .reflab-micro-box {
-  background: #161a29;
+  background: var(--reflab-panel);
   border: 1px solid var(--reflab-border);
-  border-radius: 12px;
-  padding: 10px;
-  margin-top: 12px;
+  border-radius: 16px;
+  padding: 12px;
   display: flex;
   flex-direction: column;
   align-items: stretch;
+  justify-content: center;
 }
 
 .reflab-particle-canvas-1,
 .reflab-particle-canvas-2 {
   background: #161a29;
-  border-radius: 8px;
+  border-radius: 12px;
   width: 100%;
   max-width: 100%;
   height: auto;

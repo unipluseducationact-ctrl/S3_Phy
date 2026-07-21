@@ -20,12 +20,30 @@ export function initRefractionLab(root, t) {
       <div class="reflab-sub">${t('tools.refraction.subtitle')}</div>
     </div>
     <div class="reflab-dash">
-      <div class="reflab-viz">
-        <button type="button" class="reflab-toggle-btn" data-toggle-controls>
-          <span class="reflab-toggle-icon">➡️</span>
-          <span class="reflab-toggle-text">${t('tools.refraction.hideControls')}</span>
-        </button>
-        <canvas class="reflab-canvas" width="720" height="440" aria-label="${t('tools.refraction.title')}"></canvas>
+      <div class="reflab-graphs">
+        <div class="reflab-viz">
+          <button type="button" class="reflab-toggle-btn" data-toggle-controls>
+            <span class="reflab-toggle-icon">➡️</span>
+            <span class="reflab-toggle-text">${t('tools.refraction.hideControls')}</span>
+          </button>
+          <canvas class="reflab-canvas" width="720" height="440" aria-label="${t('tools.refraction.title')}"></canvas>
+        </div>
+
+        <div class="reflab-micro-side">
+          <div class="reflab-micro-box" data-side="1">
+            <div style="font-weight: 800; font-size: 1.05rem; color: #ffea00; margin-bottom: 8px; text-align: center; display: flex; align-items: center; justify-content: center; gap: 6px;">
+              <span>🔬</span> ${t('tools.refraction.particleModel.title')}
+            </div>
+            <canvas class="reflab-particle-canvas-1" width="320" height="180" aria-label="Microscopic Particle Model 1"></canvas>
+          </div>
+
+          <div class="reflab-micro-box" data-side="2">
+            <div style="font-weight: 800; font-size: 1.05rem; color: #22d3ee; margin-bottom: 8px; text-align: center; display: flex; align-items: center; justify-content: center; gap: 6px;">
+              <span>🔬</span> ${t('tools.refraction.particleModel.title')}
+            </div>
+            <canvas class="reflab-particle-canvas-2" width="320" height="180" aria-label="Microscopic Particle Model 2"></canvas>
+          </div>
+        </div>
       </div>
 
       <div class="reflab-controls">
@@ -45,12 +63,6 @@ export function initRefractionLab(root, t) {
               <span>${t('tools.refraction.speedLabel')}₁ = <strong data-v="1">3.00</strong> ${t('tools.refraction.speedUnit')}</span>
             </div>
           </div>
-          <div class="reflab-micro-box" data-side="1">
-            <div style="font-weight: 800; font-size: 1.05rem; color: #ffea00; margin-bottom: 8px; text-align: center; display: flex; align-items: center; justify-content: center; gap: 6px;">
-              <span>🔬</span> ${t('tools.refraction.particleModel.title')}
-            </div>
-            <canvas class="reflab-particle-canvas-1" width="320" height="220" aria-label="Microscopic Particle Model 1"></canvas>
-          </div>
         </div>
 
         <!-- Column 2: Refracted Medium -->
@@ -68,12 +80,6 @@ export function initRefractionLab(root, t) {
               <span>${t('tools.refraction.nLabel')}₂ = <strong data-n="2">1.33</strong></span>
               <span>${t('tools.refraction.speedLabel')}₂ = <strong data-v="2">2.26</strong> ${t('tools.refraction.speedUnit')}</span>
             </div>
-          </div>
-          <div class="reflab-micro-box" data-side="2">
-            <div style="font-weight: 800; font-size: 1.05rem; color: #22d3ee; margin-bottom: 8px; text-align: center; display: flex; align-items: center; justify-content: center; gap: 6px;">
-              <span>🔬</span> ${t('tools.refraction.particleModel.title')}
-            </div>
-            <canvas class="reflab-particle-canvas-2" width="320" height="220" aria-label="Microscopic Particle Model 2"></canvas>
           </div>
         </div>
 
@@ -946,15 +952,15 @@ export function initRefractionLab(root, t) {
     }
     const micro1 = wrap.querySelector('.reflab-micro-box[data-side="1"]');
     if (micro1) {
-      const w = Math.max(200, micro1.clientWidth - 16);
-      const h = Math.round(w * (220 / 320));
+      const w = Math.max(200, micro1.clientWidth - 24);
+      const h = Math.round(w * (180 / 320));
       particleCanvas1.width = w;
       particleCanvas1.height = h;
     }
     const micro2 = wrap.querySelector('.reflab-micro-box[data-side="2"]');
     if (micro2) {
-      const w = Math.max(200, micro2.clientWidth - 16);
-      const h = Math.round(w * (220 / 320));
+      const w = Math.max(200, micro2.clientWidth - 24);
+      const h = Math.round(w * (180 / 320));
       particleCanvas2.width = w;
       particleCanvas2.height = h;
     }
@@ -992,8 +998,8 @@ export function initRefractionLab(root, t) {
     }
     const micro1 = wrap.querySelector('.reflab-micro-box[data-side="1"]');
     if (micro1) {
-      const w = Math.max(200, micro1.clientWidth - 16);
-      const h = Math.round(w * (220 / 320));
+      const w = Math.max(200, micro1.clientWidth - 24);
+      const h = Math.round(w * (180 / 320));
       if (particleCanvas1.width !== w) {
         particleCanvas1.width = w;
         particleCanvas1.height = h;
@@ -1001,8 +1007,8 @@ export function initRefractionLab(root, t) {
     }
     const micro2 = wrap.querySelector('.reflab-micro-box[data-side="2"]');
     if (micro2) {
-      const w = Math.max(200, micro2.clientWidth - 16);
-      const h = Math.round(w * (220 / 320));
+      const w = Math.max(200, micro2.clientWidth - 24);
+      const h = Math.round(w * (180 / 320));
       if (particleCanvas2.width !== w) {
         particleCanvas2.width = w;
         particleCanvas2.height = h;

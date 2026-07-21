@@ -1,1 +1,0 @@
-import{c as e}from"./createLabIframe-C4oMhCNB.js";import"./index-CKJ2zuFL.js";function r(t){return e(t,{slug:"change-of-state",titleKey:"tools.changeOfState.title",className:"tool-change-of-state",extraParams:()=>"&v=17"})}export{r as createChangeOfStateLab};
