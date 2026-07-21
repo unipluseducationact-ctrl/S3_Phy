@@ -89,22 +89,6 @@ html.s3phy-embed #app {
   margin: 0 auto;
   align-items: stretch;
 }
-.reflab-graphs {
-  display: flex;
-  flex-direction: row;
-  gap: 16px;
-  width: 100%;
-  align-items: stretch;
-}
-@media (max-width: 768px) {
-  .reflab-graphs {
-    flex-direction: column;
-  }
-}
-.reflab-viz, .reflab-viz-particle {
-  flex: 1;
-  min-width: 0;
-}
 .reflab-viz {
   position: relative;
   width: 100%;
@@ -118,22 +102,21 @@ html.s3phy-embed #app {
   align-items: center;
 }
 
-.reflab-viz-particle {
-  position: relative;
-  width: 100%;
-  max-width: 100%;
-  background: var(--reflab-panel);
-  padding: 14px;
-  border-radius: 16px;
+.reflab-micro-box {
+  background: #161a29;
   border: 1px solid var(--reflab-border);
+  border-radius: 12px;
+  padding: 10px;
+  margin-top: 12px;
   display: flex;
   flex-direction: column;
   align-items: stretch;
 }
 
-.reflab-particle-canvas {
+.reflab-particle-canvas-1,
+.reflab-particle-canvas-2 {
   background: #161a29;
-  border-radius: 12px;
+  border-radius: 8px;
   width: 100%;
   max-width: 100%;
   height: auto;
@@ -174,8 +157,7 @@ html.s3phy-embed #app {
   display: none !important;
 }
 
-.reflab.reflab-collapsed .reflab-viz,
-.reflab.reflab-collapsed .reflab-viz-particle {
+.reflab.reflab-collapsed .reflab-viz {
   width: 100%;
   max-width: 100%;
 }
