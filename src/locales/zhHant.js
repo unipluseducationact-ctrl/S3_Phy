@@ -82,7 +82,6 @@ export const zhHant = {
   'tools.rotatingMirror.canvas.nPrime': 'n\u2032',
   'tools.rotatingMirror.canvas.shift': '\u504f\u79fb',
   'tools.refractionTir.title': '\u9003\u7344\u904a\u6232 \u2014 \u6298\u5c04\u3001\u53f8\u4e43\u8033\u8207\u5168\u5167\u53cd\u5c04',
-  'tools.dispersion.title': '光的色散 — 三稜鏡實驗室',
   'tools.refraction.title': '\u6298\u5c04 \u2014 \u53f8\u4e43\u8033\u5b9a\u5f8b',
   'tools.refraction.n1': '\u5165\u5c04\u4ecb\u8cea',
   'tools.refraction.n2': '\u6298\u5c04\u4ecb\u8cea',

@@ -1,5 +1,5 @@
-import { initRefractionLab } from './app.js?v=20260721_fully_dynamic_v15';
-import { createT, hubLangToLocal, initLangFromUrl, setLang, getLang } from './i18n.js?v=20260721_fully_dynamic_v15';
+import { initRefractionLab } from './app.js?v=20260721_fix_syntax_v16';
+import { createT, hubLangToLocal, initLangFromUrl, setLang, getLang } from './i18n.js?v=20260721_fix_syntax_v16';
 
 const root = document.getElementById('app');
 

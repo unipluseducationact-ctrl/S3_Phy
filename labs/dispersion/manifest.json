@@ -1,8 +1,0 @@
-{
-  "slug": "dispersion",
-  "syncAll": true,
-  "exclude": [
-    "manifest.json",
-    "README.md"
-  ]
-}
