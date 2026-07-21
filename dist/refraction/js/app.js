@@ -20,12 +20,21 @@ export function initRefractionLab(root, t) {
       <div class="reflab-sub">${t('tools.refraction.subtitle')}</div>
     </div>
     <div class="reflab-dash">
-      <div class="reflab-viz">
-        <button type="button" class="reflab-toggle-btn" data-toggle-controls>
-          <span class="reflab-toggle-icon">➡️</span>
-          <span class="reflab-toggle-text">${t('tools.refraction.hideControls')}</span>
-        </button>
-        <canvas class="reflab-canvas" width="720" height="440" aria-label="${t('tools.refraction.title')}"></canvas>
+      <div class="reflab-graphs">
+        <div class="reflab-viz">
+          <button type="button" class="reflab-toggle-btn" data-toggle-controls>
+            <span class="reflab-toggle-icon">➡️</span>
+            <span class="reflab-toggle-text">${t('tools.refraction.hideControls')}</span>
+          </button>
+          <canvas class="reflab-canvas" width="720" height="440" aria-label="${t('tools.refraction.title')}"></canvas>
+        </div>
+
+        <div class="reflab-viz-particle">
+          <div style="font-weight: 800; font-size: 1.25rem; color: #22d3ee; margin-bottom: 12px; text-align: center; display: flex; align-items: center; justify-content: center; gap: 8px;">
+            <span>🔬</span> ${t('tools.refraction.particleModel.title')}
+          </div>
+          <canvas class="reflab-particle-canvas" width="720" height="440" aria-label="Microscopic Particle Model"></canvas>
+        </div>
       </div>
 
       <div class="reflab-controls">
@@ -97,13 +106,6 @@ export function initRefractionLab(root, t) {
           <div class="reflab-tir" data-tir hidden>${t('tools.refraction.tir')}</div>
           <button type="button" class="reflab-reset" data-reset>${t('tools.refraction.reset')}</button>
         </div>
-      </div>
-
-      <div class="reflab-viz-particle">
-        <div style="font-weight: 800; font-size: 1.25rem; color: #22d3ee; margin-bottom: 12px; text-align: center; display: flex; align-items: center; justify-content: center; gap: 8px;">
-          <span>🔬</span> ${t('tools.refraction.particleModel.title')}
-        </div>
-        <canvas class="reflab-particle-canvas" width="720" height="280" aria-label="Microscopic Particle Model"></canvas>
       </div>
     </div>
   `;
@@ -537,25 +539,6 @@ export function initRefractionLab(root, t) {
     drawBoxParticles(box1X, boxY, boxW, boxH, n1Val, 'rgba(255, 255, 255, 0.22)');
     drawBoxParticles(box2X, boxY, boxW, boxH, n2Val, 'rgba(34, 211, 238, 0.22)');
 
-    // Helper to calculate jiggled positions for collision points
-    function getJiggledPt(pt, seed) {
-      const jiggleSpeed = 0.05;
-      const jiggleAmp = 1.2;
-      const jx = Math.sin(animTime * jiggleSpeed + seed) * jiggleAmp;
-      const jy = Math.cos(animTime * jiggleSpeed + seed * 1.3) * jiggleAmp;
-      return { x: pt.x + jx, y: pt.y + jy };
-    }
-
-    // Helper to jiggle a whole path
-    function jigglePath(path, seedBase) {
-      return path.map((pt, idx) => {
-        if (idx === 0 || idx === path.length - 1) {
-          return pt; // Keep start and end points stable on edges
-        }
-        return getJiggledPt(pt, seedBase + idx);
-      });
-    }
-
     // Helper to generate ray paths dynamically based on refractive index
     function generateBoxRays(bx, by, bw, bh, nVal) {
       const angleRad = toRad(18);
@@ -631,17 +614,17 @@ export function initRefractionLab(root, t) {
       }
     }
 
-    // Generate and jiggle paths for both boxes
+    // Generate paths for both boxes
     const box1Data = generateBoxRays(box1X, boxY, boxW, boxH, n1Val);
     const box2Data = generateBoxRays(box2X, boxY, boxW, boxH, n2Val);
 
-    const r1_1 = jigglePath(box1Data.rays[0], 100);
-    const r1_2 = jigglePath(box1Data.rays[1], 200);
-    const r1_3 = jigglePath(box1Data.rays[2], 300);
+    const r1_1 = box1Data.rays[0];
+    const r1_2 = box1Data.rays[1];
+    const r1_3 = box1Data.rays[2];
 
-    const r2_1 = jigglePath(box2Data.rays[0], 400);
-    const r2_2 = jigglePath(box2Data.rays[1], 500);
-    const r2_3 = jigglePath(box2Data.rays[2], 600);
+    const r2_1 = box2Data.rays[0];
+    const r2_2 = box2Data.rays[1];
+    const r2_3 = box2Data.rays[2];
 
     // Helper to draw rays for a box
     function drawBoxRays(rays, bounces, primaryColor) {
@@ -994,7 +977,7 @@ export function initRefractionLab(root, t) {
     const vizP = wrap.querySelector('.reflab-viz-particle');
     if (vizP) {
       const w = Math.max(320, vizP.clientWidth - 28);
-      const h = Math.round(w * (280 / 720));
+      const h = Math.round(w * (440 / 720));
       particleCanvas.width = w;
       particleCanvas.height = h;
     }
@@ -1033,7 +1016,7 @@ export function initRefractionLab(root, t) {
     const vizP = wrap.querySelector('.reflab-viz-particle');
     if (vizP) {
       const w = Math.max(320, vizP.clientWidth - 28);
-      const h = Math.round(w * (280 / 720));
+      const h = Math.round(w * (440 / 720));
       if (particleCanvas.width !== w) {
         particleCanvas.width = w;
         particleCanvas.height = h;

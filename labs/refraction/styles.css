@@ -85,9 +85,25 @@ html.s3phy-embed #app {
   flex-direction: column;
   gap: 16px;
   width: 100%;
-  max-width: 960px;
+  max-width: 1200px;
   margin: 0 auto;
   align-items: stretch;
+}
+.reflab-graphs {
+  display: flex;
+  flex-direction: row;
+  gap: 16px;
+  width: 100%;
+  align-items: stretch;
+}
+@media (max-width: 768px) {
+  .reflab-graphs {
+    flex-direction: column;
+  }
+}
+.reflab-viz, .reflab-viz-particle {
+  flex: 1;
+  min-width: 0;
 }
 .reflab-viz {
   position: relative;
