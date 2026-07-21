@@ -622,7 +622,9 @@ export function initRefractionLab(root, t) {
 
     // Speed of light
     const speed = 1.0 / nVal;
-    const progress = (animTime * speed * 0.012) % 1.0;
+    // Exaggerate visual speed difference for teaching clarity (cubic scaling)
+    const visualSpeed = Math.pow(1.0 / nVal, 3.0);
+    const progress = (animTime * visualSpeed * 0.024) % 1.0;
 
     // Draw photons
     const p1 = getPathPos(r1, progress);
