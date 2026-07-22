@@ -168,6 +168,21 @@
             border: 1px solid var(--border);
         }
         #graphCanvas { height: 160px; background: #fff; }
+        #bounceCanvas { height: 200px; background: #fff; }
+        .graphs-row {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 20px;
+            width: 100%;
+        }
+        .graphs-row .canvas-card {
+            flex: 1 1 280px;
+            min-width: 0;
+        }
+        .graphs-row .canvas-card.bounce-card {
+            flex: 0 1 220px;
+            max-width: 260px;
+        }
     </style>
 </head>
 <body>
@@ -244,10 +259,16 @@
             </div>
         </div>
 
-        <!-- Superposition Graph -->
-        <div class="canvas-card">
-            <div class="canvas-label" id="label-graph">Superposition at Target (Displacement vs Time)</div>
-            <canvas id="graphCanvas"></canvas>
+        <!-- Graphs: displacement–time + target bounce -->
+        <div class="graphs-row">
+            <div class="canvas-card">
+                <div class="canvas-label" id="label-graph">Superposition at Target (Displacement vs Time)</div>
+                <canvas id="graphCanvas"></canvas>
+            </div>
+            <div class="canvas-card bounce-card">
+                <div class="canvas-label" id="label-bounce">Target bouncing (side view)</div>
+                <canvas id="bounceCanvas"></canvas>
+            </div>
         </div>
 
     </div>
@@ -270,6 +291,8 @@
                 spatialView: '空間視圖（俯視）',
                 dragHint: '拖曳<span style="color:#fcc419; text-shadow: 0 1px 2px rgba(0,0,0,0.2);">● 黃色目標</span>改變路徑差',
                 superposition: '目標處疊加（位移對時間）',
+                bounceView: '目標上下振動（側視）',
+                equilibrium: '平衡位置',
                 target: '目標',
                 now: '而家',
                 langBtn: '🌐 English'
@@ -290,6 +313,8 @@
                 spatialView: 'Spatial View (Top-Down Perspective)',
                 dragHint: 'Drag the <span style="color:#fcc419; text-shadow: 0 1px 2px rgba(0,0,0,0.2);">● Yellow Target</span> to change path difference',
                 superposition: 'Superposition at Target (Displacement vs Time)',
+                bounceView: 'Target bouncing (side view)',
+                equilibrium: 'Equilibrium',
                 target: 'Target',
                 now: 'Now',
                 langBtn: '🌐 中文'
@@ -323,9 +348,11 @@
             document.getElementById('label-spatial').innerText = t.spatialView;
             document.getElementById('drag-hint').innerHTML = t.dragHint;
             document.getElementById('label-graph').innerText = t.superposition;
+            document.getElementById('label-bounce').innerText = t.bounceView;
             playBtn.innerText = isPlaying ? t.pause : t.play;
             drawMain();
             drawGraph();
+            drawBounce();
         }
 
         btnLang.addEventListener('click', () => {
@@ -344,6 +371,8 @@
         const mainCtx = mainCanvas.getContext('2d');
         const graphCanvas = document.getElementById('graphCanvas');
         const graphCtx = graphCanvas.getContext('2d');
+        const bounceCanvas = document.getElementById('bounceCanvas');
+        const bounceCtx = bounceCanvas.getContext('2d');
         const readout = document.getElementById('path-readout');
         const speedSlider = document.getElementById('speedSlider');
         const btnIn = document.getElementById('btn-in');
@@ -355,6 +384,9 @@
         function resize() {
             mainCanvas.width = mainCanvas.parentElement.clientWidth - 32;
             graphCanvas.width = graphCanvas.parentElement.clientWidth - 32;
+            graphCanvas.height = 160;
+            bounceCanvas.width = bounceCanvas.parentElement.clientWidth - 32;
+            bounceCanvas.height = 200;
         }
         window.addEventListener('resize', resize);
         resize();
@@ -384,6 +416,7 @@
 
         const historyMax = 300;
         let history = new Array(historyMax).fill(0);
+        let currentDisp = 0;
         let isDragging = false;
 
         // --- Event Listeners ---
@@ -544,6 +577,7 @@
                         if (d1 > frontDist && d2 > frontDist) superPos = 0;
                     }
 
+                    currentDisp = superPos;
                     if(!force) {
                         history.push(superPos);
                         history.shift();
@@ -628,8 +662,99 @@
             graphCtx.stroke();
         }
 
+        function drawBounce() {
+            const w = bounceCanvas.width;
+            const h = bounceCanvas.height;
+            const cx = w / 2;
+            const cy = h / 2;
+            const t = dict[currentLang];
+            const maxAmp = amplitude * 2;
+            const scale = Math.min((h / 2 - 28) / maxAmp, 2.2);
+
+            bounceCtx.clearRect(0, 0, w, h);
+
+            // Vertical guide
+            bounceCtx.strokeStyle = '#dee2e6';
+            bounceCtx.lineWidth = 1;
+            bounceCtx.beginPath();
+            bounceCtx.moveTo(cx, 16);
+            bounceCtx.lineTo(cx, h - 16);
+            bounceCtx.stroke();
+
+            // Equilibrium
+            bounceCtx.strokeStyle = '#adb5bd';
+            bounceCtx.setLineDash([5, 5]);
+            bounceCtx.beginPath();
+            bounceCtx.moveTo(24, cy);
+            bounceCtx.lineTo(w - 24, cy);
+            bounceCtx.stroke();
+            bounceCtx.setLineDash([]);
+
+            bounceCtx.fillStyle = '#868e96';
+            bounceCtx.font = 'bold 10px Segoe UI, Arial';
+            bounceCtx.textAlign = 'left';
+            bounceCtx.fillText(t.equilibrium, 28, cy - 6);
+
+            // Amplitude ticks (±2A)
+            bounceCtx.strokeStyle = 'rgba(134, 46, 156, 0.25)';
+            bounceCtx.setLineDash([3, 4]);
+            for (const sign of [-1, 1]) {
+                const y = cy - sign * maxAmp * scale;
+                bounceCtx.beginPath();
+                bounceCtx.moveTo(cx - 28, y);
+                bounceCtx.lineTo(cx + 28, y);
+                bounceCtx.stroke();
+            }
+            bounceCtx.setLineDash([]);
+
+            // Motion trail from recent history
+            const trailN = 40;
+            for (let i = 0; i < trailN; i++) {
+                const idx = history.length - trailN + i;
+                if (idx < 0) continue;
+                const val = history[idx];
+                const alpha = (i + 1) / trailN * 0.35;
+                const y = cy - val * scale;
+                bounceCtx.fillStyle = `rgba(252, 196, 25, ${alpha})`;
+                bounceCtx.beginPath();
+                bounceCtx.arc(cx, y, 4 + i * 0.08, 0, Math.PI * 2);
+                bounceCtx.fill();
+            }
+
+            // Target ball
+            const ballY = cy - currentDisp * scale;
+            bounceCtx.shadowBlur = 12;
+            bounceCtx.shadowColor = 'rgba(252, 196, 25, 0.55)';
+            bounceCtx.fillStyle = '#fcc419';
+            bounceCtx.beginPath();
+            bounceCtx.arc(cx, ballY, 14, 0, Math.PI * 2);
+            bounceCtx.fill();
+            bounceCtx.shadowBlur = 0;
+
+            bounceCtx.strokeStyle = '#e67700';
+            bounceCtx.lineWidth = 2;
+            bounceCtx.stroke();
+
+            // Displacement stem
+            bounceCtx.strokeStyle = 'rgba(134, 46, 156, 0.55)';
+            bounceCtx.lineWidth = 2;
+            bounceCtx.beginPath();
+            bounceCtx.moveTo(cx, cy);
+            bounceCtx.lineTo(cx, ballY);
+            bounceCtx.stroke();
+
+            bounceCtx.fillStyle = '#495057';
+            bounceCtx.font = 'bold 11px Segoe UI, Arial';
+            bounceCtx.textAlign = 'center';
+            bounceCtx.fillText(t.target, cx, Math.min(h - 8, Math.max(14, ballY + 28)));
+        }
+
         function animate() {
-            update(); drawMain(); drawGraph(); requestAnimationFrame(animate);
+            update();
+            drawMain();
+            drawGraph();
+            drawBounce();
+            requestAnimationFrame(animate);
         }
         updateLanguageUI();
         animate();
