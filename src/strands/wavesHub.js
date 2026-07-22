@@ -42,6 +42,7 @@ const WAVES_TOPICS = [
 
 const TOOL_ORDER = [
   'waveMotion',
+  'longitudinalWave',
   'waveInterference',
   'thinFilmInterference',
   'soundRefractionShadow',
@@ -49,6 +50,8 @@ const TOOL_ORDER = [
 
 const TOOL_LOADERS = {
   waveMotion: () => import('../tools/waveMotionLab.js').then((m) => m.createWaveMotionLab),
+  longitudinalWave: () =>
+    import('../tools/longitudinalWaveLab.js').then((m) => m.createLongitudinalWaveLab),
   waveInterference: () => import('../tools/waveInterferenceLab.js').then((m) => m.createWaveInterferenceLab),
   thinFilmInterference: () =>
     import('../tools/thinFilmInterferenceLab.js').then((m) => m.createThinFilmInterferenceLab),
@@ -59,6 +62,7 @@ const TOOL_LOADERS = {
 function toolLabel(id) {
   const map = {
     waveMotion: 'tools.waveMotion.title',
+    longitudinalWave: 'tools.longitudinalWave.title',
     waveInterference: 'tools.waveInterference.title',
     thinFilmInterference: 'tools.thinFilmInterference.title',
     soundRefractionShadow: 'tools.soundRefractionShadow.title',

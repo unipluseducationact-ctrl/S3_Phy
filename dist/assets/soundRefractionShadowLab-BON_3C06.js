@@ -1,0 +1,1 @@
+import{c as a}from"./createLabIframe-Bjtwc5Q4.js";import"./index-BO13wmso.js";function e(o){return a(o,{slug:"sound-refraction-shadow",titleKey:"tools.soundRefractionShadow.title",className:"tool-sound-refraction-shadow-lab",extraParams:()=>"&v=20260722_sound_refraction_v1"})}export{e as createSoundRefractionShadowLab};
