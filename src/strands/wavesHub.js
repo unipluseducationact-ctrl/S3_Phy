@@ -46,6 +46,7 @@ const TOOL_ORDER = [
   'waveInterference',
   'thinFilmInterference',
   'diffractionGratingCompare',
+  'spectralOverlap',
   'ultrasoundReflection',
   'soundRefractionShadow',
 ];
@@ -59,6 +60,8 @@ const TOOL_LOADERS = {
     import('../tools/thinFilmInterferenceLab.js').then((m) => m.createThinFilmInterferenceLab),
   diffractionGratingCompare: () =>
     import('../tools/diffractionGratingCompareLab.js').then((m) => m.createDiffractionGratingCompareLab),
+  spectralOverlap: () =>
+    import('../tools/spectralOverlapLab.js').then((m) => m.createSpectralOverlapLab),
   ultrasoundReflection: () =>
     import('../tools/ultrasoundReflectionLab.js').then((m) => m.createUltrasoundReflectionLab),
   soundRefractionShadow: () =>
@@ -72,6 +75,7 @@ function toolLabel(id) {
     waveInterference: 'tools.waveInterference.title',
     thinFilmInterference: 'tools.thinFilmInterference.title',
     diffractionGratingCompare: 'tools.diffractionGratingCompare.title',
+    spectralOverlap: 'tools.spectralOverlap.title',
     ultrasoundReflection: 'tools.ultrasoundReflection.title',
     soundRefractionShadow: 'tools.soundRefractionShadow.title',
   };

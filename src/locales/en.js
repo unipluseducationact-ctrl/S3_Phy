@@ -89,6 +89,7 @@ export const en = {
   'tools.waveInterference.title': 'Spatial Wave Interference',
   'tools.thinFilmInterference.title': 'Thin-film Interference — Soap Film',
   'tools.diffractionGratingCompare.title': 'Double Slit & Diffraction Grating Compare',
+  'tools.spectralOverlap.title': 'Spectral Overlap — Diffraction Orders',
   'tools.soundRefractionShadow.title': 'Sound Refraction — Shadow Zone',
   'tools.refraction.n1': 'Incident medium',
   'tools.refraction.n2': 'Refracted medium',
