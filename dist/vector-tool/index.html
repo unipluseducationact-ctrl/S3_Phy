@@ -1,834 +1,1242 @@
 <!DOCTYPE html>
-<html lang="en">
+<html lang="zh-HK">
 <head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Vector Lab — Decomposition</title>
-    <style>
-        :root {
-            --primary: #4a90e2;    /* Blue for Resultant */
-            --component: #e74c3c;  /* Red for Components */
-            --angle: #f39c12;      /* Orange for Angle */
-            --grid: #95a5a6;
-            --bg: #f4f7f6;
-            --panel: #ffffff;
-        }
-        body {
-            font-family: 'Segoe UI', sans-serif;
-            background: var(--bg);
-            display: flex;
-            flex-direction: column;
-            align-items: center;
-            padding: 20px;
-        }
-        .container {
-            background: var(--panel);
-            padding: 25px;
-            border-radius: 12px;
-            box-shadow: 0 4px 20px rgba(0,0,0,0.1);
-            max-width: 800px;
-            width: 100%;
-        }
-        h2 { text-align: center; color: #333; margin-bottom: 5px; }
-        
-        canvas {
-            background: #fff;
-            border: 2px solid #eee;
-            border-radius: 8px;
-            cursor: crosshair;
-            display: block;
-            margin: 0 auto;
-            touch-action: none;
-        }
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>矢量工具 — 分解次序</title>
+  <link rel="stylesheet" href="../shared/s3phy-embed.css">
+  <script src="../shared/s3phy-embed-init.js"></script>
+  <style>
+    html, body {
+      margin: 0;
+      padding: 0;
+      background: #f8f9fa;
+    }
+    #app {
+      padding: 8px;
+      box-sizing: border-box;
+    }
 
-        .controls {
-            margin-top: 20px;
-            display: grid;
-            grid-template-columns: 1fr 1fr;
-            gap: 20px;
-            padding: 15px;
-            background: #f8f9fa;
-            border-radius: 8px;
-        }
-        
-        .control-section {
-            display: flex;
-            flex-direction: column;
-            gap: 15px;
-        }
+    html.s3phy-embed .lang-btn { display: none; }
+    html.s3phy-embed,
+    html.s3phy-embed body {
+      height: 100%;
+      overflow: hidden;
+      background: #f8f9fa;
+    }
+    html.s3phy-embed body { padding: 0; }
+    html.s3phy-embed #app {
+      padding: 4px;
+      height: 100%;
+      min-height: 0;
+      box-sizing: border-box;
+      display: flex;
+      flex-direction: column;
+    }
+    html.s3phy-embed .lab-section {
+      flex: 1 1 auto;
+      min-height: 0;
+      height: 100%;
+      display: flex;
+      flex-direction: column;
+      overflow: hidden;
+    }
+    html.s3phy-embed .vt-head { display: none; }
+    html.s3phy-embed .vt-dash {
+      flex: 1 1 auto;
+      min-height: 0;
+      align-items: stretch;
+      flex-wrap: nowrap;
+      max-width: none;
+      width: 100%;
+      margin: 0;
+    }
+    html.s3phy-embed .vt-viz {
+      flex: 1 1 auto;
+      min-height: 0;
+      min-width: 0;
+      display: flex;
+      flex-direction: column;
+      align-items: stretch;
+    }
+    html.s3phy-embed .vt-canvas {
+      width: 100%;
+      height: 100%;
+      max-width: none;
+      flex: 1;
+      object-fit: contain;
+    }
+    html.s3phy-embed .vt-controls {
+      flex: 0 0 auto;
+      max-height: 100%;
+      overflow-y: auto;
+    }
 
-        .control-group { display: flex; flex-direction: column; gap: 5px; }
-        label { font-weight: bold; font-size: 0.9em; color: #555; }
-        
-        input[type="range"] { width: 100%; cursor: pointer; }
-        .value-display { display: flex; justify-content: space-between; align-items: center; }
-        input[type="number"] { width: 70px; padding: 5px; border: 1px solid #ccc; border-radius: 4px; text-align: center; font-weight: bold; }
+    .lab-section {
+      --vt-bg: #f8f9fa;
+      --vt-panel: #ffffff;
+      --vt-border: #e8eaed;
+      --vt-text: #1a1c2c;
+      --vt-muted: #6b7280;
+      --primary: #4a90e2;
+      --component: #e74c3c;
+      --angle: #f39c12;
+      --grid: #95a5a6;
+      font-family: system-ui, -apple-system, "Segoe UI", sans-serif;
+      color: var(--vt-text);
+      background: var(--vt-bg);
+      border-radius: 12px;
+      padding: 12px;
+      max-width: 100%;
+      box-sizing: border-box;
+    }
+    .lab-section * { box-sizing: border-box; }
 
-        /* Highlight Polar Inputs */
-        .polar-input input[type="number"] {
-            border-color: var(--primary);
-            color: var(--primary);
-            background: #f0f8ff;
-        }
-        .angle-input input[type="number"] {
-            border-color: var(--angle);
-            color: var(--angle);
-            background: #fff8e1;
-        }
+    .vt-head {
+      text-align: center;
+      margin: 0 0 14px;
+      position: relative;
+    }
+    .vt-title {
+      margin: 0;
+      font-weight: 800;
+      font-size: 1.35rem;
+      background: linear-gradient(90deg, #2563eb, #16a34a);
+      -webkit-background-clip: text;
+      -webkit-text-fill-color: transparent;
+      background-clip: text;
+    }
+    .vt-sub {
+      color: var(--vt-muted);
+      font-size: 0.82rem;
+      margin: 4px 0 0;
+    }
+    .lang-btn {
+      position: absolute;
+      top: 0;
+      right: 0;
+      background: #f1f3f5;
+      color: var(--vt-muted);
+      border: 1px solid var(--vt-border);
+      padding: 6px 12px;
+      border-radius: 8px;
+      cursor: pointer;
+      font-size: 13px;
+      font-weight: 700;
+    }
+    .lang-btn:hover {
+      color: var(--vt-text);
+      border-color: #ced4da;
+      background: #e8eaed;
+    }
 
-        /* Radio Button Group */
-        .radio-group {
-            display: flex;
-            gap: 15px;
-            background: #fff;
-            padding: 8px;
-            border-radius: 6px;
-            border: 1px solid #ddd;
-        }
-        .radio-group label {
-            font-weight: normal;
-            cursor: pointer;
-            display: flex;
-            align-items: center;
-            gap: 5px;
-            font-size: 0.85em;
-        }
+    .vt-dash {
+      display: flex;
+      flex-direction: row;
+      gap: 14px;
+      width: 100%;
+      max-width: 1100px;
+      margin: 0 auto;
+      align-items: flex-start;
+      justify-content: center;
+      flex-wrap: wrap;
+    }
+    .vt-viz {
+      flex: 2;
+      min-width: min(100%, 320px);
+      background: var(--vt-panel);
+      padding: 10px;
+      border-radius: 16px;
+      border: 1px solid var(--vt-border);
+      display: flex;
+      flex-direction: column;
+      justify-content: center;
+      align-items: center;
+      box-shadow: 0 2px 12px rgba(26, 28, 44, 0.04);
+      gap: 8px;
+    }
+    .vt-canvas {
+      background: #fff;
+      border-radius: 12px;
+      width: 100%;
+      max-width: min(100%, 960px);
+      height: auto;
+      display: block;
+      border: 1px solid var(--vt-border);
+      cursor: crosshair;
+      touch-action: none;
+    }
+    .vt-hint {
+      margin: 0;
+      font-size: 0.78rem;
+      color: var(--vt-muted);
+      text-align: center;
+    }
 
-        .upload-btn-wrapper {
-            position: relative;
-            overflow: hidden;
-            display: inline-block;
-            width: 100%;
-        }
-        .btn {
-            border: 2px dashed #ccc;
-            color: #555;
-            background-color: white;
-            padding: 8px 20px;
-            border-radius: 8px;
-            font-size: 14px;
-            font-weight: bold;
-            width: 100%;
-            cursor: pointer;
-            transition: 0.2s;
-            text-align: center;
-        }
-        .btn:hover { border-color: var(--primary); color: var(--primary); }
-        .upload-btn-wrapper input[type=file] {
-            font-size: 100px;
-            position: absolute;
-            left: 0; top: 0; opacity: 0;
-            cursor: pointer;
-            width: 100%; height: 100%;
-        }
+    .vt-controls {
+      flex: 1;
+      min-width: min(100%, 280px);
+      max-width: min(360px, calc(100% - 24px));
+      background: var(--vt-panel);
+      border-radius: 16px;
+      padding: 18px;
+      border: 1px solid var(--vt-border);
+      display: flex;
+      flex-direction: column;
+      gap: 16px;
+      box-shadow: 0 2px 12px rgba(26, 28, 44, 0.04);
+    }
+    .vt-section-title {
+      margin: 0;
+      font-size: 0.88rem;
+      font-weight: 700;
+      color: var(--primary);
+    }
+    .vt-section-title.muted { color: var(--vt-muted); }
 
-        .mode-toggle {
-            grid-column: span 2;
-            text-align: center;
-            padding: 10px;
-            background: #eef2f7;
-            border-radius: 6px;
-            margin-bottom: 10px;
-            font-size: 0.9em;
-            color: #555;
-        }
-    </style>
+    .vt-cg {
+      display: flex;
+      flex-direction: column;
+      gap: 6px;
+    }
+    .vt-lr {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      font-size: 0.82rem;
+      font-weight: 600;
+      gap: 8px;
+    }
+    .vt-lr label { color: var(--vt-muted); }
+    .vt-lr .polar-label { color: var(--primary); }
+    .vt-lr .angle-label { color: var(--angle); }
+
+    input[type="number"] {
+      width: 72px;
+      padding: 4px 6px;
+      border: 1px solid var(--vt-border);
+      border-radius: 6px;
+      text-align: center;
+      font-weight: 700;
+      font-size: 0.82rem;
+      color: var(--vt-text);
+      background: #fff;
+    }
+    .polar-input input[type="number"] {
+      border-color: var(--primary);
+      color: var(--primary);
+      background: #f0f8ff;
+    }
+    .angle-input input[type="number"] {
+      border-color: var(--angle);
+      color: var(--angle);
+      background: #fff8e1;
+    }
+
+    input[type="range"] {
+      -webkit-appearance: none;
+      width: 100%;
+      background: transparent;
+      margin: 2px 0;
+      cursor: pointer;
+    }
+    input[type="range"]:focus { outline: none; }
+    input[type="range"]::-webkit-slider-runnable-track {
+      width: 100%;
+      height: 6px;
+      cursor: pointer;
+      background: #e8eaed;
+      border-radius: 3px;
+    }
+    input[type="range"]::-webkit-slider-thumb {
+      height: 18px;
+      width: 18px;
+      border-radius: 50%;
+      background: #fff;
+      cursor: pointer;
+      -webkit-appearance: none;
+      margin-top: -6px;
+      box-shadow: 0 1px 4px rgba(26, 28, 44, 0.15);
+      border: 2px solid #2563eb;
+    }
+    input[type="range"]::-moz-range-track {
+      width: 100%;
+      height: 6px;
+      cursor: pointer;
+      background: #e8eaed;
+      border-radius: 3px;
+      border: none;
+    }
+    input[type="range"]::-moz-range-thumb {
+      height: 16px;
+      width: 16px;
+      border-radius: 50%;
+      background: #fff;
+      cursor: pointer;
+      border: 2px solid #2563eb;
+      box-shadow: 0 1px 4px rgba(26, 28, 44, 0.15);
+    }
+
+    .radio-group {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 8px 12px;
+      background: #f8f9fa;
+      padding: 8px 10px;
+      border-radius: 8px;
+      border: 1px solid var(--vt-border);
+    }
+    .radio-group label {
+      font-weight: 500;
+      cursor: pointer;
+      display: flex;
+      align-items: center;
+      gap: 5px;
+      font-size: 0.78rem;
+      color: var(--vt-text);
+    }
+    .field-label {
+      font-size: 0.78rem;
+      font-weight: 600;
+      color: var(--vt-muted);
+      display: block;
+      margin-bottom: 4px;
+    }
+
+    .check-row {
+      display: flex;
+      flex-direction: row;
+      align-items: center;
+      gap: 8px;
+    }
+    .check-row input { width: auto; cursor: pointer; }
+    .check-row label {
+      margin: 0;
+      cursor: pointer;
+      font-size: 0.82rem;
+      font-weight: 600;
+      color: var(--vt-text);
+    }
+
+    .upload-btn-wrapper {
+      position: relative;
+      overflow: hidden;
+      display: block;
+      width: 100%;
+    }
+    .btn-upload {
+      border: 1px dashed #cbd5e1;
+      color: var(--vt-muted);
+      background: #f8f9fa;
+      padding: 10px 14px;
+      border-radius: 8px;
+      font-size: 0.82rem;
+      font-weight: 600;
+      width: 100%;
+      cursor: pointer;
+      transition: 0.15s;
+      text-align: center;
+    }
+    .btn-upload:hover {
+      border-color: #2563eb;
+      color: #2563eb;
+      background: #eff6ff;
+    }
+    .upload-btn-wrapper input[type="file"] {
+      font-size: 100px;
+      position: absolute;
+      left: 0;
+      top: 0;
+      opacity: 0;
+      cursor: pointer;
+      width: 100%;
+      height: 100%;
+    }
+
+    .vt-reset {
+      background: transparent;
+      border: 1px solid var(--vt-border);
+      color: var(--vt-muted);
+      padding: 10px;
+      border-radius: 8px;
+      cursor: pointer;
+      font-size: 0.82rem;
+      width: 100%;
+      font-weight: 600;
+    }
+    .vt-reset:hover {
+      background: #f1f3f5;
+      color: var(--vt-text);
+      border-color: #cbd5e1;
+    }
+
+    .vt-divider {
+      height: 1px;
+      background: var(--vt-border);
+      margin: 2px 0;
+    }
+
+    @media (max-width: 720px) {
+      .vt-dash { flex-direction: column; }
+      .vt-controls {
+        max-width: 100%;
+        width: 100%;
+      }
+      .lang-btn {
+        position: static;
+        margin-top: 8px;
+      }
+    }
+  </style>
 </head>
 <body>
+  <div id="app">
+    <div class="lab-section">
+      <div class="vt-head">
+        <h1 class="vt-title" id="page-title">矢量工具 — 分解次序</h1>
+        <p class="vt-sub" id="page-sub">拖曳矢量尖端；右鍵或 Shift 拖曳以移動原點</p>
+        <button type="button" class="lang-btn" id="lang-toggle">English</button>
+      </div>
 
-<div class="container">
-    <h2>🎛️ Vector Lab: Decomposition Order</h2>
-    <div class="mode-toggle">
-        <b>Controls:</b> Drag Vector Tip | Right-Click Drag to Move Origin
-    </div>
-
-    <canvas id="vectorCanvas" width="600" height="450"></canvas>
-
-    <div class="controls">
-        <!-- Vector Properties -->
-        <div class="control-section">
-            <h4 style="margin:0; color:var(--primary);">Vector Properties</h4>
-            
-            <!-- Magnitude Input -->
-            <div class="control-group polar-input">
-                <div class="value-display">
-                    <label style="color:var(--primary);">Magnitude (F)</label>
-                    <input type="number" id="numMag" value="7.2" step="0.1" min="0">
-                </div>
-                <input type="range" id="sliderMag" min="0" max="25" step="0.1" value="7.2">
-            </div>
-
-            <!-- Angle Input -->
-            <div class="control-group angle-input">
-                <div class="value-display">
-                    <label style="color:var(--angle);">Angle (&theta;&deg;)</label>
-                    <input type="number" id="numAngle" value="-33.7" step="1">
-                </div>
-                <input type="range" id="sliderAngle" min="-180" max="180" step="1" value="-33.7">
-                
-                <!-- Axis Reference Toggle -->
-                <div style="margin-top: 5px;">
-                    <label style="font-size: 0.8em; margin-bottom: 3px; display:block;">Measure Angle From:</label>
-                    
-                    <div class="radio-group" style="margin-bottom: 5px;">
-                        <label><input type="radio" name="angleRef" value="x" checked> Direction 1 (X)</label>
-                        <label><input type="radio" name="angleRef" value="y"> Direction 2 (Y)</label>
-                    </div>
-
-                    <div class="radio-group">
-                        <label><input type="radio" name="axisPolarity" value="1" checked> Positive Side (+)</label>
-                        <label><input type="radio" name="axisPolarity" value="-1"> Negative Side (-)</label>
-                    </div>
-                </div>
-            </div>
-
-            <!-- Components -->
-            <div class="control-group">
-                <div class="value-display">
-                    <label>Comp 1 (Dir 1)</label>
-                    <input type="number" id="numX" value="6" step="0.1">
-                </div>
-                <input type="range" id="sliderX" min="-15" max="15" step="0.1" value="6">
-            </div>
-
-            <div class="control-group">
-                <div class="value-display">
-                    <label>Comp 2 (Dir 2)</label>
-                    <input type="number" id="numY" value="4" step="0.1">
-                </div>
-                <input type="range" id="sliderY" min="-15" max="15" step="0.1" value="4">
-            </div>
+      <div class="vt-dash">
+        <div class="vt-viz">
+          <canvas id="vectorCanvas" class="vt-canvas" width="600" height="450"></canvas>
+          <p class="vt-hint" id="drag-hint">拖曳尖端調整矢量 · 右鍵／Shift／靠近原點拖曳以移動原點</p>
         </div>
 
-        <!-- Background & System -->
-        <div class="control-section" style="border-left: 1px solid #eee; padding-left: 20px;">
-            <h4 style="margin:0; color:var(--grid);">System & Visualization</h4>
+        <div class="vt-controls">
+          <h4 class="vt-section-title" id="sec-vector">矢量性質</h4>
 
-            <div class="control-group">
-                <label>Upload Background Image</label>
-                <div class="upload-btn-wrapper">
-                    <button class="btn">📂 Choose Image (JPG/PNG)</button>
-                    <input type="file" id="bgUpload" accept="image/*">
-                </div>
+          <div class="vt-cg polar-input">
+            <div class="vt-lr">
+              <label class="polar-label" id="label-mag">大小 (F)</label>
+              <input type="number" id="numMag" value="7.2" step="0.1" min="0">
             </div>
+            <input type="range" id="sliderMag" min="0" max="25" step="0.1" value="7.2">
+          </div>
 
-            <div class="control-group" style="flex-direction: row; align-items: center; gap: 10px; margin-top: 10px;">
-                <input type="checkbox" id="showGrid" checked style="width: auto;">
-                <label for="showGrid" style="margin:0; cursor: pointer;">Show Grid Overlay</label>
+          <div class="vt-cg angle-input">
+            <div class="vt-lr">
+              <label class="angle-label" id="label-angle">角度 (θ°)</label>
+              <input type="number" id="numAngle" value="-33.7" step="1">
             </div>
+            <input type="range" id="sliderAngle" min="-180" max="180" step="1" value="-33.7">
 
-            <!-- Component Style Toggle -->
-            <div class="control-group">
-                <label style="font-size: 0.9em; margin-bottom: 3px; display:block;">Component Style:</label>
-                <div class="radio-group">
-                    <label><input type="radio" name="compStyle" value="head-to-tail" checked> Head-to-Tail</label>
-                    <label><input type="radio" name="compStyle" value="origin"> Origin-Based</label>
-                </div>
+            <div>
+              <span class="field-label" id="label-angle-ref">量度角由</span>
+              <div class="radio-group" style="margin-bottom: 6px;">
+                <label><input type="radio" name="angleRef" value="x" checked> <span id="opt-ref-x">方向 1</span></label>
+                <label><input type="radio" name="angleRef" value="y"> <span id="opt-ref-y">方向 2</span></label>
+              </div>
+              <div class="radio-group">
+                <label><input type="radio" name="axisPolarity" value="1" checked> <span id="opt-pol-pos">正方向</span></label>
+                <label><input type="radio" name="axisPolarity" value="-1"> <span id="opt-pol-neg">負方向</span></label>
+              </div>
             </div>
-            
-            <!-- Decomposition Order Toggle -->
-            <div class="control-group">
-                <label style="font-size: 0.9em; margin-bottom: 3px; display:block;">Decomposition Order:</label>
-                <div class="radio-group">
-                    <label><input type="radio" name="decompOrder" value="xy" checked> Horizontal First (X→Y)</label>
-                    <label><input type="radio" name="decompOrder" value="yx"> Vertical First (Y→X)</label>
-                </div>
-            </div>
+          </div>
 
-            <div class="control-group">
-                <div class="value-display">
-                    <label>Axis Rotation (&deg;)</label>
-                    <input type="number" id="numRot" value="0" min="-180" max="180">
-                </div>
-                <input type="range" id="sliderRot" min="-180" max="180" step="1" value="0">
+          <div class="vt-cg">
+            <div class="vt-lr">
+              <label id="label-comp1">分量 1（方向 1）</label>
+              <input type="number" id="numX" value="6" step="0.1">
             </div>
-            
-            <button onclick="resetView()" style="margin-top:5px; padding: 6px; cursor: pointer;">Reset All</button>
+            <input type="range" id="sliderX" min="-15" max="15" step="0.1" value="6">
+          </div>
+
+          <div class="vt-cg">
+            <div class="vt-lr">
+              <label id="label-comp2">分量 2（方向 2）</label>
+              <input type="number" id="numY" value="4" step="0.1">
+            </div>
+            <input type="range" id="sliderY" min="-15" max="15" step="0.1" value="4">
+          </div>
+
+          <div class="vt-divider"></div>
+          <h4 class="vt-section-title muted" id="sec-system">系統與視覺化</h4>
+
+          <div class="vt-cg">
+            <span class="field-label" id="label-upload">上傳背景圖</span>
+            <div class="upload-btn-wrapper">
+              <button type="button" class="btn-upload" id="btn-upload-label">選擇圖像（JPG／PNG）</button>
+              <input type="file" id="bgUpload" accept="image/*">
+            </div>
+          </div>
+
+          <div class="check-row">
+            <input type="checkbox" id="showGrid" checked>
+            <label for="showGrid" id="label-grid">顯示方格</label>
+          </div>
+
+          <div class="vt-cg">
+            <span class="field-label" id="label-comp-style">分量樣式</span>
+            <div class="radio-group">
+              <label><input type="radio" name="compStyle" value="head-to-tail" checked> <span id="opt-style-htt">從頭至尾</span></label>
+              <label><input type="radio" name="compStyle" value="origin"> <span id="opt-style-origin">由原點出發</span></label>
+            </div>
+          </div>
+
+          <div class="vt-cg">
+            <span class="field-label" id="label-decomp">分解次序</span>
+            <div class="radio-group">
+              <label><input type="radio" name="decompOrder" value="xy" checked> <span id="opt-order-xy">水平優先</span></label>
+              <label><input type="radio" name="decompOrder" value="yx"> <span id="opt-order-yx">垂直優先</span></label>
+            </div>
+          </div>
+
+          <div class="vt-cg">
+            <div class="vt-lr">
+              <label id="label-rot">軸旋轉（°）</label>
+              <input type="number" id="numRot" value="0" min="-180" max="180">
+            </div>
+            <input type="range" id="sliderRot" min="-180" max="180" step="1" value="0">
+          </div>
+
+          <button type="button" class="vt-reset" id="btn-reset" onclick="resetView()">重設</button>
         </div>
+      </div>
     </div>
-</div>
+  </div>
 
 <script>
-    // --- Configuration ---
-    const canvas = document.getElementById('vectorCanvas');
-    const ctx = canvas.getContext('2d');
-    const width = canvas.width;
-    const height = canvas.height;
-    const scale = 20; 
-
-    // State
-    let vector = { x: 6, y: -4 }; // Y is Canvas Y (positive down)
-    let origin = { x: width/2, y: height/2 }; 
-    let axisAngle = 0; 
-    let bgImage = null; 
-    let showGrid = true;
-    let angleRef = 'x'; // 'x' or 'y'
-    let axisPolarity = 1; // 1 for Positive, -1 for Negative
-    let compStyle = 'head-to-tail'; // 'head-to-tail' or 'origin'
-    let decompOrder = 'xy'; // 'xy' (X then Y) or 'yx' (Y then X)
-
-    // Label Collision State
-    let drawnLabels = []; 
-
-    // Interaction State
-    let isDraggingVector = false;
-    let isDraggingOrigin = false;
-
-    // DOM Elements
-    const inputs = {
-        mag: document.getElementById('numMag'),
-        sliderMag: document.getElementById('sliderMag'),
-        angle: document.getElementById('numAngle'),
-        sliderAngle: document.getElementById('sliderAngle'),
-        x: document.getElementById('numX'),
-        y: document.getElementById('numY'),
-        sliderX: document.getElementById('sliderX'),
-        sliderY: document.getElementById('sliderY'),
-        rot: document.getElementById('numRot'),
-        sliderRot: document.getElementById('sliderRot'),
-        bgUpload: document.getElementById('bgUpload'),
-        checkGrid: document.getElementById('showGrid'),
-        angleRefs: document.getElementsByName('angleRef'),
-        axisPolarities: document.getElementsByName('axisPolarity'),
-        compStyles: document.getElementsByName('compStyle'),
-        decompOrders: document.getElementsByName('decompOrder')
-    };
-
-    // --- Logic ---
-
-    function getAngleFromRef() {
-        let mathAngle = Math.atan2(-vector.y, vector.x); 
-        let baseOffset = (angleRef === 'x') ? 0 : (Math.PI / 2);
-        if (axisPolarity === -1) baseOffset += Math.PI;
-
-        let relAngle = mathAngle - baseOffset;
-        let deg = relAngle * 180 / Math.PI;
-        while (deg > 180) deg -= 360;
-        while (deg < -180) deg += 360;
-        return deg;
+(function () {
+  const dict = {
+    zh: {
+      docTitle: '矢量工具 — 分解次序',
+      pageTitle: '矢量工具 — 分解次序',
+      pageSub: '拖曳矢量尖端；右鍵或 Shift 拖曳以移動原點',
+      dragHint: '拖曳尖端調整矢量 · 右鍵／Shift／靠近原點拖曳以移動原點',
+      secVector: '矢量性質',
+      secSystem: '系統與視覺化',
+      labelMag: '大小 (F)',
+      labelAngle: '角度 (θ°)',
+      labelAngleRef: '量度角由',
+      optRefX: '方向 1',
+      optRefY: '方向 2',
+      optPolPos: '正方向',
+      optPolNeg: '負方向',
+      labelComp1: '分量 1（方向 1）',
+      labelComp2: '分量 2（方向 2）',
+      labelUpload: '上傳背景圖',
+      btnUpload: '選擇圖像（JPG／PNG）',
+      labelGrid: '顯示方格',
+      labelCompStyle: '分量樣式',
+      optStyleHtt: '從頭至尾',
+      optStyleOrigin: '由原點出發',
+      labelDecomp: '分解次序',
+      optOrderXy: '水平優先',
+      optOrderYx: '垂直優先',
+      labelRot: '軸旋轉（°）',
+      btnReset: '重設',
+      dir1: '分解方向 1',
+      dir2: '分解方向 2',
+      langBtn: 'English'
+    },
+    en: {
+      docTitle: 'Vector Tool — Decomposition Order',
+      pageTitle: 'Vector Tool — Decomposition Order',
+      pageSub: 'Drag the vector tip; right-click or Shift-drag to move the origin',
+      dragHint: 'Drag tip to adjust vector · Right-click / Shift / near origin to move origin',
+      secVector: 'Vector Properties',
+      secSystem: 'System & Visualization',
+      labelMag: 'Magnitude (F)',
+      labelAngle: 'Angle (θ°)',
+      labelAngleRef: 'Measure angle from',
+      optRefX: 'Direction 1',
+      optRefY: 'Direction 2',
+      optPolPos: 'Positive',
+      optPolNeg: 'Negative',
+      labelComp1: 'Comp 1 (Dir 1)',
+      labelComp2: 'Comp 2 (Dir 2)',
+      labelUpload: 'Upload background image',
+      btnUpload: 'Choose image (JPG / PNG)',
+      labelGrid: 'Show grid',
+      labelCompStyle: 'Component style',
+      optStyleHtt: 'Head-to-tail',
+      optStyleOrigin: 'From origin',
+      labelDecomp: 'Decomposition order',
+      optOrderXy: 'Horizontal first',
+      optOrderYx: 'Vertical first',
+      labelRot: 'Axis rotation (°)',
+      btnReset: 'Reset',
+      dir1: 'Resolving Direction 1',
+      dir2: 'Resolving Direction 2',
+      langBtn: '中文'
     }
+  };
 
-    function setVectorFromRef(mag, angleDeg) {
-        let angleRad = angleDeg * Math.PI / 180;
-        let baseOffset = (angleRef === 'x') ? 0 : (Math.PI / 2);
-        if (axisPolarity === -1) baseOffset += Math.PI;
+  function hubLangToLocal(lang) {
+    if (lang === 'en') return 'en';
+    return 'zh';
+  }
 
-        let mathAngle = angleRad + baseOffset;
-        vector.x = mag * Math.cos(mathAngle);
-        vector.y = -mag * Math.sin(mathAngle); 
-    }
+  const params = new URLSearchParams(location.search);
+  let currentLang = hubLangToLocal(params.get('lang') || 'zh');
+  const t = () => dict[currentLang] || dict.zh;
 
-    // Update UI elements from State
-    function updateUI(skipActiveElement = null) {
-        const mag = Math.hypot(vector.x, vector.y);
-        const displayAngle = getAngleFromRef();
+  function updateLanguageUI() {
+    const tr = t();
+    document.documentElement.lang = currentLang === 'zh' ? 'zh-HK' : 'en';
+    document.title = tr.docTitle;
+    document.getElementById('page-title').textContent = tr.pageTitle;
+    document.getElementById('page-sub').textContent = tr.pageSub;
+    document.getElementById('drag-hint').textContent = tr.dragHint;
+    document.getElementById('lang-toggle').textContent = tr.langBtn;
+    document.getElementById('sec-vector').textContent = tr.secVector;
+    document.getElementById('sec-system').textContent = tr.secSystem;
+    document.getElementById('label-mag').textContent = tr.labelMag;
+    document.getElementById('label-angle').textContent = tr.labelAngle;
+    document.getElementById('label-angle-ref').textContent = tr.labelAngleRef;
+    document.getElementById('opt-ref-x').textContent = tr.optRefX;
+    document.getElementById('opt-ref-y').textContent = tr.optRefY;
+    document.getElementById('opt-pol-pos').textContent = tr.optPolPos;
+    document.getElementById('opt-pol-neg').textContent = tr.optPolNeg;
+    document.getElementById('label-comp1').textContent = tr.labelComp1;
+    document.getElementById('label-comp2').textContent = tr.labelComp2;
+    document.getElementById('label-upload').textContent = tr.labelUpload;
+    document.getElementById('btn-upload-label').textContent = tr.btnUpload;
+    document.getElementById('label-grid').textContent = tr.labelGrid;
+    document.getElementById('label-comp-style').textContent = tr.labelCompStyle;
+    document.getElementById('opt-style-htt').textContent = tr.optStyleHtt;
+    document.getElementById('opt-style-origin').textContent = tr.optStyleOrigin;
+    document.getElementById('label-decomp').textContent = tr.labelDecomp;
+    document.getElementById('opt-order-xy').textContent = tr.optOrderXy;
+    document.getElementById('opt-order-yx').textContent = tr.optOrderYx;
+    document.getElementById('label-rot').textContent = tr.labelRot;
+    document.getElementById('btn-reset').textContent = tr.btnReset;
+    draw();
+  }
 
-        if (skipActiveElement !== inputs.mag) inputs.mag.value = mag.toFixed(1);
-        if (skipActiveElement !== inputs.sliderMag) inputs.sliderMag.value = mag;
+  document.getElementById('lang-toggle').addEventListener('click', () => {
+    currentLang = currentLang === 'zh' ? 'en' : 'zh';
+    updateLanguageUI();
+  });
 
-        if (skipActiveElement !== inputs.angle) inputs.angle.value = displayAngle.toFixed(1);
-        if (skipActiveElement !== inputs.sliderAngle) inputs.sliderAngle.value = displayAngle;
+  window.addEventListener('message', (ev) => {
+    if (ev.data?.type !== 's3phy:lang') return;
+    currentLang = hubLangToLocal(ev.data.lang);
+    updateLanguageUI();
+  });
 
-        if (skipActiveElement !== inputs.x) inputs.x.value = vector.x.toFixed(1);
-        if (skipActiveElement !== inputs.sliderX) inputs.sliderX.value = vector.x;
-        
-        if (skipActiveElement !== inputs.y) inputs.y.value = (-vector.y).toFixed(1);
-        if (skipActiveElement !== inputs.sliderY) inputs.sliderY.value = -vector.y;
+  // --- Configuration ---
+  const canvas = document.getElementById('vectorCanvas');
+  const ctx = canvas.getContext('2d');
+  const width = canvas.width;
+  const height = canvas.height;
+  const scale = 20;
 
-        inputs.rot.value = axisAngle;
-        inputs.sliderRot.value = axisAngle;
+  // State
+  let vector = { x: 6, y: -4 }; // Y is Canvas Y (positive down)
+  let origin = { x: width / 2, y: height / 2 };
+  let axisAngle = 0;
+  let bgImage = null;
+  let showGrid = true;
+  let angleRef = 'x'; // 'x' or 'y'
+  let axisPolarity = 1; // 1 for Positive, -1 for Negative
+  let compStyle = 'head-to-tail'; // 'head-to-tail' or 'origin'
+  let decompOrder = 'xy'; // 'xy' (X then Y) or 'yx' (Y then X)
 
-        draw();
-    }
+  // Label Collision State
+  let drawnLabels = [];
 
-    // Handlers
-    function onMagnitudeInput(e) {
-        let newMag = parseFloat(e.target.value);
-        if (isNaN(newMag) || newMag < 0) newMag = 0;
-        let currentAngle = getAngleFromRef();
-        setVectorFromRef(newMag, currentAngle);
-        updateUI(e.target);
-    }
+  // Interaction State
+  let isDraggingVector = false;
+  let isDraggingOrigin = false;
 
-    function onAngleInput(e) {
-        let newAngle = parseFloat(e.target.value);
-        let currentMag = Math.hypot(vector.x, vector.y);
-        setVectorFromRef(currentMag, newAngle);
-        updateUI(e.target);
-    }
+  // DOM Elements
+  const inputs = {
+    mag: document.getElementById('numMag'),
+    sliderMag: document.getElementById('sliderMag'),
+    angle: document.getElementById('numAngle'),
+    sliderAngle: document.getElementById('sliderAngle'),
+    x: document.getElementById('numX'),
+    y: document.getElementById('numY'),
+    sliderX: document.getElementById('sliderX'),
+    sliderY: document.getElementById('sliderY'),
+    rot: document.getElementById('numRot'),
+    sliderRot: document.getElementById('sliderRot'),
+    bgUpload: document.getElementById('bgUpload'),
+    checkGrid: document.getElementById('showGrid'),
+    angleRefs: document.getElementsByName('angleRef'),
+    axisPolarities: document.getElementsByName('axisPolarity'),
+    compStyles: document.getElementsByName('compStyle'),
+    decompOrders: document.getElementsByName('decompOrder')
+  };
 
-    function onComponentInput(e) {
-        vector.x = parseFloat(inputs.sliderX.value);
-        vector.y = -parseFloat(inputs.sliderY.value);
-        updateUI(e.target);
-    }
-    
-    function onComponentTextInput(e) {
-        vector.x = parseFloat(inputs.x.value);
-        vector.y = -parseFloat(inputs.y.value);
-        updateUI(e.target);
-    }
+  // --- Logic ---
 
-    inputs.angleRefs.forEach(radio => {
-        radio.addEventListener('change', (e) => {
-            angleRef = e.target.value;
-            updateUI(); 
-        });
+  function getAngleFromRef() {
+    let mathAngle = Math.atan2(-vector.y, vector.x);
+    let baseOffset = (angleRef === 'x') ? 0 : (Math.PI / 2);
+    if (axisPolarity === -1) baseOffset += Math.PI;
+
+    let relAngle = mathAngle - baseOffset;
+    let deg = relAngle * 180 / Math.PI;
+    while (deg > 180) deg -= 360;
+    while (deg < -180) deg += 360;
+    return deg;
+  }
+
+  function setVectorFromRef(mag, angleDeg) {
+    let angleRad = angleDeg * Math.PI / 180;
+    let baseOffset = (angleRef === 'x') ? 0 : (Math.PI / 2);
+    if (axisPolarity === -1) baseOffset += Math.PI;
+
+    let mathAngle = angleRad + baseOffset;
+    vector.x = mag * Math.cos(mathAngle);
+    vector.y = -mag * Math.sin(mathAngle);
+  }
+
+  // Update UI elements from State
+  function updateUI(skipActiveElement = null) {
+    const mag = Math.hypot(vector.x, vector.y);
+    const displayAngle = getAngleFromRef();
+
+    if (skipActiveElement !== inputs.mag) inputs.mag.value = mag.toFixed(1);
+    if (skipActiveElement !== inputs.sliderMag) inputs.sliderMag.value = mag;
+
+    if (skipActiveElement !== inputs.angle) inputs.angle.value = displayAngle.toFixed(1);
+    if (skipActiveElement !== inputs.sliderAngle) inputs.sliderAngle.value = displayAngle;
+
+    if (skipActiveElement !== inputs.x) inputs.x.value = vector.x.toFixed(1);
+    if (skipActiveElement !== inputs.sliderX) inputs.sliderX.value = vector.x;
+
+    if (skipActiveElement !== inputs.y) inputs.y.value = (-vector.y).toFixed(1);
+    if (skipActiveElement !== inputs.sliderY) inputs.sliderY.value = -vector.y;
+
+    inputs.rot.value = axisAngle;
+    inputs.sliderRot.value = axisAngle;
+
+    draw();
+  }
+
+  // Handlers
+  function onMagnitudeInput(e) {
+    let newMag = parseFloat(e.target.value);
+    if (isNaN(newMag) || newMag < 0) newMag = 0;
+    let currentAngle = getAngleFromRef();
+    setVectorFromRef(newMag, currentAngle);
+    updateUI(e.target);
+  }
+
+  function onAngleInput(e) {
+    let newAngle = parseFloat(e.target.value);
+    let currentMag = Math.hypot(vector.x, vector.y);
+    setVectorFromRef(currentMag, newAngle);
+    updateUI(e.target);
+  }
+
+  function onComponentInput(e) {
+    vector.x = parseFloat(inputs.sliderX.value);
+    vector.y = -parseFloat(inputs.sliderY.value);
+    updateUI(e.target);
+  }
+
+  function onComponentTextInput(e) {
+    vector.x = parseFloat(inputs.x.value);
+    vector.y = -parseFloat(inputs.y.value);
+    updateUI(e.target);
+  }
+
+  inputs.angleRefs.forEach(radio => {
+    radio.addEventListener('change', (e) => {
+      angleRef = e.target.value;
+      updateUI();
     });
+  });
 
-    inputs.axisPolarities.forEach(radio => {
-        radio.addEventListener('change', (e) => {
-            axisPolarity = parseInt(e.target.value);
-            updateUI(); 
-        });
+  inputs.axisPolarities.forEach(radio => {
+    radio.addEventListener('change', (e) => {
+      axisPolarity = parseInt(e.target.value);
+      updateUI();
     });
+  });
 
-    inputs.compStyles.forEach(radio => {
-        radio.addEventListener('change', (e) => {
-            compStyle = e.target.value;
-            draw(); 
-        });
+  inputs.compStyles.forEach(radio => {
+    radio.addEventListener('change', (e) => {
+      compStyle = e.target.value;
+      draw();
     });
+  });
 
-    inputs.decompOrders.forEach(radio => {
-        radio.addEventListener('change', (e) => {
-            decompOrder = e.target.value;
-            draw(); 
-        });
+  inputs.decompOrders.forEach(radio => {
+    radio.addEventListener('change', (e) => {
+      decompOrder = e.target.value;
+      draw();
     });
+  });
 
-    // Event Listeners
-    inputs.sliderMag.addEventListener('input', onMagnitudeInput);
-    inputs.mag.addEventListener('input', onMagnitudeInput);
-    inputs.sliderAngle.addEventListener('input', onAngleInput);
-    inputs.angle.addEventListener('input', onAngleInput);
-    inputs.sliderX.addEventListener('input', onComponentInput);
-    inputs.sliderY.addEventListener('input', onComponentInput);
-    inputs.x.addEventListener('input', onComponentTextInput);
-    inputs.y.addEventListener('input', onComponentTextInput);
-    
-    inputs.sliderRot.addEventListener('input', () => {
-        axisAngle = parseFloat(inputs.sliderRot.value);
-        updateUI();
-    });
-    inputs.rot.addEventListener('input', () => {
-        let val = parseFloat(inputs.rot.value);
-        if (!isNaN(val)) {
-            if (val > 180) val = 180;
-            if (val < -180) val = -180;
-            axisAngle = val;
-            updateUI();
-        }
-    });
+  // Event Listeners
+  inputs.sliderMag.addEventListener('input', onMagnitudeInput);
+  inputs.mag.addEventListener('input', onMagnitudeInput);
+  inputs.sliderAngle.addEventListener('input', onAngleInput);
+  inputs.angle.addEventListener('input', onAngleInput);
+  inputs.sliderX.addEventListener('input', onComponentInput);
+  inputs.sliderY.addEventListener('input', onComponentInput);
+  inputs.x.addEventListener('input', onComponentTextInput);
+  inputs.y.addEventListener('input', onComponentTextInput);
 
-    inputs.bgUpload.addEventListener('change', function(e) {
-        const file = e.target.files[0];
-        if(!file) return;
-        const reader = new FileReader();
-        reader.onload = function(event) {
-            const img = new Image();
-            img.onload = function() { bgImage = img; draw(); }
-            img.src = event.target.result;
-        }
-        reader.readAsDataURL(file);
-    });
-
-    inputs.checkGrid.addEventListener('change', (e) => { showGrid = e.target.checked; draw(); });
-
-    window.resetView = function() {
-        origin = { x: width/2, y: height/2 };
-        axisAngle = 0;
-        vector = { x: 6, y: -4 };
-        angleRef = 'x';
-        axisPolarity = 1;
-        compStyle = 'head-to-tail';
-        decompOrder = 'xy';
-        inputs.angleRefs[0].checked = true;
-        inputs.axisPolarities[0].checked = true;
-        inputs.compStyles[0].checked = true;
-        inputs.decompOrders[0].checked = true;
-        updateUI();
-    }
-
-    // --- Coordinate Logic ---
-    function screenToLocal(screenX, screenY) {
-        let dx = screenX - origin.x;
-        let dy = screenY - origin.y;
-        let rad = -axisAngle * Math.PI / 180;
-        let localX = dx * Math.cos(rad) - dy * Math.sin(rad);
-        let localY = dx * Math.sin(rad) + dy * Math.cos(rad);
-        return { x: localX / scale, y: localY / scale };
-    }
-
-    // --- Mouse Interaction ---
-    canvas.addEventListener('mousedown', (e) => {
-        const mouse = getMousePos(e);
-        const distOrigin = Math.hypot(mouse.x - origin.x, mouse.y - origin.y);
-        
-        let rad = axisAngle * Math.PI / 180;
-        let tipLocalX = vector.x * scale;
-        let tipLocalY = vector.y * scale;
-        let tipScreenX = origin.x + (tipLocalX * Math.cos(rad) - tipLocalY * Math.sin(rad));
-        let tipScreenY = origin.y + (tipLocalX * Math.sin(rad) + tipLocalY * Math.cos(rad));
-        const distTip = Math.hypot(mouse.x - tipScreenX, mouse.y - tipScreenY);
-
-        if (e.button === 2 || e.shiftKey || distOrigin < 15) {
-            isDraggingOrigin = true;
-        } else if (distTip < 15) {
-            isDraggingVector = true;
-        }
-    });
-
-    canvas.addEventListener('mousemove', (e) => {
-        const mouse = getMousePos(e);
-        if (isDraggingOrigin) {
-            origin.x = mouse.x;
-            origin.y = mouse.y;
-            draw();
-        } else if (isDraggingVector) {
-            const local = screenToLocal(mouse.x, mouse.y);
-            vector.x = Math.max(-20, Math.min(20, local.x));
-            vector.y = Math.max(-20, Math.min(20, local.y));
-            updateUI();
-        }
-    });
-
-    window.addEventListener('mouseup', () => { isDraggingVector = false; isDraggingOrigin = false; });
-    canvas.addEventListener('contextmenu', e => e.preventDefault());
-
-    function getMousePos(evt) {
-        const rect = canvas.getBoundingClientRect();
-        return { x: evt.clientX - rect.left, y: evt.clientY - rect.top };
-    }
-
-    // --- Drawing Functions ---
-
-    function drawBackground(ctx) {
-        if (!bgImage) return;
-        const hRatio = width / bgImage.width;
-        const vRatio = height / bgImage.height;
-        const ratio = Math.min(hRatio, vRatio);
-        const centerShift_x = (width - bgImage.width * ratio) / 2;
-        const centerShift_y = (height - bgImage.height * ratio) / 2;
-        
-        ctx.save();
-        ctx.globalAlpha = 0.5; 
-        ctx.drawImage(bgImage, 0, 0, bgImage.width, bgImage.height, 
-                      centerShift_x, centerShift_y, bgImage.width*ratio, bgImage.height*ratio);
-        ctx.restore();
-    }
-
-    function drawArrow(ctx, fromX, fromY, toX, toY, color, width, dashed) {
-        const headLen = 12;
-        const angle = Math.atan2(toY - fromY, toX - fromX);
-        ctx.beginPath();
-        ctx.lineWidth = width;
-        ctx.strokeStyle = color;
-        ctx.fillStyle = color;
-        if(dashed) ctx.setLineDash([5, 5]); else ctx.setLineDash([]);
-        ctx.moveTo(fromX, fromY); ctx.lineTo(toX, toY); ctx.stroke();
-        ctx.setLineDash([]);
-        ctx.beginPath();
-        ctx.moveTo(toX, toY);
-        ctx.lineTo(toX - headLen * Math.cos(angle - Math.PI/6), toY - headLen * Math.sin(angle - Math.PI/6));
-        ctx.lineTo(toX - headLen * Math.cos(angle + Math.PI/6), toY - headLen * Math.sin(angle + Math.PI/6));
-        ctx.fill();
-    }
-
-    // --- Smart Labeling System ---
-    
-    function isIntersecting(r1, r2) {
-        return !(r2.x > r1.x + r1.w || 
-                 r2.x + r2.w < r1.x || 
-                 r2.y > r1.y + r1.h || 
-                 r2.y + r2.h < r1.y);
-    }
-
-    function drawSmartLabel(ctx, text, x, y, align, baseline, color = "#444") {
-        ctx.save();
-        ctx.font = "bold 14px sans-serif";
-        ctx.textAlign = "left"; 
-        ctx.textBaseline = "top";
-        
-        const metrics = ctx.measureText(text);
-        const textWidth = metrics.width;
-        const textHeight = 14; 
-        const padding = 4;
-
-        let boxX = x;
-        let boxY = y;
-
-        if (align === "right") boxX = x - textWidth;
-        else if (align === "center") boxX = x - textWidth / 2;
-        
-        if (baseline === "middle") boxY = y - textHeight / 2;
-        else if (baseline === "bottom") boxY = y - textHeight;
-        
-        let box = { x: boxX - padding, y: boxY - padding, w: textWidth + padding*2, h: textHeight + padding*2 };
-
-        let attempts = 0;
-        let maxAttempts = 10;
-        let overlapFound = true;
-
-        while (overlapFound && attempts < maxAttempts) {
-            overlapFound = false;
-            for (let other of drawnLabels) {
-                if (isIntersecting(box, other)) {
-                    overlapFound = true;
-                    box.y = other.y + other.h + 2; 
-                    break;
-                }
-            }
-            attempts++;
-        }
-
-        drawnLabels.push(box);
-
-        ctx.fillStyle = "rgba(255, 255, 255, 0.9)"; 
-        ctx.fillRect(box.x, box.y, box.w, box.h);
-
-        ctx.fillStyle = color;
-        ctx.fillText(text, box.x + padding, box.y + padding);
-        ctx.restore();
-    }
-
-    function drawGrid(ctx) {
-        if (!showGrid) return;
-        const gridSize = 30; 
-        
-        // Draw Grid Lines
-        ctx.strokeStyle = 'rgba(0,0,0,0.15)'; 
-        ctx.lineWidth = 1;
-        for (let i = -gridSize; i <= gridSize; i++) {
-            ctx.beginPath(); ctx.moveTo(i * scale, -gridSize * scale); ctx.lineTo(i * scale, gridSize * scale); ctx.stroke();
-            ctx.beginPath(); ctx.moveTo(-gridSize * scale, i * scale); ctx.lineTo(gridSize * scale, i * scale); ctx.stroke();
-        }
-        
-        // Draw Main Axes Lines
-        ctx.strokeStyle = '#444';
-        ctx.lineWidth = 2;
-        ctx.beginPath();
-        ctx.moveTo(0, -gridSize * scale); ctx.lineTo(0, gridSize * scale); // Y (Dir 2)
-        ctx.moveTo(-gridSize * scale, 0); ctx.lineTo(gridSize * scale, 0); // X (Dir 1)
-        ctx.stroke();
-
-        // --- Smart Label Positioning ---
-        ctx.save();
-        ctx.setTransform(1, 0, 0, 1, 0, 0); // Reset to Global
-        
-        const pad = 20; 
-        const bounds = { minX: pad, minY: pad, maxX: width - pad, maxY: height - pad };
-        
-        const rad = axisAngle * Math.PI / 180;
-        const dir1 = { x: Math.cos(rad), y: Math.sin(rad) }; 
-        const dir2 = { x: -Math.sin(rad), y: Math.cos(rad) }; 
-        
-        function getClampedPoint(dir) {
-            let t = Infinity;
-            if (dir.x > 0) t = Math.min(t, (bounds.maxX - origin.x) / dir.x);
-            else if (dir.x < 0) t = Math.min(t, (bounds.minX - origin.x) / dir.x);
-            
-            if (dir.y > 0) t = Math.min(t, (bounds.maxY - origin.y) / dir.y);
-            else if (dir.y < 0) t = Math.min(t, (bounds.minY - origin.y) / dir.y);
-            
-            return { x: origin.x + t * dir.x, y: origin.y + t * dir.y };
-        }
-
-        const p1 = getClampedPoint(dir1);
-        const p2 = getClampedPoint({x: -dir2.x, y: -dir2.y}); 
-        
-        drawSmartLabel(ctx, "Resolving Direction 1", 
-            p1.x - dir1.x * 10, 
-            p1.y - dir1.y * 10, 
-            "right", "middle"
-        );
-        
-        drawSmartLabel(ctx, "Resolving Direction 2", 
-            p2.x - (-dir2.x) * 10, 
-            p2.y - (-dir2.y) * 10, 
-            "left", "middle"
-        );
-        
-        ctx.restore();
-    }
-
-    function drawAngle(ctx, x, y) {
-        const radius = 40;
-        const mathAngle = Math.atan2(y, x); 
-        
-        ctx.beginPath();
-        ctx.strokeStyle = '#f39c12';
-        ctx.lineWidth = 2;
-
-        let startAngle = 0;
-        if (angleRef === 'x') {
-            startAngle = (axisPolarity === 1) ? 0 : Math.PI;
-        } else {
-            startAngle = (axisPolarity === 1) ? -Math.PI / 2 : Math.PI / 2;
-        }
-
-        let diff = mathAngle - startAngle;
-        while (diff > Math.PI) diff -= 2*Math.PI;
-        while (diff < -Math.PI) diff += 2*Math.PI;
-
-        let counterClockwise = (diff < 0);
-        
-        ctx.arc(0, 0, radius, startAngle, mathAngle, counterClockwise);
-        ctx.stroke();
-
-        let midRad = startAngle + diff / 2;
-        let labelRadius = radius + 15;
-        
-        const lx = labelRadius * Math.cos(midRad);
-        const ly = labelRadius * Math.sin(midRad);
-        
-        let rad = axisAngle * Math.PI / 180;
-        let gx = origin.x + (lx * Math.cos(rad) - ly * Math.sin(rad));
-        let gy = origin.y + (lx * Math.sin(rad) + ly * Math.cos(rad));
-
-        ctx.save();
-        ctx.setTransform(1, 0, 0, 1, 0, 0);
-        drawSmartLabel(ctx, "θ", gx, gy, "center", "middle", "#f39c12");
-        ctx.restore();
-    }
-
-    function drawLabels(ctx, tipX, tipY) {
-        let labelH, labelV;
-        
-        if (angleRef === 'x') {
-            labelH = "F cos θ";
-            labelV = "F sin θ";
-        } else {
-            labelH = "F sin θ"; 
-            labelV = "F cos θ"; 
-        }
-
-        let hX, hY, vX, vY;
-        let hAlign = "center", hBase = "top";
-        let vAlign = "left", vBase = "middle"; 
-
-        if (compStyle === 'head-to-tail') {
-            if (decompOrder === 'xy') {
-                // Standard: X then Y
-                hX = tipX / 2;
-                hY = (tipY < 0) ? 10 : -20;
-                if (tipY >= 0) hBase = "bottom";
-
-                vX = tipX + 10; 
-                vY = tipY / 2;
-                vAlign = "left"; 
-            } else {
-                // Reversed: Y then X
-                // Vertical component is at X=0, Y=tipY/2
-                vX = -10; 
-                vY = tipY / 2;
-                vAlign = "right";
-
-                // Horizontal component starts at (0, tipY) and goes to (tipX, tipY)
-                hX = tipX / 2;
-                hY = tipY + ((tipY < 0) ? -20 : 10);
-                hBase = (tipY < 0) ? "bottom" : "top";
-            }
-        } else {
-            // Origin Style
-            hX = tipX / 2;
-            hY = (tipY < 0) ? 10 : -20;
-            if (tipY >= 0) hBase = "bottom";
-
-            vX = -10; 
-            vY = tipY / 2;
-            vAlign = "right";
-        }
-
-        // Convert local coords to global for collision check
-        let rad = axisAngle * Math.PI / 180;
-        
-        function localToGlobal(lx, ly) {
-            return {
-                x: origin.x + (lx * Math.cos(rad) - ly * Math.sin(rad)),
-                y: origin.y + (lx * Math.sin(rad) + ly * Math.cos(rad))
-            };
-        }
-
-        let gH = localToGlobal(hX, hY);
-        let gV = localToGlobal(vX, vY);
-        let gR = localToGlobal(tipX / 2 - 10, tipY / 2 - 10);
-
-        ctx.save();
-        ctx.setTransform(1, 0, 0, 1, 0, 0);
-        
-        drawSmartLabel(ctx, labelH, gH.x, gH.y, hAlign, hBase, "#e74c3c");
-        drawSmartLabel(ctx, labelV, gV.x, gV.y, vAlign, vBase, "#e74c3c");
-        drawSmartLabel(ctx, "F", gR.x, gR.y, "right", "bottom", "#4a90e2");
-        
-        ctx.restore();
-    }
-
-    function drawComponents(ctx, tipX, tipY) {
-        if (compStyle === 'head-to-tail') {
-            if (decompOrder === 'xy') {
-                // Draw X then Y
-                drawArrow(ctx, 0, 0, tipX, 0, '#e74c3c', 2, false); 
-                drawArrow(ctx, tipX, 0, tipX, tipY, '#e74c3c', 2, false); 
-            } else {
-                // Draw Y then X
-                drawArrow(ctx, 0, 0, 0, tipY, '#e74c3c', 2, false); 
-                drawArrow(ctx, 0, tipY, tipX, tipY, '#e74c3c', 2, false); 
-            }
-        } else {
-            drawArrow(ctx, 0, 0, tipX, 0, '#e74c3c', 2, false); 
-            drawArrow(ctx, 0, 0, 0, tipY, '#e74c3c', 2, false); 
-
-            ctx.setLineDash([5, 5]);
-            ctx.strokeStyle = '#e74c3c';
-            ctx.lineWidth = 1;
-            ctx.beginPath();
-            ctx.moveTo(tipX, 0); ctx.lineTo(tipX, tipY); // Vertical dashed
-            ctx.stroke();
-            ctx.beginPath();
-            ctx.moveTo(0, tipY); ctx.lineTo(tipX, tipY); // Horizontal dashed
-            ctx.stroke();
-            ctx.setLineDash([]);
-        }
-    }
-
-    function draw() {
-        // Reset Label Collision Store for this frame
-        drawnLabels = [];
-
-        ctx.setTransform(1, 0, 0, 1, 0, 0);
-        ctx.clearRect(0, 0, width, height);
-
-        drawBackground(ctx);
-
-        ctx.translate(origin.x, origin.y);
-        ctx.rotate(axisAngle * Math.PI / 180);
-
-        drawGrid(ctx);
-
-        const tipX = vector.x * scale;
-        const tipY = vector.y * scale;
-        
-        drawAngle(ctx, tipX, tipY);
-        
-        drawComponents(ctx, tipX, tipY);
-
-        // Resultant
-        drawArrow(ctx, 0, 0, tipX, tipY, '#4a90e2', 3, false); 
-        
-        drawLabels(ctx, tipX, tipY);
-
-        ctx.beginPath(); ctx.arc(0, 0, 4, 0, Math.PI*2); ctx.fillStyle = "#333"; ctx.fill();
-    }
-
+  inputs.sliderRot.addEventListener('input', () => {
+    axisAngle = parseFloat(inputs.sliderRot.value);
     updateUI();
+  });
+  inputs.rot.addEventListener('input', () => {
+    let val = parseFloat(inputs.rot.value);
+    if (!isNaN(val)) {
+      if (val > 180) val = 180;
+      if (val < -180) val = -180;
+      axisAngle = val;
+      updateUI();
+    }
+  });
 
+  inputs.bgUpload.addEventListener('change', function (e) {
+    const file = e.target.files[0];
+    if (!file) return;
+    const reader = new FileReader();
+    reader.onload = function (event) {
+      const img = new Image();
+      img.onload = function () { bgImage = img; draw(); };
+      img.src = event.target.result;
+    };
+    reader.readAsDataURL(file);
+  });
+
+  inputs.checkGrid.addEventListener('change', (e) => { showGrid = e.target.checked; draw(); });
+
+  window.resetView = function () {
+    origin = { x: width / 2, y: height / 2 };
+    axisAngle = 0;
+    vector = { x: 6, y: -4 };
+    angleRef = 'x';
+    axisPolarity = 1;
+    compStyle = 'head-to-tail';
+    decompOrder = 'xy';
+    inputs.angleRefs[0].checked = true;
+    inputs.axisPolarities[0].checked = true;
+    inputs.compStyles[0].checked = true;
+    inputs.decompOrders[0].checked = true;
+    updateUI();
+  };
+
+  // --- Coordinate Logic ---
+  function screenToLocal(screenX, screenY) {
+    let dx = screenX - origin.x;
+    let dy = screenY - origin.y;
+    let rad = -axisAngle * Math.PI / 180;
+    let localX = dx * Math.cos(rad) - dy * Math.sin(rad);
+    let localY = dx * Math.sin(rad) + dy * Math.cos(rad);
+    return { x: localX / scale, y: localY / scale };
+  }
+
+  function getPointerPos(clientX, clientY) {
+    const rect = canvas.getBoundingClientRect();
+    return {
+      x: (clientX - rect.left) * (canvas.width / rect.width),
+      y: (clientY - rect.top) * (canvas.height / rect.height)
+    };
+  }
+
+  function getMousePos(evt) {
+    return getPointerPos(evt.clientX, evt.clientY);
+  }
+
+  function tipScreenPos() {
+    let rad = axisAngle * Math.PI / 180;
+    let tipLocalX = vector.x * scale;
+    let tipLocalY = vector.y * scale;
+    return {
+      x: origin.x + (tipLocalX * Math.cos(rad) - tipLocalY * Math.sin(rad)),
+      y: origin.y + (tipLocalX * Math.sin(rad) + tipLocalY * Math.cos(rad))
+    };
+  }
+
+  function beginDragAt(pos, forceOrigin) {
+    const distOrigin = Math.hypot(pos.x - origin.x, pos.y - origin.y);
+    const tip = tipScreenPos();
+    const distTip = Math.hypot(pos.x - tip.x, pos.y - tip.y);
+
+    if (forceOrigin || distOrigin < 15) {
+      isDraggingOrigin = true;
+      isDraggingVector = false;
+    } else if (distTip < 15) {
+      isDraggingVector = true;
+      isDraggingOrigin = false;
+    }
+  }
+
+  function moveDragAt(pos) {
+    if (isDraggingOrigin) {
+      origin.x = pos.x;
+      origin.y = pos.y;
+      draw();
+    } else if (isDraggingVector) {
+      const local = screenToLocal(pos.x, pos.y);
+      vector.x = Math.max(-20, Math.min(20, local.x));
+      vector.y = Math.max(-20, Math.min(20, local.y));
+      updateUI();
+    }
+  }
+
+  function endDrag() {
+    isDraggingVector = false;
+    isDraggingOrigin = false;
+  }
+
+  // --- Mouse Interaction ---
+  canvas.addEventListener('mousedown', (e) => {
+    const mouse = getMousePos(e);
+    beginDragAt(mouse, e.button === 2 || e.shiftKey);
+  });
+
+  canvas.addEventListener('mousemove', (e) => {
+    moveDragAt(getMousePos(e));
+  });
+
+  window.addEventListener('mouseup', endDrag);
+  canvas.addEventListener('contextmenu', e => e.preventDefault());
+
+  // --- Touch Interaction ---
+  canvas.addEventListener('touchstart', (e) => {
+    if (e.touches.length !== 1) return;
+    e.preventDefault();
+    const touch = e.touches[0];
+    beginDragAt(getPointerPos(touch.clientX, touch.clientY), false);
+  }, { passive: false });
+
+  canvas.addEventListener('touchmove', (e) => {
+    if (e.touches.length !== 1) return;
+    if (!isDraggingOrigin && !isDraggingVector) return;
+    e.preventDefault();
+    const touch = e.touches[0];
+    moveDragAt(getPointerPos(touch.clientX, touch.clientY));
+  }, { passive: false });
+
+  canvas.addEventListener('touchend', endDrag);
+  canvas.addEventListener('touchcancel', endDrag);
+
+  // --- Drawing Functions ---
+
+  function drawBackground(ctx) {
+    if (!bgImage) return;
+    const hRatio = width / bgImage.width;
+    const vRatio = height / bgImage.height;
+    const ratio = Math.min(hRatio, vRatio);
+    const centerShift_x = (width - bgImage.width * ratio) / 2;
+    const centerShift_y = (height - bgImage.height * ratio) / 2;
+
+    ctx.save();
+    ctx.globalAlpha = 0.5;
+    ctx.drawImage(bgImage, 0, 0, bgImage.width, bgImage.height,
+      centerShift_x, centerShift_y, bgImage.width * ratio, bgImage.height * ratio);
+    ctx.restore();
+  }
+
+  function drawArrow(ctx, fromX, fromY, toX, toY, color, width, dashed) {
+    const headLen = 12;
+    const angle = Math.atan2(toY - fromY, toX - fromX);
+    ctx.beginPath();
+    ctx.lineWidth = width;
+    ctx.strokeStyle = color;
+    ctx.fillStyle = color;
+    if (dashed) ctx.setLineDash([5, 5]); else ctx.setLineDash([]);
+    ctx.moveTo(fromX, fromY); ctx.lineTo(toX, toY); ctx.stroke();
+    ctx.setLineDash([]);
+    ctx.beginPath();
+    ctx.moveTo(toX, toY);
+    ctx.lineTo(toX - headLen * Math.cos(angle - Math.PI / 6), toY - headLen * Math.sin(angle - Math.PI / 6));
+    ctx.lineTo(toX - headLen * Math.cos(angle + Math.PI / 6), toY - headLen * Math.sin(angle + Math.PI / 6));
+    ctx.fill();
+  }
+
+  // --- Smart Labeling System ---
+
+  function isIntersecting(r1, r2) {
+    return !(r2.x > r1.x + r1.w ||
+      r2.x + r2.w < r1.x ||
+      r2.y > r1.y + r1.h ||
+      r2.y + r2.h < r1.y);
+  }
+
+  function drawSmartLabel(ctx, text, x, y, align, baseline, color = "#444") {
+    ctx.save();
+    ctx.font = "bold 14px system-ui, sans-serif";
+    ctx.textAlign = "left";
+    ctx.textBaseline = "top";
+
+    const metrics = ctx.measureText(text);
+    const textWidth = metrics.width;
+    const textHeight = 14;
+    const padding = 4;
+
+    let boxX = x;
+    let boxY = y;
+
+    if (align === "right") boxX = x - textWidth;
+    else if (align === "center") boxX = x - textWidth / 2;
+
+    if (baseline === "middle") boxY = y - textHeight / 2;
+    else if (baseline === "bottom") boxY = y - textHeight;
+
+    let box = { x: boxX - padding, y: boxY - padding, w: textWidth + padding * 2, h: textHeight + padding * 2 };
+
+    let attempts = 0;
+    let maxAttempts = 10;
+    let overlapFound = true;
+
+    while (overlapFound && attempts < maxAttempts) {
+      overlapFound = false;
+      for (let other of drawnLabels) {
+        if (isIntersecting(box, other)) {
+          overlapFound = true;
+          box.y = other.y + other.h + 2;
+          break;
+        }
+      }
+      attempts++;
+    }
+
+    drawnLabels.push(box);
+
+    ctx.fillStyle = "rgba(255, 255, 255, 0.9)";
+    ctx.fillRect(box.x, box.y, box.w, box.h);
+
+    ctx.fillStyle = color;
+    ctx.fillText(text, box.x + padding, box.y + padding);
+    ctx.restore();
+  }
+
+  function drawGrid(ctx) {
+    if (!showGrid) return;
+    const gridSize = 30;
+
+    // Draw Grid Lines
+    ctx.strokeStyle = 'rgba(0,0,0,0.15)';
+    ctx.lineWidth = 1;
+    for (let i = -gridSize; i <= gridSize; i++) {
+      ctx.beginPath(); ctx.moveTo(i * scale, -gridSize * scale); ctx.lineTo(i * scale, gridSize * scale); ctx.stroke();
+      ctx.beginPath(); ctx.moveTo(-gridSize * scale, i * scale); ctx.lineTo(gridSize * scale, i * scale); ctx.stroke();
+    }
+
+    // Draw Main Axes Lines
+    ctx.strokeStyle = '#444';
+    ctx.lineWidth = 2;
+    ctx.beginPath();
+    ctx.moveTo(0, -gridSize * scale); ctx.lineTo(0, gridSize * scale); // Y (Dir 2)
+    ctx.moveTo(-gridSize * scale, 0); ctx.lineTo(gridSize * scale, 0); // X (Dir 1)
+    ctx.stroke();
+
+    // --- Smart Label Positioning ---
+    ctx.save();
+    ctx.setTransform(1, 0, 0, 1, 0, 0); // Reset to Global
+
+    const pad = 20;
+    const bounds = { minX: pad, minY: pad, maxX: width - pad, maxY: height - pad };
+
+    const rad = axisAngle * Math.PI / 180;
+    const dir1 = { x: Math.cos(rad), y: Math.sin(rad) };
+    const dir2 = { x: -Math.sin(rad), y: Math.cos(rad) };
+
+    function getClampedPoint(dir) {
+      let t = Infinity;
+      if (dir.x > 0) t = Math.min(t, (bounds.maxX - origin.x) / dir.x);
+      else if (dir.x < 0) t = Math.min(t, (bounds.minX - origin.x) / dir.x);
+
+      if (dir.y > 0) t = Math.min(t, (bounds.maxY - origin.y) / dir.y);
+      else if (dir.y < 0) t = Math.min(t, (bounds.minY - origin.y) / dir.y);
+
+      return { x: origin.x + t * dir.x, y: origin.y + t * dir.y };
+    }
+
+    const p1 = getClampedPoint(dir1);
+    const p2 = getClampedPoint({ x: -dir2.x, y: -dir2.y });
+    const tr = t();
+
+    drawSmartLabel(ctx, tr.dir1,
+      p1.x - dir1.x * 10,
+      p1.y - dir1.y * 10,
+      "right", "middle"
+    );
+
+    drawSmartLabel(ctx, tr.dir2,
+      p2.x - (-dir2.x) * 10,
+      p2.y - (-dir2.y) * 10,
+      "left", "middle"
+    );
+
+    ctx.restore();
+  }
+
+  function drawAngle(ctx, x, y) {
+    const radius = 40;
+    const mathAngle = Math.atan2(y, x);
+
+    ctx.beginPath();
+    ctx.strokeStyle = '#f39c12';
+    ctx.lineWidth = 2;
+
+    let startAngle = 0;
+    if (angleRef === 'x') {
+      startAngle = (axisPolarity === 1) ? 0 : Math.PI;
+    } else {
+      startAngle = (axisPolarity === 1) ? -Math.PI / 2 : Math.PI / 2;
+    }
+
+    let diff = mathAngle - startAngle;
+    while (diff > Math.PI) diff -= 2 * Math.PI;
+    while (diff < -Math.PI) diff += 2 * Math.PI;
+
+    let counterClockwise = (diff < 0);
+
+    ctx.arc(0, 0, radius, startAngle, mathAngle, counterClockwise);
+    ctx.stroke();
+
+    let midRad = startAngle + diff / 2;
+    let labelRadius = radius + 15;
+
+    const lx = labelRadius * Math.cos(midRad);
+    const ly = labelRadius * Math.sin(midRad);
+
+    let rad = axisAngle * Math.PI / 180;
+    let gx = origin.x + (lx * Math.cos(rad) - ly * Math.sin(rad));
+    let gy = origin.y + (lx * Math.sin(rad) + ly * Math.cos(rad));
+
+    ctx.save();
+    ctx.setTransform(1, 0, 0, 1, 0, 0);
+    drawSmartLabel(ctx, "θ", gx, gy, "center", "middle", "#f39c12");
+    ctx.restore();
+  }
+
+  function drawLabels(ctx, tipX, tipY) {
+    let labelH, labelV;
+
+    if (angleRef === 'x') {
+      labelH = "F cos θ";
+      labelV = "F sin θ";
+    } else {
+      labelH = "F sin θ";
+      labelV = "F cos θ";
+    }
+
+    let hX, hY, vX, vY;
+    let hAlign = "center", hBase = "top";
+    let vAlign = "left", vBase = "middle";
+
+    if (compStyle === 'head-to-tail') {
+      if (decompOrder === 'xy') {
+        // Standard: X then Y
+        hX = tipX / 2;
+        hY = (tipY < 0) ? 10 : -20;
+        if (tipY >= 0) hBase = "bottom";
+
+        vX = tipX + 10;
+        vY = tipY / 2;
+        vAlign = "left";
+      } else {
+        // Reversed: Y then X
+        vX = -10;
+        vY = tipY / 2;
+        vAlign = "right";
+
+        hX = tipX / 2;
+        hY = tipY + ((tipY < 0) ? -20 : 10);
+        hBase = (tipY < 0) ? "bottom" : "top";
+      }
+    } else {
+      // Origin Style
+      hX = tipX / 2;
+      hY = (tipY < 0) ? 10 : -20;
+      if (tipY >= 0) hBase = "bottom";
+
+      vX = -10;
+      vY = tipY / 2;
+      vAlign = "right";
+    }
+
+    // Convert local coords to global for collision check
+    let rad = axisAngle * Math.PI / 180;
+
+    function localToGlobal(lx, ly) {
+      return {
+        x: origin.x + (lx * Math.cos(rad) - ly * Math.sin(rad)),
+        y: origin.y + (lx * Math.sin(rad) + ly * Math.cos(rad))
+      };
+    }
+
+    let gH = localToGlobal(hX, hY);
+    let gV = localToGlobal(vX, vY);
+    let gR = localToGlobal(tipX / 2 - 10, tipY / 2 - 10);
+
+    ctx.save();
+    ctx.setTransform(1, 0, 0, 1, 0, 0);
+
+    drawSmartLabel(ctx, labelH, gH.x, gH.y, hAlign, hBase, "#e74c3c");
+    drawSmartLabel(ctx, labelV, gV.x, gV.y, vAlign, vBase, "#e74c3c");
+    drawSmartLabel(ctx, "F", gR.x, gR.y, "right", "bottom", "#4a90e2");
+
+    ctx.restore();
+  }
+
+  function drawComponents(ctx, tipX, tipY) {
+    if (compStyle === 'head-to-tail') {
+      if (decompOrder === 'xy') {
+        // Draw X then Y
+        drawArrow(ctx, 0, 0, tipX, 0, '#e74c3c', 2, false);
+        drawArrow(ctx, tipX, 0, tipX, tipY, '#e74c3c', 2, false);
+      } else {
+        // Draw Y then X
+        drawArrow(ctx, 0, 0, 0, tipY, '#e74c3c', 2, false);
+        drawArrow(ctx, 0, tipY, tipX, tipY, '#e74c3c', 2, false);
+      }
+    } else {
+      drawArrow(ctx, 0, 0, tipX, 0, '#e74c3c', 2, false);
+      drawArrow(ctx, 0, 0, 0, tipY, '#e74c3c', 2, false);
+
+      ctx.setLineDash([5, 5]);
+      ctx.strokeStyle = '#e74c3c';
+      ctx.lineWidth = 1;
+      ctx.beginPath();
+      ctx.moveTo(tipX, 0); ctx.lineTo(tipX, tipY); // Vertical dashed
+      ctx.stroke();
+      ctx.beginPath();
+      ctx.moveTo(0, tipY); ctx.lineTo(tipX, tipY); // Horizontal dashed
+      ctx.stroke();
+      ctx.setLineDash([]);
+    }
+  }
+
+  function draw() {
+    // Reset Label Collision Store for this frame
+    drawnLabels = [];
+
+    ctx.setTransform(1, 0, 0, 1, 0, 0);
+    ctx.clearRect(0, 0, width, height);
+
+    drawBackground(ctx);
+
+    ctx.translate(origin.x, origin.y);
+    ctx.rotate(axisAngle * Math.PI / 180);
+
+    drawGrid(ctx);
+
+    const tipX = vector.x * scale;
+    const tipY = vector.y * scale;
+
+    drawAngle(ctx, tipX, tipY);
+
+    drawComponents(ctx, tipX, tipY);
+
+    // Resultant
+    drawArrow(ctx, 0, 0, tipX, tipY, '#4a90e2', 3, false);
+
+    drawLabels(ctx, tipX, tipY);
+
+    ctx.beginPath(); ctx.arc(0, 0, 4, 0, Math.PI * 2); ctx.fillStyle = "#333"; ctx.fill();
+  }
+
+  updateLanguageUI();
+  updateUI();
+})();
 </script>
 
 </body>
 </html>
-
-
-
-
-

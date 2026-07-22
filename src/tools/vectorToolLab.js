@@ -6,6 +6,6 @@ export function createVectorToolLab(t) {
     slug: 'vector-tool',
     titleKey: 'tools.vectorTool.title',
     className: 'tool-vector-tool-lab',
-    extraParams: () => '&v=20260722_vector_v1',
+    extraParams: () => '&v=20260722_vector_v2',
   });
 }
