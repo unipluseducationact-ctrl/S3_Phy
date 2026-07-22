@@ -71,43 +71,43 @@
 
         .wave-banner {
             background: #eef6fc;
-            border: 2px solid #93c5fd;
-            border-radius: 12px;
-            margin: 16px 0;
-            padding: 16px 20px;
+            border: 1px solid #93c5fd;
+            border-radius: 8px;
+            margin: 8px 0;
+            padding: 6px 12px;
             text-align: center;
             color: var(--text);
-            font-weight: 800;
-            font-size: 22px;
-            letter-spacing: 0.02em;
+            font-weight: 700;
+            font-size: 13px;
+            letter-spacing: 0;
             display: flex;
             align-items: center;
             justify-content: center;
-            gap: 18px;
+            gap: 8px;
         }
         .banner-arrow {
-            width: 88px;
-            height: 64px;
+            width: 40px;
+            height: 28px;
             flex-shrink: 0;
             animation: waveFlow 1.5s infinite ease-in-out;
             transition: transform 0.25s ease;
         }
         .banner-arrow path {
-            stroke-width: 5.5;
+            stroke-width: 4;
         }
         .banner-arrow.dir-right { transform: scaleX(-1); }
         @keyframes waveFlow {
-            0% { transform: translateX(8px); }
-            50% { transform: translateX(-8px); }
-            100% { transform: translateX(8px); }
+            0% { transform: translateX(4px); }
+            50% { transform: translateX(-4px); }
+            100% { transform: translateX(4px); }
         }
         .banner-arrow.dir-right {
             animation-name: waveFlowRight;
         }
         @keyframes waveFlowRight {
-            0% { transform: scaleX(-1) translateX(8px); }
-            50% { transform: scaleX(-1) translateX(-8px); }
-            100% { transform: scaleX(-1) translateX(8px); }
+            0% { transform: scaleX(-1) translateX(4px); }
+            50% { transform: scaleX(-1) translateX(-4px); }
+            100% { transform: scaleX(-1) translateX(4px); }
         }
 
         .controls {

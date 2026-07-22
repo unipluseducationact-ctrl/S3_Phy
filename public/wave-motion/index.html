@@ -328,6 +328,7 @@
         .hl-btn.active.off { border-color: #64748b; background: #f1f5f9; color: #334155; }
         .hl-btn.active.in { border-color: #10b981; background: #ecfdf5; color: #047857; }
         .hl-btn.active.anti { border-color: #e11d48; background: #fff1f2; color: #be123c; }
+        .hl-btn.active.out { border-color: #7c3aed; background: #f5f3ff; color: #6d28d9; }
         .hl-btn.active.right { border-color: #0f766e; background: #ccfbf1; color: #0f766e; }
         .hl-btn.active.left { border-color: #0369a1; background: #e0f2fe; color: #0369a1; }
 
@@ -405,6 +406,7 @@
                     <button type="button" class="hl-btn active off" id="hl-off" data-mode="off">關閉</button>
                     <button type="button" class="hl-btn" id="hl-in" data-mode="in">同相</button>
                     <button type="button" class="hl-btn" id="hl-anti" data-mode="anti">反相</button>
+                    <button type="button" class="hl-btn" id="hl-out" data-mode="out">不同相</button>
                 </div>
             </div>
 
@@ -515,8 +517,10 @@
                 highlightOff: '關閉',
                 highlightInPhase: '同相',
                 highlightAntiPhase: '反相',
+                highlightOutOfPhase: '不同相',
                 inPhaseTag: '同相',
                 antiPhaseTag: '反相',
+                outOfPhaseTag: '不同相',
                 refTag: '參考',
                 controlsTitle: '控制面板',
                 hidePanel: '隱藏面板',
@@ -562,8 +566,10 @@
                 highlightOff: 'Off',
                 highlightInPhase: 'In-phase',
                 highlightAntiPhase: 'Antiphase',
+                highlightOutOfPhase: 'Out of phase',
                 inPhaseTag: 'In-phase',
                 antiPhaseTag: 'Antiphase',
+                outOfPhaseTag: 'Out of phase',
                 refTag: 'Ref',
                 controlsTitle: 'Controls',
                 hidePanel: 'Hide panel',
@@ -672,7 +678,7 @@
         let phasePx = 0; // phase scrub in canvas pixels
         let travelDir = 1; // 1 = right, -1 = left
         let selectedPIndex = 0;
-        let highlightMode = 'off'; // 'off' | 'in' | 'anti'
+        let highlightMode = 'off'; // 'off' | 'in' | 'anti' | 'out'
         let isPlaying = false;
         let lastTs = 0;
         let controlsHidden = sessionStorage.getItem('wave-motion:controlsHidden') === '1';
@@ -740,14 +746,24 @@
             }));
         }
 
-        /** @returns {'in'|'anti'|'other'} */
+        /** @returns {'in'|'anti'|'out'} */
         function phaseRelation(fracA, fracB) {
             const diff = Math.abs(fracA - fracB);
             const nearestHalf = Math.round(diff * 2) / 2;
-            if (Math.abs(diff - nearestHalf) > 0.05) return 'other';
+            if (Math.abs(diff - nearestHalf) > 0.05) return 'out'; // neither integer nor half-integer λ
             const twice = Math.round(nearestHalf * 2);
             if (twice % 2 === 0) return 'in';   // integer λ
             return 'anti';                       // half-integer λ
+        }
+
+        function highlightStyle(mode) {
+            if (mode === 'in') {
+                return { stroke: '#10b981', soft: 'rgba(16,185,129,0.75)', text: '#047857', tagKey: 'inPhaseTag' };
+            }
+            if (mode === 'anti') {
+                return { stroke: '#e11d48', soft: 'rgba(225,29,72,0.75)', text: '#be123c', tagKey: 'antiPhaseTag' };
+            }
+            return { stroke: '#7c3aed', soft: 'rgba(124,58,237,0.75)', text: '#6d28d9', tagKey: 'outOfPhaseTag' };
         }
 
         function clamp(v, min, max) {
@@ -817,6 +833,7 @@
             document.getElementById('hl-off').innerText = tr.highlightOff;
             document.getElementById('hl-in').innerText = tr.highlightInPhase;
             document.getElementById('hl-anti').innerText = tr.highlightAntiPhase;
+            document.getElementById('hl-out').innerText = tr.highlightOutOfPhase;
             document.getElementById('label-travel').innerText = tr.travelLabel;
             document.getElementById('dir-right').innerText = tr.travelRight;
             document.getElementById('dir-left').innerText = tr.travelLeft;
@@ -872,6 +889,7 @@
                 btn.classList.toggle('off', mode === 'off' && highlightMode === 'off');
                 btn.classList.toggle('in', mode === 'in' && highlightMode === 'in');
                 btn.classList.toggle('anti', mode === 'anti' && highlightMode === 'anti');
+                btn.classList.toggle('out', mode === 'out' && highlightMode === 'out');
             });
         }
 
@@ -884,6 +902,7 @@
         document.getElementById('hl-off').addEventListener('click', () => setHighlightMode('off'));
         document.getElementById('hl-in').addEventListener('click', () => setHighlightMode('in'));
         document.getElementById('hl-anti').addEventListener('click', () => setHighlightMode('anti'));
+        document.getElementById('hl-out').addEventListener('click', () => setHighlightMode('out'));
 
         function syncTravelButtons() {
             const isRight = travelDir === 1;
@@ -1260,12 +1279,13 @@
                 drawDoubleArrowV(waveCtx, ampArrowXLow, waveCenterY, troughY, tr.amplitude);
             }
 
-            // Particles (+ in-phase / antiphase highlighting)
+            // Particles (+ phase-relation highlighting)
             const ref = plist[selectedPIndex];
             const refY = waveCenterY - amplitude * Math.sin(k * (ref.x - ORIGIN_X - shift));
+            const hl = highlightMode !== 'off' ? highlightStyle(highlightMode) : null;
 
             // Dashed connectors first (under dots)
-            if (highlightMode !== 'off') {
+            if (hl) {
                 plist.forEach((p, index) => {
                     if (index === selectedPIndex) return;
                     const rel = phaseRelation(ref.frac, p.frac);
@@ -1273,7 +1293,7 @@
                     const y = waveCenterY - amplitude * Math.sin(k * (p.x - ORIGIN_X - shift));
                     waveCtx.beginPath();
                     waveCtx.setLineDash([6, 4]);
-                    waveCtx.strokeStyle = highlightMode === 'in' ? 'rgba(16,185,129,0.75)' : 'rgba(225,29,72,0.75)';
+                    waveCtx.strokeStyle = hl.soft;
                     waveCtx.lineWidth = 2;
                     waveCtx.moveTo(ref.x, refY);
                     waveCtx.lineTo(p.x, y);
@@ -1291,9 +1311,9 @@
 
                 if (isPartner) {
                     waveCtx.beginPath();
-                    waveCtx.shadowColor = highlightMode === 'in' ? '#10b981' : '#e11d48';
+                    waveCtx.shadowColor = hl.stroke;
                     waveCtx.shadowBlur = 16;
-                    waveCtx.strokeStyle = highlightMode === 'in' ? '#10b981' : '#e11d48';
+                    waveCtx.strokeStyle = hl.stroke;
                     waveCtx.lineWidth = 4;
                     waveCtx.arc(p.x, y, 16, 0, Math.PI * 2);
                     waveCtx.stroke();
@@ -1334,10 +1354,10 @@
                     waveCtx.fillText(label, p.x, labelY);
                 } else if (isPartner) {
                     const roleKey = particleRoleKey(p, shift, L);
-                    waveCtx.fillStyle = highlightMode === 'in' ? '#047857' : '#be123c';
+                    waveCtx.fillStyle = hl.text;
                     waveCtx.font = 'bold 12px ' + FONT;
                     waveCtx.textAlign = 'center';
-                    const tag = highlightMode === 'in' ? tr.inPhaseTag : tr.antiPhaseTag;
+                    const tag = tr[hl.tagKey];
                     const label = roleKey
                         ? `${p.id} (${tr.particleLabels[roleKey]}) · ${tag}`
                         : `${p.id} · ${tag}`;
