@@ -9,11 +9,13 @@
     <style>
         html.s3phy-embed .logo { display: none; }
         html.s3phy-embed .lang-btn { display: none; }
-        html.s3phy-embed body { padding: 12px; }
+        html.s3phy-embed body { padding: 8px; }
+        html.s3phy-embed .page-header-text h1 { font-size: 1.15rem; margin-bottom: 2px; }
+        html.s3phy-embed .page-header-text p { font-size: 0.78rem; margin-bottom: 6px; }
         * { box-sizing: border-box; }
 
         :root {
-            --primary: #8e44ad;
+            --primary: #c026d3;
             --ghost: #bdc3c7;
             --dark: #2c3e50;
             --light: #ecf0f1;
@@ -28,39 +30,44 @@
             flex-direction: column;
             align-items: center;
             margin: 0;
-            padding: 20px;
+            padding: 12px;
         }
 
-        .logo { width: 180px; height: auto; margin-bottom: 10px; }
-        h1 { margin-bottom: 5px; margin-top: 0; text-align: center; }
-        p { margin-top: 0; color: #7f8c8d; text-align: center; margin-bottom: 20px; }
+        .logo { width: 120px; height: auto; margin-bottom: 4px; }
+        h1 { margin-bottom: 2px; margin-top: 0; text-align: center; }
+        p { margin-top: 0; color: #7f8c8d; text-align: center; margin-bottom: 8px; }
 
         .container {
-            width: 95%;
-            max-width: 920px;
+            width: 98%;
+            max-width: 1100px;
             display: flex;
             flex-direction: column;
-            gap: 15px;
+            gap: 10px;
         }
 
         .card {
             background: white;
             border: 1px solid #e0e0e0;
-            border-radius: 12px;
-            padding: 15px;
-            box-shadow: 0 4px 10px rgba(0,0,0,0.03);
+            border-radius: 10px;
+            padding: 8px 10px;
+            box-shadow: 0 2px 6px rgba(0,0,0,0.03);
             position: relative;
+        }
+
+        .card.graph-card {
+            padding: 8px 10px 10px;
         }
 
         .card-header {
             font-weight: bold;
-            margin-bottom: 10px;
+            margin-bottom: 6px;
             display: flex;
             justify-content: space-between;
             align-items: center;
             color: var(--dark);
-            gap: 10px;
+            gap: 8px;
             flex-wrap: wrap;
+            font-size: 13px;
         }
 
         canvas {
@@ -69,49 +76,56 @@
             border-radius: 8px;
             width: 100%;
             touch-action: none;
+            display: block;
         }
-        #waveCanvas { cursor: grab; }
+        #waveCanvas { cursor: grab; min-height: 320px; }
         #waveCanvas:active { cursor: grabbing; }
+        #graphCanvas { min-height: 260px; }
 
         .controls-area {
             display: flex;
             flex-direction: column;
-            gap: 14px;
+            gap: 6px;
             background: #f8f9fa;
-            padding: 15px;
-            border-radius: 12px;
+            padding: 8px 10px;
+            border-radius: 8px;
             border: 1px solid #eee;
+        }
+
+        .controls-area > label {
+            font-size: 11px;
+            margin-bottom: 0;
         }
 
         .particle-selector-container {
             display: flex;
             flex-wrap: wrap;
-            gap: 8px;
+            gap: 5px;
             justify-content: center;
         }
 
         .p-btn {
-            border: 2px solid transparent;
+            border: 1.5px solid transparent;
             background: white;
-            padding: 6px 12px;
-            border-radius: 20px;
+            padding: 3px 8px;
+            border-radius: 14px;
             cursor: pointer;
             font-weight: bold;
-            font-size: 13px;
-            box-shadow: 0 2px 4px rgba(0,0,0,0.05);
-            transition: all 0.2s;
+            font-size: 11px;
+            box-shadow: 0 1px 2px rgba(0,0,0,0.04);
+            transition: all 0.15s;
             display: flex;
             align-items: center;
-            gap: 5px;
+            gap: 4px;
         }
-        .p-btn:hover { transform: translateY(-1px); box-shadow: 0 4px 6px rgba(0,0,0,0.1); }
+        .p-btn:hover { transform: translateY(-1px); box-shadow: 0 2px 4px rgba(0,0,0,0.08); }
         .p-btn.active { border-color: var(--dark); background: #e9ecef; }
-        .color-dot { width: 10px; height: 10px; border-radius: 50%; }
+        .color-dot { width: 8px; height: 8px; border-radius: 50%; }
 
         .slider-row {
             display: flex;
             align-items: center;
-            gap: 12px;
+            gap: 8px;
             width: 100%;
             flex-wrap: wrap;
         }
@@ -121,42 +135,48 @@
             display: flex;
             flex-direction: column;
             justify-content: center;
-            min-width: 160px;
+            min-width: 140px;
+            gap: 2px;
         }
 
         .param-grid {
             display: grid;
-            grid-template-columns: 1fr 1fr;
-            gap: 12px;
+            grid-template-columns: 1fr 1fr 1fr;
+            gap: 8px;
         }
-        @media (max-width: 640px) {
+        @media (max-width: 720px) {
             .param-grid { grid-template-columns: 1fr; }
+        }
+
+        .param-card.speed-card {
+            border-color: #86efac;
+            background: #f0fdf4;
         }
 
         .param-card {
             background: white;
             border: 1px solid #e5e7eb;
-            border-radius: 10px;
-            padding: 12px;
+            border-radius: 8px;
+            padding: 6px 8px;
             display: flex;
             flex-direction: column;
-            gap: 8px;
+            gap: 4px;
         }
 
         .param-header {
             display: flex;
             justify-content: space-between;
             align-items: center;
-            gap: 8px;
+            gap: 6px;
         }
-        .param-header label { margin: 0; color: #64748b; }
+        .param-header label { margin: 0; color: #64748b; font-size: 11px; }
         .param-header input[type=number] {
-            width: 88px;
+            width: 64px;
             border: 1px solid #d1d5db;
-            border-radius: 6px;
-            padding: 4px 8px;
+            border-radius: 5px;
+            padding: 2px 6px;
             font-weight: 700;
-            font-size: 14px;
+            font-size: 12px;
             color: var(--dark);
             text-align: right;
         }
@@ -164,16 +184,16 @@
         .derived-row {
             display: flex;
             flex-wrap: wrap;
-            gap: 8px;
+            gap: 6px;
             justify-content: center;
         }
         .derived-badge {
             background: #eef2ff;
             color: #3730a3;
             border: 1px solid #c7d2fe;
-            padding: 6px 12px;
+            padding: 3px 8px;
             border-radius: 999px;
-            font-size: 13px;
+            font-size: 11px;
             font-weight: 700;
         }
         .derived-badge.speed {
@@ -185,11 +205,11 @@
         .progress-badge {
             background: var(--dark);
             color: white;
-            padding: 4px 12px;
-            border-radius: 12px;
-            font-size: 14px;
+            padding: 3px 8px;
+            border-radius: 10px;
+            font-size: 12px;
             font-weight: bold;
-            min-width: 80px;
+            min-width: 64px;
             text-align: center;
         }
 
@@ -197,19 +217,22 @@
             border: none;
             background: var(--primary);
             color: white;
-            padding: 8px 14px;
-            border-radius: 8px;
+            padding: 5px 10px;
+            border-radius: 6px;
             font-weight: 700;
+            font-size: 12px;
             cursor: pointer;
             white-space: nowrap;
         }
         .play-btn:hover { filter: brightness(1.05); }
 
-        label { font-size: 12px; font-weight: bold; margin-bottom: 5px; color: #7f8c8d; }
-        input[type=range] { width: 100%; cursor: pointer; accent-color: var(--primary); }
+        label { font-size: 11px; font-weight: bold; margin-bottom: 2px; color: #7f8c8d; }
+        input[type=range] { width: 100%; height: 18px; cursor: pointer; accent-color: var(--primary); }
 
-        .page-header { width: 95%; max-width: 920px; display: flex; justify-content: space-between; align-items: flex-start; gap: 12px; }
+        .page-header { width: 98%; max-width: 1100px; display: flex; justify-content: space-between; align-items: flex-start; gap: 12px; }
         .page-header-text { flex: 1; text-align: center; }
+        .page-header-text h1 { font-size: 1.35rem; }
+        .page-header-text p { font-size: 0.85rem; margin-bottom: 10px; }
         .lang-btn { background: #f8f9fa; color: #7f8c8d; border: 1px solid #e0e0e0; padding: 6px 12px; border-radius: 6px; cursor: pointer; font-size: 13px; font-weight: 700; transition: all 0.2s; flex-shrink: 0; margin-top: 4px; }
         .lang-btn:hover { color: var(--dark); border-color: #bdc3c7; background: #ecf0f1; }
 
@@ -267,24 +290,24 @@
         .highlight-row {
             display: flex;
             flex-wrap: wrap;
-            gap: 8px;
+            gap: 5px;
             justify-content: center;
             align-items: center;
         }
         .highlight-row > span {
-            font-size: 12px;
+            font-size: 11px;
             font-weight: 700;
             color: #7f8c8d;
-            margin-right: 4px;
+            margin-right: 2px;
         }
         .hl-btn {
-            border: 2px solid #e5e7eb;
+            border: 1.5px solid #e5e7eb;
             background: white;
-            padding: 6px 14px;
-            border-radius: 20px;
+            padding: 3px 9px;
+            border-radius: 14px;
             cursor: pointer;
             font-weight: 700;
-            font-size: 13px;
+            font-size: 11px;
             color: #475569;
             transition: all 0.15s;
         }
@@ -292,6 +315,16 @@
         .hl-btn.active.off { border-color: #64748b; background: #f1f5f9; color: #334155; }
         .hl-btn.active.in { border-color: #10b981; background: #ecfdf5; color: #047857; }
         .hl-btn.active.anti { border-color: #e11d48; background: #fff1f2; color: #be123c; }
+        .hl-btn.active.right { border-color: #0f766e; background: #ccfbf1; color: #0f766e; }
+        .hl-btn.active.left { border-color: #0369a1; background: #e0f2fe; color: #0369a1; }
+
+        .controls-compact-row {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 8px 14px;
+            justify-content: center;
+            align-items: center;
+        }
     </style>
 </head>
 <body>
@@ -301,7 +334,7 @@
     <div class="page-header">
         <div class="page-header-text">
             <h1 id="page-title">🌊 波相分析</h1>
-            <p id="page-subtitle">橫波：粒子置於波峰、波谷同平衡位置。</p>
+            <p id="page-subtitle">橫波：粒子分別位於波峰、波谷與平衡位置。</p>
         </div>
         <button class="lang-btn" id="lang-toggle" type="button">🌐 English</button>
     </div>
@@ -309,14 +342,21 @@
     <div class="container">
 
         <div class="controls-area">
-            <label id="label-select-particle" style="text-align:center">選擇要繪圖嘅粒子：</label>
+            <label id="label-select-particle" style="text-align:center">選擇要繪製圖像的粒子：</label>
             <div class="particle-selector-container" id="p-buttons"></div>
 
-            <div class="highlight-row">
-                <span id="label-highlight">高亮相位關係：</span>
-                <button type="button" class="hl-btn active off" id="hl-off" data-mode="off">關閉</button>
-                <button type="button" class="hl-btn" id="hl-in" data-mode="in">同相</button>
-                <button type="button" class="hl-btn" id="hl-anti" data-mode="anti">反相</button>
+            <div class="controls-compact-row">
+                <div class="highlight-row">
+                    <span id="label-highlight">標示相位關係：</span>
+                    <button type="button" class="hl-btn active off" id="hl-off" data-mode="off">關閉</button>
+                    <button type="button" class="hl-btn" id="hl-in" data-mode="in">同相</button>
+                    <button type="button" class="hl-btn" id="hl-anti" data-mode="anti">反相</button>
+                </div>
+                <div class="highlight-row">
+                    <span id="label-travel">波傳播方向：</span>
+                    <button type="button" class="hl-btn" id="dir-left" data-dir="-1">← 向左</button>
+                    <button type="button" class="hl-btn active right" id="dir-right" data-dir="1">向右 →</button>
+                </div>
             </div>
 
             <div class="param-grid">
@@ -334,6 +374,13 @@
                     </div>
                     <input type="range" id="period-slider" min="0.5" max="4" step="0.01" value="1.5">
                 </div>
+                <div class="param-card speed-card">
+                    <div class="param-header">
+                        <label id="label-speed">波速 v = fλ</label>
+                        <input type="number" id="speed-input" min="0.13" max="8" step="0.01" value="1.00">
+                    </div>
+                    <input type="range" id="speed-slider" min="0.13" max="8" step="0.01" value="1">
+                </div>
             </div>
 
             <div class="derived-row">
@@ -345,7 +392,7 @@
                 <button class="play-btn" id="btn-play" type="button">▶ 播放</button>
                 <div class="slider-container">
                     <div style="display:flex; justify-content:space-between; align-items:center;">
-                        <label id="label-time-shift" style="margin:0;">相位／時間（左右拖曳）</label>
+                        <label id="label-time-shift" style="margin:0;">相位／時間（左右拖動）</label>
                     </div>
                     <input type="range" id="time-slider" min="-400" max="400" value="0" step="1">
                 </div>
@@ -353,35 +400,35 @@
             </div>
         </div>
 
-        <div class="card">
+        <div class="card graph-card">
             <div class="card-header">
                 <span id="label-wave-profile">🌊 波形圖（y 對 x）</span>
-                <span id="label-click-dots" style="font-size:12px; color:#999">撳圓點選擇</span>
+                <span id="label-click-dots" style="font-size:12px; color:#999">點選圓點以選擇粒子</span>
             </div>
-            <canvas id="waveCanvas" width="850" height="260"></canvas>
+            <canvas id="waveCanvas" width="1000" height="360"></canvas>
         </div>
 
-        <div class="card">
+        <div class="card graph-card">
             <div class="card-header">
                 <span id="graph-title">📉 位移–時間圖</span>
                 <span id="label-center-line" style="font-size:12px; color:#999">中線 = t(0)</span>
             </div>
-            <canvas id="graphCanvas" width="850" height="200"></canvas>
+            <canvas id="graphCanvas" width="1000" height="280"></canvas>
         </div>
 
-        <div class="card">
+        <div class="card graph-card">
             <div class="card-header">
                 <span id="label-rel-title">⚡ 波速關係</span>
-                <span id="label-rel-hint" style="font-size:12px; color:#999">調高 λ 或 f → 波速 v 上升</span>
+                <span id="label-rel-hint" style="font-size:12px; color:#999">增大 λ 或 f → 波速 v 上升</span>
             </div>
             <div class="rel-layout">
                 <div class="rel-formulas">
                     <div class="rel-formula">v = f λ</div>
                     <div class="rel-formula">v = λ / T</div>
-                    <div class="rel-note" id="rel-note">波速等於頻率乘波長。增大波長或頻率（縮短週期），波速會上升，動畫亦會加快。</div>
+                    <div class="rel-note" id="rel-note">波速等於頻率與波長之積。增大波長或頻率（即縮短週期），波速會上升，動畫亦會相應加快。</div>
                 </div>
                 <div>
-                    <canvas id="relCanvas" width="400" height="180"></canvas>
+                    <canvas id="relCanvas" width="480" height="220"></canvas>
                     <div class="bar-block">
                         <div class="bar-label"><span id="bar-lambda-label">λ</span><span id="bar-lambda-val">1.50</span></div>
                         <div class="bar-track"><div class="bar-fill lambda" id="bar-lambda" style="width:33%"></div></div>
@@ -405,19 +452,19 @@
             zh: {
                 pageTitle: '🌊 波相分析',
                 docTitle: '波相分析',
-                subtitle: '橫波：粒子置於波峰、波谷同平衡位置。',
-                selectParticle: '選擇要繪圖嘅粒子：',
-                timeShift: '相位／時間（左右拖曳）',
+                subtitle: '橫波：粒子分別位於波峰、波谷與平衡位置。',
+                selectParticle: '選擇要繪製圖像的粒子：',
+                timeShift: '相位／時間（左右拖動）',
                 waveProfile: '🌊 波形圖（y 對 x）',
-                clickDots: '撳圓點選擇',
+                clickDots: '點選圓點以選擇粒子',
                 graphTitle: '📉 位移–時間圖',
-                graphTitleFor: (id) => `📉 粒子 ${id} 嘅位移–時間圖`,
+                graphTitleFor: (id) => `📉 粒子 ${id} 的位移–時間圖`,
                 centerLine: '中線 = t(0)',
                 displacementY: '位移 (y)',
                 timeT: '時間 (t) →',
                 tZero: 't = 0',
-                now: '而家',
-                particleLabels: { crest: '波峰', eq: '平衡', trough: '波谷' },
+                now: '現時',
+                particleLabels: { crest: '波峰', eq: '平衡點', trough: '波谷' },
                 transverse: '橫波',
                 crest: '波峰',
                 trough: '波谷',
@@ -426,21 +473,26 @@
                 oneLambda: '一個波長 λ',
                 labelLambda: '波長 λ',
                 labelPeriod: '週期 T',
+                labelSpeed: '波速 v = fλ',
                 freqBadge: (f) => `f = ${f} Hz`,
                 speedBadge: (v) => `v = fλ = ${v}`,
                 play: '▶ 播放',
                 pause: '⏸ 暫停',
                 relTitle: '⚡ 波速關係',
-                relHint: '調高 λ 或 f → 波速 v 上升',
-                relNote: '波速等於頻率乘波長。增大波長或頻率（縮短週期），波速會上升，動畫亦會加快。',
+                relHint: '可直接調校 v；固定 λ 時，v = fλ ⇒ f = v/λ，T = λ/v',
+                relNote: '波速等於頻率與波長之積（v = fλ = λ/T）。調校波速時會保持波長不變，並更新頻率與週期；動畫速度亦會隨 v 改變。',
                 barLambda: '波長 λ',
                 barFreq: '頻率 f',
                 barSpeed: '波速 v',
                 axisF: 'f →',
                 axisV: 'v →',
                 curveNote: 'v = fλ（固定 λ）',
-                waveDirection: '波傳播方向 →',
-                highlightLabel: '高亮相位關係：',
+                waveDirectionRight: '波傳播方向 →',
+                waveDirectionLeft: '波傳播方向 ←',
+                travelLabel: '波傳播方向：',
+                travelRight: '向右 →',
+                travelLeft: '← 向左',
+                highlightLabel: '標示相位關係：',
                 highlightOff: '關閉',
                 highlightInPhase: '同相',
                 highlightAntiPhase: '反相',
@@ -473,20 +525,25 @@
                 oneLambda: 'One wavelength λ',
                 labelLambda: 'Wavelength λ',
                 labelPeriod: 'Period T',
+                labelSpeed: 'Speed v = fλ',
                 freqBadge: (f) => `f = ${f} Hz`,
                 speedBadge: (v) => `v = fλ = ${v}`,
                 play: '▶ Play',
                 pause: '⏸ Pause',
                 relTitle: '⚡ Wave Speed Relationship',
-                relHint: 'Higher λ or f → higher speed v',
-                relNote: 'Wave speed equals frequency times wavelength. Increasing λ or f (shorter T) raises v and speeds up the animation.',
+                relHint: 'Adjust v directly; with λ fixed, v = fλ ⇒ f = v/λ, T = λ/v',
+                relNote: 'Wave speed equals frequency times wavelength (v = fλ = λ/T). Changing v keeps λ fixed and updates f and T; the animation speed follows v.',
                 barLambda: 'Wavelength λ',
                 barFreq: 'Frequency f',
                 barSpeed: 'Speed v',
                 axisF: 'f →',
                 axisV: 'v →',
                 curveNote: 'v = fλ (fixed λ)',
-                waveDirection: 'Wave travel direction →',
+                waveDirectionRight: 'Wave travel direction →',
+                waveDirectionLeft: 'Wave travel direction ←',
+                travelLabel: 'Wave travel direction:',
+                travelRight: 'Right →',
+                travelLeft: '← Left',
                 highlightLabel: 'Highlight phase relation:',
                 highlightOff: 'Off',
                 highlightInPhase: 'In-phase',
@@ -516,25 +573,28 @@
         const slider = document.getElementById('time-slider');
         const lambdaSlider = document.getElementById('lambda-slider');
         const periodSlider = document.getElementById('period-slider');
+        const speedSlider = document.getElementById('speed-slider');
         const lambdaInput = document.getElementById('lambda-input');
         const periodInput = document.getElementById('period-input');
+        const speedInput = document.getElementById('speed-input');
         const graphTitle = document.getElementById('graph-title');
         const progressText = document.getElementById('progress-text');
         const pBtnContainer = document.getElementById('p-buttons');
         const btnLang = document.getElementById('lang-toggle');
         const btnPlay = document.getElementById('btn-play');
 
-        const amplitude = 55;
-        const waveCenterY = 130;
+        const amplitude = 78;
+        const waveCenterY = Math.round(waveCanvas.height / 2);
         const graphCenterY = graphCanvas.height / 2;
         const tOrigin = graphCanvas.width / 2;
-        const PX_PER_UNIT = 200; // canvas px per unit of λ
-        const ORIGIN_X = 40;
+        const PX_PER_UNIT = 220; // canvas px per unit of λ
+        const ORIGIN_X = 48;
 
         // Physical parameters
         let lambda = 1.5;
         let period = 1.5;
-        let phasePx = 0; // phase shift in canvas pixels along x
+        let phasePx = 0; // phase scrub in canvas pixels
+        let travelDir = 1; // 1 = right, -1 = left
         let selectedPIndex = 0;
         let highlightMode = 'off'; // 'off' | 'in' | 'anti'
         let isPlaying = false;
@@ -563,6 +623,30 @@
             return freq() * lambda;
         }
 
+        function shiftPx() {
+            return travelDir * phasePx;
+        }
+
+        function wrapFeatureX(x, L) {
+            let xx = x;
+            const minX = ORIGIN_X - 0.05 * L;
+            const maxX = waveCanvas.width - 24;
+            while (xx < minX) xx += L;
+            while (xx > maxX) xx -= L;
+            return xx;
+        }
+
+        /** Current role of a particle on the travelling wave: crest / trough / eq */
+        function particleRoleKey(p, shift, L) {
+            const s = Math.sin((2 * Math.PI / L) * (p.x - ORIGIN_X - shift));
+            const dCrest = Math.abs(s - 1);
+            const dTrough = Math.abs(s + 1);
+            const dEq = Math.abs(s);
+            if (dCrest <= dTrough && dCrest <= dEq) return 'crest';
+            if (dTrough <= dEq) return 'trough';
+            return 'eq';
+        }
+
         function particles() {
             const L = wavelengthPx();
             return PARTICLE_SPEC.map((p) => ({
@@ -586,12 +670,21 @@
         }
 
         function syncParamInputs() {
-            lambdaSlider.value = String(lambda);
-            periodSlider.value = String(period);
-            lambdaInput.value = lambda.toFixed(2);
-            periodInput.value = period.toFixed(2);
             const f = freq();
             const v = speed();
+            const vMin = lambda / 4;      // T max = 4
+            const vMax = lambda / 0.5;    // T min = 0.5
+            speedSlider.min = String(vMin.toFixed(2));
+            speedSlider.max = String(vMax.toFixed(2));
+            speedInput.min = String(vMin.toFixed(2));
+            speedInput.max = String(vMax.toFixed(2));
+
+            lambdaSlider.value = String(lambda);
+            periodSlider.value = String(period);
+            speedSlider.value = String(v);
+            lambdaInput.value = lambda.toFixed(2);
+            periodInput.value = period.toFixed(2);
+            speedInput.value = v.toFixed(2);
             document.getElementById('freq-badge').innerText = t().freqBadge(f.toFixed(2));
             document.getElementById('speed-badge').innerText = t().speedBadge(v.toFixed(2));
 
@@ -599,8 +692,8 @@
             const fMin = 1 / 4;
             const fMax = 1 / 0.5;
             const fPct = ((f - fMin) / (fMax - fMin)) * 100;
-            const vMax = fMax * 4;
-            const vPct = (v / vMax) * 100;
+            const vAbsMax = fMax * 4;
+            const vPct = (v / vAbsMax) * 100;
             document.getElementById('bar-lambda').style.width = `${clamp(lamPct, 2, 100)}%`;
             document.getElementById('bar-freq').style.width = `${clamp(fPct, 2, 100)}%`;
             document.getElementById('bar-speed').style.width = `${clamp(vPct, 2, 100)}%`;
@@ -629,6 +722,7 @@
             document.getElementById('label-center-line').innerText = tr.centerLine;
             document.getElementById('label-lambda').innerText = tr.labelLambda;
             document.getElementById('label-period').innerText = tr.labelPeriod;
+            document.getElementById('label-speed').innerText = tr.labelSpeed;
             document.getElementById('label-rel-title').innerText = tr.relTitle;
             document.getElementById('label-rel-hint').innerText = tr.relHint;
             document.getElementById('rel-note').innerText = tr.relNote;
@@ -639,8 +733,12 @@
             document.getElementById('hl-off').innerText = tr.highlightOff;
             document.getElementById('hl-in').innerText = tr.highlightInPhase;
             document.getElementById('hl-anti').innerText = tr.highlightAntiPhase;
+            document.getElementById('label-travel').innerText = tr.travelLabel;
+            document.getElementById('dir-right').innerText = tr.travelRight;
+            document.getElementById('dir-left').innerText = tr.travelLeft;
             btnPlay.innerText = isPlaying ? tr.pause : tr.play;
             syncHighlightButtons();
+            syncTravelButtons();
             updateGraphTitle();
             syncParamInputs();
             update();
@@ -678,7 +776,7 @@
         }
 
         function syncHighlightButtons() {
-            document.querySelectorAll('.hl-btn').forEach((btn) => {
+            document.querySelectorAll('.hl-btn[data-mode]').forEach((btn) => {
                 const mode = btn.getAttribute('data-mode');
                 btn.classList.toggle('active', mode === highlightMode);
                 btn.classList.toggle('off', mode === 'off' && highlightMode === 'off');
@@ -697,10 +795,27 @@
         document.getElementById('hl-in').addEventListener('click', () => setHighlightMode('in'));
         document.getElementById('hl-anti').addEventListener('click', () => setHighlightMode('anti'));
 
+        function syncTravelButtons() {
+            document.getElementById('dir-right').classList.toggle('active', travelDir === 1);
+            document.getElementById('dir-right').classList.toggle('right', travelDir === 1);
+            document.getElementById('dir-left').classList.toggle('active', travelDir === -1);
+            document.getElementById('dir-left').classList.toggle('left', travelDir === -1);
+        }
+
+        function setTravelDir(dir) {
+            travelDir = dir === -1 ? -1 : 1;
+            syncTravelButtons();
+            update();
+        }
+
+        document.getElementById('dir-right').addEventListener('click', () => setTravelDir(1));
+        document.getElementById('dir-left').addEventListener('click', () => setTravelDir(-1));
+
         function setLambda(val, fromInput) {
             const prevL = wavelengthPx();
             const phaseFrac = phasePx / prevL;
             lambda = clamp(Number(val), 0.5, 4);
+            // Keep period fixed when λ changes → v = λ/T updates via v = fλ
             phasePx = phaseFrac * wavelengthPx();
             syncPhaseSlider();
             if (!fromInput) lambdaInput.value = lambda.toFixed(2);
@@ -716,6 +831,17 @@
             update();
         }
 
+        /** Set wave speed v; keep λ fixed and update T = λ/v so that v = fλ holds. */
+        function setSpeed(val, fromInput) {
+            const vMin = lambda / 4;
+            const vMax = lambda / 0.5;
+            const v = clamp(Number(val), vMin, vMax);
+            period = clamp(lambda / v, 0.5, 4);
+            if (!fromInput) speedInput.value = v.toFixed(2);
+            syncParamInputs();
+            update();
+        }
+
         function syncPhaseSlider() {
             const L = wavelengthPx();
             const maxPhase = 1.5 * L;
@@ -727,8 +853,10 @@
 
         lambdaSlider.addEventListener('input', (e) => setLambda(e.target.value, false));
         periodSlider.addEventListener('input', (e) => setPeriod(e.target.value, false));
+        speedSlider.addEventListener('input', (e) => setSpeed(e.target.value, false));
         lambdaInput.addEventListener('change', (e) => setLambda(e.target.value, true));
         periodInput.addEventListener('change', (e) => setPeriod(e.target.value, true));
+        speedInput.addEventListener('change', (e) => setSpeed(e.target.value, true));
 
         slider.addEventListener('input', (e) => {
             phasePx = parseFloat(e.target.value);
@@ -768,26 +896,64 @@
         });
 
         function drawDoubleArrowV(ctx, x, y1, y2, label) {
+            const top = Math.min(y1, y2);
+            const bot = Math.max(y1, y2);
             ctx.strokeStyle = '#e67e22';
             ctx.fillStyle = '#e67e22';
             ctx.lineWidth = 2;
+
+            // Vertical span: equilibrium ↔ crest (amplitude A)
             ctx.beginPath();
-            ctx.moveTo(x, y1);
-            ctx.lineTo(x, y2);
+            ctx.moveTo(x, top);
+            ctx.lineTo(x, bot);
             ctx.stroke();
-            // arrow heads
-            const dir = y2 > y1 ? 1 : -1;
-            [[y1, -dir], [y2, dir]].forEach(([y, d]) => {
-                ctx.beginPath();
-                ctx.moveTo(x, y);
-                ctx.lineTo(x - 5, y + d * 8);
-                ctx.lineTo(x + 5, y + d * 8);
-                ctx.closePath();
-                ctx.fill();
-            });
+
+            // Outward arrowheads (top points up, bottom points down)
+            ctx.beginPath();
+            ctx.moveTo(x, top);
+            ctx.lineTo(x - 5, top + 8);
+            ctx.lineTo(x + 5, top + 8);
+            ctx.closePath();
+            ctx.fill();
+            ctx.beginPath();
+            ctx.moveTo(x, bot);
+            ctx.lineTo(x - 5, bot - 8);
+            ctx.lineTo(x + 5, bot - 8);
+            ctx.closePath();
+            ctx.fill();
+
+            // End ticks on equilibrium / crest
+            ctx.beginPath();
+            ctx.moveTo(x - 7, top);
+            ctx.lineTo(x + 7, top);
+            ctx.moveTo(x - 7, bot);
+            ctx.lineTo(x + 7, bot);
+            ctx.stroke();
+
             ctx.font = 'bold 12px Segoe UI, Arial';
             ctx.textAlign = 'left';
-            ctx.fillText(label, x + 8, (y1 + y2) / 2 + 4);
+            ctx.textBaseline = 'middle';
+            ctx.fillText(label, x + 10, (top + bot) / 2);
+            ctx.textBaseline = 'alphabetic';
+        }
+
+        /** Prefer the on-screen crest/trough nearest the canvas centre (stable while travelling). */
+        function pickFeatureX(baseFrac, L, shift) {
+            const mid = waveCanvas.width / 2;
+            let best = null;
+            let bestDist = Infinity;
+            const nMin = Math.floor((-ORIGIN_X - shift) / L) - 1;
+            const nMax = Math.ceil((waveCanvas.width - ORIGIN_X - shift) / L) + 1;
+            for (let n = nMin; n <= nMax; n++) {
+                const x = ORIGIN_X + (baseFrac + n) * L + shift;
+                if (x < 36 || x > waveCanvas.width - 50) continue;
+                const d = Math.abs(x - mid);
+                if (d < bestDist) {
+                    bestDist = d;
+                    best = x;
+                }
+            }
+            return best;
         }
 
         function drawLambdaBracket(ctx, x1, x2, y, label) {
@@ -825,37 +991,32 @@
 
             waveCtx.clearRect(0, 0, waveCanvas.width, waveCanvas.height);
 
-            // Transverse badge + wave direction banner
+            // Transverse badge
             waveCtx.font = 'bold 13px Segoe UI, Arial';
             waveCtx.textAlign = 'left';
             const badge = tr.transverse;
             const tw = waveCtx.measureText(badge).width + 16;
-            waveCtx.fillStyle = '#8e44ad';
+            waveCtx.fillStyle = '#c026d3';
             waveCtx.beginPath();
             waveCtx.roundRect(12, 10, tw, 24, 6);
             waveCtx.fill();
             waveCtx.fillStyle = '#fff';
             waveCtx.fillText(badge, 20, 27);
 
-            // Persistent wave travel direction (rightward)
-            const dirLabel = tr.waveDirection;
+            // Persistent wave travel direction banner (arrow on the travel side)
+            const dirLabel = travelDir === 1 ? tr.waveDirectionRight : tr.waveDirectionLeft;
             waveCtx.font = 'bold 13px Segoe UI, Arial';
             const dw = waveCtx.measureText(dirLabel).width + 28;
             const dirX = 12 + tw + 10;
-            waveCtx.fillStyle = '#0f766e';
+            waveCtx.fillStyle = travelDir === 1 ? '#0f766e' : '#0369a1';
             waveCtx.beginPath();
             waveCtx.roundRect(dirX, 10, dw, 24, 6);
             waveCtx.fill();
             waveCtx.fillStyle = '#fff';
+            waveCtx.textAlign = 'left';
             waveCtx.fillText(dirLabel, dirX + 10, 27);
-            // Direction chevron
-            const tipX = dirX + dw - 10;
-            waveCtx.beginPath();
-            waveCtx.moveTo(tipX, 22);
-            waveCtx.lineTo(tipX - 8, 16);
-            waveCtx.lineTo(tipX - 8, 28);
-            waveCtx.closePath();
-            waveCtx.fill();
+
+            const shift = shiftPx();
 
             // Equilibrium line
             waveCtx.beginPath();
@@ -870,7 +1031,7 @@
             waveCtx.textAlign = 'right';
             waveCtx.fillText(tr.equilibrium, waveCanvas.width - 10, waveCenterY - 8);
 
-            // Ghost wave (t=0) — labels anchored here
+            // Ghost wave (t=0) reference only — no crest/trough labels
             waveCtx.beginPath();
             waveCtx.strokeStyle = '#bdc3c7';
             waveCtx.lineWidth = 2;
@@ -883,56 +1044,77 @@
             waveCtx.stroke();
             waveCtx.setLineDash([]);
 
-            // Active wave
+            // Active travelling wave (brighter so it stands out from ghost)
             waveCtx.beginPath();
-            waveCtx.strokeStyle = '#8e44ad';
-            waveCtx.lineWidth = 3;
+            waveCtx.strokeStyle = '#e879f9';
+            waveCtx.lineWidth = 4;
+            waveCtx.shadowColor = 'rgba(232, 121, 249, 0.55)';
+            waveCtx.shadowBlur = 8;
             for (let x = 0; x < waveCanvas.width; x++) {
-                const y = waveCenterY - amplitude * Math.sin(k * (x - ORIGIN_X - phasePx));
+                const y = waveCenterY - amplitude * Math.sin(k * (x - ORIGIN_X - shift));
                 if (x === 0) waveCtx.moveTo(x, y);
                 else waveCtx.lineTo(x, y);
             }
             waveCtx.stroke();
+            waveCtx.shadowBlur = 0;
 
-            // Crest / trough labels on ghost wave
-            const crestX = ORIGIN_X + 0.25 * L;
-            const troughX = ORIGIN_X + 0.75 * L;
-            const crestY = waveCenterY - amplitude;
-            const troughY = waveCenterY + amplitude;
-
-            waveCtx.fillStyle = '#c0392b';
+            // Crest / trough labels — draw every on-screen extremum so markers
+            // travel continuously with the wave (no wrap jump that looks reversed)
             waveCtx.font = 'bold 12px Segoe UI, Arial';
             waveCtx.textAlign = 'center';
-            waveCtx.fillText(tr.crest, crestX, crestY - 14);
-            waveCtx.beginPath();
-            waveCtx.arc(crestX, crestY, 4, 0, Math.PI * 2);
-            waveCtx.fill();
+            const nMin = Math.floor((-ORIGIN_X - shift) / L) - 1;
+            const nMax = Math.ceil((waveCanvas.width - ORIGIN_X - shift) / L) + 1;
+            for (let n = nMin; n <= nMax; n++) {
+                const cX = ORIGIN_X + (0.25 + n) * L + shift;
+                const tX = ORIGIN_X + (0.75 + n) * L + shift;
+                if (cX >= 8 && cX <= waveCanvas.width - 8) {
+                    waveCtx.fillStyle = '#c0392b';
+                    waveCtx.fillText(tr.crest, cX, waveCenterY - amplitude - 14);
+                    waveCtx.beginPath();
+                    waveCtx.arc(cX, waveCenterY - amplitude, 4, 0, Math.PI * 2);
+                    waveCtx.fill();
+                }
+                if (tX >= 8 && tX <= waveCanvas.width - 8) {
+                    waveCtx.fillStyle = '#2980b9';
+                    waveCtx.fillText(tr.trough, tX, waveCenterY + amplitude + 18);
+                    waveCtx.beginPath();
+                    waveCtx.arc(tX, waveCenterY + amplitude, 4, 0, Math.PI * 2);
+                    waveCtx.fill();
+                }
+            }
 
-            waveCtx.fillStyle = '#2980b9';
-            waveCtx.fillText(tr.trough, troughX, troughY + 18);
-            waveCtx.beginPath();
-            waveCtx.arc(troughX, troughY, 4, 0, Math.PI * 2);
-            waveCtx.fill();
+            // Amplitude arrows: eq ↔ crest (upper) and eq ↔ trough (lower)
+            const crestX = pickFeatureX(0.25, L, shift);
+            const troughX = pickFeatureX(0.75, L, shift);
+            const crestY = waveCenterY - amplitude;
+            const troughY = waveCenterY + amplitude;
+            if (crestX != null) {
+                const ampArrowX = clamp(crestX + 26, 28, waveCanvas.width - 70);
+                drawDoubleArrowV(waveCtx, ampArrowX, waveCenterY, crestY, tr.amplitude);
 
-            // Amplitude arrow at first crest
-            drawDoubleArrowV(waveCtx, crestX + 28, waveCenterY, crestY, tr.amplitude);
+                const nextCrestX = crestX + L;
+                if (nextCrestX <= waveCanvas.width - 20) {
+                    drawLambdaBracket(waveCtx, crestX, nextCrestX, waveCanvas.height - 28, tr.oneLambda);
+                }
+            }
+            if (troughX != null) {
+                const ampArrowXLow = clamp(troughX + 26, 28, waveCanvas.width - 70);
+                drawDoubleArrowV(waveCtx, ampArrowXLow, waveCenterY, troughY, tr.amplitude);
+            }
 
-            // One wavelength bracket (crest to next crest)
-            const nextCrestX = ORIGIN_X + 1.25 * L;
-            drawLambdaBracket(waveCtx, crestX, Math.min(nextCrestX, waveCanvas.width - 20), waveCanvas.height - 28, tr.oneLambda);
-
-            // Progress arrow when phase nonzero
-            if (Math.abs(phasePx) > 8) {
-                const curCrestX = crestX + phasePx;
+            // Progress arrow: ghost crest → current crest (same branch, no wrap)
+            const ghostCrestX = ORIGIN_X + 0.25 * L;
+            const curCrestX = ghostCrestX + shift;
+            if (Math.abs(shift) > 8 && curCrestX > 8 && curCrestX < waveCanvas.width - 8) {
                 waveCtx.beginPath();
                 waveCtx.strokeStyle = '#2c3e50';
                 waveCtx.lineWidth = 2;
-                waveCtx.moveTo(crestX, crestY - 30);
+                waveCtx.moveTo(ghostCrestX, crestY - 30);
                 waveCtx.lineTo(curCrestX, crestY - 30);
                 waveCtx.stroke();
                 waveCtx.beginPath();
                 waveCtx.fillStyle = '#2c3e50';
-                if (phasePx > 0) {
+                if (shift > 0) {
                     waveCtx.moveTo(curCrestX, crestY - 30);
                     waveCtx.lineTo(curCrestX - 8, crestY - 35);
                     waveCtx.lineTo(curCrestX - 8, crestY - 25);
@@ -946,7 +1128,7 @@
 
             // Particles (+ in-phase / antiphase highlighting)
             const ref = plist[selectedPIndex];
-            const refY = waveCenterY - amplitude * Math.sin(k * (ref.x - ORIGIN_X - phasePx));
+            const refY = waveCenterY - amplitude * Math.sin(k * (ref.x - ORIGIN_X - shift));
 
             // Dashed connectors first (under dots)
             if (highlightMode !== 'off') {
@@ -954,7 +1136,7 @@
                     if (index === selectedPIndex) return;
                     const rel = phaseRelation(ref.frac, p.frac);
                     if (rel !== highlightMode) return;
-                    const y = waveCenterY - amplitude * Math.sin(k * (p.x - ORIGIN_X - phasePx));
+                    const y = waveCenterY - amplitude * Math.sin(k * (p.x - ORIGIN_X - shift));
                     waveCtx.beginPath();
                     waveCtx.setLineDash([6, 4]);
                     waveCtx.strokeStyle = highlightMode === 'in' ? 'rgba(16,185,129,0.75)' : 'rgba(225,29,72,0.75)';
@@ -967,7 +1149,7 @@
             }
 
             plist.forEach((p, index) => {
-                const y = waveCenterY - amplitude * Math.sin(k * (p.x - ORIGIN_X - phasePx));
+                const y = waveCenterY - amplitude * Math.sin(k * (p.x - ORIGIN_X - shift));
                 const isSelected = index === selectedPIndex;
                 const rel = phaseRelation(ref.frac, p.frac);
                 const isPartner = highlightMode !== 'off' && !isSelected && rel === highlightMode;
@@ -1006,17 +1188,21 @@
                     waveCtx.lineWidth = 3;
                     waveCtx.strokeStyle = 'rgba(0,0,0,0.45)';
                     waveCtx.stroke();
+                    const roleKey = particleRoleKey(p, shift, L);
                     waveCtx.fillStyle = '#111';
                     waveCtx.font = 'bold 13px Segoe UI, Arial';
                     waveCtx.textAlign = 'center';
                     const tag = highlightMode !== 'off' ? ` · ${tr.refTag}` : '';
-                    waveCtx.fillText(`${p.id} (${tr.particleLabels[p.labelKey]}${tag})`, p.x, y - 22);
+                    const labelY = roleKey === 'trough' ? y + 22 : y - 22;
+                    waveCtx.fillText(`${p.id} (${tr.particleLabels[roleKey]}${tag})`, p.x, labelY);
                 } else if (isPartner) {
+                    const roleKey = particleRoleKey(p, shift, L);
                     waveCtx.fillStyle = highlightMode === 'in' ? '#047857' : '#be123c';
                     waveCtx.font = 'bold 12px Segoe UI, Arial';
                     waveCtx.textAlign = 'center';
                     const tag = highlightMode === 'in' ? tr.inPhaseTag : tr.antiPhaseTag;
-                    waveCtx.fillText(`${p.id} · ${tag}`, p.x, y - 22);
+                    const labelY = roleKey === 'trough' ? y + 20 : y - 22;
+                    waveCtx.fillText(`${p.id} (${tr.particleLabels[roleKey]}) · ${tag}`, p.x, labelY);
                 } else {
                     waveCtx.fillStyle = 'rgba(0,0,0,0.45)';
                     waveCtx.font = '10px Segoe UI, Arial';
@@ -1083,7 +1269,7 @@
             graphCtx.globalAlpha = 0.2;
             for (let px = 0; px < graphCanvas.width; px++) {
                 const tVal = px - tOrigin;
-                const y = graphCenterY - amplitude * Math.sin(k * (p.x - ORIGIN_X - tVal));
+                const y = graphCenterY - amplitude * Math.sin(k * (p.x - ORIGIN_X - travelDir * tVal));
                 if (px === 0) graphCtx.moveTo(px, y);
                 else graphCtx.lineTo(px, y);
             }
@@ -1097,13 +1283,13 @@
             const endDraw = Math.max(tOrigin, markerX);
             for (let px = startDraw; px <= endDraw; px++) {
                 const tVal = px - tOrigin;
-                const y = graphCenterY - amplitude * Math.sin(k * (p.x - ORIGIN_X - tVal));
+                const y = graphCenterY - amplitude * Math.sin(k * (p.x - ORIGIN_X - travelDir * tVal));
                 if (px === startDraw) graphCtx.moveTo(px, y);
                 else graphCtx.lineTo(px, y);
             }
             graphCtx.stroke();
 
-            const currentY = graphCenterY - amplitude * Math.sin(k * (p.x - ORIGIN_X - phasePx));
+            const currentY = graphCenterY - amplitude * Math.sin(k * (p.x - ORIGIN_X - shiftPx()));
             graphCtx.beginPath();
             graphCtx.strokeStyle = '#333';
             graphCtx.setLineDash([4, 4]);

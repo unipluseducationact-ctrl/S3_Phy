@@ -1,1 +1,0 @@
-import{c as e}from"./createLabIframe-BrSZUwOJ.js";import"./index-BJ7buzgz.js";function a(t){return e(t,{slug:"ultrasound-reflection",titleKey:"tools.ultrasoundReflection.title",className:"tool-ultrasound-reflection-lab",extraParams:()=>"&v=20260722_ultrasound_reflection_v2"})}export{a as createUltrasoundReflectionLab};
