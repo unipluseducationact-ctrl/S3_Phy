@@ -6,6 +6,6 @@ export function createLongitudinalWaveLab(t) {
     slug: 'longitudinal-wave',
     titleKey: 'tools.longitudinalWave.title',
     className: 'tool-longitudinal-wave-lab',
-    extraParams: () => '&v=20260722_longitudinal_v2',
+    extraParams: () => '&v=20260722_longitudinal_v3',
   });
 }

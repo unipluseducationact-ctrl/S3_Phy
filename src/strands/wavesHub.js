@@ -1,7 +1,9 @@
 import { t } from '../i18n.js';
 import { mountHubShell } from '../hubShell.js';
-import { cleanupLabInstance, hydrateNoteCards } from './hubHelpers.js';
+import { cleanupLabInstance, hydrateNoteCards, loadToolId, saveToolId } from './hubHelpers.js';
 import { renderToolsShell, hydrateToolsShell } from '../tools/toolsShell.js';
+
+const TOOL_STORAGE_KEY = 's3phy.waves.tool';
 
 const WAVES_TOPICS = [
   {
@@ -84,7 +86,7 @@ function toolLabel(id) {
 
 export function mountWavesHub(root) {
   let section = sessionStorage.getItem('s3phy.waves.section') || 'topics';
-  let toolId = 'waveMotion';
+  let toolId = loadToolId(TOOL_STORAGE_KEY, TOOL_ORDER, 'waveMotion');
   let shell = null;
   let el = { main: null };
   let activeLabInstance = null;
@@ -126,6 +128,7 @@ export function mountWavesHub(root) {
         getActiveToolId: () => toolId,
         onSelectTool: (id) => {
           toolId = id;
+          saveToolId(TOOL_STORAGE_KEY, toolId);
         },
         mountTool: (stage) => {
           void mountActiveTool(stage);
@@ -223,6 +226,7 @@ export function mountWavesHub(root) {
       const targetTool = toolBtn.getAttribute('data-go-tool');
       if (TOOL_ORDER.includes(targetTool)) {
         toolId = targetTool;
+        saveToolId(TOOL_STORAGE_KEY, toolId);
       }
       section = 'tools';
       sessionStorage.setItem('s3phy.waves.section', 'tools');

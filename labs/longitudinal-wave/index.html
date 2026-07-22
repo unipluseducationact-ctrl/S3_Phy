@@ -75,26 +75,42 @@
             width: 36px;
             height: 28px;
             animation: waveFlow 1.5s infinite ease-in-out;
+            transition: transform 0.25s ease;
         }
+        .banner-arrow.dir-right { transform: scaleX(-1); }
         @keyframes waveFlow {
             0% { transform: translateX(5px); }
             50% { transform: translateX(-5px); }
             100% { transform: translateX(5px); }
         }
+        .banner-arrow.dir-right {
+            animation-name: waveFlowRight;
+        }
+        @keyframes waveFlowRight {
+            0% { transform: scaleX(-1) translateX(5px); }
+            50% { transform: scaleX(-1) translateX(-5px); }
+            100% { transform: scaleX(-1) translateX(5px); }
+        }
 
         .controls {
             display: flex;
-            flex-wrap: wrap;
+            flex-direction: column;
             gap: 12px;
-            align-items: center;
-            justify-content: space-between;
             background: #252525;
             border: 1px solid #333;
             border-radius: 10px;
             padding: 12px 14px;
             margin-bottom: 14px;
         }
-        .btn-row { display: flex; gap: 8px; flex-wrap: wrap; }
+        .controls-row {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 12px;
+            align-items: center;
+            justify-content: space-between;
+            width: 100%;
+        }
+        .btn-row { display: flex; gap: 8px; flex-wrap: wrap; align-items: center; }
         button.ctrl {
             border: none;
             border-radius: 8px;
@@ -109,11 +125,34 @@
         button.ctrl.primary { background: #0284c7; }
         button.ctrl.primary:hover { background: #0369a1; }
 
+        .toggle-container {
+            display: flex;
+            background: #1a1a1a;
+            border-radius: 8px;
+            padding: 3px;
+            border: 1px solid #444;
+        }
+        .toggle-btn {
+            background: transparent;
+            border: none;
+            padding: 7px 12px;
+            border-radius: 6px;
+            color: #94a3b8;
+            font-size: 12px;
+            font-weight: 700;
+            cursor: pointer;
+        }
+        .toggle-btn.active {
+            background: #0284c7;
+            color: #fff;
+            box-shadow: 0 2px 4px rgba(0,0,0,0.25);
+        }
+
         .slider-group {
             display: flex;
             flex-direction: column;
             gap: 4px;
-            min-width: 160px;
+            min-width: 140px;
             flex: 1;
         }
         .slider-group label {
@@ -122,11 +161,23 @@
             font-weight: 700;
             display: flex;
             justify-content: space-between;
+            gap: 8px;
         }
         .slider-group input[type=range] {
             width: 100%;
             accent-color: #4db8ff;
             cursor: pointer;
+        }
+        .dir-group {
+            display: flex;
+            flex-direction: column;
+            gap: 4px;
+            min-width: 160px;
+        }
+        .dir-group > span {
+            font-size: 12px;
+            color: #94a3b8;
+            font-weight: 700;
         }
 
         .hint {
@@ -195,24 +246,39 @@
     </div>
 
     <div class="wave-banner">
-        <svg class="banner-arrow" viewBox="0 0 40 30" aria-hidden="true">
+        <svg class="banner-arrow" id="banner-arrow" viewBox="0 0 40 30" aria-hidden="true">
             <path d="M35,15 L5,15 L15,5 M5,15 L15,25" fill="none" stroke="#fff" stroke-width="4" stroke-linecap="round" stroke-linejoin="round"/>
         </svg>
         <span id="label-banner">波傳播方向（向左）</span>
     </div>
 
     <div class="controls">
-        <div class="btn-row">
-            <button class="ctrl primary" id="btn-play" type="button">⏸ 暫停</button>
-            <button class="ctrl" id="btn-reset" type="button">↺ 重設</button>
+        <div class="controls-row">
+            <div class="btn-row">
+                <button class="ctrl primary" id="btn-play" type="button">⏸ 暫停</button>
+                <button class="ctrl" id="btn-reset" type="button">↺ 重設</button>
+            </div>
+            <div class="dir-group">
+                <span id="label-direction">傳播方向</span>
+                <div class="toggle-container">
+                    <button type="button" class="toggle-btn active" id="btn-dir-left">← 向左</button>
+                    <button type="button" class="toggle-btn" id="btn-dir-right">→ 向右</button>
+                </div>
+            </div>
         </div>
-        <div class="slider-group">
-            <label><span id="label-phase">相位 / 時間</span><span id="phase-val">0.00 λ</span></label>
-            <input type="range" id="phase-slider" min="0" max="1000" value="0" step="1">
-        </div>
-        <div class="slider-group" style="max-width:180px;">
-            <label><span id="label-speed">動畫速度</span><span id="speed-val">1.0×</span></label>
-            <input type="range" id="speed-slider" min="0.2" max="2.5" value="1" step="0.1">
+        <div class="controls-row">
+            <div class="slider-group">
+                <label><span id="label-wavelength">波長 λ</span><span id="wavelength-val">8 間距</span></label>
+                <input type="range" id="wavelength-slider" min="4" max="10" value="8" step="1">
+            </div>
+            <div class="slider-group">
+                <label><span id="label-phase">相位 / 時間</span><span id="phase-val">0.00 λ</span></label>
+                <input type="range" id="phase-slider" min="0" max="1000" value="0" step="1">
+            </div>
+            <div class="slider-group" style="max-width:180px;">
+                <label><span id="label-speed">波速</span><span id="speed-val">1.0×</span></label>
+                <input type="range" id="speed-slider" min="0.2" max="2.5" value="1" step="0.1">
+            </div>
         </div>
     </div>
 
@@ -235,24 +301,32 @@
         zh: {
             docTitle: '縱波物理',
             pageTitle: '縱波物理',
-            banner: '波傳播方向（向左）',
+            bannerLeft: '波傳播方向（向左）',
+            bannerRight: '波傳播方向（向右）',
             play: '▶ 播放',
             pause: '⏸ 暫停',
             reset: '↺ 重設',
             phase: '相位 / 時間',
-            speed: '動畫速度',
-            hint: '拖曳畫面或滑桿改變相位；撳粒子可睇位移同速度方向。',
+            speed: '波速',
+            wavelength: '波長 λ',
+            wavelengthVal: (n) => `${n} 間距`,
+            direction: '傳播方向',
+            dirLeft: '← 向左',
+            dirRight: '→ 向右',
+            hint: '拖曳畫面或滑桿改變相位；撳粒子可睇位移同速度方向。可用控制調波長、方向同波速。',
             equilibrium: '平衡位置（等距）',
             compression: '密部',
             highDensity: '高密度',
             rarefaction: '疏部',
             lowDensity: '低密度',
+            centreCompression: '密部中心',
+            centreRarefaction: '疏部中心',
             amplitude: '振幅',
             vZero: '(v = 0)',
             selectHint: '撳下方粒子睇詳情',
             info: (id, disp, velDir) => `粒子 <strong>${id}</strong>：位移 ${disp}　｜　速度方向：<strong>${velDir}</strong>`,
-            velLeft: '← 向左（同波傳播）',
-            velRight: '→ 向右（反波傳播）',
+            velWith: (dir) => dir < 0 ? '← 向左（同波傳播）' : '→ 向右（同波傳播）',
+            velAgainst: (dir) => dir < 0 ? '← 向左（反波傳播）' : '→ 向右（反波傳播）',
             velZero: '靜止（振幅點）',
             conclusionTitle: '結論',
             conclusionHtml: () => `位於兩個相鄰振幅點之間嘅粒子有以下行為：
@@ -265,24 +339,32 @@
         en: {
             docTitle: 'Longitudinal Wave Physics',
             pageTitle: 'Longitudinal Wave Physics',
-            banner: 'WAVE TRAVELING DIRECTION (LEFT)',
+            bannerLeft: 'WAVE TRAVELING DIRECTION (LEFT)',
+            bannerRight: 'WAVE TRAVELING DIRECTION (RIGHT)',
             play: '▶ Play',
             pause: '⏸ Pause',
             reset: '↺ Reset',
             phase: 'Phase / Time',
-            speed: 'Anim Speed',
-            hint: 'Drag the canvas or slider to change phase; click a particle to see displacement and velocity.',
+            speed: 'Wave speed',
+            wavelength: 'Wavelength λ',
+            wavelengthVal: (n) => `${n} spacings`,
+            direction: 'Travel direction',
+            dirLeft: '← Left',
+            dirRight: '→ Right',
+            hint: 'Drag the canvas or slider to change phase; click a particle to see displacement and velocity. Use controls for wavelength, direction and wave speed.',
             equilibrium: 'Equilibrium positions (uniform spacing)',
             compression: 'Compression',
             highDensity: 'High Density',
             rarefaction: 'Rarefaction',
             lowDensity: 'Low Density',
+            centreCompression: 'Centre of compression',
+            centreRarefaction: 'Centre of rarefaction',
             amplitude: 'AMPLITUDE',
             vZero: '(v = 0)',
             selectHint: 'Click a particle below for details',
             info: (id, disp, velDir) => `Particle <strong>${id}</strong>: displacement ${disp}  |  velocity: <strong>${velDir}</strong>`,
-            velLeft: '← Left (with wave)',
-            velRight: '→ Right (against wave)',
+            velWith: (dir) => dir < 0 ? '← Left (with wave)' : '→ Right (with wave)',
+            velAgainst: (dir) => dir < 0 ? '← Left (against wave)' : '→ Right (against wave)',
             velZero: 'At rest (amplitude point)',
             conclusionTitle: 'Conclusion',
             conclusionHtml: () => `Particles located between two adjacent amplitude points behave as follows:
@@ -306,8 +388,7 @@
     const EQ_X0 = 100;
     const SPACING = 80;
     const AMP = 40;
-    const LAMBDA = 640; // 8 spacings
-    const K = (2 * Math.PI) / LAMBDA;
+    const DEFAULT_SPACINGS = 8;
     const OMEGA = 1.2; // rad/s visual
     const Y_EQ = 60;
     const Y_PART = 200;
@@ -316,45 +397,83 @@
     const ctx = canvas.getContext('2d');
     const phaseSlider = document.getElementById('phase-slider');
     const speedSlider = document.getElementById('speed-slider');
+    const wavelengthSlider = document.getElementById('wavelength-slider');
     const btnPlay = document.getElementById('btn-play');
     const btnReset = document.getElementById('btn-reset');
     const btnLang = document.getElementById('lang-toggle');
+    const btnDirLeft = document.getElementById('btn-dir-left');
+    const btnDirRight = document.getElementById('btn-dir-right');
+    const bannerArrow = document.getElementById('banner-arrow');
     const phaseVal = document.getElementById('phase-val');
     const speedVal = document.getElementById('speed-val');
+    const wavelengthVal = document.getElementById('wavelength-val');
     const particleInfo = document.getElementById('particle-info');
 
+    let lambdaSpacings = DEFAULT_SPACINGS;
+    let LAMBDA = lambdaSpacings * SPACING;
+    let K = (2 * Math.PI) / LAMBDA;
+    // travelDir: -1 = left (default), +1 = right
+    let travelDir = -1;
     let phase = 0; // ωt in radians
     let isPlaying = true;
     let speed = 1;
-    let selected = 1; // B — near compression centre at t=0 with our phase convention
+    let selected = 1;
     let lastTs = 0;
     let dragging = false;
     let dragStartX = 0;
     let dragStartPhase = 0;
 
+    function setLambdaFromSpacings(n) {
+        lambdaSpacings = n;
+        LAMBDA = lambdaSpacings * SPACING;
+        K = (2 * Math.PI) / LAMBDA;
+    }
+
     function eqX(i) {
         return EQ_X0 + i * SPACING;
     }
 
-    // Wave travels LEFT: ξ = A sin(kx + ωt)
+    // Wave argument: left → kx+φ, right → kx−φ
+    function waveArg(x, ph) {
+        return K * x + travelDir * ph;
+    }
+
+    // ξ = A sin(kx ± φ)
     function displacement(i, ph) {
-        return AMP * Math.sin(K * eqX(i) + ph);
+        return AMP * Math.sin(waveArg(eqX(i), ph));
     }
 
     function velocitySign(i, ph) {
-        // v = ∂ξ/∂t = A ω cos(kx + ωt); ω>0
-        const c = Math.cos(K * eqX(i) + ph);
+        // left:  v =  A ω cos(kx+φ) → sign = cos
+        // right: v = −A ω cos(kx−φ) → sign = −cos
+        const c = Math.cos(waveArg(eqX(i), ph));
         if (Math.abs(c) < 0.08) return 0;
-        return c > 0 ? 1 : -1; // +1 = right, -1 = left
+        const signed = travelDir < 0 ? c : -c;
+        return signed > 0 ? 1 : -1; // +1 = right, -1 = left
     }
 
     function particleX(i, ph) {
         return eqX(i) + displacement(i, ph);
     }
 
-    // Density proxy: -∂ξ/∂x = -A k cos(kx+ωt); compression when > 0
+    // Density proxy: −∂ξ/∂x = −A k cos(kx±φ); compression when > 0
     function densityMetric(x, ph) {
-        return -AMP * K * Math.cos(K * x + ph);
+        return -AMP * K * Math.cos(waveArg(x, ph));
+    }
+
+    function phaseCosAbs(i, ph) {
+        return Math.abs(Math.cos(waveArg(eqX(i), ph)));
+    }
+
+    function updateDirectionUI() {
+        const tr = t();
+        btnDirLeft.classList.toggle('active', travelDir < 0);
+        btnDirRight.classList.toggle('active', travelDir > 0);
+        btnDirLeft.innerText = tr.dirLeft;
+        btnDirRight.innerText = tr.dirRight;
+        bannerArrow.classList.toggle('dir-right', travelDir > 0);
+        document.getElementById('label-banner').innerText =
+            travelDir < 0 ? tr.bannerLeft : tr.bannerRight;
     }
 
     function updateLanguageUI() {
@@ -363,14 +482,17 @@
         document.title = tr.docTitle;
         btnLang.innerText = tr.langBtn;
         document.getElementById('page-title').innerText = tr.pageTitle;
-        document.getElementById('label-banner').innerText = tr.banner;
         document.getElementById('label-phase').innerText = tr.phase;
         document.getElementById('label-speed').innerText = tr.speed;
+        document.getElementById('label-wavelength').innerText = tr.wavelength;
+        document.getElementById('label-direction').innerText = tr.direction;
         document.getElementById('label-hint').innerText = tr.hint;
         document.getElementById('label-conclusion-title').innerText = tr.conclusionTitle;
         document.getElementById('label-conclusion-body').innerHTML = tr.conclusionHtml();
         btnReset.innerText = tr.reset;
         btnPlay.innerText = isPlaying ? tr.pause : tr.play;
+        wavelengthVal.innerText = tr.wavelengthVal(lambdaSpacings);
+        updateDirectionUI();
         updateParticleInfo();
         draw();
     }
@@ -390,13 +512,15 @@
         const disp = displacement(selected, phase);
         const vs = velocitySign(selected, phase);
         let velDir = tr.velZero;
-        if (vs < 0) velDir = tr.velLeft;
-        else if (vs > 0) velDir = tr.velRight;
+        if (vs !== 0) {
+            const withWave = vs === travelDir;
+            velDir = withWave ? tr.velWith(vs) : tr.velAgainst(vs);
+        }
         const dispStr = `${disp >= 0 ? '+' : ''}${disp.toFixed(1)} px`;
         particleInfo.innerHTML = tr.info(IDS[selected], dispStr, velDir);
     }
 
-    function drawZone(xCenter, width, color, title, subtitle) {
+    function drawZone(xCenter, width, color) {
         const x = xCenter - width / 2;
         ctx.fillStyle = color.replace('1)', '0.08)');
         ctx.strokeStyle = color.replace('1)', '0.35)');
@@ -406,12 +530,36 @@
         ctx.fill();
         ctx.stroke();
         ctx.setLineDash([]);
+    }
+
+    function drawCentreMarker(xCenter, color, title, subtitle) {
+        // Vertical centre line
+        ctx.strokeStyle = color.replace('1)', '0.85)');
+        ctx.lineWidth = 2;
+        ctx.setLineDash([4, 4]);
+        ctx.beginPath();
+        ctx.moveTo(xCenter, 140);
+        ctx.lineTo(xCenter, 340);
+        ctx.stroke();
+        ctx.setLineDash([]);
+
+        // Centre dot
+        ctx.beginPath();
+        ctx.arc(xCenter, Y_PART, 5, 0, Math.PI * 2);
         ctx.fillStyle = color.replace('1)', '1)');
-        ctx.font = 'bold 14px Segoe UI, sans-serif';
+        ctx.fill();
+        ctx.strokeStyle = '#fff';
+        ctx.lineWidth = 1.5;
+        ctx.stroke();
+
+        // Labels
+        ctx.fillStyle = color.replace('1)', '1)');
+        ctx.font = 'bold 13px Segoe UI, sans-serif';
         ctx.textAlign = 'center';
-        ctx.fillText(title, xCenter, 360);
-        ctx.font = '12px Segoe UI, sans-serif';
-        ctx.fillText(subtitle, xCenter, 380);
+        ctx.fillText(title, xCenter, 358);
+        ctx.font = '11px Segoe UI, sans-serif';
+        ctx.fillStyle = color.replace('1)', '0.85)');
+        ctx.fillText(subtitle, xCenter, 376);
     }
 
     function roundRect(x, y, w, h, r) {
@@ -424,32 +572,50 @@
         ctx.closePath();
     }
 
+    // Compression: cos(kx±φ) = −1 → kx±φ = π + 2πn
+    // Rarefaction: cos(kx±φ) = +1 → kx±φ = 0 + 2πn
+    function centreMods(ph) {
+        // waveArg = Kx + travelDir*φ
+        // compression: Kx + travelDir*φ = π → x = (π − travelDir*φ)/K
+        const xComp = ((Math.PI - travelDir * ph) / K + 10 * LAMBDA) % LAMBDA;
+        const xRare = ((0 - travelDir * ph) / K + 10 * LAMBDA) % LAMBDA;
+        return { xComp, xRare };
+    }
+
+    function placeZone(xMod) {
+        let best = xMod;
+        while (best < 80) best += LAMBDA;
+        while (best > 860) best -= LAMBDA;
+        if (best < 80) best += LAMBDA;
+        return best;
+    }
+
+    function zoneWidth(base) {
+        // Scale highlight width with wavelength so short λ still looks tight
+        return Math.max(90, Math.min(base, LAMBDA * 0.55));
+    }
+
     function draw() {
         const tr = t();
         const W = canvas.width;
-        const H = canvas.height;
-        ctx.clearRect(0, 0, W, H);
+        ctx.clearRect(0, 0, W, canvas.height);
 
-        // Moving compression / rarefaction centres: max density at cos(kx+φ)=−1 → kx+φ = π
-        // compression centre x: Kx + phase = π + 2πn → x = (π - phase + 2πn)/K
-        const xComp = ((Math.PI - phase) / K + 10 * LAMBDA) % LAMBDA;
-        const xRare = ((0 - phase) / K + 10 * LAMBDA) % LAMBDA; // cos = +1 → rarefaction (low density)
-        // Map into visible band roughly 60–880
-        function placeZone(xMod) {
-            // find instance near middle of particle row
-            let best = xMod;
-            while (best < 80) best += LAMBDA;
-            while (best > 860) best -= LAMBDA;
-            if (best < 80) best += LAMBDA;
-            return best;
-        }
+        const { xComp, xRare } = centreMods(phase);
         const xc = placeZone(xComp);
         const xr = placeZone(xRare);
-        drawZone(xc, 170, 'rgba(77,184,255,1)', tr.compression, tr.highDensity);
-        drawZone(xr, 260, 'rgba(255,77,77,1)', tr.rarefaction, tr.lowDensity);
-        // second compression if visible
+
+        drawZone(xc, zoneWidth(170), 'rgba(77,184,255,1)');
+        drawZone(xr, zoneWidth(260), 'rgba(255,77,77,1)');
+
         const xc2 = xc + LAMBDA;
-        if (xc2 < 900) drawZone(xc2, 170, 'rgba(77,184,255,1)', tr.compression, '');
+        const xr2 = xr + LAMBDA;
+        if (xc2 < 900) drawZone(xc2, zoneWidth(170), 'rgba(77,184,255,1)');
+        if (xr2 < 900) drawZone(xr2, zoneWidth(260), 'rgba(255,77,77,1)');
+
+        drawCentreMarker(xc, 'rgba(77,184,255,1)', tr.centreCompression, tr.highDensity);
+        drawCentreMarker(xr, 'rgba(255,77,77,1)', tr.centreRarefaction, tr.lowDensity);
+        if (xc2 < 900) drawCentreMarker(xc2, 'rgba(77,184,255,1)', tr.centreCompression, '');
+        if (xr2 < 900) drawCentreMarker(xr2, 'rgba(255,77,77,1)', tr.centreRarefaction, '');
 
         // Equilibrium label
         ctx.fillStyle = '#666';
@@ -482,7 +648,7 @@
             const x = particleX(i, phase);
             const dens = densityMetric(eqX(i), phase);
             const vs = velocitySign(i, phase);
-            const atAmp = Math.abs(Math.cos(K * eqX(i) + phase)) < 0.12;
+            const atAmp = phaseCosAbs(i, phase) < 0.12;
             const isSel = selected === i;
 
             let fill = dens > 0.02 ? '#4db8ff' : dens < -0.02 ? '#ff4d4d' : '#94a3b8';
@@ -504,7 +670,6 @@
             ctx.textAlign = 'center';
             ctx.fillText(IDS[i], x, Y_PART + 35);
 
-            // Velocity arrow (or amplitude markers when v ≈ 0)
             if (atAmp || vs === 0) {
                 ctx.fillStyle = '#ffcc00';
                 ctx.font = 'bold 12px Segoe UI, sans-serif';
@@ -512,7 +677,7 @@
                 ctx.font = '12px Segoe UI, sans-serif';
                 ctx.fillText(tr.vZero, x, Y_PART + 80);
             } else {
-                const len = 28 + Math.abs(Math.cos(K * eqX(i) + phase)) * 12;
+                const len = 28 + phaseCosAbs(i, phase) * 12;
                 const x2 = vs < 0 ? x - len : x + len;
                 ctx.strokeStyle = fill;
                 ctx.fillStyle = fill;
@@ -573,8 +738,10 @@
         if (!dragging) return;
         const pt = canvasPoint(ev);
         const dx = pt.x - dragStartX;
-        // Drag right → advance phase so wave pattern moves left visually with travel direction
-        phase = dragStartPhase + (dx / LAMBDA) * 2 * Math.PI;
+        // Drag so pattern follows travel: advance phase proportional to drag / λ
+        // Left-going: drag right advances φ (pattern moves left)
+        // Right-going: drag right advances φ (pattern moves right) — same φ advance
+        phase = dragStartPhase + (dx / LAMBDA) * 2 * Math.PI * (travelDir < 0 ? 1 : -1);
         syncPhaseSlider();
         updateParticleInfo();
         draw();
@@ -604,6 +771,23 @@
         speedVal.innerText = `${speed.toFixed(1)}×`;
     });
 
+    wavelengthSlider.addEventListener('input', () => {
+        setLambdaFromSpacings(parseInt(wavelengthSlider.value, 10));
+        wavelengthVal.innerText = t().wavelengthVal(lambdaSpacings);
+        updateParticleInfo();
+        draw();
+    });
+
+    function setTravelDir(dir) {
+        travelDir = dir;
+        updateDirectionUI();
+        updateParticleInfo();
+        draw();
+    }
+
+    btnDirLeft.addEventListener('click', () => setTravelDir(-1));
+    btnDirRight.addEventListener('click', () => setTravelDir(1));
+
     btnPlay.addEventListener('click', () => {
         isPlaying = !isPlaying;
         btnPlay.innerText = isPlaying ? t().pause : t().play;
@@ -613,7 +797,15 @@
     btnReset.addEventListener('click', () => {
         phase = 0;
         selected = 1;
+        speed = 1;
+        travelDir = -1;
+        setLambdaFromSpacings(DEFAULT_SPACINGS);
+        wavelengthSlider.value = String(DEFAULT_SPACINGS);
+        speedSlider.value = '1';
+        speedVal.innerText = '1.0×';
+        wavelengthVal.innerText = t().wavelengthVal(lambdaSpacings);
         syncPhaseSlider();
+        updateDirectionUI();
         updateParticleInfo();
         draw();
     });
