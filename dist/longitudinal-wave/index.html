@@ -336,6 +336,7 @@
             speed: '波速',
             wavelength: '波長 λ',
             wavelengthVal: (n) => `${n} 間距`,
+            wavelengthMark: 'λ',
             direction: '傳播方向',
             dirLeft: '← 向左',
             dirRight: '→ 向右',
@@ -376,6 +377,7 @@
             speed: 'Wave speed',
             wavelength: 'Wavelength λ',
             wavelengthVal: (n) => `${n} spacings`,
+            wavelengthMark: 'λ',
             direction: 'Travel direction',
             dirLeft: '← Left',
             dirRight: '→ Right',
@@ -550,19 +552,7 @@
         particleInfo.innerHTML = tr.info(IDS[selected], dispStr, velDir);
     }
 
-    function drawZone(xCenter, width, color) {
-        const x = xCenter - width / 2;
-        ctx.fillStyle = color.replace('1)', '0.08)');
-        ctx.strokeStyle = color.replace('1)', '0.35)');
-        ctx.lineWidth = 1.5;
-        ctx.setLineDash([6, 6]);
-        roundRect(x, 150, width, 230, 12);
-        ctx.fill();
-        ctx.stroke();
-        ctx.setLineDash([]);
-    }
-
-    function drawCentreMarker(xCenter, color, title, subtitle) {
+    function drawCentreMarker(xCenter, color, title) {
         // Vertical centre line
         ctx.strokeStyle = color.replace('1)', '0.85)');
         ctx.lineWidth = 2;
@@ -582,24 +572,11 @@
         ctx.lineWidth = 1.5;
         ctx.stroke();
 
-        // Labels
+        // Label
         ctx.fillStyle = color.replace('1)', '1)');
         ctx.font = 'bold 13px Segoe UI, sans-serif';
         ctx.textAlign = 'center';
         ctx.fillText(title, xCenter, 358);
-        ctx.font = '11px Segoe UI, sans-serif';
-        ctx.fillStyle = color.replace('1)', '0.85)');
-        ctx.fillText(subtitle, xCenter, 376);
-    }
-
-    function roundRect(x, y, w, h, r) {
-        ctx.beginPath();
-        ctx.moveTo(x + r, y);
-        ctx.arcTo(x + w, y, x + w, y + h, r);
-        ctx.arcTo(x + w, y + h, x, y + h, r);
-        ctx.arcTo(x, y + h, x, y, r);
-        ctx.arcTo(x, y, x + w, y, r);
-        ctx.closePath();
     }
 
     // Compression: cos(kx±φ) = −1 → kx±φ = π + 2πn
@@ -612,70 +589,6 @@
         return { xComp, xRare };
     }
 
-    // Amplitude points: sin(kx±φ) = ±1 → kx±φ = π/2 + nπ
-    function amplitudeMods(ph) {
-        const xPlus = ((Math.PI / 2 - travelDir * ph) / K + 10 * LAMBDA) % LAMBDA; // +A
-        const xMinus = ((3 * Math.PI / 2 - travelDir * ph) / K + 10 * LAMBDA) % LAMBDA; // −A
-        return { xPlus, xMinus };
-    }
-
-    function drawAmplitudeMarker(eqAt, sign, title) {
-        // Particle at max |displacement| from equilibrium eqAt
-        const xEq = eqAt;
-        const xPart = eqAt + sign * AMP;
-        const y = Y_PART - 48;
-
-        // Guide from equilibrium to displaced position
-        ctx.strokeStyle = 'rgba(202, 138, 4, 0.9)';
-        ctx.fillStyle = 'rgba(202, 138, 4, 0.95)';
-        ctx.lineWidth = 2;
-        ctx.setLineDash([]);
-        ctx.beginPath();
-        ctx.moveTo(xEq, y);
-        ctx.lineTo(xPart, y);
-        ctx.stroke();
-
-        // End caps
-        const cap = 6;
-        ctx.beginPath();
-        ctx.moveTo(xEq, y - cap);
-        ctx.lineTo(xEq, y + cap);
-        ctx.moveTo(xPart, y - cap);
-        ctx.lineTo(xPart, y + cap);
-        ctx.stroke();
-
-        // Arrowheads toward both ends (dimension bracket)
-        const dir = sign > 0 ? 1 : -1;
-        ctx.beginPath();
-        ctx.moveTo(xPart, y);
-        ctx.lineTo(xPart - dir * 7, y - 5);
-        ctx.lineTo(xPart - dir * 7, y + 5);
-        ctx.closePath();
-        ctx.fill();
-        ctx.beginPath();
-        ctx.moveTo(xEq, y);
-        ctx.lineTo(xEq + dir * 7, y - 5);
-        ctx.lineTo(xEq + dir * 7, y + 5);
-        ctx.closePath();
-        ctx.fill();
-
-        // Equilibrium tick on particle row
-        ctx.setLineDash([3, 3]);
-        ctx.strokeStyle = 'rgba(202, 138, 4, 0.45)';
-        ctx.beginPath();
-        ctx.moveTo(xEq, Y_EQ + 10);
-        ctx.lineTo(xEq, Y_PART);
-        ctx.stroke();
-        ctx.setLineDash([]);
-
-        // Label
-        const mid = (xEq + xPart) / 2;
-        ctx.fillStyle = '#ca8a04';
-        ctx.font = 'bold 12px Segoe UI, sans-serif';
-        ctx.textAlign = 'center';
-        ctx.fillText(title, mid, y - 10);
-    }
-
     function placeZone(xMod) {
         let best = xMod;
         while (best < 80) best += LAMBDA;
@@ -684,9 +597,72 @@
         return best;
     }
 
-    function zoneWidth(base) {
-        // Scale highlight width with wavelength so short λ still looks tight
-        return Math.max(90, Math.min(base, LAMBDA * 0.55));
+    function drawWavelengthIndicator(x1, x2, label) {
+        const W = canvas.width;
+        // Prefer a fully visible λ span; otherwise shift into view
+        let a = x1;
+        let b = x2;
+        if (b - a < 50) return;
+        if (a < 50) {
+            const shift = Math.ceil((50 - a) / LAMBDA) * LAMBDA;
+            a += shift;
+            b += shift;
+        }
+        if (b > W - 30) {
+            const shift = Math.ceil((b - (W - 30)) / LAMBDA) * LAMBDA;
+            a -= shift;
+            b -= shift;
+        }
+        if (a < 40 || b > W - 20 || b - a < 50) return;
+
+        const y = 112;
+        ctx.strokeStyle = '#6366f1';
+        ctx.fillStyle = '#6366f1';
+        ctx.lineWidth = 2;
+        ctx.setLineDash([]);
+
+        // Horizontal bar
+        ctx.beginPath();
+        ctx.moveTo(a, y);
+        ctx.lineTo(b, y);
+        ctx.stroke();
+
+        // End ticks
+        const tick = 8;
+        ctx.beginPath();
+        ctx.moveTo(a, y - tick);
+        ctx.lineTo(a, y + tick);
+        ctx.moveTo(b, y - tick);
+        ctx.lineTo(b, y + tick);
+        ctx.stroke();
+
+        // Arrowheads
+        const ah = 7;
+        ctx.beginPath();
+        ctx.moveTo(a, y);
+        ctx.lineTo(a + ah, y - 5);
+        ctx.lineTo(a + ah, y + 5);
+        ctx.closePath();
+        ctx.fill();
+        ctx.beginPath();
+        ctx.moveTo(b, y);
+        ctx.lineTo(b - ah, y - 5);
+        ctx.lineTo(b - ah, y + 5);
+        ctx.closePath();
+        ctx.fill();
+
+        // Label
+        ctx.font = 'bold 14px Segoe UI, sans-serif';
+        ctx.textAlign = 'center';
+        ctx.textBaseline = 'bottom';
+        const mid = (a + b) / 2;
+        const padX = 10;
+        const tw = ctx.measureText(label).width;
+        ctx.fillStyle = 'rgba(248,249,250,0.92)';
+        ctx.fillRect(mid - tw / 2 - padX, y - 22, tw + padX * 2, 18);
+        ctx.fillStyle = '#4338ca';
+        ctx.fillText(label, mid, y - 6);
+        ctx.textBaseline = 'alphabetic';
     }
 
     function draw() {
@@ -715,29 +691,16 @@
         const xc = placeZone(xComp);
         const xr = placeZone(xRare);
 
-        drawZone(xc, zoneWidth(170), 'rgba(2,132,199,1)');
-        drawZone(xr, zoneWidth(260), 'rgba(220,38,38,1)');
-
         const xc2 = xc + LAMBDA;
         const xr2 = xr + LAMBDA;
-        if (xc2 < 900) drawZone(xc2, zoneWidth(170), 'rgba(2,132,199,1)');
-        if (xr2 < 900) drawZone(xr2, zoneWidth(260), 'rgba(220,38,38,1)');
 
-        drawCentreMarker(xc, 'rgba(2,132,199,1)', tr.centreCompression, tr.highDensity);
-        drawCentreMarker(xr, 'rgba(220,38,38,1)', tr.centreRarefaction, tr.lowDensity);
-        if (xc2 < 900) drawCentreMarker(xc2, 'rgba(2,132,199,1)', tr.centreCompression, '');
-        if (xr2 < 900) drawCentreMarker(xr2, 'rgba(220,38,38,1)', tr.centreRarefaction, '');
+        drawCentreMarker(xc, 'rgba(2,132,199,1)', tr.centreCompression);
+        drawCentreMarker(xr, 'rgba(220,38,38,1)', tr.centreRarefaction);
+        if (xc2 < 900) drawCentreMarker(xc2, 'rgba(2,132,199,1)', tr.centreCompression);
+        if (xr2 < 900) drawCentreMarker(xr2, 'rgba(220,38,38,1)', tr.centreRarefaction);
 
-        // Amplitude points (+A and −A) — track with the wave
-        const { xPlus, xMinus } = amplitudeMods(phase);
-        const xaPlus = placeZone(xPlus);
-        const xaMinus = placeZone(xMinus);
-        drawAmplitudeMarker(xaPlus, 1, tr.amplitudeA);
-        drawAmplitudeMarker(xaMinus, -1, tr.amplitudeA);
-        const xaPlus2 = xaPlus + LAMBDA;
-        const xaMinus2 = xaMinus + LAMBDA;
-        if (xaPlus2 < 900) drawAmplitudeMarker(xaPlus2, 1, tr.amplitudeA);
-        if (xaMinus2 < 900) drawAmplitudeMarker(xaMinus2, -1, tr.amplitudeA);
+        // Wavelength span between consecutive compression centres
+        drawWavelengthIndicator(xc, xc + LAMBDA, tr.wavelengthMark);
 
         // Equilibrium label
         ctx.fillStyle = '#6b7280';
@@ -794,10 +757,8 @@
 
             if (atAmp || vs === 0) {
                 ctx.fillStyle = '#92400e';
-                ctx.font = 'bold 12px Segoe UI, sans-serif';
-                ctx.fillText(tr.amplitudePoint, x, Y_PART + 62);
                 ctx.font = '12px Segoe UI, sans-serif';
-                ctx.fillText(tr.vZero, x, Y_PART + 80);
+                ctx.fillText(tr.vZero, x, Y_PART + 62);
             } else {
                 const len = 28 + phaseCosAbs(i, phase) * 12;
                 const x2 = vs < 0 ? x - len : x + len;

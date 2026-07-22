@@ -1,0 +1,1 @@
+import{c as t}from"./createLabIframe-C5_C4Any.js";import"./index-zQGyD5wR.js";function i(r){return t(r,{slug:"rotating-mirror",titleKey:"tools.rotatingMirror.title",className:"tool-rotating-mirror-lab",extraParams:()=>"&v=20260722_rotating_mirror_light_v1"})}export{i as createRotatingMirrorLab};
