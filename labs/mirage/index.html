@@ -1,0 +1,835 @@
+<!DOCTYPE html>
+<html lang="zh-HK">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>海市蜃樓 — 熱空氣全內反射</title>
+    <link rel="stylesheet" href="../shared/s3phy-embed.css">
+    <script src="../shared/s3phy-embed-init.js"></script>
+    <style>
+        html.s3phy-embed .lang-btn { display: none; }
+        html.s3phy-embed body { padding: 12px; }
+        :root {
+            --bg: #f7f3eb;
+            --panel: #fffdf8;
+            --text: #2a241c;
+            --muted: #6b5f52;
+            --border: #e6ddd0;
+            --cold: #2f6f8f;
+            --hot: #c45c26;
+            --sky: #5ba3c9;
+            --road: #3d3a38;
+            --accent: #b45309;
+            --ok: #0f766e;
+            --btn: #efe6d8;
+            --btn-text: #4a3f34;
+            --active: #b45309;
+        }
+        * { box-sizing: border-box; }
+        body {
+            margin: 0;
+            padding: 20px;
+            font-family: "Noto Sans TC", "Segoe UI", sans-serif;
+            background:
+                radial-gradient(ellipse 80% 50% at 50% -10%, #fde8c8 0%, transparent 55%),
+                linear-gradient(180deg, #f7f3eb 0%, #efe6d8 100%);
+            color: var(--text);
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+        }
+        .header-top {
+            display: flex;
+            justify-content: space-between;
+            align-items: flex-start;
+            width: 100%;
+            max-width: 920px;
+            margin-bottom: 8px;
+            gap: 12px;
+        }
+        .header-text { flex: 1; }
+        h2 {
+            margin: 0 0 6px;
+            color: var(--accent);
+            font-weight: 800;
+            letter-spacing: 0.02em;
+            font-size: 1.45rem;
+        }
+        #page-desc {
+            margin: 0;
+            color: var(--muted);
+            font-size: 0.95rem;
+            line-height: 1.45;
+        }
+        .lang-btn {
+            background: var(--btn);
+            color: var(--btn-text);
+            border: 1px solid var(--border);
+            padding: 6px 12px;
+            border-radius: 8px;
+            cursor: pointer;
+            font-size: 13px;
+            font-weight: 700;
+            flex-shrink: 0;
+        }
+        .container {
+            width: 100%;
+            max-width: 920px;
+            display: flex;
+            flex-direction: column;
+            gap: 16px;
+        }
+        .controls, .canvas-card, .explain {
+            background: var(--panel);
+            border: 1px solid var(--border);
+            border-radius: 16px;
+            box-shadow: 0 2px 10px rgba(42, 36, 28, 0.05);
+        }
+        .controls {
+            padding: 16px 18px;
+            display: flex;
+            flex-wrap: wrap;
+            gap: 16px 24px;
+            align-items: flex-end;
+        }
+        .control-group {
+            display: flex;
+            flex-direction: column;
+            gap: 6px;
+            min-width: 180px;
+            flex: 1 1 180px;
+        }
+        .slider-label {
+            font-size: 0.8rem;
+            font-weight: 700;
+            color: var(--muted);
+            text-transform: uppercase;
+            letter-spacing: 0.04em;
+        }
+        .slider-row {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+        input[type=range] {
+            flex: 1;
+            accent-color: var(--accent);
+            cursor: pointer;
+        }
+        .val {
+            font-variant-numeric: tabular-nums;
+            font-weight: 700;
+            min-width: 4.5rem;
+            text-align: right;
+            color: var(--text);
+            font-size: 0.9rem;
+        }
+        .stats {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 10px;
+            align-items: stretch;
+            flex: 2 1 280px;
+        }
+        .stat {
+            background: #faf6ef;
+            border: 1px solid var(--border);
+            border-radius: 10px;
+            padding: 8px 12px;
+            min-width: 110px;
+            flex: 1;
+        }
+        .stat .k {
+            display: block;
+            font-size: 0.72rem;
+            font-weight: 700;
+            color: var(--muted);
+            margin-bottom: 2px;
+        }
+        .stat .v {
+            font-weight: 800;
+            font-size: 0.95rem;
+            font-variant-numeric: tabular-nums;
+        }
+        .stat.cold .v { color: var(--cold); }
+        .stat.hot .v { color: var(--hot); }
+        .status-pill {
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            padding: 10px 14px;
+            border-radius: 10px;
+            font-weight: 800;
+            font-size: 0.9rem;
+            flex: 1 1 160px;
+            text-align: center;
+            border: 1px solid transparent;
+            transition: background 0.2s, color 0.2s;
+        }
+        .status-pill.tir {
+            background: #ecfdf5;
+            color: var(--ok);
+            border-color: #a7f3d0;
+        }
+        .status-pill.refract {
+            background: #fff7ed;
+            color: var(--hot);
+            border-color: #fed7aa;
+        }
+        .canvas-card { padding: 14px; }
+        .canvas-label {
+            font-size: 0.8rem;
+            font-weight: 700;
+            color: var(--muted);
+            margin-bottom: 8px;
+        }
+        #sceneCanvas {
+            width: 100%;
+            height: 380px;
+            display: block;
+            border-radius: 12px;
+            background: #c8dff0;
+            border: 1px solid var(--border);
+            cursor: crosshair;
+        }
+        .hint {
+            text-align: center;
+            font-size: 0.82rem;
+            color: var(--muted);
+            margin-top: 8px;
+            font-weight: 500;
+        }
+        .explain {
+            padding: 14px 18px;
+            font-size: 0.9rem;
+            line-height: 1.55;
+            color: var(--muted);
+        }
+        .explain strong { color: var(--text); }
+        .formula {
+            margin-top: 8px;
+            font-family: "Roboto Mono", "Consolas", monospace;
+            font-size: 0.85rem;
+            color: var(--cold);
+            background: #f0f7fb;
+            border-radius: 8px;
+            padding: 8px 12px;
+            display: inline-block;
+        }
+    </style>
+</head>
+<body>
+    <div class="header-top">
+        <div class="header-text">
+            <h2 id="page-title">Mirage — TIR in hot &amp; cold air</h2>
+            <p id="page-desc">Light in denser cool air can totally reflect at hotter, rarer air — looking like water on the road.</p>
+        </div>
+        <button type="button" class="lang-btn" id="lang-toggle">🌐 English</button>
+    </div>
+
+    <div class="container">
+        <div class="controls">
+            <div class="control-group">
+                <span class="slider-label" id="label-temp">Hot-air temperature</span>
+                <div class="slider-row">
+                    <input type="range" id="tempSlider" min="20" max="80" step="1" value="55">
+                    <span class="val" id="tempVal">55 °C</span>
+                </div>
+            </div>
+            <div class="control-group">
+                <span class="slider-label" id="label-angle">Ray incidence angle θ₁</span>
+                <div class="slider-row">
+                    <input type="range" id="angleSlider" min="70" max="89.5" step="0.1" value="86">
+                    <span class="val" id="angleVal">86.0°</span>
+                </div>
+            </div>
+            <div class="stats">
+                <div class="stat cold">
+                    <span class="k" id="label-ncold">n cold (dense)</span>
+                    <span class="v" id="nColdVal">1.0003</span>
+                </div>
+                <div class="stat hot">
+                    <span class="k" id="label-nhot">n hot (rare)</span>
+                    <span class="v" id="nHotVal">1.0001</span>
+                </div>
+                <div class="stat">
+                    <span class="k" id="label-crit">Critical angle θc</span>
+                    <span class="v" id="critVal">—</span>
+                </div>
+                <div class="status-pill tir" id="statusPill">TIR — mirage</div>
+            </div>
+        </div>
+
+        <div class="canvas-card">
+            <div class="canvas-label" id="label-scene">Side view: cool air → hot air near the road</div>
+            <canvas id="sceneCanvas" width="880" height="380"></canvas>
+            <div class="hint" id="drag-hint">Drag the eye to change viewing height · rays from the sky hit the air interface</div>
+        </div>
+
+        <div class="explain" id="explain-box">
+            <strong>Why it looks like water:</strong> cooler air is denser (higher n). Hot air near asphalt is rarer (lower n). Light going from cold → hot can undergo <strong>total internal reflection</strong> when θ₁ &gt; θc, so the sky is reflected up to your eye — like a mirror puddle.
+            <div class="formula" id="formula">θc = arcsin(n_hot / n_cold)</div>
+        </div>
+    </div>
+
+    <script>
+        const N_COLD = 1.0003;
+        // Teaching model: exaggerate Δn so θc moves into a visible range (real air Δn is tiny).
+        function nHotFromTemp(tC) {
+            const cool = 20;
+            const strength = Math.max(0, (tC - cool) / 60); // 0..1
+            const delta = 0.00005 + strength * 0.00022; // up to ~0.00027
+            return Math.max(1.00005, N_COLD - delta);
+        }
+
+        const dict = {
+            zh: {
+                title: '海市蜃樓 — 熱／冷空氣全內反射',
+                desc: '光喺較密嘅冷空氣入面，撞到較疏嘅熱空氣介面，可以發生全內反射，睇落好似路面有水。',
+                temp: '熱空氣溫度',
+                angle: '光線入射角 θ₁',
+                ncold: 'n 冷（光密）',
+                nhot: 'n 熱（光疏）',
+                crit: '臨界角 θc',
+                scene: '側視：冷空氣 → 路面附近熱空氣',
+                hint: '拖曳眼睛改變視高 · 天空光線打落空氣介面',
+                explain: '<strong>點解似水：</strong>冷空氣較密（n 較大），路面附近熱空氣較疏（n 較細）。光由冷 → 熱，當 θ₁ &gt; θc 就會<strong>全內反射</strong>，天空光被反射入眼 — 好似地面有一面鏡。<br><em>註：真實大氣 Δn 好細；呢度用放大模型方便睇到臨界角變化。</em>',
+                formula: 'θc = arcsin(n_熱 / n_冷)',
+                statusTir: '全內反射 → 海市蜃樓',
+                statusRefract: '折射入熱層（未成蜃景）',
+                coldAir: '冷空氣（密）',
+                hotAir: '熱空氣（疏）',
+                road: '熱瀝青路',
+                sky: '天空',
+                eye: '眼睛',
+                object: '景物',
+                interface: '冷／熱空氣介面',
+                tirRay: '全內反射',
+                refrRay: '折射',
+                virtual: '虛像（似水面）',
+                water: '「假水」',
+                langBtn: '🌐 English'
+            },
+            en: {
+                title: 'Mirage — TIR in hot & cold air',
+                desc: 'Light in denser cool air can totally reflect at hotter, rarer air — looking like water on the road.',
+                temp: 'Hot-air temperature',
+                angle: 'Ray incidence angle θ₁',
+                ncold: 'n cold (dense)',
+                nhot: 'n hot (rare)',
+                crit: 'Critical angle θc',
+                scene: 'Side view: cool air → hot air near the road',
+                hint: 'Drag the eye to change viewing height · sky rays hit the air interface',
+                explain: '<strong>Why it looks like water:</strong> cooler air is denser (higher n). Hot air near asphalt is rarer (lower n). Light going from cold → hot can undergo <strong>total internal reflection</strong> when θ₁ &gt; θc, so the sky is reflected up to your eye — like a mirror puddle.<br><em>Note: real air Δn is tiny; this lab uses an exaggerated model so θc changes clearly.</em>',
+                formula: 'θc = arcsin(n_hot / n_cold)',
+                statusTir: 'TIR → mirage',
+                statusRefract: 'Refracts into hot layer (no mirage)',
+                coldAir: 'Cool air (dense)',
+                hotAir: 'Hot air (rare)',
+                road: 'Hot asphalt',
+                sky: 'Sky',
+                eye: 'Eye',
+                object: 'Object',
+                interface: 'Cold / hot air interface',
+                tirRay: 'TIR',
+                refrRay: 'Refraction',
+                virtual: 'Virtual image (“water”)',
+                water: '“False water”',
+                langBtn: '🌐 中文'
+            }
+        };
+
+        function hubLangToLocal(lang) {
+            if (lang === 'en') return 'en';
+            return 'zh';
+        }
+
+        const params = new URLSearchParams(location.search);
+        let currentLang = hubLangToLocal(params.get('lang') || 'zh');
+
+        const canvas = document.getElementById('sceneCanvas');
+        const ctx = canvas.getContext('2d');
+        const tempSlider = document.getElementById('tempSlider');
+        const angleSlider = document.getElementById('angleSlider');
+        const statusPill = document.getElementById('statusPill');
+
+        let eyeY = 120;
+        let draggingEye = false;
+        let shimmerT = 0;
+
+        function nHot() {
+            return nHotFromTemp(parseFloat(tempSlider.value));
+        }
+
+        function criticalAngleDeg() {
+            const ratio = nHot() / N_COLD;
+            if (ratio >= 1) return 90;
+            return (Math.asin(ratio) * 180) / Math.PI;
+        }
+
+        function incidenceDeg() {
+            return parseFloat(angleSlider.value);
+        }
+
+        function isTir() {
+            return incidenceDeg() > criticalAngleDeg() + 1e-6;
+        }
+
+        function updateLanguageUI() {
+            const t = dict[currentLang];
+            document.documentElement.lang = currentLang === 'zh' ? 'zh-HK' : 'en';
+            document.title = t.title;
+            document.getElementById('lang-toggle').innerText = t.langBtn;
+            document.getElementById('page-title').innerText = t.title;
+            document.getElementById('page-desc').innerText = t.desc;
+            document.getElementById('label-temp').innerText = t.temp;
+            document.getElementById('label-angle').innerText = t.angle;
+            document.getElementById('label-ncold').innerText = t.ncold;
+            document.getElementById('label-nhot').innerText = t.nhot;
+            document.getElementById('label-crit').innerText = t.crit;
+            document.getElementById('label-scene').innerText = t.scene;
+            document.getElementById('drag-hint').innerText = t.hint;
+            document.getElementById('explain-box').innerHTML = t.explain + `<div class="formula" id="formula">${t.formula}</div>`;
+            updateReadouts();
+            draw();
+        }
+
+        function updateReadouts() {
+            const t = dict[currentLang];
+            const th = parseFloat(tempSlider.value);
+            const nh = nHot();
+            const tc = criticalAngleDeg();
+            const i = incidenceDeg();
+            document.getElementById('tempVal').textContent = `${th.toFixed(0)} °C`;
+            document.getElementById('angleVal').textContent = `${i.toFixed(1)}°`;
+            document.getElementById('nColdVal').textContent = N_COLD.toFixed(6);
+            document.getElementById('nHotVal').textContent = nh.toFixed(6);
+            document.getElementById('critVal').textContent = `${tc.toFixed(2)}°`;
+            const tir = isTir();
+            statusPill.textContent = tir ? t.statusTir : t.statusRefract;
+            statusPill.className = 'status-pill ' + (tir ? 'tir' : 'refract');
+        }
+
+        function layout() {
+            const w = canvas.width;
+            const h = canvas.height;
+            const roadTop = h - 48;
+            const interfaceY = roadTop - 70;
+            const skyTop = 0;
+            return { w, h, roadTop, interfaceY, skyTop, objX: 90, eyeX: w - 90 };
+        }
+
+        function drawSky(L) {
+            const g = ctx.createLinearGradient(0, 0, 0, L.interfaceY);
+            g.addColorStop(0, '#7eb8d8');
+            g.addColorStop(0.55, '#b7d6ea');
+            g.addColorStop(1, '#d9e8f2');
+            ctx.fillStyle = g;
+            ctx.fillRect(0, 0, L.w, L.interfaceY);
+        }
+
+        function drawHotLayer(L) {
+            const g = ctx.createLinearGradient(0, L.interfaceY, 0, L.roadTop);
+            g.addColorStop(0, 'rgba(251, 191, 36, 0.12)');
+            g.addColorStop(0.5, 'rgba(234, 88, 12, 0.22)');
+            g.addColorStop(1, 'rgba(194, 65, 12, 0.35)');
+            ctx.fillStyle = g;
+            ctx.fillRect(0, L.interfaceY, L.w, L.roadTop - L.interfaceY);
+
+            // Heat shimmer waves
+            ctx.save();
+            ctx.strokeStyle = 'rgba(255, 180, 80, 0.35)';
+            ctx.lineWidth = 1.5;
+            for (let i = 0; i < 5; i++) {
+                const y = L.interfaceY + 12 + i * 12;
+                ctx.beginPath();
+                for (let x = 0; x <= L.w; x += 8) {
+                    const yy = y + Math.sin(x * 0.04 + shimmerT * 0.05 + i) * 2.5;
+                    if (x === 0) ctx.moveTo(x, yy);
+                    else ctx.lineTo(x, yy);
+                }
+                ctx.stroke();
+            }
+            ctx.restore();
+        }
+
+        function drawRoad(L) {
+            const g = ctx.createLinearGradient(0, L.roadTop, 0, L.h);
+            g.addColorStop(0, '#4a4745');
+            g.addColorStop(1, '#2c2a28');
+            ctx.fillStyle = g;
+            ctx.fillRect(0, L.roadTop, L.w, L.h - L.roadTop);
+            ctx.strokeStyle = 'rgba(255,255,255,0.25)';
+            ctx.setLineDash([18, 14]);
+            ctx.lineWidth = 3;
+            ctx.beginPath();
+            ctx.moveTo(40, L.roadTop + 22);
+            ctx.lineTo(L.w - 40, L.roadTop + 22);
+            ctx.stroke();
+            ctx.setLineDash([]);
+        }
+
+        function drawInterface(L, t) {
+            ctx.strokeStyle = 'rgba(42, 36, 28, 0.45)';
+            ctx.setLineDash([6, 5]);
+            ctx.lineWidth = 1.5;
+            ctx.beginPath();
+            ctx.moveTo(0, L.interfaceY);
+            ctx.lineTo(L.w, L.interfaceY);
+            ctx.stroke();
+            ctx.setLineDash([]);
+            ctx.fillStyle = 'rgba(42, 36, 28, 0.55)';
+            ctx.font = 'bold 11px "Noto Sans TC", sans-serif';
+            ctx.fillText(t.interface, 12, L.interfaceY - 8);
+        }
+
+        function drawLabels(L, t) {
+            ctx.font = 'bold 12px "Noto Sans TC", sans-serif';
+            ctx.fillStyle = varCold();
+            ctx.fillText(t.coldAir, 12, 28);
+            ctx.fillStyle = '#c2410c';
+            ctx.fillText(t.hotAir, 12, L.interfaceY + 22);
+            ctx.fillStyle = '#e7e5e4';
+            ctx.fillText(t.road, 12, L.roadTop + 38);
+        }
+
+        function varCold() {
+            return '#1e5a73';
+        }
+
+        function drawCactus(L, t) {
+            const x = L.objX;
+            const base = L.interfaceY - 8;
+            ctx.fillStyle = '#3f7a4a';
+            // trunk
+            roundRect(x - 10, base - 90, 20, 90, 6);
+            ctx.fill();
+            // arms
+            roundRect(x - 38, base - 70, 28, 12, 5);
+            ctx.fill();
+            roundRect(x - 38, base - 70, 12, 36, 5);
+            ctx.fill();
+            roundRect(x + 10, base - 55, 28, 12, 5);
+            ctx.fill();
+            roundRect(x + 26, base - 55, 12, 28, 5);
+            ctx.fill();
+            ctx.fillStyle = '#2f5a38';
+            ctx.font = 'bold 11px "Noto Sans TC", sans-serif';
+            ctx.fillText(t.object, x - 18, base - 100);
+        }
+
+        function roundRect(x, y, w, h, r) {
+            ctx.beginPath();
+            ctx.moveTo(x + r, y);
+            ctx.arcTo(x + w, y, x + w, y + h, r);
+            ctx.arcTo(x + w, y + h, x, y + h, r);
+            ctx.arcTo(x, y + h, x, y, r);
+            ctx.arcTo(x, y, x + w, y, r);
+            ctx.closePath();
+        }
+
+        function drawEye(L, t) {
+            const x = L.eyeX;
+            const y = Math.max(36, Math.min(L.interfaceY - 24, eyeY));
+            eyeY = y;
+            ctx.fillStyle = '#1c1917';
+            ctx.beginPath();
+            ctx.ellipse(x, y, 16, 10, 0, 0, Math.PI * 2);
+            ctx.fill();
+            ctx.fillStyle = '#f8fafc';
+            ctx.beginPath();
+            ctx.ellipse(x - 2, y, 8, 7, 0, 0, Math.PI * 2);
+            ctx.fill();
+            ctx.fillStyle = '#0ea5e9';
+            ctx.beginPath();
+            ctx.arc(x - 3, y, 3.5, 0, Math.PI * 2);
+            ctx.fill();
+            ctx.fillStyle = '#1c1917';
+            ctx.font = 'bold 11px "Noto Sans TC", sans-serif';
+            ctx.fillText(t.eye, x - 14, y - 16);
+            return { x, y };
+        }
+
+        function drawRayBundle(L, eye, t) {
+            const iDeg = incidenceDeg();
+            const tc = criticalAngleDeg();
+            const tir = iDeg > tc;
+            // Hit point on interface chosen so reflected ray aims toward eye
+            // For teaching: place hit under the midline, compute from angle
+            const hitX = L.w * 0.52;
+            const hitY = L.interfaceY;
+
+            // Incidence measured from normal (vertical). Grazing → large θ₁
+            const iRad = (iDeg * Math.PI) / 180;
+            // Incoming direction in cool air: toward interface from upper-left sky
+            // Angle from downward normal: θ₁ means direction makes θ₁ with vertical
+            const dx = Math.sin(iRad);
+            const dy = Math.cos(iRad); // positive downward toward interface
+
+            // Back-trace source from hit along -incident
+            const srcLen = 160;
+            const srcX = hitX - dx * srcLen;
+            const srcY = hitY - dy * srcLen;
+
+            // Draw sky source glow
+            ctx.fillStyle = 'rgba(255, 255, 255, 0.85)';
+            ctx.beginPath();
+            ctx.arc(srcX, Math.max(18, srcY), 6, 0, Math.PI * 2);
+            ctx.fill();
+            ctx.fillStyle = '#0369a1';
+            ctx.font = 'bold 11px "Noto Sans TC", sans-serif';
+            ctx.fillText(t.sky, srcX + 10, Math.max(22, srcY) + 4);
+
+            // Incident segment
+            ctx.strokeStyle = '#0284c7';
+            ctx.lineWidth = 2.5;
+            ctx.beginPath();
+            ctx.moveTo(srcX, Math.max(10, srcY));
+            ctx.lineTo(hitX, hitY);
+            ctx.stroke();
+            drawArrow(hitX - dx * 18, hitY - dy * 18, hitX, hitY, '#0284c7');
+
+            // Normal at interface
+            ctx.strokeStyle = 'rgba(42,36,28,0.35)';
+            ctx.setLineDash([3, 3]);
+            ctx.lineWidth = 1;
+            ctx.beginPath();
+            ctx.moveTo(hitX, hitY - 40);
+            ctx.lineTo(hitX, hitY + 40);
+            ctx.stroke();
+            ctx.setLineDash([]);
+            ctx.fillStyle = 'rgba(42,36,28,0.5)';
+            ctx.font = '10px sans-serif';
+            ctx.fillText('N', hitX + 4, hitY - 42);
+
+            // Angle arc for θ₁
+            ctx.strokeStyle = '#0369a1';
+            ctx.lineWidth = 1.5;
+            ctx.beginPath();
+            ctx.arc(hitX, hitY, 28, -Math.PI / 2, -Math.PI / 2 + iRad, false);
+            ctx.stroke();
+            ctx.fillStyle = '#0369a1';
+            ctx.font = 'bold 11px "Noto Sans TC", sans-serif';
+            ctx.fillText('θ₁', hitX + 32, hitY - 8);
+
+            if (tir) {
+                // Reflected ray (equal angle other side of normal) → up-right
+                const rdx = dx;
+                const rdy = -dy;
+                // Extend toward eye roughly
+                const endX = eye.x;
+                const endY = eye.y;
+                // Ideal reflect line from hit
+                const len = Math.hypot(endX - hitX, endY - hitY);
+                const idealEndX = hitX + rdx * Math.max(len, 120);
+                const idealEndY = hitY + rdy * Math.max(len, 120);
+
+                ctx.strokeStyle = '#0f766e';
+                ctx.lineWidth = 2.8;
+                ctx.beginPath();
+                ctx.moveTo(hitX, hitY);
+                ctx.lineTo(idealEndX, idealEndY);
+                ctx.stroke();
+                drawArrow(idealEndX - rdx * 16, idealEndY - rdy * 16, idealEndX, idealEndY, '#0f766e');
+
+                // Soft guide to eye
+                ctx.strokeStyle = 'rgba(15, 118, 110, 0.35)';
+                ctx.setLineDash([4, 4]);
+                ctx.beginPath();
+                ctx.moveTo(idealEndX, idealEndY);
+                ctx.lineTo(eye.x, eye.y);
+                ctx.stroke();
+                ctx.setLineDash([]);
+
+                ctx.fillStyle = '#0f766e';
+                ctx.font = 'bold 12px "Noto Sans TC", sans-serif';
+                ctx.fillText(t.tirRay, hitX + 10, hitY + 18);
+
+                // Virtual image below interface (mirror of sky source)
+                const virtY = hitY + (hitY - Math.max(10, srcY));
+                const virtX = srcX;
+                ctx.save();
+                ctx.globalAlpha = 0.45;
+                ctx.fillStyle = '#38bdf8';
+                ctx.beginPath();
+                ctx.arc(virtX, Math.min(L.roadTop - 8, virtY), 7, 0, Math.PI * 2);
+                ctx.fill();
+                ctx.restore();
+                ctx.strokeStyle = 'rgba(14, 165, 233, 0.5)';
+                ctx.setLineDash([4, 4]);
+                ctx.beginPath();
+                ctx.moveTo(virtX, Math.min(L.roadTop - 8, virtY));
+                ctx.lineTo(hitX, hitY);
+                ctx.stroke();
+                ctx.setLineDash([]);
+                ctx.fillStyle = '#0369a1';
+                ctx.font = 'bold 11px "Noto Sans TC", sans-serif';
+                ctx.fillText(t.virtual, virtX + 12, Math.min(L.roadTop - 8, virtY) + 4);
+
+                // False water patch on road
+                drawWaterPatch(L, hitX);
+            } else {
+                // Refract into hot layer (away from normal since n2 < n1 → θ2 > θ1)
+                const s = (N_COLD / nHot()) * Math.sin(iRad);
+                let rRad;
+                if (s >= 1) {
+                    rRad = Math.PI / 2;
+                } else {
+                    rRad = Math.asin(s);
+                }
+                const fdx = Math.sin(rRad);
+                const fdy = Math.cos(rRad);
+                const endX = hitX + fdx * 90;
+                const endY = Math.min(L.roadTop - 4, hitY + fdy * 90);
+                ctx.strokeStyle = '#c2410c';
+                ctx.lineWidth = 2.5;
+                ctx.beginPath();
+                ctx.moveTo(hitX, hitY);
+                ctx.lineTo(endX, endY);
+                ctx.stroke();
+                drawArrow(endX - fdx * 14, endY - fdy * 14, endX, endY, '#c2410c');
+                ctx.fillStyle = '#c2410c';
+                ctx.font = 'bold 12px "Noto Sans TC", sans-serif';
+                ctx.fillText(t.refrRay + ' θ₂', hitX + 14, hitY + 28);
+            }
+
+            // Fan of secondary rays to show threshold
+            drawFan(L, hitX, hitY, tc, t);
+        }
+
+        function drawFan(L, hitX, hitY, tc, t) {
+            const angles = [tc - 2, tc + 0.5, tc + 3];
+            angles.forEach((a, idx) => {
+                if (a < 70 || a > 89.5) return;
+                const iRad = (a * Math.PI) / 180;
+                const dx = Math.sin(iRad);
+                const dy = Math.cos(iRad);
+                const srcX = hitX - 40 - idx * 28 - dx * 70;
+                const srcY = hitY - dy * 70;
+                const tir = a > tc;
+                ctx.globalAlpha = 0.35;
+                ctx.strokeStyle = tir ? '#0f766e' : '#c2410c';
+                ctx.lineWidth = 1.2;
+                ctx.beginPath();
+                ctx.moveTo(srcX, Math.max(8, srcY));
+                ctx.lineTo(hitX - 8 - idx * 10, hitY);
+                ctx.stroke();
+                if (tir) {
+                    ctx.beginPath();
+                    ctx.moveTo(hitX - 8 - idx * 10, hitY);
+                    ctx.lineTo(hitX - 8 - idx * 10 + dx * 50, hitY - dy * 50);
+                    ctx.stroke();
+                } else {
+                    ctx.beginPath();
+                    ctx.moveTo(hitX - 8 - idx * 10, hitY);
+                    ctx.lineTo(hitX - 8 - idx * 10 + dx * 40, hitY + dy * 40);
+                    ctx.stroke();
+                }
+                ctx.globalAlpha = 1;
+            });
+        }
+
+        function drawWaterPatch(L, hitX) {
+            const t = dict[currentLang];
+            const y = L.roadTop + 8;
+            const g = ctx.createRadialGradient(hitX, y, 4, hitX, y, 90);
+            g.addColorStop(0, 'rgba(125, 211, 252, 0.55)');
+            g.addColorStop(0.5, 'rgba(56, 189, 248, 0.28)');
+            g.addColorStop(1, 'rgba(56, 189, 248, 0)');
+            ctx.fillStyle = g;
+            ctx.beginPath();
+            ctx.ellipse(hitX, y, 95, 14, 0, 0, Math.PI * 2);
+            ctx.fill();
+            // shimmer lines
+            ctx.strokeStyle = 'rgba(255,255,255,0.45)';
+            ctx.lineWidth = 1;
+            for (let i = -2; i <= 2; i++) {
+                ctx.beginPath();
+                ctx.moveTo(hitX - 50, y + i * 3 + Math.sin(shimmerT * 0.08 + i) * 1.5);
+                ctx.quadraticCurveTo(hitX, y + i * 2, hitX + 50, y + i * 3 + Math.cos(shimmerT * 0.08 + i) * 1.5);
+                ctx.stroke();
+            }
+            ctx.fillStyle = 'rgba(224, 242, 254, 0.9)';
+            ctx.font = 'bold 11px "Noto Sans TC", sans-serif';
+            ctx.fillText(t.water, hitX - 24, y - 10);
+        }
+
+        function drawArrow(x0, y0, x1, y1, color) {
+            const ang = Math.atan2(y1 - y0, x1 - x0);
+            ctx.fillStyle = color;
+            ctx.beginPath();
+            ctx.moveTo(x1, y1);
+            ctx.lineTo(x1 - 10 * Math.cos(ang - 0.4), y1 - 10 * Math.sin(ang - 0.4));
+            ctx.lineTo(x1 - 10 * Math.cos(ang + 0.4), y1 - 10 * Math.sin(ang + 0.4));
+            ctx.closePath();
+            ctx.fill();
+        }
+
+        function draw() {
+            const L = layout();
+            const t = dict[currentLang];
+            ctx.clearRect(0, 0, L.w, L.h);
+            drawSky(L);
+            drawHotLayer(L);
+            drawRoad(L);
+            drawInterface(L, t);
+            drawLabels(L, t);
+            drawCactus(L, t);
+            const eye = drawEye(L, t);
+            drawRayBundle(L, eye, t);
+        }
+
+        function resize() {
+            const parent = canvas.parentElement;
+            const cssW = parent.clientWidth - 28;
+            canvas.width = Math.max(640, cssW);
+            canvas.height = 380;
+            draw();
+        }
+
+        // Events
+        tempSlider.addEventListener('input', () => { updateReadouts(); draw(); });
+        angleSlider.addEventListener('input', () => { updateReadouts(); draw(); });
+
+        canvas.addEventListener('mousedown', (e) => {
+            const rect = canvas.getBoundingClientRect();
+            const scaleX = canvas.width / rect.width;
+            const scaleY = canvas.height / rect.height;
+            const x = (e.clientX - rect.left) * scaleX;
+            const y = (e.clientY - rect.top) * scaleY;
+            const L = layout();
+            if (Math.hypot(x - L.eyeX, y - eyeY) < 36) draggingEye = true;
+        });
+        window.addEventListener('mousemove', (e) => {
+            if (!draggingEye) return;
+            const rect = canvas.getBoundingClientRect();
+            const scaleY = canvas.height / rect.height;
+            const L = layout();
+            eyeY = Math.max(36, Math.min(L.interfaceY - 24, (e.clientY - rect.top) * scaleY));
+            draw();
+        });
+        window.addEventListener('mouseup', () => { draggingEye = false; });
+
+        document.getElementById('lang-toggle').addEventListener('click', () => {
+            currentLang = currentLang === 'zh' ? 'en' : 'zh';
+            updateLanguageUI();
+        });
+        window.addEventListener('message', (ev) => {
+            if (ev.data?.type !== 's3phy:lang') return;
+            currentLang = hubLangToLocal(ev.data.lang);
+            updateLanguageUI();
+        });
+        window.addEventListener('resize', resize);
+
+        function animate() {
+            shimmerT += 1;
+            draw();
+            requestAnimationFrame(animate);
+        }
+
+        updateLanguageUI();
+        resize();
+        animate();
+    </script>
+</body>
+</html>

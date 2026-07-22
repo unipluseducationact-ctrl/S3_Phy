@@ -5,7 +5,7 @@ import { renderToolsShell, hydrateToolsShell } from '../tools/toolsShell.js';
 import { mountFlashcardStudy } from '../flashcards/flashcardStudy.js';
 import { buildOpticsDeck } from '../flashcards/flashcardDeck.js';
 
-const TOOL_ORDER = ['refraction', 'refractionTir'];
+const TOOL_ORDER = ['refraction', 'refractionTir', 'mirage'];
 const TOOL_STORAGE_KEY = 's3phy.refraction.tool';
 const WORKSHEET_ORDER = ['lightLens'];
 const SUMMARY_ASSET_VERSION = '20260627-em-v2';
@@ -28,12 +28,14 @@ const WORKSHEET_LOADERS = {
 const TOOL_LOADERS = {
   refraction: () => import('../tools/refractionLab.js').then((m) => m.createRefractionLab),
   refractionTir: () => import('../tools/tirEscapeLab.js').then((m) => m.createTirEscapeLab),
+  mirage: () => import('../tools/mirageLab.js').then((m) => m.createMirageLab),
 };
 
 function toolLabel(id) {
   const map = {
     refraction: 'tools.refraction.title',
     refractionTir: 'tools.refractionTir.title',
+    mirage: 'tools.mirage.title',
   };
   return t(map[id] || id);
 }
@@ -184,12 +186,13 @@ export function mountRefractionHub(root) {
     const cards = [
       ['refraction', 'topic.refractionSnell'],
       ['refractionTir', 'topic.refractionTir'],
+      ['mirage', 'topic.mirage'],
     ];
     return `
       <section class="panel panel--topic-hub">
         <h2>${t('topics.title')}</h2>
         <p class="lead">${t('topics.intro')}</p>
-        <div class="grid cols-2 topic-hub-grid">
+        <div class="grid cols-3 topic-hub-grid">
           ${cards
             .map(([id, key]) => {
               return `
