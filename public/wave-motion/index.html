@@ -358,16 +358,6 @@
             padding: 6px 14px;
             font-size: 12px;
         }
-        .toolbar-travel {
-            display: flex;
-            gap: 4px;
-            align-items: center;
-        }
-        .toolbar-travel .hl-btn {
-            padding: 3px 8px;
-            font-size: 11px;
-            min-width: 0;
-        }
 
         .controls-compact-row {
             display: flex;
@@ -395,10 +385,6 @@
         <div class="controls-area" id="controls-area">
             <div class="controls-toolbar">
                 <p class="controls-toolbar-title" id="controls-title">控制面板</p>
-                <div class="toolbar-travel" id="toolbar-travel" title="">
-                    <button type="button" class="hl-btn" id="dir-left-mini" data-dir="-1">←</button>
-                    <button type="button" class="hl-btn active right" id="dir-right-mini" data-dir="1">→</button>
-                </div>
                 <button type="button" class="controls-toggle-btn" id="btn-toggle-controls" aria-expanded="true">隱藏面板</button>
             </div>
             <div class="controls-body" id="controls-body">
@@ -731,15 +717,19 @@
             return xx;
         }
 
-        /** Current role of a particle on the travelling wave: crest / trough / eq */
+        /**
+         * Role only when the particle is actually at that point (not en route).
+         * @returns {'crest'|'trough'|'eq'|null}
+         */
         function particleRoleKey(p, shift, L) {
             const s = Math.sin((2 * Math.PI / L) * (p.x - ORIGIN_X - shift));
-            const dCrest = Math.abs(s - 1);
-            const dTrough = Math.abs(s + 1);
-            const dEq = Math.abs(s);
-            if (dCrest <= dTrough && dCrest <= dEq) return 'crest';
-            if (dTrough <= dEq) return 'trough';
-            return 'eq';
+            const atCrest = 0.92;   // sin ≈ 1
+            const atTrough = -0.92; // sin ≈ -1
+            const atEq = 0.12;      // |sin| ≈ 0
+            if (s >= atCrest) return 'crest';
+            if (s <= atTrough) return 'trough';
+            if (Math.abs(s) <= atEq) return 'eq';
+            return null;
         }
 
         function particles() {
@@ -830,7 +820,6 @@
             document.getElementById('label-travel').innerText = tr.travelLabel;
             document.getElementById('dir-right').innerText = tr.travelRight;
             document.getElementById('dir-left').innerText = tr.travelLeft;
-            document.getElementById('toolbar-travel').title = tr.travelHint;
             btnPlay.innerText = isPlaying ? tr.pause : tr.play;
             syncHighlightButtons();
             syncTravelButtons();
@@ -899,16 +888,12 @@
         function syncTravelButtons() {
             const isRight = travelDir === 1;
             const isLeft = travelDir === -1;
-            ['dir-right', 'dir-right-mini'].forEach((id) => {
-                const el = document.getElementById(id);
-                el.classList.toggle('active', isRight);
-                el.classList.toggle('right', isRight);
-            });
-            ['dir-left', 'dir-left-mini'].forEach((id) => {
-                const el = document.getElementById(id);
-                el.classList.toggle('active', isLeft);
-                el.classList.toggle('left', isLeft);
-            });
+            const dirRight = document.getElementById('dir-right');
+            const dirLeft = document.getElementById('dir-left');
+            dirRight.classList.toggle('active', isRight);
+            dirRight.classList.toggle('right', isRight);
+            dirLeft.classList.toggle('active', isLeft);
+            dirLeft.classList.toggle('left', isLeft);
         }
 
         function setTravelDir(dir) {
@@ -919,8 +904,6 @@
 
         document.getElementById('dir-right').addEventListener('click', () => setTravelDir(1));
         document.getElementById('dir-left').addEventListener('click', () => setTravelDir(-1));
-        document.getElementById('dir-right-mini').addEventListener('click', () => setTravelDir(1));
-        document.getElementById('dir-left-mini').addEventListener('click', () => setTravelDir(-1));
 
         function setLambda(val, fromInput) {
             const prevL = wavelengthPx();
@@ -1344,16 +1327,22 @@
                     waveCtx.font = 'bold 13px ' + FONT;
                     waveCtx.textAlign = 'center';
                     const tag = highlightMode !== 'off' ? ` · ${tr.refTag}` : '';
+                    const label = roleKey
+                        ? `${p.id} (${tr.particleLabels[roleKey]}${tag})`
+                        : (highlightMode !== 'off' ? `${p.id} (${tr.refTag})` : p.id);
                     const labelY = roleKey === 'trough' ? y + 22 : y - 22;
-                    waveCtx.fillText(`${p.id} (${tr.particleLabels[roleKey]}${tag})`, p.x, labelY);
+                    waveCtx.fillText(label, p.x, labelY);
                 } else if (isPartner) {
                     const roleKey = particleRoleKey(p, shift, L);
                     waveCtx.fillStyle = highlightMode === 'in' ? '#047857' : '#be123c';
                     waveCtx.font = 'bold 12px ' + FONT;
                     waveCtx.textAlign = 'center';
                     const tag = highlightMode === 'in' ? tr.inPhaseTag : tr.antiPhaseTag;
+                    const label = roleKey
+                        ? `${p.id} (${tr.particleLabels[roleKey]}) · ${tag}`
+                        : `${p.id} · ${tag}`;
                     const labelY = roleKey === 'trough' ? y + 20 : y - 22;
-                    waveCtx.fillText(`${p.id} (${tr.particleLabels[roleKey]}) · ${tag}`, p.x, labelY);
+                    waveCtx.fillText(label, p.x, labelY);
                 } else {
                     waveCtx.fillStyle = 'rgba(0,0,0,0.45)';
                     waveCtx.font = '10px ' + FONT;

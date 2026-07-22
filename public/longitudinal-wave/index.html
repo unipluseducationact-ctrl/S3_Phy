@@ -322,6 +322,8 @@
             centreCompression: '密部中心',
             centreRarefaction: '疏部中心',
             amplitude: '振幅',
+            amplitudePoint: '振幅點',
+            amplitudeA: '振幅 A',
             vZero: '(v = 0)',
             selectHint: '撳下方粒子睇詳情',
             info: (id, disp, velDir) => `粒子 <strong>${id}</strong>：位移 ${disp}　｜　速度方向：<strong>${velDir}</strong>`,
@@ -360,6 +362,8 @@
             centreCompression: 'Centre of compression',
             centreRarefaction: 'Centre of rarefaction',
             amplitude: 'AMPLITUDE',
+            amplitudePoint: 'Amplitude point',
+            amplitudeA: 'Amplitude A',
             vZero: '(v = 0)',
             selectHint: 'Click a particle below for details',
             info: (id, disp, velDir) => `Particle <strong>${id}</strong>: displacement ${disp}  |  velocity: <strong>${velDir}</strong>`,
@@ -582,6 +586,70 @@
         return { xComp, xRare };
     }
 
+    // Amplitude points: sin(kx±φ) = ±1 → kx±φ = π/2 + nπ
+    function amplitudeMods(ph) {
+        const xPlus = ((Math.PI / 2 - travelDir * ph) / K + 10 * LAMBDA) % LAMBDA; // +A
+        const xMinus = ((3 * Math.PI / 2 - travelDir * ph) / K + 10 * LAMBDA) % LAMBDA; // −A
+        return { xPlus, xMinus };
+    }
+
+    function drawAmplitudeMarker(eqAt, sign, title) {
+        // Particle at max |displacement| from equilibrium eqAt
+        const xEq = eqAt;
+        const xPart = eqAt + sign * AMP;
+        const y = Y_PART - 48;
+
+        // Guide from equilibrium to displaced position
+        ctx.strokeStyle = 'rgba(255, 204, 0, 0.9)';
+        ctx.fillStyle = 'rgba(255, 204, 0, 0.95)';
+        ctx.lineWidth = 2;
+        ctx.setLineDash([]);
+        ctx.beginPath();
+        ctx.moveTo(xEq, y);
+        ctx.lineTo(xPart, y);
+        ctx.stroke();
+
+        // End caps
+        const cap = 6;
+        ctx.beginPath();
+        ctx.moveTo(xEq, y - cap);
+        ctx.lineTo(xEq, y + cap);
+        ctx.moveTo(xPart, y - cap);
+        ctx.lineTo(xPart, y + cap);
+        ctx.stroke();
+
+        // Arrowheads toward both ends (dimension bracket)
+        const dir = sign > 0 ? 1 : -1;
+        ctx.beginPath();
+        ctx.moveTo(xPart, y);
+        ctx.lineTo(xPart - dir * 7, y - 5);
+        ctx.lineTo(xPart - dir * 7, y + 5);
+        ctx.closePath();
+        ctx.fill();
+        ctx.beginPath();
+        ctx.moveTo(xEq, y);
+        ctx.lineTo(xEq + dir * 7, y - 5);
+        ctx.lineTo(xEq + dir * 7, y + 5);
+        ctx.closePath();
+        ctx.fill();
+
+        // Equilibrium tick on particle row
+        ctx.setLineDash([3, 3]);
+        ctx.strokeStyle = 'rgba(255, 204, 0, 0.45)';
+        ctx.beginPath();
+        ctx.moveTo(xEq, Y_EQ + 10);
+        ctx.lineTo(xEq, Y_PART);
+        ctx.stroke();
+        ctx.setLineDash([]);
+
+        // Label
+        const mid = (xEq + xPart) / 2;
+        ctx.fillStyle = '#ffcc00';
+        ctx.font = 'bold 12px Segoe UI, sans-serif';
+        ctx.textAlign = 'center';
+        ctx.fillText(title, mid, y - 10);
+    }
+
     function placeZone(xMod) {
         let best = xMod;
         while (best < 80) best += LAMBDA;
@@ -616,6 +684,17 @@
         drawCentreMarker(xr, 'rgba(255,77,77,1)', tr.centreRarefaction, tr.lowDensity);
         if (xc2 < 900) drawCentreMarker(xc2, 'rgba(77,184,255,1)', tr.centreCompression, '');
         if (xr2 < 900) drawCentreMarker(xr2, 'rgba(255,77,77,1)', tr.centreRarefaction, '');
+
+        // Amplitude points (+A and −A) — track with the wave
+        const { xPlus, xMinus } = amplitudeMods(phase);
+        const xaPlus = placeZone(xPlus);
+        const xaMinus = placeZone(xMinus);
+        drawAmplitudeMarker(xaPlus, 1, tr.amplitudeA);
+        drawAmplitudeMarker(xaMinus, -1, tr.amplitudeA);
+        const xaPlus2 = xaPlus + LAMBDA;
+        const xaMinus2 = xaMinus + LAMBDA;
+        if (xaPlus2 < 900) drawAmplitudeMarker(xaPlus2, 1, tr.amplitudeA);
+        if (xaMinus2 < 900) drawAmplitudeMarker(xaMinus2, -1, tr.amplitudeA);
 
         // Equilibrium label
         ctx.fillStyle = '#666';
@@ -673,7 +752,7 @@
             if (atAmp || vs === 0) {
                 ctx.fillStyle = '#ffcc00';
                 ctx.font = 'bold 12px Segoe UI, sans-serif';
-                ctx.fillText(tr.amplitude, x, Y_PART + 62);
+                ctx.fillText(tr.amplitudePoint, x, Y_PART + 62);
                 ctx.font = '12px Segoe UI, sans-serif';
                 ctx.fillText(tr.vZero, x, Y_PART + 80);
             } else {
