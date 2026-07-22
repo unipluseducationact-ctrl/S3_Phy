@@ -1,1 +1,0 @@
-import{c as t}from"./createLabIframe-B_efyTWl.js";import"./index-Bp5_CuLf.js";function o(e){return t(e,{slug:"em-spectrum",titleKey:"tools.em.title",className:"tool-em-spectrum"})}export{o as createEmLab};
