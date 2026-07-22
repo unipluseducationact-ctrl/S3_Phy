@@ -88,6 +88,7 @@ export const en = {
   'tools.ultrasoundReflection.title': 'Ultrasound Reflection',
   'tools.waveInterference.title': 'Spatial Wave Interference',
   'tools.thinFilmInterference.title': 'Thin-film Interference — Soap Film',
+  'tools.diffractionGratingCompare.title': 'Double Slit & Diffraction Grating Compare',
   'tools.soundRefractionShadow.title': 'Sound Refraction — Shadow Zone',
   'tools.refraction.n1': 'Incident medium',
   'tools.refraction.n2': 'Refracted medium',

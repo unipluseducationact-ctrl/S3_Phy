@@ -45,6 +45,7 @@ const TOOL_ORDER = [
   'longitudinalWave',
   'waveInterference',
   'thinFilmInterference',
+  'diffractionGratingCompare',
   'ultrasoundReflection',
   'soundRefractionShadow',
 ];
@@ -56,6 +57,8 @@ const TOOL_LOADERS = {
   waveInterference: () => import('../tools/waveInterferenceLab.js').then((m) => m.createWaveInterferenceLab),
   thinFilmInterference: () =>
     import('../tools/thinFilmInterferenceLab.js').then((m) => m.createThinFilmInterferenceLab),
+  diffractionGratingCompare: () =>
+    import('../tools/diffractionGratingCompareLab.js').then((m) => m.createDiffractionGratingCompareLab),
   ultrasoundReflection: () =>
     import('../tools/ultrasoundReflectionLab.js').then((m) => m.createUltrasoundReflectionLab),
   soundRefractionShadow: () =>
@@ -68,6 +71,7 @@ function toolLabel(id) {
     longitudinalWave: 'tools.longitudinalWave.title',
     waveInterference: 'tools.waveInterference.title',
     thinFilmInterference: 'tools.thinFilmInterference.title',
+    diffractionGratingCompare: 'tools.diffractionGratingCompare.title',
     ultrasoundReflection: 'tools.ultrasoundReflection.title',
     soundRefractionShadow: 'tools.soundRefractionShadow.title',
   };

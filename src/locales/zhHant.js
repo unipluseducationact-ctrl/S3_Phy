@@ -88,6 +88,7 @@ export const zhHant = {
   'tools.ultrasoundReflection.title': '\u8d85\u8072\u6ce2\u53cd\u5c04',
   'tools.waveInterference.title': '\u7a7a\u9593\u6ce2\u7684\u5e72\u6d09',
   'tools.thinFilmInterference.title': '\u8584\u819c\u5e72\u6d89 \u2014 \u80a5\u7682\u6ce1',
+  'tools.diffractionGratingCompare.title': '\u96d9\u72f9\u7e2b\u8207\u5149\u6805\u6bd4\u8f03',
   'tools.soundRefractionShadow.title': '\u8072\u6ce2\u6298\u5c04 \u2014 \u9670\u5f71\u5340',
   'tools.refraction.n1': '\u5165\u5c04\u4ecb\u8cea',
   'tools.refraction.n2': '\u6298\u5c04\u4ecb\u8cea',
