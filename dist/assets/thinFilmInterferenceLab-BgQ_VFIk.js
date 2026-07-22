@@ -1,0 +1,1 @@
+import{c as t}from"./createLabIframe-BBM0YeRk.js";import"./index-DbT5iX8r.js";function n(e){return t(e,{slug:"thin-film-interference",titleKey:"tools.thinFilmInterference.title",className:"tool-thin-film-interference-lab",extraParams:()=>"&v=20260722_thin_film_v2"})}export{n as createThinFilmInterferenceLab};

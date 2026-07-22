@@ -75,12 +75,13 @@
             border: 1px solid #ddd;
             border-radius: 8px;
             width: 100%;
+            max-width: 100%;
             touch-action: none;
             display: block;
         }
-        #waveCanvas { cursor: grab; min-height: 320px; }
+        #waveCanvas { cursor: grab; min-height: 300px; }
         #waveCanvas:active { cursor: grabbing; }
-        #graphCanvas { min-height: 260px; }
+        #graphCanvas { min-height: 240px; }
 
         input[type=range] {
             width: 100%;
@@ -615,10 +616,15 @@
         const controlsArea = document.getElementById('controls-area');
         const btnToggleControls = document.getElementById('btn-toggle-controls');
 
-        const amplitude = 78;
-        const waveCenterY = Math.round(waveCanvas.height / 2);
-        const graphCenterY = graphCanvas.height / 2;
-        const tOrigin = graphCanvas.width / 2;
+        // Logical (CSS-pixel) drawing size — backing store is scaled by devicePixelRatio
+        let waveW = 1000;
+        let waveH = 360;
+        let graphW = 1000;
+        let graphH = 280;
+        let amplitude = 78;
+        let waveCenterY = 180;
+        let graphCenterY = 140;
+        let tOrigin = 500;
         const PX_PER_UNIT = 220; // preferred canvas px per unit of λ (may shrink to fit A–H)
         const ORIGIN_X = 48;
         const PARTICLE_RIGHT_PAD = 36;
@@ -628,6 +634,51 @@
         const FREQ_MAX = 1 / PERIOD_MIN; // 2
         /** Visual playback scale — keeps motion easy to follow while v = fλ ratios stay correct. */
         const PLAY_RATE = 0.35;
+        const FONT = 'Segoe UI, "Noto Sans TC", "Microsoft JhengHei", system-ui, sans-serif';
+
+        /**
+         * Match canvas backing-store pixels to CSS size × devicePixelRatio for sharp text/lines.
+         * Drawing code uses CSS-pixel coordinates (waveW/waveH, graphW/graphH).
+         */
+        function fitHiDpiCanvas(canvas, ctx, fallbackW, fallbackH) {
+            const parentW = canvas.parentElement?.clientWidth || 0;
+            const cssW = Math.max(280, Math.floor(parentW || fallbackW));
+            const cssH = Math.max(
+                Math.round(fallbackH * 0.9),
+                Math.round(cssW * (fallbackH / fallbackW))
+            );
+            const dpr = Math.min(window.devicePixelRatio || 1, 3);
+            canvas.width = Math.round(cssW * dpr);
+            canvas.height = Math.round(cssH * dpr);
+            canvas.style.width = `${cssW}px`;
+            canvas.style.height = `${cssH}px`;
+            ctx.setTransform(dpr, 0, 0, dpr, 0, 0);
+            ctx.imageSmoothingEnabled = true;
+            if ('imageSmoothingQuality' in ctx) ctx.imageSmoothingQuality = 'high';
+            return { w: cssW, h: cssH };
+        }
+
+        function resizeCanvases() {
+            const prevL = wavelengthPx();
+            const phaseFrac = prevL > 0 ? phasePx / prevL : 0;
+
+            const wave = fitHiDpiCanvas(waveCanvas, waveCtx, 1000, 360);
+            waveW = wave.w;
+            waveH = wave.h;
+            waveCenterY = Math.round(waveH / 2);
+            amplitude = Math.round(waveH * (78 / 360));
+
+            const graph = fitHiDpiCanvas(graphCanvas, graphCtx, 1000, 280);
+            graphW = graph.w;
+            graphH = graph.h;
+            graphCenterY = Math.round(graphH / 2);
+            tOrigin = Math.round(graphW / 2);
+
+            phasePx = phaseFrac * wavelengthPx();
+            syncPhaseSlider();
+            initControls();
+            update();
+        }
 
         // Physical parameters
         let lambda = 1.5;
@@ -655,7 +706,7 @@
         /** Pixel length of one λ — scales with λ, but never so large that A–H leave the canvas. */
         function wavelengthPx() {
             const preferred = Math.max(80, lambda * PX_PER_UNIT);
-            const fit = (waveCanvas.width - ORIGIN_X - PARTICLE_RIGHT_PAD) / PARTICLE_MAX_FRAC;
+            const fit = (waveW - ORIGIN_X - PARTICLE_RIGHT_PAD) / PARTICLE_MAX_FRAC;
             return Math.max(50, Math.min(preferred, fit));
         }
 
@@ -674,7 +725,7 @@
         function wrapFeatureX(x, L) {
             let xx = x;
             const minX = ORIGIN_X - 0.05 * L;
-            const maxX = waveCanvas.width - 24;
+            const maxX = waveW - 24;
             while (xx < minX) xx += L;
             while (xx > maxX) xx -= L;
             return xx;
@@ -964,7 +1015,7 @@
             startPhase = phasePx;
             try { waveCanvas.setPointerCapture(e.pointerId); } catch (_) { /* ignore */ }
             const rect = waveCanvas.getBoundingClientRect();
-            const scaleX = waveCanvas.width / rect.width;
+            const scaleX = waveW / rect.width;
             const mouseX = (e.clientX - rect.left) * scaleX;
             particles().forEach((p, idx) => {
                 if (Math.abs(mouseX - p.x) < 20) selectParticle(idx);
@@ -977,7 +1028,7 @@
                 return;
             }
             const rect = waveCanvas.getBoundingClientRect();
-            const scaleX = waveCanvas.width / rect.width;
+            const scaleX = waveW / rect.width;
             const dx = (e.clientX - startX) * scaleX;
             phasePx = startPhase + dx;
             syncPhaseSlider();
@@ -1022,7 +1073,7 @@
             ctx.lineTo(x + 7, bot);
             ctx.stroke();
 
-            ctx.font = 'bold 12px Segoe UI, Arial';
+            ctx.font = 'bold 12px ' + FONT;
             ctx.textAlign = 'left';
             ctx.textBaseline = 'middle';
             ctx.fillText(label, x + 10, (top + bot) / 2);
@@ -1031,14 +1082,14 @@
 
         /** Prefer the on-screen crest/trough nearest the canvas centre (stable while travelling). */
         function pickFeatureX(baseFrac, L, shift) {
-            const mid = waveCanvas.width / 2;
+            const mid = waveW / 2;
             let best = null;
             let bestDist = Infinity;
             const nMin = Math.floor((-ORIGIN_X - shift) / L) - 1;
-            const nMax = Math.ceil((waveCanvas.width - ORIGIN_X - shift) / L) + 1;
+            const nMax = Math.ceil((waveW - ORIGIN_X - shift) / L) + 1;
             for (let n = nMin; n <= nMax; n++) {
                 const x = ORIGIN_X + (baseFrac + n) * L + shift;
-                if (x < 36 || x > waveCanvas.width - 50) continue;
+                if (x < 36 || x > waveW - 50) continue;
                 const d = Math.abs(x - mid);
                 if (d < bestDist) {
                     bestDist = d;
@@ -1052,7 +1103,7 @@
         function drawTravelDirectionIndicator(ctx, tr, dir, _shift, startX) {
             const goingRight = dir === 1;
             const label = `${tr.travelDirCanvas} ${goingRight ? '→' : '←'}`;
-            ctx.font = 'bold 12px Segoe UI, Arial';
+            ctx.font = 'bold 12px ' + FONT;
             const w = ctx.measureText(label).width + 16;
             const y = 10;
             ctx.fillStyle = goingRight ? 'rgba(15,118,110,0.9)' : 'rgba(3,105,161,0.9)';
@@ -1103,7 +1154,7 @@
             ctx.closePath();
             ctx.fill();
 
-            ctx.font = 'bold 12px Segoe UI, Arial';
+            ctx.font = 'bold 12px ' + FONT;
             ctx.textAlign = 'center';
             ctx.textBaseline = 'top';
             ctx.fillText(label, (left + right) / 2, y + tick + 4);
@@ -1116,10 +1167,10 @@
             const k = (2 * Math.PI) / L;
             const plist = particles();
 
-            waveCtx.clearRect(0, 0, waveCanvas.width, waveCanvas.height);
+            waveCtx.clearRect(0, 0, waveW, waveH);
 
             // Transverse badge
-            waveCtx.font = 'bold 13px Segoe UI, Arial';
+            waveCtx.font = 'bold 13px ' + FONT;
             waveCtx.textAlign = 'left';
             const badge = tr.transverse;
             const tw = waveCtx.measureText(badge).width + 16;
@@ -1137,13 +1188,13 @@
             waveCtx.strokeStyle = '#cbd5e1';
             waveCtx.setLineDash([6, 4]);
             waveCtx.moveTo(0, waveCenterY);
-            waveCtx.lineTo(waveCanvas.width, waveCenterY);
+            waveCtx.lineTo(waveW, waveCenterY);
             waveCtx.stroke();
             waveCtx.setLineDash([]);
             waveCtx.fillStyle = '#64748b';
-            waveCtx.font = 'bold 12px Segoe UI, Arial';
+            waveCtx.font = 'bold 12px ' + FONT;
             waveCtx.textAlign = 'right';
-            waveCtx.fillText(tr.equilibrium, waveCanvas.width - 10, waveCenterY - 8);
+            waveCtx.fillText(tr.equilibrium, waveW - 10, waveCenterY - 8);
 
             // Travel-direction indicator (updates with ←/→ control; chevrons scroll with the wave)
             drawTravelDirectionIndicator(waveCtx, tr, travelDir, shift, 12 + tw + 10);
@@ -1153,7 +1204,7 @@
             waveCtx.strokeStyle = '#bdc3c7';
             waveCtx.lineWidth = 2;
             waveCtx.setLineDash([5, 5]);
-            for (let x = 0; x < waveCanvas.width; x++) {
+            for (let x = 0; x < waveW; x++) {
                 const y = waveCenterY - amplitude * Math.sin(k * (x - ORIGIN_X));
                 if (x === 0) waveCtx.moveTo(x, y);
                 else waveCtx.lineTo(x, y);
@@ -1167,7 +1218,7 @@
             waveCtx.lineWidth = 4;
             waveCtx.shadowColor = 'rgba(232, 121, 249, 0.55)';
             waveCtx.shadowBlur = 8;
-            for (let x = 0; x < waveCanvas.width; x++) {
+            for (let x = 0; x < waveW; x++) {
                 const y = waveCenterY - amplitude * Math.sin(k * (x - ORIGIN_X - shift));
                 if (x === 0) waveCtx.moveTo(x, y);
                 else waveCtx.lineTo(x, y);
@@ -1177,21 +1228,21 @@
 
             // Crest / trough labels — draw every on-screen extremum so markers
             // travel continuously with the wave (no wrap jump that looks reversed)
-            waveCtx.font = 'bold 12px Segoe UI, Arial';
+            waveCtx.font = 'bold 12px ' + FONT;
             waveCtx.textAlign = 'center';
             const nMin = Math.floor((-ORIGIN_X - shift) / L) - 1;
-            const nMax = Math.ceil((waveCanvas.width - ORIGIN_X - shift) / L) + 1;
+            const nMax = Math.ceil((waveW - ORIGIN_X - shift) / L) + 1;
             for (let n = nMin; n <= nMax; n++) {
                 const cX = ORIGIN_X + (0.25 + n) * L + shift;
                 const tX = ORIGIN_X + (0.75 + n) * L + shift;
-                if (cX >= 8 && cX <= waveCanvas.width - 8) {
+                if (cX >= 8 && cX <= waveW - 8) {
                     waveCtx.fillStyle = '#c0392b';
                     waveCtx.fillText(tr.crest, cX, waveCenterY - amplitude - 14);
                     waveCtx.beginPath();
                     waveCtx.arc(cX, waveCenterY - amplitude, 4, 0, Math.PI * 2);
                     waveCtx.fill();
                 }
-                if (tX >= 8 && tX <= waveCanvas.width - 8) {
+                if (tX >= 8 && tX <= waveW - 8) {
                     waveCtx.fillStyle = '#2980b9';
                     waveCtx.fillText(tr.trough, tX, waveCenterY + amplitude + 18);
                     waveCtx.beginPath();
@@ -1206,23 +1257,23 @@
             const crestY = waveCenterY - amplitude;
             const troughY = waveCenterY + amplitude;
             if (crestX != null) {
-                const ampArrowX = clamp(crestX + 26, 28, waveCanvas.width - 70);
+                const ampArrowX = clamp(crestX + 26, 28, waveW - 70);
                 drawDoubleArrowV(waveCtx, ampArrowX, waveCenterY, crestY, tr.amplitude);
 
                 // One-λ bracket between neighbouring crests (keep fully on-screen)
                 let bracketLeft = crestX;
                 let bracketRight = crestX + L;
-                if (bracketRight > waveCanvas.width - 16) {
+                if (bracketRight > waveW - 16) {
                     bracketRight = crestX;
                     bracketLeft = crestX - L;
                 }
-                if (bracketLeft >= 16 && bracketRight <= waveCanvas.width - 16 && bracketRight - bracketLeft > 40) {
-                    const bracketY = Math.min(waveCanvas.height - 22, waveCenterY + amplitude + 42);
+                if (bracketLeft >= 16 && bracketRight <= waveW - 16 && bracketRight - bracketLeft > 40) {
+                    const bracketY = Math.min(waveH - 22, waveCenterY + amplitude + 42);
                     drawLambdaBracket(waveCtx, bracketLeft, bracketRight, bracketY, tr.oneLambda);
                 }
             }
             if (troughX != null) {
-                const ampArrowXLow = clamp(troughX + 26, 28, waveCanvas.width - 70);
+                const ampArrowXLow = clamp(troughX + 26, 28, waveW - 70);
                 drawDoubleArrowV(waveCtx, ampArrowXLow, waveCenterY, troughY, tr.amplitude);
             }
 
@@ -1290,7 +1341,7 @@
                     waveCtx.stroke();
                     const roleKey = particleRoleKey(p, shift, L);
                     waveCtx.fillStyle = '#111';
-                    waveCtx.font = 'bold 13px Segoe UI, Arial';
+                    waveCtx.font = 'bold 13px ' + FONT;
                     waveCtx.textAlign = 'center';
                     const tag = highlightMode !== 'off' ? ` · ${tr.refTag}` : '';
                     const labelY = roleKey === 'trough' ? y + 22 : y - 22;
@@ -1298,14 +1349,14 @@
                 } else if (isPartner) {
                     const roleKey = particleRoleKey(p, shift, L);
                     waveCtx.fillStyle = highlightMode === 'in' ? '#047857' : '#be123c';
-                    waveCtx.font = 'bold 12px Segoe UI, Arial';
+                    waveCtx.font = 'bold 12px ' + FONT;
                     waveCtx.textAlign = 'center';
                     const tag = highlightMode === 'in' ? tr.inPhaseTag : tr.antiPhaseTag;
                     const labelY = roleKey === 'trough' ? y + 20 : y - 22;
                     waveCtx.fillText(`${p.id} (${tr.particleLabels[roleKey]}) · ${tag}`, p.x, labelY);
                 } else {
                     waveCtx.fillStyle = 'rgba(0,0,0,0.45)';
-                    waveCtx.font = '10px Segoe UI, Arial';
+                    waveCtx.font = '10px ' + FONT;
                     waveCtx.textAlign = 'center';
                     waveCtx.fillText(p.id, p.x, y - 12);
                 }
@@ -1322,19 +1373,19 @@
             // pixel on graph: t_val relative to origin; physical time = (t_val / L) * T
             const markerX = tOrigin + phasePx;
 
-            graphCtx.clearRect(0, 0, graphCanvas.width, graphCanvas.height);
+            graphCtx.clearRect(0, 0, graphW, graphH);
 
             graphCtx.beginPath();
             graphCtx.strokeStyle = '#ccc';
             graphCtx.moveTo(0, graphCenterY);
-            graphCtx.lineTo(graphCanvas.width, graphCenterY);
+            graphCtx.lineTo(graphW, graphCenterY);
             graphCtx.stroke();
 
             graphCtx.beginPath();
             graphCtx.strokeStyle = '#95a5a6';
             graphCtx.lineWidth = 2;
             graphCtx.moveTo(tOrigin, 10);
-            graphCtx.lineTo(tOrigin, graphCanvas.height - 10);
+            graphCtx.lineTo(tOrigin, graphH - 10);
             graphCtx.stroke();
 
             // Period markers
@@ -1344,30 +1395,30 @@
             for (let n = -3; n <= 3; n++) {
                 if (n === 0) continue;
                 const x = tOrigin + n * L;
-                if (x < 0 || x > graphCanvas.width) continue;
+                if (x < 0 || x > graphW) continue;
                 graphCtx.beginPath();
                 graphCtx.moveTo(x, 15);
-                graphCtx.lineTo(x, graphCanvas.height - 15);
+                graphCtx.lineTo(x, graphH - 15);
                 graphCtx.stroke();
                 graphCtx.fillStyle = '#94a3b8';
-                graphCtx.font = '11px Segoe UI, Arial';
+                graphCtx.font = '11px ' + FONT;
                 graphCtx.textAlign = 'center';
-                graphCtx.fillText(`${n > 0 ? '+' : ''}${n}T`, x, graphCanvas.height - 6);
+                graphCtx.fillText(`${n > 0 ? '+' : ''}${n}T`, x, graphH - 6);
             }
             graphCtx.setLineDash([]);
 
             graphCtx.fillStyle = '#7f8c8d';
-            graphCtx.font = '12px Segoe UI, Arial';
+            graphCtx.font = '12px ' + FONT;
             graphCtx.textAlign = 'left';
             graphCtx.fillText(tr.displacementY, 10, 20);
-            graphCtx.fillText(tr.timeT, graphCanvas.width - 70, graphCenterY + 20);
-            graphCtx.fillText(tr.tZero, tOrigin + 5, graphCanvas.height - 15);
+            graphCtx.fillText(tr.timeT, graphW - 70, graphCenterY + 20);
+            graphCtx.fillText(tr.tZero, tOrigin + 5, graphH - 15);
 
             graphCtx.beginPath();
             graphCtx.strokeStyle = p.color;
             graphCtx.lineWidth = 2;
             graphCtx.globalAlpha = 0.2;
-            for (let px = 0; px < graphCanvas.width; px++) {
+            for (let px = 0; px < graphW; px++) {
                 const tVal = px - tOrigin;
                 const y = graphCenterY - amplitude * Math.sin(k * (p.x - ORIGIN_X - travelDir * tVal));
                 if (px === 0) graphCtx.moveTo(px, y);
@@ -1394,7 +1445,7 @@
             graphCtx.strokeStyle = '#333';
             graphCtx.setLineDash([4, 4]);
             graphCtx.moveTo(markerX, 20);
-            graphCtx.lineTo(markerX, graphCanvas.height - 20);
+            graphCtx.lineTo(markerX, graphH - 20);
             graphCtx.stroke();
             graphCtx.setLineDash([]);
 
@@ -1403,7 +1454,7 @@
             graphCtx.arc(markerX, currentY, 8, 0, Math.PI * 2);
             graphCtx.fill();
             graphCtx.fillStyle = '#333';
-            graphCtx.font = 'bold 12px Segoe UI, Arial';
+            graphCtx.font = 'bold 12px ' + FONT;
             graphCtx.fillText(tr.now, markerX + 10, currentY);
         }
 
@@ -1436,10 +1487,14 @@
         }
 
         // Init
-        syncPhaseSlider();
-        initControls();
+        resizeCanvases();
         selectParticle(0);
         updateLanguageUI();
+        let resizeTimer = null;
+        window.addEventListener('resize', () => {
+            clearTimeout(resizeTimer);
+            resizeTimer = setTimeout(resizeCanvases, 120);
+        });
         requestAnimationFrame(tick);
     </script>
 </body>
