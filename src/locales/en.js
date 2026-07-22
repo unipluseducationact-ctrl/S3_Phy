@@ -259,9 +259,10 @@ export const en = {
   'tools.faultyCalibration.invalidInterval': 'C_u must differ from C_f (interval cannot be zero).',
   // Mechanics translations
   'strand.mechanics.title': 'Mechanics',
-  'strand.mechanics.desc': 'Force and motion: position, speed, acceleration, and Newton\'s laws of motion (Coming soon).',
+  'strand.mechanics.desc': 'Force and motion: position, speed, acceleration, projectile motion, and Newton\'s laws.',
   'strand.mechanics.subtitle': 'Mechanics — force and motion',
   'mechanics.section.empty': 'Mechanics strand content is coming soon.',
+  'tools.projectileMotion.title': 'Projectile motion',
   // Gas and kinetic theory translations
   'strand.gas.title': 'Gas & Kinetic Theory',
   'strand.gas.desc': 'Gas laws, kinetic theory, pressure, and molecular motion (Coming soon).',

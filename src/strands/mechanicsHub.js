@@ -1,6 +1,9 @@
-import { t, getLang } from '../i18n.js';
-import { hydrateNoteCards, hydrateSummaryCards } from './hubHelpers.js';
+import { t } from '../i18n.js';
+import { cleanupLabInstance, hydrateNoteCards, hydrateSummaryCards, loadToolId, saveToolId } from './hubHelpers.js';
 import { mountHubShell } from '../hubShell.js';
+import { renderToolsShell, hydrateToolsShell } from '../tools/toolsShell.js';
+
+const TOOL_STORAGE_KEY = 's3phy.mechanics.tool';
 
 const MECHANICS_TOPICS = [
   {
@@ -32,6 +35,7 @@ const MECHANICS_TOPICS = [
     titleKey: 'topic.projectileMotion',
     fileEn: 'projectile-motion-en.pdf',
     fileZh: 'projectile-motion-zhHant.pdf',
+    tool: 'projectileMotion',
   },
   {
     id: 'force',
@@ -95,11 +99,43 @@ const MECHANICS_SUMMARY_ROWS = MECHANICS_TOPICS.map((r) => {
   };
 });
 
+const TOOL_ORDER = ['projectileMotion'];
+
+const TOOL_LOADERS = {
+  projectileMotion: () =>
+    import('../tools/projectileMotionLab.js').then((m) => m.createProjectileMotionLab),
+};
+
+function toolLabel(id) {
+  const map = {
+    projectileMotion: 'tools.projectileMotion.title',
+  };
+  return t(map[id] || id);
+}
+
 export function mountMechanicsHub(root) {
   let section = sessionStorage.getItem('s3phy.mechanics.section') || 'topics';
+  let toolId = loadToolId(TOOL_STORAGE_KEY, TOOL_ORDER, 'projectileMotion');
 
   let shell = null;
   let el = { main: null };
+  let activeLabInstance = null;
+
+  function cleanupActiveLab() {
+    cleanupLabInstance(activeLabInstance);
+    activeLabInstance = null;
+  }
+
+  async function mountActiveTool(stage) {
+    stage.innerHTML = '';
+    cleanupActiveLab();
+    const loader = TOOL_LOADERS[toolId];
+    if (!loader) return;
+    const factory = await loader();
+    const node = factory(t);
+    activeLabInstance = node;
+    stage.appendChild(node);
+  }
 
   function renderMain() {
     if (!el.main) return;
@@ -109,12 +145,24 @@ export function mountMechanicsHub(root) {
     } else if (section === 'notes') {
       el.main.innerHTML = renderNotesShell();
     } else if (section === 'tools') {
-      el.main.innerHTML = `
-        <section class="panel">
-          <h2>${t('tools.title')}</h2>
-          <p class="lead">${t('tools.comingSoon')}</p>
-        </section>
-      `;
+      el.main.innerHTML = renderToolsShell({
+        toolOrder: TOOL_ORDER,
+        toolId,
+        getLabel: toolLabel,
+        t,
+      });
+      hydrateToolsShell(root, {
+        getLabel: toolLabel,
+        t,
+        getActiveToolId: () => toolId,
+        onSelectTool: (id) => {
+          toolId = id;
+          saveToolId(TOOL_STORAGE_KEY, toolId);
+        },
+        mountTool: (stage) => {
+          void mountActiveTool(stage);
+        },
+      });
     } else if (section === 'worksheets') {
       el.main.innerHTML = `
         <section class="panel">
@@ -155,6 +203,9 @@ export function mountMechanicsHub(root) {
       subtitleKey: 'strand.mechanics.subtitle',
       activeSection: section,
       onSection: (id) => {
+        if (section === 'tools' && id !== 'tools') {
+          cleanupActiveLab();
+        }
         section = id;
         sessionStorage.setItem('s3phy.mechanics.section', id);
         shell.updateSection(section);
@@ -173,17 +224,34 @@ export function mountMechanicsHub(root) {
         <h2>${t('topics.title')}</h2>
         <p class="lead">${t('topics.intro')}</p>
         <div class="grid cols-2 topic-hub-grid">
-          ${MECHANICS_TOPICS.map((topic) => `
+          ${MECHANICS_TOPICS.map((topic) => {
+            const btn = topic.tool
+              ? `<button class="btn primary" type="button" data-go-tool="${topic.tool}">${t('topic.openTool')}</button>`
+              : `<button class="btn primary" type="button" data-go-section="notes">${t('topic.viewNotes')}</button>`;
+            return `
             <div class="card">
               <h3>${t(topic.titleKey)}</h3>
-              <button class="btn primary" type="button" data-go-section="notes">${t('topic.viewNotes')}</button>
-            </div>
-          `).join('')}
+              ${btn}
+            </div>`;
+          }).join('')}
         </div>
       </section>`;
   }
 
   function onMainClick(ev) {
+    const toolBtn = ev.target.closest('[data-go-tool]');
+    if (toolBtn) {
+      const targetTool = toolBtn.getAttribute('data-go-tool');
+      if (TOOL_ORDER.includes(targetTool)) {
+        toolId = targetTool;
+        saveToolId(TOOL_STORAGE_KEY, toolId);
+      }
+      section = 'tools';
+      sessionStorage.setItem('s3phy.mechanics.section', 'tools');
+      shell.updateSection(section);
+      renderMain();
+      return;
+    }
     const notesBtn = ev.target.closest('[data-go-section]');
     if (notesBtn?.getAttribute('data-go-section') === 'notes') {
       section = 'notes';
@@ -240,17 +308,15 @@ export function mountMechanicsHub(root) {
     await hydrateSummaryCards(root, MECHANICS_SUMMARY_ROWS);
   }
 
-  const onLang = onLangChange;
-  const onClick = (ev) => onMainClick(ev);
-
-  window.addEventListener('s3phy:lang', onLang);
-  root.addEventListener('click', onClick);
+  window.addEventListener('s3phy:lang', onLangChange);
+  root.addEventListener('click', onMainClick);
 
   render();
 
   return () => {
-    window.removeEventListener('s3phy:lang', onLang);
-    root.removeEventListener('click', onClick);
+    window.removeEventListener('s3phy:lang', onLangChange);
+    root.removeEventListener('click', onMainClick);
+    cleanupActiveLab();
     shell?.destroy();
   };
 }

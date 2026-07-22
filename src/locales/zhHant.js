@@ -259,9 +259,10 @@ export const zhHant = {
   'tools.faultyCalibration.invalidInterval': 'C<sub>u</sub> \u8207 C<sub>f</sub> \u4e0d\u53ef\u76f8\u540c\uff08\u5340\u9593\u4e0d\u53ef\u70ba\u96f6\uff09\u3002',
   // Mechanics translations
   'strand.mechanics.title': '力學',
-  'strand.mechanics.desc': '力與運動：位置、速率、加速度及牛頓運動定律（即將推出）。',
+  'strand.mechanics.desc': '力與運動：位置、速率、加速度、拋體運動及牛頓運動定律。',
   'strand.mechanics.subtitle': '力學 — 力與運動',
   'mechanics.section.empty': '力學單元內容即將推出。',
+  'tools.projectileMotion.title': '拋體運動',
   // Gas and kinetic theory translations
   'strand.gas.title': '\u6c23\u9ad4\u8207\u5206\u5b50\u904b\u52d5\u8ad6',
   'strand.gas.desc': '\u6c23\u9ad4\u5b9a\u5f8b\u3001\u5206\u5b50\u904b\u52d5\u8ad6\u3001\u589a\u529b\u8207\u5206\u5b50\u904b\u52d5\uff08\u5373\u5c07\u63a8\u51fa\uff09\u3002',
