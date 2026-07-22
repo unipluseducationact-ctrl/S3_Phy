@@ -36,16 +36,24 @@ const WAVES_TOPICS = [
     titleKey: 'topic.soundWave',
     fileEn: 'sound-wave-en.pdf',
     fileZh: 'sound-wave-zhHant.pdf',
+    tool: 'soundRefractionShadow',
   },
 ];
 
-const TOOL_ORDER = ['waveMotion', 'waveInterference', 'thinFilmInterference'];
+const TOOL_ORDER = [
+  'waveMotion',
+  'waveInterference',
+  'thinFilmInterference',
+  'soundRefractionShadow',
+];
 
 const TOOL_LOADERS = {
   waveMotion: () => import('../tools/waveMotionLab.js').then((m) => m.createWaveMotionLab),
   waveInterference: () => import('../tools/waveInterferenceLab.js').then((m) => m.createWaveInterferenceLab),
   thinFilmInterference: () =>
     import('../tools/thinFilmInterferenceLab.js').then((m) => m.createThinFilmInterferenceLab),
+  soundRefractionShadow: () =>
+    import('../tools/soundRefractionShadowLab.js').then((m) => m.createSoundRefractionShadowLab),
 };
 
 function toolLabel(id) {
@@ -53,6 +61,7 @@ function toolLabel(id) {
     waveMotion: 'tools.waveMotion.title',
     waveInterference: 'tools.waveInterference.title',
     thinFilmInterference: 'tools.thinFilmInterference.title',
+    soundRefractionShadow: 'tools.soundRefractionShadow.title',
   };
   return t(map[id] || id);
 }

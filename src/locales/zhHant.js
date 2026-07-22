@@ -86,6 +86,7 @@ export const zhHant = {
   'tools.waveMotion.title': '\u6ce2\u52d5\u904b\u52d5 \u2014 \u76f8\u4f4d\u5206\u6790',
   'tools.waveInterference.title': '\u7a7a\u9593\u6ce2\u7684\u5e72\u6d09',
   'tools.thinFilmInterference.title': '\u8584\u819c\u5e72\u6d89 \u2014 \u80a5\u7682\u6ce1',
+  'tools.soundRefractionShadow.title': '\u8072\u6ce2\u6298\u5c04 \u2014 \u9670\u5f71\u5340',
   'tools.refraction.n1': '\u5165\u5c04\u4ecb\u8cea',
   'tools.refraction.n2': '\u6298\u5c04\u4ecb\u8cea',
   'tools.refraction.angle': '\u5165\u5c04\u89d4\uff08\u5ea6\uff09',
