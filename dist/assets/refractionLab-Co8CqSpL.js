@@ -1,0 +1,1 @@
+import{c as a}from"./createLabIframe-B_efyTWl.js";import"./index-Bp5_CuLf.js";function o(r){return a(r,{slug:"refraction",titleKey:"tools.refraction.title",className:"tool-refraction-lab",extraParams:()=>"&v=20260721_angle_follow_ray_v27"})}export{o as createRefractionLab};

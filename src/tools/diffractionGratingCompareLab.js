@@ -6,6 +6,6 @@ export function createDiffractionGratingCompareLab(t) {
     slug: 'diffraction-grating-compare',
     titleKey: 'tools.diffractionGratingCompare.title',
     className: 'tool-diffraction-grating-compare-lab',
-    extraParams: () => '&v=20260722_diffraction_compare_v1',
+    extraParams: () => '&v=20260722_diffraction_compare_v2',
   });
 }

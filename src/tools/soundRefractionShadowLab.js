@@ -6,6 +6,6 @@ export function createSoundRefractionShadowLab(t) {
     slug: 'sound-refraction-shadow',
     titleKey: 'tools.soundRefractionShadow.title',
     className: 'tool-sound-refraction-shadow-lab',
-    extraParams: () => '&v=20260722_sound_refraction_v1',
+    extraParams: () => '&v=20260722_sound_refraction_v2',
   });
 }

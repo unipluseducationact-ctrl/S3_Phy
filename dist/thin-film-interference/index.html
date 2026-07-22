@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>肥皂泡薄膜干涉 (Thin-film Interference)</title>
+    <title>肥皂泡薄膜干涉</title>
     <link rel="stylesheet" href="../shared/s3phy-embed.css">
     <script src="../shared/s3phy-embed-init.js"></script>
     <link href="https://fonts.googleapis.com/css2?family=Noto+Sans+TC:wght@400;500;700;900&family=Rajdhani:wght@500;700;800&display=swap" rel="stylesheet">
@@ -93,7 +93,7 @@
 
     <div class="control-panel">
         <div class="header-top">
-            <h1><span>Thin-film Interference</span><br>肥皂泡薄膜干涉</h1>
+            <h1 id="page-title">肥皂泡薄膜干涉</h1>
             <button class="lang-btn" id="lang-toggle">🌐 English</button>
         </div>
 
@@ -102,59 +102,62 @@
         <div class="result-box">
             <div class="color-preview" id="color-preview"></div>
             <div>
-                <div class="result-text" id="result-status">干涉結果 (Interference Result)</div>
-                <div class="result-sub" id="result-intensity">Intensity: 100%</div>
+                <div class="result-text" id="result-status"></div>
+                <div class="result-sub" id="result-intensity"></div>
             </div>
         </div>
 
         <div class="card">
             <div class="slider-group">
-                <div class="slider-header"><span id="label-wl">入射光波長 (Wavelength λ)</span> <span class="val-display" id="val-wl">532 nm</span></div>
+                <div class="slider-header"><span id="label-wl">入射光波長 (λ)</span> <span class="val-display" id="val-wl">532 nm</span></div>
                 <input type="range" id="slider-wl" min="380" max="750" step="1" value="532">
             </div>
             <div class="slider-group">
-                <div class="slider-header"><span id="label-th">薄膜厚度 (Thickness t)</span> <span class="val-display" id="val-th">200 nm</span></div>
+                <div class="slider-header"><span id="label-th">薄膜厚度 (t)</span> <span class="val-display" id="val-th">200 nm</span></div>
                 <input type="range" id="slider-th" min="0" max="600" step="1" value="200">
             </div>
         </div>
 
         <div class="scenario-btns">
-            <button class="scenario" id="btn-q-burst">🫧 Q(e): 泡泡破裂前 (t → 0)</button>
-            <button class="scenario" id="btn-constructive">✨ 產生完全相長干涉 (Bright)</button>
-            <button class="scenario" id="btn-destructive">🌑 產生完全相消干涉 (Dark)</button>
+            <button class="scenario" id="btn-q-burst"></button>
+            <button class="scenario" id="btn-constructive"></button>
+            <button class="scenario" id="btn-destructive"></button>
         </div>
     </div>
 
 <script>
     const dict = {
         zh: {
-            wl: "入射光波長 (Wavelength λ)",
-            th: "薄膜厚度 (Thickness t)",
-            btnBurst: "🫧 Q(e): 泡泡破裂前 (t → 0)",
-            btnConst: "✨ 產生完全相長干涉 (Bright)",
-            btnDest: "🌑 產生完全相消干涉 (Dark)",
+            title: "肥皂泡薄膜干涉",
+            wl: "入射光波長 (λ)",
+            th: "薄膜厚度 (t)",
+            btnBurst: "🫧 Q(e)：泡泡破裂前（t → 0）",
+            btnConst: "✨ 產生完全相長干涉（亮）",
+            btnDest: "🌑 產生完全相消干涉（暗）",
             langBtn: "🌐 English",
-            filmLabel: "Soap Film (n = 1.33)",
-            resConst: "相長干涉 (Constructive)",
-            resDest: "相消干涉 (Destructive)",
-            resPartial: "部分干涉 (Partial)",
-            antiphaseMark: "反相 (Antiphase)",
-            inphaseMark: "同相 (In phase)",
+            filmLabel: "肥皂膜 (n = 1.33)",
+            airLabel: "空氣 (n = 1.0)",
+            resConst: "相長干涉",
+            resDest: "相消干涉",
+            resPartial: "部分干涉",
+            antiphaseMark: "反相",
+            inphaseMark: "同相",
             pathDiffMark: "路徑差",
             remark: "* 註：反射光 p 與入射光反相，反射光 q 與入射光同相。",
             exp: (wl, wl_prime, t, pathDiff, phaseDiffStr, isConst) => `
                 <b>物理分析：</b><br>
                 1. 膜內波長縮短：<span class="formula">λ' = λ / n = ${wl} / 1.33 ≈ ${wl_prime} nm</span>
                 2. 光線 q 多走的距離：<span class="formula">Δx ≈ 2t = ${2*t} nm = ${pathDiff} λ'</span>
-                3. 反射相位反轉 (Phase Shift)：<br>
-                &nbsp;&nbsp;• 光線 p (空氣→水)：<span class="highlight-red">反轉 λ'/2 (反相)</span><br>
-                &nbsp;&nbsp;• 光線 q (水→空氣)：<span class="highlight-green">無反轉 (同相)</span><br>
+                3. 反射相位反轉：<br>
+                &nbsp;&nbsp;• 光線 p（空氣→水）：<span class="highlight-red">反轉 λ'/2（反相）</span><br>
+                &nbsp;&nbsp;• 光線 q（水→空氣）：<span class="highlight-green">無反轉（同相）</span><br>
                 4. 總等效路徑差：<br><span class="formula">| Δx - λ'/2 | = ${phaseDiffStr}</span>
-                👉 結論：兩道光波相遇時，呈現 <span class="${isConst ? 'highlight-yellow' : 'highlight-red'}">${isConst ? '相長 (亮)' : '相消 (暗)'}</span>。
+                👉 結論：兩道光波相遇時，呈現 <span class="${isConst ? 'highlight-yellow' : 'highlight-red'}">${isConst ? '相長（亮）' : '相消（暗）'}</span>。
             `,
-            expZero: `<b>Q(e) 泡泡破裂前分析：</b><br>當厚度 <span class="highlight-yellow">t → 0</span> 時，光線 q 多走的路徑差 Δx 趨近於 0。<br>然而，因為光線 p 反射時有 <span class="highlight-red">λ'/2 的相位反轉</span>，而光線 q 沒有。<br>因此兩道光波相遇時必定是<b>完全相反 (Antiphase)</b>，產生<span class="highlight-red">破壞性干涉</span>，導致泡泡看起來是<b>黑色</b>的！`
+            expZero: `<b>Q(e) 泡泡破裂前分析：</b><br>當厚度 <span class="highlight-yellow">t → 0</span> 時，光線 q 多走的路徑差 Δx 趨近於 0。<br>然而，因為光線 p 反射時有 <span class="highlight-red">λ'/2 的相位反轉</span>，而光線 q 沒有。<br>因此兩道光波相遇時必定是<b>完全反相</b>，產生<span class="highlight-red">相消干涉</span>，導致泡泡看起來是<b>黑色</b>的！`
         },
         en: {
+            title: "Thin-film Interference",
             wl: "Incident Wavelength (λ)",
             th: "Film Thickness (t)",
             btnBurst: "🫧 Q(e): Just before bursting (t → 0)",
@@ -162,6 +165,7 @@
             btnDest: "🌑 Destructive Interference (Dark)",
             langBtn: "🌐 中文",
             filmLabel: "Soap Film (n = 1.33)",
+            airLabel: "Air (n = 1.0)",
             resConst: "Constructive Interference",
             resDest: "Destructive Interference",
             resPartial: "Partial Interference",
@@ -222,6 +226,8 @@
     function updateLanguageUI() {
         const t = dict[currentLang];
         document.documentElement.lang = currentLang === 'zh' ? 'zh-HK' : 'en';
+        document.title = t.title;
+        document.getElementById('page-title').innerText = t.title;
         btnLang.innerText = t.langBtn;
         document.getElementById('label-wl').innerText = t.wl;
         document.getElementById('label-th').innerText = t.th;
@@ -229,6 +235,8 @@
         document.getElementById('btn-constructive').innerText = t.btnConst;
         document.getElementById('btn-destructive').innerText = t.btnDest;
         document.getElementById('label-film').innerText = t.filmLabel;
+        document.getElementById('label-air-top').innerText = t.airLabel;
+        document.getElementById('label-air-bot').innerText = t.airLabel;
         updatePhysics();
     }
 
@@ -292,7 +300,9 @@
             isConst = intensity > 0.5;
         }
 
-        resIntensity.innerText = `Intensity: ${(intensity * 100).toFixed(1)}%`;
+        resIntensity.innerText = currentLang === 'zh'
+            ? `強度：${(intensity * 100).toFixed(1)}%`
+            : `Intensity: ${(intensity * 100).toFixed(1)}%`;
 
         if (th === 0) {
             expText.innerHTML = t_dict.expZero;

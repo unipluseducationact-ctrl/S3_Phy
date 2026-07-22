@@ -1,15 +1,16 @@
 <!DOCTYPE html>
-<html lang="en">
+<html lang="zh-HK">
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Sound Refraction: Shadow Zone</title>
+    <title>聲波折射：聲影區</title>
     <link rel="stylesheet" href="../shared/s3phy-embed.css">
     <script src="../shared/s3phy-embed-init.js"></script>
     <style>
         html.s3phy-embed, html.s3phy-embed body { height: 100%; }
         html.s3phy-embed body { padding: 12px; overflow: auto; }
         html.s3phy-embed .sim-logo { display: none; }
+        html.s3phy-embed .lang-btn { display: none; }
         body {
             font-family: 'Segoe UI', Roboto, Helvetica, Arial, sans-serif;
             background-color: #f8f9fa;
@@ -179,6 +180,24 @@
         
         .day-text h3 { color: #e67e22; }
 
+        .header-row {
+            display: flex;
+            justify-content: flex-end;
+            margin-bottom: 5px;
+        }
+        .lang-btn {
+            background: #e9ecef;
+            color: #495057;
+            border: 1px solid #dee2e6;
+            padding: 6px 12px;
+            border-radius: 6px;
+            cursor: pointer;
+            font-size: 13px;
+            font-weight: bold;
+            transition: 0.2s;
+        }
+        .lang-btn:hover { background: #dee2e6; color: #212529; }
+
     </style>
 </head>
 <body>
@@ -187,6 +206,9 @@
 
     <!-- 1. MAIN SIMULATION -->
     <div class="sim-container">
+        <div class="header-row">
+            <button class="lang-btn" id="lang-toggle">🌐 English</button>
+        </div>
         <div class="canvas-box">
             <!-- LOGO -->
             <img src="https://d41chssnpqdne.cloudfront.net/user_upload_by_module/chat_bot/files/176719383/gmz0hrxeu3IahMoI.png?Expires=1768107214&Signature=sxAyHnUVfmA1k~641AdOimr7TOsYSJmY-Qd4Oer8H8~cP1zSyzM9WSpYVWRRVvHE2VAyMhBFZVLTyPnhsILFgSblbnIy2RBxnrCnbfF94nSFjNJXmqd84-bc~BPwA-c9kYqfwAcAT18n08gdaMGo1ZFX~l1EnNRSXGUIOuT0YVPRgxRdOqp5n18PzSzLDsNXR-LHlCaaOpJwN4189hMwFO9RK4HVV7ttPR5IkM4D3P5ZkgrhwwONZf-KyFSj8TTrogQdXBU57OHfYsys909ufQP0egR40O4iddp9ivrJHDbmqecRlyKLud8X8lm0RKiu6yCj9wo52Kx1SjUYu5Y2Kg__&Key-Pair-Id=K3USGZIKWMDCSX" 
@@ -194,26 +216,24 @@
 
             <canvas id="simCanvas" width="800" height="350"></canvas>
             
-            <div id="lbl-top" class="label" style="top: 15px; right: 15px;">🔥 Warm Air (Fast)</div>
-            <div id="lbl-bot" class="label" style="bottom: 15px; right: 15px;">❄️ Cold Ground (Slow)</div>
-            <div class="label" style="bottom: 45px; left: 15px;">🔊 Source</div>
+            <div id="lbl-top" class="label" style="top: 15px; right: 15px;">🔥 暖空氣（快）</div>
+            <div id="lbl-bot" class="label" style="bottom: 15px; right: 15px;">❄️ 冷地面（慢）</div>
+            <div id="lbl-source" class="label" style="bottom: 45px; left: 15px;">🔊 聲源</div>
 
             <!-- Night: TIR Marker -->
             <div id="tir-container" class="tir-marker">
-                <div class="tir-label">↩️ Total Internal Reflection</div>
+                <div class="tir-label" id="tir-label">↩️ 全內反射</div>
                 <div class="tir-dot"></div>
             </div>
 
             <!-- Day: Shadow Zone Label (UPDATED TEXT) -->
-            <div id="shadow-label" class="shadow-zone-label">
-                🔉 Shadow Zone (Very Soft Sound)
-            </div>
+            <div id="shadow-label" class="shadow-zone-label"></div>
         </div>
 
         <div class="controls">
-            <button id="btn-night" class="active" onclick="setMode('night')">🌙 Night (Inversion)</button>
-            <button id="btn-day" onclick="setMode('day')">☀️ Hot Day</button>
-            <button class="replay" onclick="reset()">🔄 Replay</button>
+            <button id="btn-night" class="active" onclick="setMode('night')">🌙 夜間（逆溫）</button>
+            <button id="btn-day" onclick="setMode('day')">☀️ 炎熱日間</button>
+            <button id="btn-replay" class="replay" onclick="reset()">🔄 重播</button>
         </div>
     </div>
 
@@ -223,9 +243,9 @@
             <canvas id="diagramCanvas" width="320" height="240"></canvas>
         </div>
         <div class="diagram-text">
-            <h3 id="exp-title">Why does it bend down?</h3>
+            <h3 id="exp-title">為何向下偏折？</h3>
             <p id="exp-desc">
-                Sound moves from <strong>Slow</strong> (Cold) to <strong>Fast</strong> (Warm). It speeds up and turns <strong>AWAY</strong> from the normal.
+                聲波由 <strong>慢</strong>（冷）介質進入 <strong>快</strong>（暖）介質。速度加快，偏折方向 <strong>遠離</strong> 法線。
             </p>
             <ul id="exp-list" style="padding-left: 20px; line-height: 1.8;">
                 <!-- Content injected by JS -->
@@ -236,6 +256,81 @@
 </div>
 
 <script>
+    const dict = {
+        zh: {
+            langBtn: '🌐 English',
+            btnNight: '🌙 夜間（逆溫）',
+            btnDay: '☀️ 炎熱日間',
+            btnReplay: '🔄 重播',
+            lblWarmFast: '🔥 暖空氣（快）',
+            lblColdSlow: '❄️ 冷地面（慢）',
+            lblCoolSlow: '❄️ 冷空氣（慢）',
+            lblHotFast: '🔥 熱地面（快）',
+            lblSource: '🔊 聲源',
+            tirLabel: '↩️ 全內反射',
+            shadowZone: '🔉 聲影區（聲音極弱）',
+            expTitleNight: '為何向下偏折？',
+            expDescNight: '聲波由 <strong>慢</strong>（冷）介質進入 <strong>快</strong>（暖）介質。速度加快，偏折方向 <strong>遠離</strong> 法線。',
+            expListNight: `
+                <li><strong>規則：</strong>θ<sub>2</sub>（折射角）> θ<sub>1</sub>（入射角）。</li>
+                <li>當 θ<sub>2</sub> 達 90° 時，發生 <strong>全內反射</strong>。</li>
+                <li>結果：聲波被困在近地面區域。</li>
+            `,
+            expTitleDay: '為何向上偏折？',
+            expDescDay: '聲波由 <strong>快</strong>（熱地面）介質進入 <strong>慢</strong>（冷空氣）介質。速度減慢，偏折方向 <strong>趨向</strong> 法線。',
+            expListDay: `
+                <li><strong>規則：</strong>θ<sub>2</sub>（折射角）< θ<sub>1</sub>（入射角）。</li>
+                <li>波前變得更陡，聲波向上逃逸至天空。</li>
+                <li>結果：形成 <strong>聲影區</strong>，該處聲音極弱。</li>
+            `,
+            fastMediumWarm: '快介質（暖）',
+            slowMediumCold: '慢介質（冷）',
+            slowMediumCool: '慢介質（冷）',
+            fastMediumHot: '快介質（熱）',
+            normal: '法線'
+        },
+        en: {
+            langBtn: '🌐 中文',
+            btnNight: '🌙 Night (Inversion)',
+            btnDay: '☀️ Hot Day',
+            btnReplay: '🔄 Replay',
+            lblWarmFast: '🔥 Warm Air (Fast)',
+            lblColdSlow: '❄️ Cold Ground (Slow)',
+            lblCoolSlow: '❄️ Cool Air (Slow)',
+            lblHotFast: '🔥 Hot Ground (Fast)',
+            lblSource: '🔊 Source',
+            tirLabel: '↩️ Total Internal Reflection',
+            shadowZone: '🔉 Shadow Zone (Very Soft Sound)',
+            expTitleNight: 'Why does it bend down?',
+            expDescNight: 'Sound moves from <strong>Slow</strong> (Cold) to <strong>Fast</strong> (Warm). It speeds up and turns <strong>AWAY</strong> from the normal.',
+            expListNight: `
+                <li><strong>Rule:</strong> θ<sub>2</sub> (Refracted) > θ<sub>1</sub> (Incident).</li>
+                <li>When θ<sub>2</sub> hits 90°, <strong>Total Internal Reflection</strong> occurs.</li>
+                <li>Result: Sound is trapped near the ground.</li>
+            `,
+            expTitleDay: 'Why does it bend up?',
+            expDescDay: 'Sound moves from <strong>Fast</strong> (Hot Ground) to <strong>Slow</strong> (Cool Air). It slows down and turns <strong>TOWARDS</strong> the normal.',
+            expListDay: `
+                <li><strong>Rule:</strong> θ<sub>2</sub> (Refracted) < θ<sub>1</sub> (Incident).</li>
+                <li>The wave becomes steeper and escapes to the sky.</li>
+                <li>Result: A <strong>Shadow Zone</strong> is formed where sound is very soft.</li>
+            `,
+            fastMediumWarm: 'FAST Medium (Warm)',
+            slowMediumCold: 'SLOW Medium (Cold)',
+            slowMediumCool: 'SLOW Medium (Cool)',
+            fastMediumHot: 'FAST Medium (Hot)',
+            normal: 'Normal'
+        }
+    };
+
+    function hubLangToLocal(lang) {
+        if (lang === 'en') return 'en';
+        return 'zh';
+    }
+
+    const params = new URLSearchParams(location.search);
+    let currentLang = hubLangToLocal(params.get('lang') || 'zh');
+
     /* =========================================
        PART 1: MAIN SIMULATION
        ========================================= */
@@ -247,6 +342,9 @@
     const shadowLabel = document.getElementById('shadow-label');
     const lblTop = document.getElementById('lbl-top');
     const lblBot = document.getElementById('lbl-bot');
+    const lblSource = document.getElementById('lbl-source');
+    const tirLabelEl = document.getElementById('tir-label');
+    const btnLang = document.getElementById('lang-toggle');
     
     const explainBox = document.getElementById('explain-box');
     const expTitle = document.getElementById('exp-title');
@@ -265,6 +363,62 @@
         speedBase: 3, bendFactor: 0.6
     };
 
+    function updateCanvasLabels() {
+        const t = dict[currentLang];
+        lblSource.innerText = t.lblSource;
+        tirLabelEl.innerText = t.tirLabel;
+        shadowLabel.innerText = t.shadowZone;
+        if (mode === 'night') {
+            lblTop.innerText = t.lblWarmFast;
+            lblBot.innerText = t.lblColdSlow;
+        } else {
+            lblTop.innerText = t.lblCoolSlow;
+            lblBot.innerText = t.lblHotFast;
+        }
+    }
+
+    function updateExplanation() {
+        const t = dict[currentLang];
+        if (mode === 'night') {
+            explainBox.classList.remove('day-text');
+            expTitle.innerText = t.expTitleNight;
+            expDesc.innerHTML = t.expDescNight;
+            expList.innerHTML = t.expListNight;
+            shadowLabel.style.display = 'none';
+        } else {
+            explainBox.classList.add('day-text');
+            expTitle.innerText = t.expTitleDay;
+            expDesc.innerHTML = t.expDescDay;
+            expList.innerHTML = t.expListDay;
+            shadowLabel.style.display = 'flex';
+        }
+        updateCanvasLabels();
+        drawDiagram();
+    }
+
+    function updateLanguageUI() {
+        const t = dict[currentLang];
+        document.documentElement.lang = currentLang === 'zh' ? 'zh-HK' : 'en';
+        document.title = currentLang === 'zh' ? '聲波折射：聲影區' : 'Sound Refraction: Shadow Zone';
+        btnLang.innerText = t.langBtn;
+        document.getElementById('btn-night').innerText = t.btnNight;
+        document.getElementById('btn-day').innerText = t.btnDay;
+        document.getElementById('btn-replay').innerText = t.btnReplay;
+        updateExplanation();
+        draw();
+    }
+
+    btnLang.addEventListener('click', () => {
+        currentLang = currentLang === 'zh' ? 'en' : 'zh';
+        updateLanguageUI();
+    });
+
+    window.addEventListener('message', (ev) => {
+        if (ev.data?.type !== 's3phy:lang') return;
+        currentLang = hubLangToLocal(ev.data.lang);
+        updateLanguageUI();
+    });
+
     function setMode(m) {
         mode = m;
         document.getElementById('btn-night').className = mode === 'night' ? 'active' : '';
@@ -272,31 +426,6 @@
         
         updateExplanation(); 
         reset();
-    }
-
-    function updateExplanation() {
-        if (mode === 'night') {
-            explainBox.classList.remove('day-text');
-            expTitle.innerText = "Why does it bend down?";
-            expDesc.innerHTML = `Sound moves from <strong>Slow</strong> (Cold) to <strong>Fast</strong> (Warm). It speeds up and turns <strong>AWAY</strong> from the normal.`;
-            expList.innerHTML = `
-                <li><strong>Rule:</strong> θ<sub>2</sub> (Refracted) > θ<sub>1</sub> (Incident).</li>
-                <li>When θ<sub>2</sub> hits 90°, <strong>Total Internal Reflection</strong> occurs.</li>
-                <li>Result: Sound is trapped near the ground.</li>
-            `;
-            shadowLabel.style.display = 'none'; // Hide shadow label
-        } else {
-            explainBox.classList.add('day-text');
-            expTitle.innerText = "Why does it bend up?";
-            expDesc.innerHTML = `Sound moves from <strong>Fast</strong> (Hot Ground) to <strong>Slow</strong> (Cool Air). It slows down and turns <strong>TOWARDS</strong> the normal.`;
-            expList.innerHTML = `
-                <li><strong>Rule:</strong> θ<sub>2</sub> (Refracted) < θ<sub>1</sub> (Incident).</li>
-                <li>The wave becomes steeper and escapes to the sky.</li>
-                <li>Result: A <strong>Shadow Zone</strong> is formed where sound is very soft.</li>
-            `;
-            shadowLabel.style.display = 'flex'; // Show shadow label
-        }
-        drawDiagram(); 
     }
 
     function init() {
@@ -310,11 +439,10 @@
 
         if (mode === 'night') {
             canvas.style.background = "linear-gradient(to top, #d0ebff 0%, #ffc9c9 100%)";
-            lblTop.innerText = "🔥 Warm Air (Fast)"; lblBot.innerText = "❄️ Cold Ground (Slow)";
         } else {
             canvas.style.background = "linear-gradient(to top, #ffc9c9 0%, #d0ebff 100%)";
-            lblTop.innerText = "❄️ Cool Air (Slow)"; lblBot.innerText = "🔥 Hot Ground (Fast)";
         }
+        updateCanvasLabels();
         ctx.clearRect(0, 0, canvas.width, canvas.height);
         drawBg();
     }
@@ -402,21 +530,23 @@
 
         dCtx.clearRect(0,0,W,H);
 
+        const t = dict[currentLang];
+
         // 1. Backgrounds & Labels
         if (mode === 'night') {
             dCtx.fillStyle = "#ffe3e3"; dCtx.fillRect(0, 0, W, cy);
             dCtx.fillStyle = "#e7f5ff"; dCtx.fillRect(0, cy, W, cy);
             
             dCtx.font = "bold 13px Arial";
-            dCtx.fillStyle = "#c92a2a"; dCtx.fillText("FAST Medium (Warm)", 10, 20);
-            dCtx.fillStyle = "#1864ab"; dCtx.fillText("SLOW Medium (Cold)", 10, H - 10);
+            dCtx.fillStyle = "#c92a2a"; dCtx.fillText(t.fastMediumWarm, 10, 20);
+            dCtx.fillStyle = "#1864ab"; dCtx.fillText(t.slowMediumCold, 10, H - 10);
         } else {
             dCtx.fillStyle = "#e7f5ff"; dCtx.fillRect(0, 0, W, cy);
             dCtx.fillStyle = "#ffe3e3"; dCtx.fillRect(0, cy, W, cy);
 
             dCtx.font = "bold 13px Arial";
-            dCtx.fillStyle = "#1864ab"; dCtx.fillText("SLOW Medium (Cool)", 10, 20);
-            dCtx.fillStyle = "#c92a2a"; dCtx.fillText("FAST Medium (Hot)", 10, H - 10);
+            dCtx.fillStyle = "#1864ab"; dCtx.fillText(t.slowMediumCool, 10, 20);
+            dCtx.fillStyle = "#c92a2a"; dCtx.fillText(t.fastMediumHot, 10, H - 10);
         }
 
         // 2. Normal Line
@@ -424,7 +554,7 @@
         dCtx.setLineDash([5, 5]);
         dCtx.moveTo(cx, 20); dCtx.lineTo(cx, H - 20);
         dCtx.strokeStyle = "#666"; dCtx.stroke(); dCtx.setLineDash([]);
-        dCtx.fillStyle = "#666"; dCtx.fillText("Normal", cx + 5, 35);
+        dCtx.fillStyle = "#666"; dCtx.fillText(t.normal, cx + 5, 35);
 
         // 3. Rays & Angles
         const len = 90;
@@ -475,7 +605,7 @@
     }
 
     window.onload = () => {
-        updateExplanation();
+        updateLanguageUI();
         init();
         loop();
     };

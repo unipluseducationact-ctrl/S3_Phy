@@ -6,6 +6,6 @@ export function createUltrasoundReflectionLab(t) {
     slug: 'ultrasound-reflection',
     titleKey: 'tools.ultrasoundReflection.title',
     className: 'tool-ultrasound-reflection-lab',
-    extraParams: () => '&v=20260722_ultrasound_reflection_v1',
+    extraParams: () => '&v=20260722_ultrasound_reflection_v2',
   });
 }

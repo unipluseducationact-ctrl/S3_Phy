@@ -1,9 +1,9 @@
 <!DOCTYPE html>
-<html lang="en">
+<html lang="zh-HK">
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Slow Motion Ultrasound Model</title>
+    <title>超聲波反射</title>
     <link rel="stylesheet" href="../shared/s3phy-embed.css">
     <script src="../shared/s3phy-embed-init.js"></script>
     <style>
@@ -23,6 +23,7 @@
             width: 100%;
             height: auto;
         }
+        html.s3phy-embed .lang-btn { display: none; }
         body {
             font-family: 'Segoe UI', Roboto, sans-serif;
             background-color: #0f0f0f;
@@ -101,33 +102,158 @@
         .highlight { color: #ffeb3b; font-weight: bold; }
         .status-text { color: #aaa; font-size: 0.9rem; }
 
+        .header-row {
+            display: flex;
+            justify-content: space-between;
+            align-items: flex-start;
+            margin-bottom: 10px;
+        }
+        .lang-btn {
+            background: #333;
+            color: #aaa;
+            border: 1px solid #444;
+            padding: 6px 12px;
+            border-radius: 6px;
+            cursor: pointer;
+            font-size: 13px;
+            font-weight: bold;
+            transition: 0.2s;
+        }
+        .lang-btn:hover { background: #444; color: #fff; }
+
     </style>
 </head>
 <body>
 
 <div class="container">
-    <h2>Ultrasound Reflection</h2>
-    <div class="subtitle">Slow Motion Visualization • Point Object</div>
+    <div class="header-row">
+        <div>
+            <h2 id="page-title">超聲波反射</h2>
+            <div class="subtitle" id="page-subtitle">慢動作可視化 • 點物體</div>
+        </div>
+        <button class="lang-btn" id="lang-toggle">🌐 English</button>
+    </div>
     
     <canvas id="simCanvas" width="800" height="320"></canvas>
 
     <div class="status-bar">
-        <div>Time: <span id="timeDisplay" class="highlight">0.000 s</span></div>
-        <div id="statusText" class="status-text">Ready to start</div>
+        <div><span id="time-label">時間：</span><span id="timeDisplay" class="highlight">0.000 s</span></div>
+        <div id="statusText" class="status-text">準備就緒</div>
     </div>
 
     <div class="controls" style="margin-top:25px;">
-        <button class="btn-main" id="actionBtn" onclick="togglePlay()">▶ Start</button>
-        <button class="btn-reset" onclick="resetSim()">↺ Reset</button>
+        <button class="btn-main" id="actionBtn" onclick="togglePlay()">▶ 開始</button>
+        <button class="btn-reset" id="resetBtn" onclick="resetSim()">↺ 重設</button>
     </div>
 </div>
 
 <script>
+    const dict = {
+        zh: {
+            langBtn: '🌐 English',
+            pageTitle: '超聲波反射',
+            pageSubtitle: '慢動作可視化 • 點物體',
+            timeLabel: '時間：',
+            ready: '準備就緒',
+            start: '▶ 開始',
+            pause: '⏸ 暫停',
+            resume: '▶ 繼續',
+            replay: '↺ 重播',
+            reset: '↺ 重設',
+            emitting: '發射訊號中…',
+            reachedCar: '訊號到達汽車… 距離 = 64m + d',
+            reflecting: '反射訊號中…',
+            returned: '訊號返回聲源。',
+            source: '聲源',
+            car: '汽車'
+        },
+        en: {
+            langBtn: '🌐 中文',
+            pageTitle: 'Ultrasound Reflection',
+            pageSubtitle: 'Slow Motion Visualization • Point Object',
+            timeLabel: 'Time: ',
+            ready: 'Ready',
+            readyToStart: 'Ready to start',
+            start: '▶ Start',
+            pause: '⏸ Pause',
+            resume: '▶ Resume',
+            replay: '↺ Replay',
+            reset: '↺ Reset',
+            emitting: 'Emitting Signal...',
+            reachedCar: 'Signal reached Car. Distance = 64m + d',
+            reflecting: 'Reflecting Signal...',
+            returned: 'Signal returned to Source.',
+            source: 'Source',
+            car: 'Car'
+        }
+    };
+
+    function hubLangToLocal(lang) {
+        if (lang === 'en') return 'en';
+        return 'zh';
+    }
+
+    const params = new URLSearchParams(location.search);
+    let currentLang = hubLangToLocal(params.get('lang') || 'zh');
+
     const canvas = document.getElementById('simCanvas');
     const ctx = canvas.getContext('2d');
     const timeDisplay = document.getElementById('timeDisplay');
     const statusText = document.getElementById('statusText');
     const actionBtn = document.getElementById('actionBtn');
+    const resetBtn = document.getElementById('resetBtn');
+    const btnLang = document.getElementById('lang-toggle');
+    const pageTitle = document.getElementById('page-title');
+    const pageSubtitle = document.getElementById('page-subtitle');
+    const timeLabel = document.getElementById('time-label');
+
+    function t() { return dict[currentLang]; }
+
+    function getActionBtnText() {
+        const d = t();
+        if (time >= 0.4) return d.replay;
+        if (isRunning) return d.pause;
+        if (time > 0 || hasPausedAtHit) return d.resume;
+        return d.start;
+    }
+
+    function getStatusText() {
+        const d = t();
+        if (time >= 0.4) return d.returned;
+        if (hasPausedAtHit && !isRunning) return d.reachedCar;
+        if (isRunning) return hasPausedAtHit ? d.reflecting : d.emitting;
+        if (time === 0 && !hasPausedAtHit) return d.ready;
+        return d.ready;
+    }
+
+    function updateLanguageUI() {
+        const d = t();
+        document.documentElement.lang = currentLang === 'zh' ? 'zh-HK' : 'en';
+        document.title = d.pageTitle;
+        btnLang.innerText = d.langBtn;
+        pageTitle.innerText = d.pageTitle;
+        pageSubtitle.innerText = d.pageSubtitle;
+        timeLabel.innerText = d.timeLabel;
+        resetBtn.innerText = d.reset;
+        actionBtn.innerText = getActionBtnText();
+        statusText.innerText = getStatusText();
+        if (time >= 0.4) statusText.style.color = '#4fc3f7';
+        else if (hasPausedAtHit && !isRunning) statusText.style.color = '#ff4081';
+        else if (isRunning) statusText.style.color = '#ffeb3b';
+        else statusText.style.color = '#aaa';
+        draw();
+    }
+
+    btnLang.addEventListener('click', () => {
+        currentLang = currentLang === 'zh' ? 'en' : 'zh';
+        updateLanguageUI();
+    });
+
+    window.addEventListener('message', (ev) => {
+        if (ev.data?.type !== 's3phy:lang') return;
+        currentLang = hubLangToLocal(ev.data.lang);
+        updateLanguageUI();
+    });
 
     // --- Visual Configuration ---
     const START_X = 100;       // Generator
@@ -168,7 +294,7 @@
         ctx.fillStyle = '#aaa';
         ctx.font = "12px Arial";
         ctx.textAlign = "center";
-        ctx.fillText("Source", START_X, Y_AXIS - 25);
+        ctx.fillText(t().source, START_X, Y_AXIS - 25);
 
         // 4. Calculate Positions
         // Map time (0 -> 0.2) to distance (START -> HIT)
@@ -206,7 +332,7 @@
         
         ctx.fillStyle = '#ff4081';
         ctx.font = "bold 14px Arial";
-        ctx.fillText("Car", carX, Y_AXIS - 15);
+        ctx.fillText(t().car, carX, Y_AXIS - 15);
 
         // 7. Draw Signal Pulse
         if (time <= 0.4) {
@@ -268,8 +394,8 @@
             time = 0.2; // Snap to exact
             hasPausedAtHit = true;
             isRunning = false; // Pause
-            actionBtn.innerText = "▶ Resume";
-            statusText.innerText = "Signal reached Car. Distance = 64m + d";
+            actionBtn.innerText = getActionBtnText();
+            statusText.innerText = getStatusText();
             statusText.style.color = "#ff4081";
             draw();
             return; 
@@ -279,8 +405,8 @@
         if (time >= 0.4) {
             time = 0.4;
             isRunning = false;
-            actionBtn.innerText = "↺ Replay";
-            statusText.innerText = "Signal returned to Source.";
+            actionBtn.innerText = getActionBtnText();
+            statusText.innerText = getStatusText();
             statusText.style.color = "#4fc3f7";
             draw();
             return;
@@ -299,17 +425,12 @@
 
         isRunning = !isRunning;
         if (isRunning) {
-            actionBtn.innerText = "⏸ Pause";
-            if (!hasPausedAtHit) {
-                statusText.innerText = "Emitting Signal...";
-                statusText.style.color = "#ffeb3b";
-            } else {
-                statusText.innerText = "Reflecting Signal...";
-                statusText.style.color = "#ffeb3b";
-            }
+            actionBtn.innerText = getActionBtnText();
+            statusText.innerText = getStatusText();
+            statusText.style.color = "#ffeb3b";
             update();
         } else {
-            actionBtn.innerText = "▶ Resume";
+            actionBtn.innerText = getActionBtnText();
             cancelAnimationFrame(animationId);
         }
     }
@@ -319,9 +440,9 @@
         cancelAnimationFrame(animationId);
         time = 0;
         hasPausedAtHit = false;
-        actionBtn.innerText = "▶ Start";
+        actionBtn.innerText = getActionBtnText();
         timeDisplay.innerText = "0.000 s";
-        statusText.innerText = "Ready";
+        statusText.innerText = getStatusText();
         statusText.style.color = "#aaa";
         draw();
     }
@@ -330,7 +451,7 @@
     window.resetSim = resetSim;
 
     // Init
-    draw();
+    updateLanguageUI();
 
 </script>
 

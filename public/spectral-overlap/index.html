@@ -13,6 +13,7 @@
             height: 100%;
             overflow: hidden;
         }
+        html.s3phy-embed .lang-btn { display: none; }
 
         :root {
             --bg: #050508;
@@ -78,6 +79,34 @@
             padding-bottom: 10px;
             margin-bottom: 5px;
         }
+
+        .controls-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            border-bottom: 1px solid var(--border);
+            padding-bottom: 10px;
+            margin-bottom: 5px;
+        }
+        .controls-header h2 {
+            border-bottom: none;
+            padding-bottom: 0;
+            margin-bottom: 0;
+        }
+        .lang-btn {
+            background: rgba(255,255,255,0.05);
+            color: #888;
+            border: 1px solid var(--border);
+            padding: 4px 10px;
+            border-radius: 6px;
+            cursor: pointer;
+            font-size: 11px;
+            font-weight: 700;
+            transition: all 0.2s;
+            text-transform: none;
+            letter-spacing: 0;
+        }
+        .lang-btn:hover { color: #fff; border-color: #aaa; }
 
         .control-group {
             background: rgba(255,255,255,0.03);
@@ -214,12 +243,15 @@
     </div>
 
     <div class="controls">
-        <h2>Spectrum Controls</h2>
+        <div class="controls-header">
+            <h2 id="controls-title">Spectrum Controls</h2>
+            <button class="lang-btn" id="lang-toggle">🌐 English</button>
+        </div>
         
         <!-- Order 2 Control -->
         <div class="control-group" style="border-left: 3px solid var(--red);">
             <div class="group-header">
-                <span class="group-title">n<sup>th</sup> Order (n=2)</span>
+                <span class="group-title" id="group-n">n<sup>th</sup> Order (n=2)</span>
                 <label class="switch">
                     <input type="checkbox" id="check-n" checked>
                     <span class="slider"></span>
@@ -227,7 +259,7 @@
             </div>
             <div class="range-container">
                 <div class="range-label">
-                    <span>Transparency</span>
+                    <span id="label-trans-n">Transparency</span>
                     <span id="val-n">80%</span>
                 </div>
                 <input type="range" id="slider-n" min="0" max="100" value="80">
@@ -237,7 +269,7 @@
         <!-- Order 3 Control -->
         <div class="control-group" style="border-left: 3px solid var(--violet);">
             <div class="group-header">
-                <span class="group-title">(n+1)<sup>th</sup> Order (n=3)</span>
+                <span class="group-title" id="group-n1">(n+1)<sup>th</sup> Order (n=3)</span>
                 <label class="switch">
                     <input type="checkbox" id="check-n1" checked>
                     <span class="slider"></span>
@@ -245,7 +277,7 @@
             </div>
             <div class="range-container">
                 <div class="range-label">
-                    <span>Transparency</span>
+                    <span id="label-trans-n1">Transparency</span>
                     <span id="val-n1">80%</span>
                 </div>
                 <input type="range" id="slider-n1" min="0" max="100" value="80">
@@ -258,8 +290,8 @@
     
     <!-- 1. Text Explanation -->
     <div class="math-column" style="max-width: 120px; margin-right: 5px;">
-        <div class="math-title">Overlap Condition</div>
-        <div style="font-size: 0.75rem; color: #aaa;">
+        <div class="math-title" id="overlap-title">Overlap Condition</div>
+        <div id="overlap-desc" style="font-size: 0.75rem; color: #aaa;">
             Red end of <span class="highlight-n">n</span> > Violet start of <span class="highlight-n">n+1</span>
         </div>
     </div>
@@ -290,7 +322,7 @@
 
     <!-- 4. Substitution -->
     <div class="equation-box">
-        <div style="color:#888; font-size:0.75rem; margin-bottom:4px;">Substitute:</div>
+        <div id="substitute-label" style="color:#888; font-size:0.75rem; margin-bottom:4px;">Substitute:</div>
         <div>n <span class="highlight-red">λ<sub>red</sub></span> > (n+1) <span class="highlight-violet">λ<sub>violet</sub></span></div>
     </div>
 
@@ -298,7 +330,7 @@
 
     <!-- 5. Result -->
     <div class="math-column" style="border-left: 1px solid #333; padding-left: 15px;">
-        <div class="math-title">Limit (λ ≈ 700/400)</div>
+        <div class="math-title" id="limit-title">Limit (λ ≈ 700/400)</div>
         <div>7n > 4(n+1)</div>
         <div style="color:var(--accent); font-weight:bold; margin-top:4px;">n > 1.33</div>
     </div>
@@ -306,6 +338,74 @@
 </div>
 
 <script>
+    const dict = {
+        zh: {
+            docTitle: '光譜重疊：完整方程式',
+            controlsTitle: '光譜控制',
+            groupN: '第 n 級 (n=2)',
+            groupN1: '第 n+1 級 (n=3)',
+            transparency: '透明度',
+            overlapTitle: '重疊條件',
+            overlapDesc: '<span class="highlight-n">n</span> 級紅端 > <span class="highlight-n">n+1</span> 級紫端',
+            substitute: '代入：',
+            limitTitle: '極限（λ ≈ 700/400）',
+            nOrderMax: 'n 級最大',
+            n1OrderMax: 'n+1 級最大',
+            langBtn: '🌐 English'
+        },
+        en: {
+            docTitle: 'Spectral Overlap: Full Equations',
+            controlsTitle: 'Spectrum Controls',
+            groupN: 'n<sup>th</sup> Order (n=2)',
+            groupN1: '(n+1)<sup>th</sup> Order (n=3)',
+            transparency: 'Transparency',
+            overlapTitle: 'Overlap Condition',
+            overlapDesc: 'Red end of <span class="highlight-n">n</span> > Violet start of <span class="highlight-n">n+1</span>',
+            substitute: 'Substitute:',
+            limitTitle: 'Limit (λ ≈ 700/400)',
+            nOrderMax: 'n Order Max.',
+            n1OrderMax: 'n+1 Order Max.',
+            langBtn: '🌐 中文'
+        }
+    };
+
+    function hubLangToLocal(lang) {
+        if (lang === 'en') return 'en';
+        return 'zh';
+    }
+
+    const params = new URLSearchParams(location.search);
+    let currentLang = hubLangToLocal(params.get('lang') || 'zh');
+    const btnLang = document.getElementById('lang-toggle');
+
+    function updateLanguageUI() {
+        document.title = dict[currentLang].docTitle;
+        const t = dict[currentLang];
+        document.documentElement.lang = currentLang === 'zh' ? 'zh-HK' : 'en';
+        btnLang.innerText = t.langBtn;
+        document.getElementById('controls-title').innerText = t.controlsTitle;
+        document.getElementById('group-n').innerHTML = t.groupN;
+        document.getElementById('group-n1').innerHTML = t.groupN1;
+        document.getElementById('label-trans-n').innerText = t.transparency;
+        document.getElementById('label-trans-n1').innerText = t.transparency;
+        document.getElementById('overlap-title').innerText = t.overlapTitle;
+        document.getElementById('overlap-desc').innerHTML = t.overlapDesc;
+        document.getElementById('substitute-label').innerText = t.substitute;
+        document.getElementById('limit-title').innerText = t.limitTitle;
+        draw();
+    }
+
+    btnLang.addEventListener('click', () => {
+        currentLang = currentLang === 'zh' ? 'en' : 'zh';
+        updateLanguageUI();
+    });
+
+    window.addEventListener('message', (ev) => {
+        if (ev.data?.type !== 's3phy:lang') return;
+        currentLang = hubLangToLocal(ev.data.lang);
+        updateLanguageUI();
+    });
+
     const canvas = document.getElementById('simCanvas');
     const ctx = canvas.getContext('2d');
 
@@ -349,7 +449,7 @@
             draw();
         });
 
-        draw();
+        updateLanguageUI();
     }
 
     function resize() {
@@ -397,10 +497,10 @@
         ctx.globalCompositeOperation = 'screen'; 
 
         if (config.nOrder.visible) {
-            drawOrder(2, config.nOrder.opacity, "n Order Max.");
+            drawOrder(2, config.nOrder.opacity, dict[currentLang].nOrderMax);
         }
         if (config.n1Order.visible) {
-            drawOrder(3, config.n1Order.opacity, "n+1 Order Max.");
+            drawOrder(3, config.n1Order.opacity, dict[currentLang].n1OrderMax);
         }
 
         ctx.globalCompositeOperation = 'source-over'; 

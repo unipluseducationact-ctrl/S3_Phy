@@ -6,6 +6,6 @@ export function createWaveMotionLab(t) {
     slug: 'wave-motion',
     titleKey: 'tools.waveMotion.title',
     className: 'tool-wave-motion-lab',
-    extraParams: () => '&v=20260722_wave_phase_v1',
+    extraParams: () => '&v=20260722_wave_phase_v2',
   });
 }

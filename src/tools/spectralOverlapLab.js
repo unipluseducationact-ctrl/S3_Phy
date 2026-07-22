@@ -6,6 +6,6 @@ export function createSpectralOverlapLab(t) {
     slug: 'spectral-overlap',
     titleKey: 'tools.spectralOverlap.title',
     className: 'tool-spectral-overlap-lab',
-    extraParams: () => '&v=20260722_spectral_overlap_v1',
+    extraParams: () => '&v=20260722_spectral_overlap_v2',
   });
 }

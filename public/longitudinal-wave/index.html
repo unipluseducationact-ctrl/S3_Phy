@@ -1,229 +1,654 @@
 <!DOCTYPE html>
-<html lang="en">
+<html lang="zh-HK">
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Longitudinal Wave Final Analysis</title>
+    <title>縱波物理</title>
     <link rel="stylesheet" href="../shared/s3phy-embed.css">
     <script src="../shared/s3phy-embed-init.js"></script>
     <style>
         html.s3phy-embed body { padding: 12px; }
+        html.s3phy-embed .lang-btn { display: none; }
+        * { box-sizing: border-box; }
         body {
-            font-family: 'Segoe UI', sans-serif;
+            font-family: 'Segoe UI', 'Noto Sans TC', sans-serif;
             background-color: #121212;
             color: #e0e0e0;
             display: flex;
             flex-direction: column;
             align-items: center;
+            margin: 0;
             padding: 20px;
         }
 
         .container {
             background: #1e1e1e;
-            padding: 30px;
+            padding: 24px;
             border-radius: 12px;
             box-shadow: 0 10px 30px rgba(0,0,0,0.6);
-            max-width: 950px;
+            max-width: 980px;
             width: 100%;
         }
 
-        h2 { border-left: 5px solid #4db8ff; padding-left: 15px; color: #fff; margin-bottom: 5px;}
-        
-        /* Wave Direction Banner */
+        .header-row {
+            display: flex;
+            justify-content: space-between;
+            align-items: flex-start;
+            gap: 12px;
+            margin-bottom: 8px;
+        }
+        h2 {
+            border-left: 5px solid #4db8ff;
+            padding-left: 15px;
+            color: #fff;
+            margin: 0;
+        }
+        .lang-btn {
+            background: rgba(255,255,255,0.05);
+            color: #aaa;
+            border: 1px solid #444;
+            padding: 6px 12px;
+            border-radius: 6px;
+            cursor: pointer;
+            font-size: 13px;
+            font-weight: 700;
+            flex-shrink: 0;
+        }
+        .lang-btn:hover { color: #fff; border-color: #666; background: rgba(255,255,255,0.1); }
+
         .wave-banner {
             background: rgba(255, 255, 255, 0.05);
             border: 1px solid #444;
             border-radius: 8px;
-            margin: 20px 0;
+            margin: 16px 0;
             padding: 10px;
             text-align: center;
             color: #fff;
             font-weight: bold;
-            font-size: 18px;
+            font-size: 17px;
             display: flex;
             align-items: center;
             justify-content: center;
-            gap: 15px;
+            gap: 12px;
         }
-
-        svg { width: 100%; height: auto; background: #252525; border-radius: 8px; border: 1px solid #333; }
-        
-        .label-top { font-size: 13px; font-weight: bold; fill: #777; text-anchor: middle; }
-        .label-bottom { font-size: 15px; font-weight: bold; fill: #fff; text-anchor: middle; }
-        .label-zone { font-size: 14px; font-weight: bold; letter-spacing: 2px; text-anchor: middle; text-transform: uppercase; }
-        .label-note { font-size: 12px; fill: #aaa; text-anchor: middle; }
-        .label-amp { font-size: 12px; font-weight: bold; fill: #ffcc00; text-anchor: middle; }
-
-        /* Conclusion Box */
-        .conclusion-box {
-            margin-top: 25px;
-            padding: 20px;
-            background: #2a2a2a;
-            border-left: 5px solid #00e676;
-            border-radius: 4px;
-        }
-        .conclusion-title { color: #00e676; font-weight: bold; margin-bottom: 10px; display: block; font-size: 1.1em; }
-        .conclusion-text { line-height: 1.6; color: #ddd; }
-        .highlight-same { color: #4db8ff; font-weight: bold; }
-        .highlight-opp { color: #ff4d4d; font-weight: bold; }
-
-        /* Guide Lines */
-        .guide-line { stroke: #444; stroke-width: 1; stroke-dasharray: 3,3; opacity: 0.3; }
-        
-        /* Animations */
-        @keyframes moveLeft {
-            0% { transform: translateX(0); opacity: 0.6; }
-            50% { transform: translateX(-5px); opacity: 1; }
-            100% { transform: translateX(0); opacity: 0.6; }
-        }
-        @keyframes moveRight {
-            0% { transform: translateX(0); opacity: 0.6; }
-            50% { transform: translateX(5px); opacity: 1; }
-            100% { transform: translateX(0); opacity: 0.6; }
+        .banner-arrow {
+            width: 36px;
+            height: 28px;
+            animation: waveFlow 1.5s infinite ease-in-out;
         }
         @keyframes waveFlow {
             0% { transform: translateX(5px); }
             50% { transform: translateX(-5px); }
             100% { transform: translateX(5px); }
         }
-        
-        .arrow-left { animation: moveLeft 1s infinite; }
-        .arrow-right { animation: moveRight 1s infinite; }
-        .big-wave-arrow { animation: waveFlow 1.5s infinite ease-in-out; }
 
+        .controls {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 12px;
+            align-items: center;
+            justify-content: space-between;
+            background: #252525;
+            border: 1px solid #333;
+            border-radius: 10px;
+            padding: 12px 14px;
+            margin-bottom: 14px;
+        }
+        .btn-row { display: flex; gap: 8px; flex-wrap: wrap; }
+        button.ctrl {
+            border: none;
+            border-radius: 8px;
+            padding: 8px 14px;
+            font-weight: 700;
+            cursor: pointer;
+            background: #334155;
+            color: #fff;
+            font-size: 13px;
+        }
+        button.ctrl:hover { background: #475569; }
+        button.ctrl.primary { background: #0284c7; }
+        button.ctrl.primary:hover { background: #0369a1; }
+
+        .slider-group {
+            display: flex;
+            flex-direction: column;
+            gap: 4px;
+            min-width: 160px;
+            flex: 1;
+        }
+        .slider-group label {
+            font-size: 12px;
+            color: #94a3b8;
+            font-weight: 700;
+            display: flex;
+            justify-content: space-between;
+        }
+        .slider-group input[type=range] {
+            width: 100%;
+            accent-color: #4db8ff;
+            cursor: pointer;
+        }
+
+        .hint {
+            font-size: 12px;
+            color: #888;
+            margin: 0 0 10px;
+            text-align: center;
+        }
+
+        .canvas-wrap {
+            background: #252525;
+            border-radius: 8px;
+            border: 1px solid #333;
+            overflow: hidden;
+            touch-action: none;
+        }
+        canvas {
+            display: block;
+            width: 100%;
+            height: auto;
+            cursor: grab;
+        }
+        canvas:active { cursor: grabbing; }
+
+        .particle-info {
+            margin-top: 12px;
+            padding: 10px 14px;
+            background: rgba(77, 184, 255, 0.08);
+            border: 1px solid rgba(77, 184, 255, 0.25);
+            border-radius: 8px;
+            font-size: 14px;
+            min-height: 44px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            text-align: center;
+            color: #cbd5e1;
+        }
+        .particle-info strong { color: #fff; }
+
+        .conclusion-box {
+            margin-top: 18px;
+            padding: 18px;
+            background: #2a2a2a;
+            border-left: 5px solid #00e676;
+            border-radius: 4px;
+        }
+        .conclusion-title {
+            color: #00e676;
+            font-weight: bold;
+            margin-bottom: 10px;
+            display: block;
+            font-size: 1.1em;
+        }
+        .conclusion-text { line-height: 1.6; color: #ddd; }
+        .highlight-same { color: #4db8ff; font-weight: bold; }
+        .highlight-opp { color: #ff4d4d; font-weight: bold; }
     </style>
 </head>
 <body>
 
 <div class="container">
-    <h2>Longitudinal Wave Physics</h2>
-    
-    <div class="wave-banner">
-        <svg style="width: 40px; height: 30px; background:transparent; border:none; vertical-align: middle;" viewBox="0 0 40 30">
-            <path d="M35,15 L5,15 L15,5 M5,15 L15,25" fill="none" stroke="#fff" stroke-width="4" stroke-linecap="round" stroke-linejoin="round" class="big-wave-arrow"/>
-        </svg>
-        WAVE TRAVELING DIRECTION (LEFT)
+    <div class="header-row">
+        <h2 id="page-title">縱波物理</h2>
+        <button class="lang-btn" id="lang-toggle" type="button">🌐 English</button>
     </div>
 
-    <svg viewBox="0 0 950 420">
-        <defs>
-            <marker id="arrowBlue" markerWidth="7" markerHeight="7" refX="6" refY="3.5" orient="auto">
-                <path d="M0,0 L0,7 L7,3.5 z" fill="#4db8ff" />
-            </marker>
-            <marker id="arrowRed" markerWidth="7" markerHeight="7" refX="6" refY="3.5" orient="auto">
-                <path d="M0,0 L0,7 L7,3.5 z" fill="#ff4d4d" />
-            </marker>
-        </defs>
+    <div class="wave-banner">
+        <svg class="banner-arrow" viewBox="0 0 40 30" aria-hidden="true">
+            <path d="M35,15 L5,15 L15,5 M5,15 L15,25" fill="none" stroke="#fff" stroke-width="4" stroke-linecap="round" stroke-linejoin="round"/>
+        </svg>
+        <span id="label-banner">波傳播方向（向左）</span>
+    </div>
 
-        <!-- ZONES (Backgrounds) -->
-        
-        <!-- Compression Zone: Covers A(140) -> C(220) -->
-        <rect x="100" y="150" width="160" height="240" fill="rgba(77, 184, 255, 0.08)" rx="12" stroke="rgba(77, 184, 255, 0.3)" stroke-dasharray="6,6" />
-        <text x="180" y="360" class="label-zone" fill="#4db8ff">Compression</text>
-        <text x="180" y="380" class="label-note" fill="#4db8ff">High Density</text>
-
-        <!-- Rarefaction Zone: Covers E(390) -> G(610) -->
-        <rect x="360" y="150" width="280" height="240" fill="rgba(255, 77, 77, 0.08)" rx="12" stroke="rgba(255, 77, 77, 0.3)" stroke-dasharray="6,6" />
-        <text x="500" y="360" class="label-zone" fill="#ff4d4d">Rarefaction</text>
-        <text x="500" y="380" class="label-note" fill="#ff4d4d">Low Density</text>
-
-        <!-- Compression Zone 2: Covers I(780) -> ... -->
-        <rect x="740" y="150" width="160" height="240" fill="rgba(77, 184, 255, 0.08)" rx="12" stroke="rgba(77, 184, 255, 0.3)" stroke-dasharray="6,6" />
-        <text x="820" y="360" class="label-zone" fill="#4db8ff">Compression</text>
-
-        <!-- TOP ROW: EQUILIBRIUM (Y = 60) -->
-        <text x="475" y="30" text-anchor="middle" fill="#666" font-size="12">--- Equilibrium Positions (Uniform Spacing) ---</text>
-        
-        <!-- Vertical Guides -->
-        <g class="guide-line">
-            <line x1="100" y1="60" x2="100" y2="250" /> <!-- A -->
-            <line x1="180" y1="60" x2="180" y2="250" /> <!-- B -->
-            <line x1="260" y1="60" x2="260" y2="250" /> <!-- C -->
-            <line x1="340" y1="60" x2="340" y2="250" /> <!-- D -->
-            <line x1="420" y1="60" x2="420" y2="250" /> <!-- E -->
-            <line x1="500" y1="60" x2="500" y2="250" /> <!-- F -->
-            <line x1="580" y1="60" x2="580" y2="250" /> <!-- G -->
-            <line x1="660" y1="60" x2="660" y2="250" /> <!-- H -->
-            <line x1="740" y1="60" x2="740" y2="250" /> <!-- I -->
-            <line x1="820" y1="60" x2="820" y2="250" /> <!-- J -->
-        </g>
-
-        <!-- Top Dots -->
-        <g fill="#666">
-            <circle cx="100" cy="60" r="4" /> <text x="100" y="45" class="label-top">A</text>
-            <circle cx="180" cy="60" r="4" /> <text x="180" y="45" class="label-top">B</text>
-            <circle cx="260" cy="60" r="4" /> <text x="260" y="45" class="label-top">C</text>
-            <circle cx="340" cy="60" r="4" /> <text x="340" y="45" class="label-top">D</text>
-            <circle cx="420" cy="60" r="4" /> <text x="420" y="45" class="label-top">E</text>
-            <circle cx="500" cy="60" r="4" /> <text x="500" y="45" class="label-top">F</text>
-            <circle cx="580" cy="60" r="4" /> <text x="580" y="45" class="label-top">G</text>
-            <circle cx="660" cy="60" r="4" /> <text x="660" y="45" class="label-top">H</text>
-            <circle cx="740" cy="60" r="4" /> <text x="740" y="45" class="label-top">I</text>
-            <circle cx="820" cy="60" r="4" /> <text x="820" y="45" class="label-top">J</text>
-        </g>
-
-        <!-- BOTTOM ROW: ACTUAL POSITIONS (Y = 200) -->
-        
-        <!-- === COMPRESSION GROUP (A, B, C) === -->
-        <circle cx="140" cy="200" r="9" fill="#4db8ff" />
-        <text x="140" y="235" class="label-bottom">A</text>
-        <line x1="140" y1="260" x2="110" y2="260" stroke="#4db8ff" stroke-width="3" marker-end="url(#arrowBlue)" class="arrow-left" />
-
-        <circle cx="180" cy="200" r="9" fill="#4db8ff" />
-        <text x="180" y="235" class="label-bottom">B</text>
-        <line x1="180" y1="260" x2="140" y2="260" stroke="#4db8ff" stroke-width="4" marker-end="url(#arrowBlue)" class="arrow-left" />
-        
-        <circle cx="220" cy="200" r="9" fill="#4db8ff" />
-        <text x="220" y="235" class="label-bottom">C</text>
-        <line x1="220" y1="260" x2="190" y2="260" stroke="#4db8ff" stroke-width="3" marker-end="url(#arrowBlue)" class="arrow-left" />
-
-        <!-- === AMPLITUDE (D) === -->
-        <circle cx="300" cy="200" r="11" fill="#ffcc00" stroke="#fff" stroke-width="2" />
-        <text x="300" y="235" class="label-bottom" fill="#ffcc00">D</text>
-        <text x="300" y="265" class="label-amp">AMPLITUDE</text>
-        <text x="300" y="285" class="label-note" fill="#ffcc00">(v = 0)</text>
-
-        <!-- === RAREFACTION GROUP (E, F, G) === -->
-        <circle cx="390" cy="200" r="9" fill="#ff4d4d" />
-        <text x="390" y="235" class="label-bottom">E</text>
-        <line x1="390" y1="260" x2="420" y2="260" stroke="#ff4d4d" stroke-width="3" marker-end="url(#arrowRed)" class="arrow-right" />
-
-        <circle cx="500" cy="200" r="9" fill="#ff4d4d" />
-        <text x="500" y="235" class="label-bottom">F</text>
-        <line x1="500" y1="260" x2="540" y2="260" stroke="#ff4d4d" stroke-width="4" marker-end="url(#arrowRed)" class="arrow-right" />
-
-        <circle cx="610" cy="200" r="9" fill="#ff4d4d" />
-        <text x="610" y="235" class="label-bottom">G</text>
-        <line x1="610" y1="260" x2="640" y2="260" stroke="#ff4d4d" stroke-width="3" marker-end="url(#arrowRed)" class="arrow-right" />
-
-        <!-- === AMPLITUDE (H) === -->
-        <circle cx="700" cy="200" r="11" fill="#ffcc00" stroke="#fff" stroke-width="2" />
-        <text x="700" y="235" class="label-bottom" fill="#ffcc00">H</text>
-        <text x="700" y="265" class="label-amp">AMPLITUDE</text>
-        <text x="700" y="285" class="label-note" fill="#ffcc00">(v = 0)</text>
-
-        <!-- === COMPRESSION GROUP (I, J) === -->
-        <circle cx="780" cy="200" r="9" fill="#4db8ff" />
-        <text x="780" y="235" class="label-bottom">I</text>
-        <line x1="780" y1="260" x2="750" y2="260" stroke="#4db8ff" stroke-width="3" marker-end="url(#arrowBlue)" class="arrow-left" />
-
-        <circle cx="820" cy="200" r="9" fill="#4db8ff" />
-        <text x="820" y="235" class="label-bottom">J</text>
-        <line x1="820" y1="260" x2="780" y2="260" stroke="#4db8ff" stroke-width="4" marker-end="url(#arrowBlue)" class="arrow-left" />
-
-    </svg>
-
-    <div class="conclusion-box">
-        <span class="conclusion-title">Conclusion</span>
-        <div class="conclusion-text">
-            Particles located between two adjacent amplitude points behave as follows:
-            <ul>
-                <li>Particles near the center of a <strong>Compression</strong> move in the <span class="highlight-same">same direction</span> as the wave.</li>
-                <li>Particles near the center of a <strong>Rarefaction</strong> move in the <span class="highlight-opp">opposite direction</span> to the wave.</li>
-            </ul>
+    <div class="controls">
+        <div class="btn-row">
+            <button class="ctrl primary" id="btn-play" type="button">⏸ 暫停</button>
+            <button class="ctrl" id="btn-reset" type="button">↺ 重設</button>
+        </div>
+        <div class="slider-group">
+            <label><span id="label-phase">相位 / 時間</span><span id="phase-val">0.00 λ</span></label>
+            <input type="range" id="phase-slider" min="0" max="1000" value="0" step="1">
+        </div>
+        <div class="slider-group" style="max-width:180px;">
+            <label><span id="label-speed">動畫速度</span><span id="speed-val">1.0×</span></label>
+            <input type="range" id="speed-slider" min="0.2" max="2.5" value="1" step="0.1">
         </div>
     </div>
+
+    <p class="hint" id="label-hint">拖曳畫面或滑桿改變相位；撳粒子可睇位移同速度方向。</p>
+
+    <div class="canvas-wrap">
+        <canvas id="simCanvas" width="950" height="420"></canvas>
+    </div>
+
+    <div class="particle-info" id="particle-info"></div>
+
+    <div class="conclusion-box">
+        <span class="conclusion-title" id="label-conclusion-title">結論</span>
+        <div class="conclusion-text" id="label-conclusion-body"></div>
+    </div>
 </div>
+
+<script>
+    const dict = {
+        zh: {
+            docTitle: '縱波物理',
+            pageTitle: '縱波物理',
+            banner: '波傳播方向（向左）',
+            play: '▶ 播放',
+            pause: '⏸ 暫停',
+            reset: '↺ 重設',
+            phase: '相位 / 時間',
+            speed: '動畫速度',
+            hint: '拖曳畫面或滑桿改變相位；撳粒子可睇位移同速度方向。',
+            equilibrium: '平衡位置（等距）',
+            compression: '密部',
+            highDensity: '高密度',
+            rarefaction: '疏部',
+            lowDensity: '低密度',
+            amplitude: '振幅',
+            vZero: '(v = 0)',
+            selectHint: '撳下方粒子睇詳情',
+            info: (id, disp, velDir) => `粒子 <strong>${id}</strong>：位移 ${disp}　｜　速度方向：<strong>${velDir}</strong>`,
+            velLeft: '← 向左（同波傳播）',
+            velRight: '→ 向右（反波傳播）',
+            velZero: '靜止（振幅點）',
+            conclusionTitle: '結論',
+            conclusionHtml: () => `位於兩個相鄰振幅點之間嘅粒子有以下行為：
+                <ul>
+                    <li>密部中心附近嘅粒子，運動方向同<span class="highlight-same">波傳播方向相同</span>。</li>
+                    <li>疏部中心附近嘅粒子，運動方向同<span class="highlight-opp">波傳播方向相反</span>。</li>
+                </ul>`,
+            langBtn: '🌐 English'
+        },
+        en: {
+            docTitle: 'Longitudinal Wave Physics',
+            pageTitle: 'Longitudinal Wave Physics',
+            banner: 'WAVE TRAVELING DIRECTION (LEFT)',
+            play: '▶ Play',
+            pause: '⏸ Pause',
+            reset: '↺ Reset',
+            phase: 'Phase / Time',
+            speed: 'Anim Speed',
+            hint: 'Drag the canvas or slider to change phase; click a particle to see displacement and velocity.',
+            equilibrium: 'Equilibrium positions (uniform spacing)',
+            compression: 'Compression',
+            highDensity: 'High Density',
+            rarefaction: 'Rarefaction',
+            lowDensity: 'Low Density',
+            amplitude: 'AMPLITUDE',
+            vZero: '(v = 0)',
+            selectHint: 'Click a particle below for details',
+            info: (id, disp, velDir) => `Particle <strong>${id}</strong>: displacement ${disp}  |  velocity: <strong>${velDir}</strong>`,
+            velLeft: '← Left (with wave)',
+            velRight: '→ Right (against wave)',
+            velZero: 'At rest (amplitude point)',
+            conclusionTitle: 'Conclusion',
+            conclusionHtml: () => `Particles located between two adjacent amplitude points behave as follows:
+                <ul>
+                    <li>Near the centre of a <strong>Compression</strong>, particles move in the <span class="highlight-same">same direction</span> as the wave.</li>
+                    <li>Near the centre of a <strong>Rarefaction</strong>, particles move in the <span class="highlight-opp">opposite direction</span> to the wave.</li>
+                </ul>`,
+            langBtn: '🌐 中文'
+        }
+    };
+
+    function hubLangToLocal(lang) {
+        return lang === 'en' ? 'en' : 'zh';
+    }
+
+    const params = new URLSearchParams(location.search);
+    let currentLang = hubLangToLocal(params.get('lang') || 'zh');
+    function t() { return dict[currentLang]; }
+
+    const IDS = ['A', 'B', 'C', 'D', 'E', 'F', 'G', 'H', 'I', 'J'];
+    const EQ_X0 = 100;
+    const SPACING = 80;
+    const AMP = 40;
+    const LAMBDA = 640; // 8 spacings
+    const K = (2 * Math.PI) / LAMBDA;
+    const OMEGA = 1.2; // rad/s visual
+    const Y_EQ = 60;
+    const Y_PART = 200;
+
+    const canvas = document.getElementById('simCanvas');
+    const ctx = canvas.getContext('2d');
+    const phaseSlider = document.getElementById('phase-slider');
+    const speedSlider = document.getElementById('speed-slider');
+    const btnPlay = document.getElementById('btn-play');
+    const btnReset = document.getElementById('btn-reset');
+    const btnLang = document.getElementById('lang-toggle');
+    const phaseVal = document.getElementById('phase-val');
+    const speedVal = document.getElementById('speed-val');
+    const particleInfo = document.getElementById('particle-info');
+
+    let phase = 0; // ωt in radians
+    let isPlaying = true;
+    let speed = 1;
+    let selected = 1; // B — near compression centre at t=0 with our phase convention
+    let lastTs = 0;
+    let dragging = false;
+    let dragStartX = 0;
+    let dragStartPhase = 0;
+
+    function eqX(i) {
+        return EQ_X0 + i * SPACING;
+    }
+
+    // Wave travels LEFT: ξ = A sin(kx + ωt)
+    function displacement(i, ph) {
+        return AMP * Math.sin(K * eqX(i) + ph);
+    }
+
+    function velocitySign(i, ph) {
+        // v = ∂ξ/∂t = A ω cos(kx + ωt); ω>0
+        const c = Math.cos(K * eqX(i) + ph);
+        if (Math.abs(c) < 0.08) return 0;
+        return c > 0 ? 1 : -1; // +1 = right, -1 = left
+    }
+
+    function particleX(i, ph) {
+        return eqX(i) + displacement(i, ph);
+    }
+
+    // Density proxy: -∂ξ/∂x = -A k cos(kx+ωt); compression when > 0
+    function densityMetric(x, ph) {
+        return -AMP * K * Math.cos(K * x + ph);
+    }
+
+    function updateLanguageUI() {
+        const tr = t();
+        document.documentElement.lang = currentLang === 'zh' ? 'zh-HK' : 'en';
+        document.title = tr.docTitle;
+        btnLang.innerText = tr.langBtn;
+        document.getElementById('page-title').innerText = tr.pageTitle;
+        document.getElementById('label-banner').innerText = tr.banner;
+        document.getElementById('label-phase').innerText = tr.phase;
+        document.getElementById('label-speed').innerText = tr.speed;
+        document.getElementById('label-hint').innerText = tr.hint;
+        document.getElementById('label-conclusion-title').innerText = tr.conclusionTitle;
+        document.getElementById('label-conclusion-body').innerHTML = tr.conclusionHtml();
+        btnReset.innerText = tr.reset;
+        btnPlay.innerText = isPlaying ? tr.pause : tr.play;
+        updateParticleInfo();
+        draw();
+    }
+
+    function syncPhaseSlider() {
+        const frac = ((phase / (2 * Math.PI)) % 1 + 1) % 1;
+        phaseSlider.value = Math.round(frac * 1000);
+        phaseVal.innerText = `${(frac).toFixed(2)} λ`;
+    }
+
+    function updateParticleInfo() {
+        const tr = t();
+        if (selected == null) {
+            particleInfo.innerHTML = tr.selectHint;
+            return;
+        }
+        const disp = displacement(selected, phase);
+        const vs = velocitySign(selected, phase);
+        let velDir = tr.velZero;
+        if (vs < 0) velDir = tr.velLeft;
+        else if (vs > 0) velDir = tr.velRight;
+        const dispStr = `${disp >= 0 ? '+' : ''}${disp.toFixed(1)} px`;
+        particleInfo.innerHTML = tr.info(IDS[selected], dispStr, velDir);
+    }
+
+    function drawZone(xCenter, width, color, title, subtitle) {
+        const x = xCenter - width / 2;
+        ctx.fillStyle = color.replace('1)', '0.08)');
+        ctx.strokeStyle = color.replace('1)', '0.35)');
+        ctx.lineWidth = 1.5;
+        ctx.setLineDash([6, 6]);
+        roundRect(x, 150, width, 230, 12);
+        ctx.fill();
+        ctx.stroke();
+        ctx.setLineDash([]);
+        ctx.fillStyle = color.replace('1)', '1)');
+        ctx.font = 'bold 14px Segoe UI, sans-serif';
+        ctx.textAlign = 'center';
+        ctx.fillText(title, xCenter, 360);
+        ctx.font = '12px Segoe UI, sans-serif';
+        ctx.fillText(subtitle, xCenter, 380);
+    }
+
+    function roundRect(x, y, w, h, r) {
+        ctx.beginPath();
+        ctx.moveTo(x + r, y);
+        ctx.arcTo(x + w, y, x + w, y + h, r);
+        ctx.arcTo(x + w, y + h, x, y + h, r);
+        ctx.arcTo(x, y + h, x, y, r);
+        ctx.arcTo(x, y, x + w, y, r);
+        ctx.closePath();
+    }
+
+    function draw() {
+        const tr = t();
+        const W = canvas.width;
+        const H = canvas.height;
+        ctx.clearRect(0, 0, W, H);
+
+        // Moving compression / rarefaction centres: max density at cos(kx+φ)=−1 → kx+φ = π
+        // compression centre x: Kx + phase = π + 2πn → x = (π - phase + 2πn)/K
+        const xComp = ((Math.PI - phase) / K + 10 * LAMBDA) % LAMBDA;
+        const xRare = ((0 - phase) / K + 10 * LAMBDA) % LAMBDA; // cos = +1 → rarefaction (low density)
+        // Map into visible band roughly 60–880
+        function placeZone(xMod) {
+            // find instance near middle of particle row
+            let best = xMod;
+            while (best < 80) best += LAMBDA;
+            while (best > 860) best -= LAMBDA;
+            if (best < 80) best += LAMBDA;
+            return best;
+        }
+        const xc = placeZone(xComp);
+        const xr = placeZone(xRare);
+        drawZone(xc, 170, 'rgba(77,184,255,1)', tr.compression, tr.highDensity);
+        drawZone(xr, 260, 'rgba(255,77,77,1)', tr.rarefaction, tr.lowDensity);
+        // second compression if visible
+        const xc2 = xc + LAMBDA;
+        if (xc2 < 900) drawZone(xc2, 170, 'rgba(77,184,255,1)', tr.compression, '');
+
+        // Equilibrium label
+        ctx.fillStyle = '#666';
+        ctx.font = '12px Segoe UI, sans-serif';
+        ctx.textAlign = 'center';
+        ctx.fillText(`--- ${tr.equilibrium} ---`, W / 2, 28);
+
+        // Guide lines + top dots
+        for (let i = 0; i < IDS.length; i++) {
+            const x = eqX(i);
+            ctx.strokeStyle = 'rgba(68,68,68,0.35)';
+            ctx.setLineDash([3, 3]);
+            ctx.beginPath();
+            ctx.moveTo(x, Y_EQ);
+            ctx.lineTo(x, 250);
+            ctx.stroke();
+            ctx.setLineDash([]);
+
+            ctx.fillStyle = '#666';
+            ctx.beginPath();
+            ctx.arc(x, Y_EQ, 4, 0, Math.PI * 2);
+            ctx.fill();
+            ctx.font = 'bold 13px Segoe UI, sans-serif';
+            ctx.textAlign = 'center';
+            ctx.fillText(IDS[i], x, Y_EQ - 12);
+        }
+
+        // Particles
+        for (let i = 0; i < IDS.length; i++) {
+            const x = particleX(i, phase);
+            const dens = densityMetric(eqX(i), phase);
+            const vs = velocitySign(i, phase);
+            const atAmp = Math.abs(Math.cos(K * eqX(i) + phase)) < 0.12;
+            const isSel = selected === i;
+
+            let fill = dens > 0.02 ? '#4db8ff' : dens < -0.02 ? '#ff4d4d' : '#94a3b8';
+            if (atAmp) fill = '#ffcc00';
+
+            const r = atAmp ? 11 : (isSel ? 11 : 9);
+            ctx.beginPath();
+            ctx.arc(x, Y_PART, r, 0, Math.PI * 2);
+            ctx.fillStyle = fill;
+            ctx.fill();
+            if (atAmp || isSel) {
+                ctx.strokeStyle = '#fff';
+                ctx.lineWidth = isSel ? 2.5 : 2;
+                ctx.stroke();
+            }
+
+            ctx.fillStyle = atAmp ? '#ffcc00' : '#fff';
+            ctx.font = 'bold 15px Segoe UI, sans-serif';
+            ctx.textAlign = 'center';
+            ctx.fillText(IDS[i], x, Y_PART + 35);
+
+            // Velocity arrow (or amplitude markers when v ≈ 0)
+            if (atAmp || vs === 0) {
+                ctx.fillStyle = '#ffcc00';
+                ctx.font = 'bold 12px Segoe UI, sans-serif';
+                ctx.fillText(tr.amplitude, x, Y_PART + 62);
+                ctx.font = '12px Segoe UI, sans-serif';
+                ctx.fillText(tr.vZero, x, Y_PART + 80);
+            } else {
+                const len = 28 + Math.abs(Math.cos(K * eqX(i) + phase)) * 12;
+                const x2 = vs < 0 ? x - len : x + len;
+                ctx.strokeStyle = fill;
+                ctx.fillStyle = fill;
+                ctx.lineWidth = 3;
+                ctx.beginPath();
+                ctx.moveTo(x, Y_PART + 58);
+                ctx.lineTo(x2, Y_PART + 58);
+                ctx.stroke();
+                const dir = vs < 0 ? -1 : 1;
+                ctx.beginPath();
+                ctx.moveTo(x2, Y_PART + 58);
+                ctx.lineTo(x2 - dir * 8, Y_PART + 52);
+                ctx.lineTo(x2 - dir * 8, Y_PART + 64);
+                ctx.closePath();
+                ctx.fill();
+            }
+        }
+    }
+
+    function canvasPoint(ev) {
+        const rect = canvas.getBoundingClientRect();
+        const scaleX = canvas.width / rect.width;
+        const scaleY = canvas.height / rect.height;
+        const clientX = ev.touches ? ev.touches[0].clientX : ev.clientX;
+        const clientY = ev.touches ? ev.touches[0].clientY : ev.clientY;
+        return {
+            x: (clientX - rect.left) * scaleX,
+            y: (clientY - rect.top) * scaleY
+        };
+    }
+
+    function hitParticle(pt) {
+        for (let i = 0; i < IDS.length; i++) {
+            const x = particleX(i, phase);
+            const dx = pt.x - x;
+            const dy = pt.y - Y_PART;
+            if (dx * dx + dy * dy < 22 * 22) return i;
+        }
+        return null;
+    }
+
+    function onPointerDown(ev) {
+        const pt = canvasPoint(ev);
+        const hit = hitParticle(pt);
+        if (hit != null) {
+            selected = hit;
+            updateParticleInfo();
+            draw();
+            return;
+        }
+        dragging = true;
+        dragStartX = pt.x;
+        dragStartPhase = phase;
+        if (ev.cancelable) ev.preventDefault();
+    }
+
+    function onPointerMove(ev) {
+        if (!dragging) return;
+        const pt = canvasPoint(ev);
+        const dx = pt.x - dragStartX;
+        // Drag right → advance phase so wave pattern moves left visually with travel direction
+        phase = dragStartPhase + (dx / LAMBDA) * 2 * Math.PI;
+        syncPhaseSlider();
+        updateParticleInfo();
+        draw();
+        if (ev.cancelable) ev.preventDefault();
+    }
+
+    function onPointerUp() {
+        dragging = false;
+    }
+
+    canvas.addEventListener('mousedown', onPointerDown);
+    window.addEventListener('mousemove', onPointerMove);
+    window.addEventListener('mouseup', onPointerUp);
+    canvas.addEventListener('touchstart', onPointerDown, { passive: false });
+    window.addEventListener('touchmove', onPointerMove, { passive: false });
+    window.addEventListener('touchend', onPointerUp);
+
+    phaseSlider.addEventListener('input', () => {
+        phase = (parseInt(phaseSlider.value, 10) / 1000) * 2 * Math.PI;
+        phaseVal.innerText = `${(phaseSlider.value / 1000).toFixed(2)} λ`;
+        updateParticleInfo();
+        draw();
+    });
+
+    speedSlider.addEventListener('input', () => {
+        speed = parseFloat(speedSlider.value);
+        speedVal.innerText = `${speed.toFixed(1)}×`;
+    });
+
+    btnPlay.addEventListener('click', () => {
+        isPlaying = !isPlaying;
+        btnPlay.innerText = isPlaying ? t().pause : t().play;
+        lastTs = 0;
+    });
+
+    btnReset.addEventListener('click', () => {
+        phase = 0;
+        selected = 1;
+        syncPhaseSlider();
+        updateParticleInfo();
+        draw();
+    });
+
+    btnLang.addEventListener('click', () => {
+        currentLang = currentLang === 'zh' ? 'en' : 'zh';
+        updateLanguageUI();
+    });
+
+    window.addEventListener('message', (ev) => {
+        if (ev.data?.type !== 's3phy:lang') return;
+        currentLang = hubLangToLocal(ev.data.lang);
+        updateLanguageUI();
+    });
+
+    function tick(ts) {
+        if (isPlaying) {
+            if (!lastTs) lastTs = ts;
+            const dt = Math.min(0.05, (ts - lastTs) / 1000);
+            lastTs = ts;
+            phase += OMEGA * speed * dt;
+            syncPhaseSlider();
+            updateParticleInfo();
+            draw();
+        } else {
+            lastTs = 0;
+        }
+        requestAnimationFrame(tick);
+    }
+
+    updateLanguageUI();
+    syncPhaseSlider();
+    speedVal.innerText = '1.0×';
+    requestAnimationFrame(tick);
+</script>
 
 </body>
 </html>

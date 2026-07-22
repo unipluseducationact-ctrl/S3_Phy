@@ -8,6 +8,7 @@
     <script src="../shared/s3phy-embed-init.js"></script>
     <style>
         html.s3phy-embed .logo { display: none; }
+        html.s3phy-embed .lang-btn { display: none; }
         html.s3phy-embed body { padding: 12px; }
         :root {
             --bg: #ffffff;
@@ -38,8 +39,12 @@
         }
 
         .logo { max-width: 200px; height: auto; margin-bottom: 10px; }
+        .header-top { display: flex; justify-content: space-between; align-items: flex-start; width: 100%; max-width: 900px; margin-bottom: 5px; }
+        .header-text { flex: 1; }
         h2 { margin: 0 0 5px 0; color: var(--superposition); font-weight: 700; }
         p { margin: 0 0 20px 0; font-size: 1rem; color: #6c757d; }
+        .lang-btn { background: var(--btn-bg); color: var(--btn-text); border: 1px solid var(--border); padding: 6px 12px; border-radius: 6px; cursor: pointer; font-size: 13px; font-weight: 700; transition: all 0.2s; flex-shrink: 0; margin-left: 15px; }
+        .lang-btn:hover { background: var(--btn-hover); color: #000; }
 
         .container {
             display: flex;
@@ -167,8 +172,13 @@
 </head>
 <body>
 
-    <h2>Spatial Wave Interference</h2>
-    <p>Visualize how path difference and propagation affect superposition.</p>
+    <div class="header-top">
+        <div class="header-text">
+            <h2 id="page-title">Spatial Wave Interference</h2>
+            <p id="page-desc">Visualize how path difference and propagation affect superposition.</p>
+        </div>
+        <button class="lang-btn" id="lang-toggle">🌐 English</button>
+    </div>
 
     <div class="container">
         
@@ -177,7 +187,7 @@
             <div class="row">
                 <div class="control-group">
                     <div class="slider-container">
-                        <span class="slider-label">Mode</span>
+                        <span class="slider-label" id="label-mode">Mode</span>
                         <div class="toggle-container">
                             <button id="mode-steady" class="toggle-btn active" onclick="setMode('steady')">Steady State</button>
                             <button id="mode-pulse" class="toggle-btn" onclick="setMode('pulse')">Transient</button>
@@ -186,13 +196,13 @@
                 </div>
 
                 <div id="playback-controls">
-                    <button class="reset-btn" onclick="resetPulse()">⏮ Reset</button>
+                    <button class="reset-btn" id="resetBtn" onclick="resetPulse()">⏮ Reset</button>
                     <button class="play-btn" onclick="togglePlay()" id="playBtn">▶ Play</button>
                 </div>
 
                 <div class="control-group">
                     <div class="slider-container">
-                        <span class="slider-label">Source Phase</span>
+                        <span class="slider-label" id="label-phase">Source Phase</span>
                         <div class="toggle-container">
                             <button id="btn-in" class="toggle-btn active" onclick="setPhase(0)">In-Phase</button>
                             <button id="btn-anti" class="toggle-btn" onclick="setPhase(Math.PI)">Anti-Phase</button>
@@ -217,7 +227,7 @@
 
                 <div class="control-group">
                     <div class="slider-container">
-                        <span class="slider-label">Anim Speed</span>
+                        <span class="slider-label" id="label-speed">Anim Speed</span>
                         <input type="range" id="speedSlider" min="0" max="3.0" step="0.1" value="1.0">
                     </div>
                     <div class="readout" id="path-readout">Δx = 0.00 λ</div>
@@ -227,22 +237,108 @@
 
         <!-- 3D View -->
         <div class="canvas-card">
-            <div class="canvas-label">Spatial View (Top-Down Perspective)</div>
+            <div class="canvas-label" id="label-spatial">Spatial View (Top-Down Perspective)</div>
             <canvas id="mainCanvas" height="400"></canvas>
-            <div style="text-align:center; font-size:0.85rem; color:#868e96; margin-top:10px; font-weight:500;">
+            <div id="drag-hint" style="text-align:center; font-size:0.85rem; color:#868e96; margin-top:10px; font-weight:500;">
                 Drag the <span style="color:#fcc419; text-shadow: 0 1px 2px rgba(0,0,0,0.2);">● Yellow Target</span> to change path difference
             </div>
         </div>
 
         <!-- Superposition Graph -->
         <div class="canvas-card">
-            <div class="canvas-label">Superposition at Target (Displacement vs Time)</div>
+            <div class="canvas-label" id="label-graph">Superposition at Target (Displacement vs Time)</div>
             <canvas id="graphCanvas"></canvas>
         </div>
 
     </div>
 
     <script>
+        const dict = {
+            zh: {
+                title: '空間波干涉',
+                desc: '觀察路徑差同傳播點樣影響疊加。',
+                mode: '模式',
+                steady: '穩態',
+                transient: '瞬態',
+                sourcePhase: '波源相位',
+                inPhase: '同相',
+                antiPhase: '反相',
+                reset: '⏮ 重設',
+                play: '▶ 播放',
+                pause: '⏸ 暫停',
+                animSpeed: '動畫速度',
+                spatialView: '空間視圖（俯視）',
+                dragHint: '拖曳<span style="color:#fcc419; text-shadow: 0 1px 2px rgba(0,0,0,0.2);">● 黃色目標</span>改變路徑差',
+                superposition: '目標處疊加（位移對時間）',
+                target: '目標',
+                now: '而家',
+                langBtn: '🌐 English'
+            },
+            en: {
+                title: 'Spatial Wave Interference',
+                desc: 'Visualize how path difference and propagation affect superposition.',
+                mode: 'Mode',
+                steady: 'Steady State',
+                transient: 'Transient',
+                sourcePhase: 'Source Phase',
+                inPhase: 'In-Phase',
+                antiPhase: 'Anti-Phase',
+                reset: '⏮ Reset',
+                play: '▶ Play',
+                pause: '⏸ Pause',
+                animSpeed: 'Anim Speed',
+                spatialView: 'Spatial View (Top-Down Perspective)',
+                dragHint: 'Drag the <span style="color:#fcc419; text-shadow: 0 1px 2px rgba(0,0,0,0.2);">● Yellow Target</span> to change path difference',
+                superposition: 'Superposition at Target (Displacement vs Time)',
+                target: 'Target',
+                now: 'Now',
+                langBtn: '🌐 中文'
+            }
+        };
+
+        function hubLangToLocal(lang) {
+            if (lang === 'en') return 'en';
+            return 'zh';
+        }
+
+        const params = new URLSearchParams(location.search);
+        let currentLang = hubLangToLocal(params.get('lang') || 'zh');
+        const btnLang = document.getElementById('lang-toggle');
+
+        function updateLanguageUI() {
+            const t = dict[currentLang];
+            document.documentElement.lang = currentLang === 'zh' ? 'zh-HK' : 'en';
+            document.title = t.title;
+            btnLang.innerText = t.langBtn;
+            document.getElementById('page-title').innerText = t.title;
+            document.getElementById('page-desc').innerText = t.desc;
+            document.getElementById('label-mode').innerText = t.mode;
+            document.getElementById('mode-steady').innerText = t.steady;
+            document.getElementById('mode-pulse').innerText = t.transient;
+            document.getElementById('label-phase').innerText = t.sourcePhase;
+            document.getElementById('btn-in').innerText = t.inPhase;
+            document.getElementById('btn-anti').innerText = t.antiPhase;
+            document.getElementById('resetBtn').innerText = t.reset;
+            document.getElementById('label-speed').innerText = t.animSpeed;
+            document.getElementById('label-spatial').innerText = t.spatialView;
+            document.getElementById('drag-hint').innerHTML = t.dragHint;
+            document.getElementById('label-graph').innerText = t.superposition;
+            playBtn.innerText = isPlaying ? t.pause : t.play;
+            drawMain();
+            drawGraph();
+        }
+
+        btnLang.addEventListener('click', () => {
+            currentLang = currentLang === 'zh' ? 'en' : 'zh';
+            updateLanguageUI();
+        });
+
+        window.addEventListener('message', (ev) => {
+            if (ev.data?.type !== 's3phy:lang') return;
+            currentLang = hubLangToLocal(ev.data.lang);
+            updateLanguageUI();
+        });
+
         // --- Setup ---
         const mainCanvas = document.getElementById('mainCanvas');
         const mainCtx = mainCanvas.getContext('2d');
@@ -345,13 +441,13 @@
 
         function togglePlay() {
             isPlaying = !isPlaying;
-            playBtn.innerText = isPlaying ? "⏸ Pause" : "▶ Play";
+            playBtn.innerText = isPlaying ? dict[currentLang].pause : dict[currentLang].play;
         }
 
         function resetPulse() {
             simTime = 0;
             isPlaying = true;
-            playBtn.innerText = "⏸ Pause";
+            playBtn.innerText = dict[currentLang].pause;
             history.fill(0);
         }
 
@@ -507,7 +603,7 @@
 
             mainCtx.shadowBlur = 10; mainCtx.shadowColor = "rgba(0,0,0,0.2)";
             mainCtx.fillStyle = '#fcc419'; mainCtx.beginPath(); mainCtx.arc(target.x, target.y, 12, 0, Math.PI*2); mainCtx.fill();
-            mainCtx.shadowBlur = 0; mainCtx.fillStyle = '#495057'; mainCtx.fillText("Target", target.x + 15, target.y + 5);
+            mainCtx.shadowBlur = 0; mainCtx.fillStyle = '#495057'; mainCtx.fillText(dict[currentLang].target, target.x + 15, target.y + 5);
         }
 
         function drawGraph() {
@@ -521,7 +617,7 @@
             graphCtx.strokeStyle = '#868e96'; graphCtx.lineWidth = 2; graphCtx.setLineDash([2, 2]);
             graphCtx.beginPath(); graphCtx.moveTo(nowX, 0); graphCtx.lineTo(nowX, h); graphCtx.stroke(); graphCtx.setLineDash([]);
             
-            graphCtx.fillStyle = '#868e96'; graphCtx.font = "bold 10px Arial"; graphCtx.fillText("Now", nowX + 5, 20);
+            graphCtx.fillStyle = '#868e96'; graphCtx.font = "bold 10px Arial"; graphCtx.fillText(dict[currentLang].now, nowX + 5, 20);
 
             graphCtx.beginPath(); graphCtx.strokeStyle = '#862e9c'; graphCtx.lineWidth = 3;
             const step = nowX / historyMax;
@@ -535,6 +631,7 @@
         function animate() {
             update(); drawMain(); drawGraph(); requestAnimationFrame(animate);
         }
+        updateLanguageUI();
         animate();
 
     </script>
