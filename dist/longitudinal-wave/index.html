@@ -113,31 +113,32 @@
         .controls {
             display: flex;
             flex-direction: column;
-            gap: 12px;
+            gap: 6px;
             background: #f8f9fa;
             border: 1px solid var(--border);
-            border-radius: 10px;
-            padding: 12px 14px;
-            margin-bottom: 14px;
+            border-radius: 8px;
+            padding: 6px 10px;
+            margin-bottom: 8px;
         }
         .controls-row {
             display: flex;
             flex-wrap: wrap;
-            gap: 12px;
+            gap: 8px;
             align-items: center;
-            justify-content: space-between;
+            justify-content: flex-start;
             width: 100%;
         }
-        .btn-row { display: flex; gap: 8px; flex-wrap: wrap; align-items: center; }
+        .btn-row { display: flex; gap: 6px; flex-wrap: wrap; align-items: center; }
         button.ctrl {
             border: 1px solid var(--border);
-            border-radius: 8px;
-            padding: 8px 14px;
+            border-radius: 6px;
+            padding: 4px 10px;
             font-weight: 700;
             cursor: pointer;
             background: var(--btn-bg);
             color: var(--btn-text);
-            font-size: 13px;
+            font-size: 11px;
+            line-height: 1.3;
         }
         button.ctrl:hover { background: var(--btn-hover); color: #1a1c2c; }
         button.ctrl.primary { background: var(--active-bg); color: #fff; border-color: var(--active-bg); }
@@ -146,62 +147,68 @@
         .toggle-container {
             display: flex;
             background: var(--btn-bg);
-            border-radius: 8px;
-            padding: 3px;
+            border-radius: 6px;
+            padding: 2px;
             border: 1px solid var(--border);
         }
         .toggle-btn {
             background: transparent;
             border: none;
-            padding: 7px 12px;
-            border-radius: 6px;
+            padding: 4px 8px;
+            border-radius: 4px;
             color: var(--btn-text);
-            font-size: 12px;
+            font-size: 11px;
             font-weight: 700;
             cursor: pointer;
+            line-height: 1.3;
         }
         .toggle-btn.active {
             background: var(--active-bg);
             color: #fff;
-            box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+            box-shadow: 0 1px 2px rgba(0,0,0,0.08);
         }
 
         .slider-group {
             display: flex;
             flex-direction: column;
-            gap: 4px;
-            min-width: 140px;
+            gap: 2px;
+            min-width: 100px;
             flex: 1;
+            max-width: 200px;
         }
         .slider-group label {
-            font-size: 12px;
+            font-size: 10px;
             color: var(--text-muted);
             font-weight: 700;
             display: flex;
             justify-content: space-between;
-            gap: 8px;
+            gap: 6px;
+            line-height: 1.2;
         }
         .slider-group input[type=range] {
             width: 100%;
+            height: 16px;
             accent-color: #4db8ff;
             cursor: pointer;
         }
         .dir-group {
             display: flex;
-            flex-direction: column;
-            gap: 4px;
-            min-width: 160px;
+            flex-direction: row;
+            align-items: center;
+            gap: 6px;
+            min-width: 0;
         }
         .dir-group > span {
-            font-size: 12px;
+            font-size: 10px;
             color: var(--text-muted);
             font-weight: 700;
+            white-space: nowrap;
         }
 
         .hint {
-            font-size: 12px;
+            font-size: 11px;
             color: var(--text-muted);
-            margin: 0 0 10px;
+            margin: 0 0 8px;
             text-align: center;
         }
 
@@ -294,7 +301,7 @@
                 <label><span id="label-phase">相位 / 時間</span><span id="phase-val">0.00 λ</span></label>
                 <input type="range" id="phase-slider" min="0" max="1000" value="0" step="1">
             </div>
-            <div class="slider-group" style="max-width:180px;">
+            <div class="slider-group" style="max-width:140px;">
                 <label><span id="label-speed">波速</span><span id="speed-val">1.0×</span></label>
                 <input type="range" id="speed-slider" min="0.2" max="2.5" value="1" step="0.1">
             </div>
