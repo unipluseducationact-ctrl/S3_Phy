@@ -36,7 +36,7 @@ const WAVES_TOPICS = [
     titleKey: 'topic.soundWave',
     fileEn: 'sound-wave-en.pdf',
     fileZh: 'sound-wave-zhHant.pdf',
-    tool: 'soundRefractionShadow',
+    tool: 'ultrasoundReflection',
   },
 ];
 
@@ -45,6 +45,7 @@ const TOOL_ORDER = [
   'longitudinalWave',
   'waveInterference',
   'thinFilmInterference',
+  'ultrasoundReflection',
   'soundRefractionShadow',
 ];
 
@@ -55,6 +56,8 @@ const TOOL_LOADERS = {
   waveInterference: () => import('../tools/waveInterferenceLab.js').then((m) => m.createWaveInterferenceLab),
   thinFilmInterference: () =>
     import('../tools/thinFilmInterferenceLab.js').then((m) => m.createThinFilmInterferenceLab),
+  ultrasoundReflection: () =>
+    import('../tools/ultrasoundReflectionLab.js').then((m) => m.createUltrasoundReflectionLab),
   soundRefractionShadow: () =>
     import('../tools/soundRefractionShadowLab.js').then((m) => m.createSoundRefractionShadowLab),
 };
@@ -65,6 +68,7 @@ function toolLabel(id) {
     longitudinalWave: 'tools.longitudinalWave.title',
     waveInterference: 'tools.waveInterference.title',
     thinFilmInterference: 'tools.thinFilmInterference.title',
+    ultrasoundReflection: 'tools.ultrasoundReflection.title',
     soundRefractionShadow: 'tools.soundRefractionShadow.title',
   };
   return t(map[id] || id);

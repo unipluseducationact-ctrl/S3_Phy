@@ -85,6 +85,7 @@ export const en = {
   'tools.refraction.title': 'Refraction — Snell’s law',
   'tools.waveMotion.title': 'Wave Motion — Phase Analysis',
   'tools.longitudinalWave.title': 'Longitudinal Wave — Compression & Rarefaction',
+  'tools.ultrasoundReflection.title': 'Ultrasound Reflection',
   'tools.waveInterference.title': 'Spatial Wave Interference',
   'tools.thinFilmInterference.title': 'Thin-film Interference — Soap Film',
   'tools.soundRefractionShadow.title': 'Sound Refraction — Shadow Zone',
