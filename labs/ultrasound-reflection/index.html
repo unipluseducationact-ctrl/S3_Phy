@@ -26,8 +26,8 @@
         html.s3phy-embed .lang-btn { display: none; }
         body {
             font-family: 'Segoe UI', Roboto, sans-serif;
-            background-color: #0f0f0f;
-            color: #e0e0e0;
+            background-color: #f8f9fa;
+            color: #2c3e50;
             display: flex;
             flex-direction: column;
             align-items: center;
@@ -37,24 +37,24 @@
         }
 
         .container {
-            background-color: #1a1a1a;
+            background-color: #ffffff;
             padding: 30px;
             border-radius: 20px;
-            box-shadow: 0 20px 50px rgba(0,0,0,0.7);
+            box-shadow: 0 4px 12px rgba(0,0,0,0.05);
             width: 800px;
             text-align: center;
-            border: 1px solid #333;
+            border: 1px solid #e8eaed;
         }
 
-        h2 { margin: 0 0 10px 0; color: #4fc3f7; font-weight: 400; letter-spacing: 1px; }
-        .subtitle { color: #777; font-size: 0.9rem; margin-bottom: 20px; }
+        h2 { margin: 0 0 10px 0; color: #0284c7; font-weight: 600; letter-spacing: 0.5px; }
+        .subtitle { color: #6b7280; font-size: 0.9rem; margin-bottom: 20px; }
 
         canvas {
-            background: #222;
+            background: linear-gradient(180deg, #ffffff 0%, #f8f9fa 100%);
             border-radius: 12px;
-            border: 1px solid #333;
+            border: 1px solid #e9ecef;
             margin-bottom: 20px;
-            box-shadow: inset 0 0 30px rgba(0,0,0,0.8);
+            box-shadow: inset 0 0 20px rgba(0,0,0,0.03);
         }
 
         .controls {
@@ -78,29 +78,29 @@
         }
 
         .btn-main { 
-            background: linear-gradient(135deg, #4fc3f7, #0288d1); 
+            background: linear-gradient(135deg, #0284c7, #2563eb); 
             color: #fff; 
-            box-shadow: 0 4px 15px rgba(3, 169, 244, 0.3);
+            box-shadow: 0 4px 12px rgba(2, 132, 199, 0.25);
         }
-        .btn-main:hover { transform: translateY(-2px); box-shadow: 0 6px 20px rgba(3, 169, 244, 0.5); }
+        .btn-main:hover { transform: translateY(-2px); box-shadow: 0 6px 16px rgba(2, 132, 199, 0.35); }
         .btn-main:active { transform: scale(0.98); }
 
-        .btn-reset { background: #333; color: #aaa; border: 1px solid #444; }
-        .btn-reset:hover { background: #444; color: #fff; }
+        .btn-reset { background: #e9ecef; color: #495057; border: 1px solid #e8eaed; }
+        .btn-reset:hover { background: #dee2e6; color: #1a1c2c; }
 
         .status-bar {
             display: flex;
             justify-content: space-between;
-            background: #000;
+            background: #f1f3f5;
             padding: 15px 25px;
             border-radius: 8px;
             font-family: 'Courier New', monospace;
             font-size: 1.1rem;
-            border: 1px solid #333;
+            border: 1px solid #e8eaed;
         }
 
-        .highlight { color: #ffeb3b; font-weight: bold; }
-        .status-text { color: #aaa; font-size: 0.9rem; }
+        .highlight { color: #b45309; font-weight: bold; }
+        .status-text { color: #6b7280; font-size: 0.9rem; }
 
         .header-row {
             display: flex;
@@ -109,9 +109,9 @@
             margin-bottom: 10px;
         }
         .lang-btn {
-            background: #333;
-            color: #aaa;
-            border: 1px solid #444;
+            background: #e9ecef;
+            color: #495057;
+            border: 1px solid #e8eaed;
             padding: 6px 12px;
             border-radius: 6px;
             cursor: pointer;
@@ -119,7 +119,7 @@
             font-weight: bold;
             transition: 0.2s;
         }
-        .lang-btn:hover { background: #444; color: #fff; }
+        .lang-btn:hover { background: #dee2e6; color: #1a1c2c; }
 
     </style>
 </head>
@@ -237,10 +237,10 @@
         resetBtn.innerText = d.reset;
         actionBtn.innerText = getActionBtnText();
         statusText.innerText = getStatusText();
-        if (time >= 0.4) statusText.style.color = '#4fc3f7';
-        else if (hasPausedAtHit && !isRunning) statusText.style.color = '#ff4081';
-        else if (isRunning) statusText.style.color = '#ffeb3b';
-        else statusText.style.color = '#aaa';
+        if (time >= 0.4) statusText.style.color = '#0284c7';
+        else if (hasPausedAtHit && !isRunning) statusText.style.color = '#db2777';
+        else if (isRunning) statusText.style.color = '#b45309';
+        else statusText.style.color = '#6b7280';
         draw();
     }
 
@@ -272,7 +272,7 @@
         ctx.clearRect(0, 0, canvas.width, canvas.height);
 
         // 1. Grid/Background Lines
-        ctx.strokeStyle = '#333';
+        ctx.strokeStyle = 'rgba(0,0,0,0.06)';
         ctx.lineWidth = 1;
         ctx.beginPath();
         for(let i=50; i<800; i+=50) { ctx.moveTo(i, 0); ctx.lineTo(i, canvas.height); }
@@ -280,18 +280,18 @@
 
         // 2. Main Axis
         ctx.beginPath();
-        ctx.strokeStyle = '#666';
+        ctx.strokeStyle = '#adb5bd';
         ctx.lineWidth = 2;
         ctx.moveTo(50, Y_AXIS);
         ctx.lineTo(750, Y_AXIS);
         ctx.stroke();
 
         // 3. Generator (Source)
-        ctx.fillStyle = '#0288d1';
+        ctx.fillStyle = '#0284c7';
         ctx.fillRect(START_X - 15, Y_AXIS - 15, 30, 30);
-        ctx.fillStyle = '#81d4fa'; // Screen
+        ctx.fillStyle = '#7dd3fc';
         ctx.fillRect(START_X - 10, Y_AXIS - 10, 20, 20);
-        ctx.fillStyle = '#aaa';
+        ctx.fillStyle = '#495057';
         ctx.font = "12px Arial";
         ctx.textAlign = "center";
         ctx.fillText(t().source, START_X, Y_AXIS - 25);
@@ -316,21 +316,21 @@
         // 5. Draw Ghost Car (Start Position)
         ctx.beginPath();
         ctx.arc(CAR_START_X, Y_AXIS, 3, 0, Math.PI*2);
-        ctx.fillStyle = '#555';
+        ctx.fillStyle = '#9ca3af';
         ctx.fill();
         // Dotted line for start
-        ctx.beginPath(); ctx.setLineDash([4,4]); ctx.strokeStyle='#444';
+        ctx.beginPath(); ctx.setLineDash([4,4]); ctx.strokeStyle='#cbd5e1';
         ctx.moveTo(CAR_START_X, Y_AXIS-40); ctx.lineTo(CAR_START_X, Y_AXIS+40);
         ctx.stroke(); ctx.setLineDash([]);
 
         // 6. Draw Real Car (Point Object)
         ctx.beginPath();
         ctx.arc(carX, Y_AXIS, 6, 0, Math.PI*2);
-        ctx.fillStyle = '#ff4081'; // Pink
-        ctx.shadowBlur = 15; ctx.shadowColor = 'rgba(255, 64, 129, 0.5)';
+        ctx.fillStyle = '#db2777';
+        ctx.shadowBlur = 10; ctx.shadowColor = 'rgba(219, 39, 119, 0.3)';
         ctx.fill(); ctx.shadowBlur = 0;
         
-        ctx.fillStyle = '#ff4081';
+        ctx.fillStyle = '#db2777';
         ctx.font = "bold 14px Arial";
         ctx.fillText(t().car, carX, Y_AXIS - 15);
 
@@ -341,30 +341,30 @@
             let pulseSize = 12;
             let dir = (time <= 0.2) ? 1 : -1; // Face right or left
             ctx.arc(signalX, Y_AXIS, pulseSize, -Math.PI/2, Math.PI/2, (dir === -1));
-            ctx.strokeStyle = '#ffeb3b';
+            ctx.strokeStyle = '#ca8a04';
             ctx.lineWidth = 3;
             ctx.stroke();
             
             // Glow
             ctx.beginPath();
             ctx.arc(signalX, Y_AXIS, pulseSize-4, 0, Math.PI*2);
-            ctx.fillStyle = 'rgba(255, 235, 59, 0.3)';
+            ctx.fillStyle = 'rgba(202, 138, 4, 0.25)';
             ctx.fill();
         }
 
         // 8. Annotations
         // 64m Bracket
-        drawBracket(START_X, CAR_START_X, Y_AXIS + 50, "64 m", "#ccc");
+        drawBracket(START_X, CAR_START_X, Y_AXIS + 50, "64 m", "#495057");
 
         // 'd' Bracket (Only if car moved enough)
         if (carX > CAR_START_X + 2) {
-            drawBracket(CAR_START_X, carX, Y_AXIS + 50, "d", "#ff4081");
+            drawBracket(CAR_START_X, carX, Y_AXIS + 50, "d", "#db2777");
         }
 
         // Collision Line
         if (time >= 0.2) {
             ctx.beginPath();
-            ctx.setLineDash([4,4]); ctx.strokeStyle='#ff4081';
+            ctx.setLineDash([4,4]); ctx.strokeStyle='#db2777';
             ctx.moveTo(CAR_HIT_X, Y_AXIS-40); ctx.lineTo(CAR_HIT_X, Y_AXIS+40);
             ctx.stroke(); ctx.setLineDash([]);
         }
@@ -396,7 +396,7 @@
             isRunning = false; // Pause
             actionBtn.innerText = getActionBtnText();
             statusText.innerText = getStatusText();
-            statusText.style.color = "#ff4081";
+            statusText.style.color = "#db2777";
             draw();
             return; 
         }
@@ -407,7 +407,7 @@
             isRunning = false;
             actionBtn.innerText = getActionBtnText();
             statusText.innerText = getStatusText();
-            statusText.style.color = "#4fc3f7";
+            statusText.style.color = "#0284c7";
             draw();
             return;
         }
@@ -427,7 +427,7 @@
         if (isRunning) {
             actionBtn.innerText = getActionBtnText();
             statusText.innerText = getStatusText();
-            statusText.style.color = "#ffeb3b";
+            statusText.style.color = "#b45309";
             update();
         } else {
             actionBtn.innerText = getActionBtnText();
@@ -443,7 +443,7 @@
         actionBtn.innerText = getActionBtnText();
         timeDisplay.innerText = "0.000 s";
         statusText.innerText = getStatusText();
-        statusText.style.color = "#aaa";
+        statusText.style.color = "#6b7280";
         draw();
     }
 

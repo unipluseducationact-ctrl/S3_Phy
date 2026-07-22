@@ -16,13 +16,14 @@
         html.s3phy-embed .lang-btn { display: none; }
 
         :root {
-            --bg: #050508;
-            --panel: rgba(20, 20, 28, 0.9);
-            --accent: #00f2ff;
-            --red: #ff4444;
-            --violet: #aa44ff;
-            --text: #e0e0e0;
-            --border: rgba(255, 255, 255, 0.15);
+            --bg: #f8f9fa;
+            --panel: #ffffff;
+            --accent: #0284c7;
+            --red: #dc2626;
+            --violet: #7c3aed;
+            --text: #2c3e50;
+            --text-muted: #6b7280;
+            --border: #e8eaed;
         }
 
         body {
@@ -47,7 +48,7 @@
         #sim-container {
             flex: 1;
             position: relative;
-            background: radial-gradient(circle at 0% 50%, #1a1a20 0%, #000 100%);
+            background: linear-gradient(180deg, #ffffff 0%, #f8f9fa 100%);
             overflow: hidden;
         }
         canvas { display: block; width: 100%; height: 100%; }
@@ -59,11 +60,10 @@
             right: 20px;
             width: 300px;
             background: var(--panel);
-            backdrop-filter: blur(15px);
             border: 1px solid var(--border);
             border-radius: 16px;
             padding: 20px;
-            box-shadow: 0 10px 40px rgba(0,0,0,0.6);
+            box-shadow: 0 4px 12px rgba(0,0,0,0.08);
             display: flex;
             flex-direction: column;
             gap: 15px;
@@ -94,8 +94,8 @@
             margin-bottom: 0;
         }
         .lang-btn {
-            background: rgba(255,255,255,0.05);
-            color: #888;
+            background: #e9ecef;
+            color: #495057;
             border: 1px solid var(--border);
             padding: 4px 10px;
             border-radius: 6px;
@@ -106,10 +106,10 @@
             text-transform: none;
             letter-spacing: 0;
         }
-        .lang-btn:hover { color: #fff; border-color: #aaa; }
+        .lang-btn:hover { color: #1a1c2c; border-color: #ced4da; background: #dee2e6; }
 
         .control-group {
-            background: rgba(255,255,255,0.03);
+            background: #f8f9fa;
             padding: 12px;
             border-radius: 10px;
             border: 1px solid var(--border);
@@ -125,7 +125,7 @@
         .group-title {
             font-weight: 700;
             font-size: 0.9rem;
-            color: #fff;
+            color: var(--text);
         }
 
         /* Toggle Switch */
@@ -140,7 +140,7 @@
             position: absolute;
             cursor: pointer;
             top: 0; left: 0; right: 0; bottom: 0;
-            background-color: #444;
+            background-color: #ced4da;
             transition: .4s;
             border-radius: 20px;
         }
@@ -162,13 +162,13 @@
             flex-direction: column;
             gap: 5px;
         }
-        .range-label { font-size: 0.75rem; color: #888; display: flex; justify-content: space-between; }
+        .range-label { font-size: 0.75rem; color: var(--text-muted); display: flex; justify-content: space-between; }
         
         input[type=range] {
             width: 100%;
             accent-color: var(--accent);
             height: 4px;
-            background: rgba(255,255,255,0.1);
+            background: #e9ecef;
             border-radius: 2px;
             appearance: none;
             cursor: pointer;
@@ -185,7 +185,7 @@
         /* BOTTOM MATH PANEL */
         .math-panel {
             height: 160px;
-            background: #08080a;
+            background: #ffffff;
             border-top: 1px solid var(--border);
             padding: 0 10px;
             display: flex;
@@ -201,15 +201,15 @@
             font-family: 'JetBrains Mono', monospace;
             font-size: 0.8rem;
             line-height: 1.5;
-            color: #888;
+            color: var(--text-muted);
         }
 
         .equation-box {
-            background: rgba(255,255,255,0.03);
+            background: #f8f9fa;
             padding: 8px 15px;
             border-radius: 12px;
             border: 1px solid var(--border);
-            color: #fff;
+            color: var(--text);
             font-size: 0.85rem;
             text-align: center;
             font-family: 'JetBrains Mono', monospace;
@@ -223,15 +223,15 @@
         .math-title {
             font-family: 'Inter', sans-serif;
             font-weight: 700;
-            color: #fff;
+            color: var(--text);
             margin-bottom: 6px;
             font-size: 0.85rem;
-            border-bottom: 1px solid #333;
+            border-bottom: 1px solid var(--border);
             padding-bottom: 4px;
             display: inline-block;
         }
 
-        .arrow { font-size: 1.2rem; color: #444; padding: 0 5px; }
+        .arrow { font-size: 1.2rem; color: #adb5bd; padding: 0 5px; }
 
     </style>
 </head>
@@ -291,13 +291,13 @@
     <!-- 1. Text Explanation -->
     <div class="math-column" style="max-width: 120px; margin-right: 5px;">
         <div class="math-title" id="overlap-title">Overlap Condition</div>
-        <div id="overlap-desc" style="font-size: 0.75rem; color: #aaa;">
+        <div id="overlap-desc" style="font-size: 0.75rem; color: var(--text-muted);">
             Red end of <span class="highlight-n">n</span> > Violet start of <span class="highlight-n">n+1</span>
         </div>
     </div>
 
     <!-- 2. Definitions (New) -->
-    <div class="equation-box" style="border-color: rgba(255,255,255,0.25);">
+    <div class="equation-box" style="border-color: #e8eaed;">
         <div style="margin-bottom: 6px;">
             d sin(<span class="highlight-red">θ<sub>red</sub></span>) = n <span class="highlight-red">λ<sub>red</sub></span>
         </div>
@@ -313,7 +313,7 @@
         <div style="margin-bottom: 6px;">
             <span class="highlight-red">θ<sub>red</sub></span> > <span class="highlight-violet">θ<sub>violet</sub></span>
         </div>
-        <div style="border-top: 1px solid rgba(255,255,255,0.15); padding-top: 6px;">
+        <div style="border-top: 1px solid #e8eaed; padding-top: 6px;">
             d sin(<span class="highlight-red">θ<sub>red</sub></span>) > d sin(<span class="highlight-violet">θ<sub>violet</sub></span>)
         </div>
     </div>
@@ -322,14 +322,14 @@
 
     <!-- 4. Substitution -->
     <div class="equation-box">
-        <div id="substitute-label" style="color:#888; font-size:0.75rem; margin-bottom:4px;">Substitute:</div>
+        <div id="substitute-label" style="color:var(--text-muted); font-size:0.75rem; margin-bottom:4px;">Substitute:</div>
         <div>n <span class="highlight-red">λ<sub>red</sub></span> > (n+1) <span class="highlight-violet">λ<sub>violet</sub></span></div>
     </div>
 
     <div class="arrow">&rArr;</div>
 
     <!-- 5. Result -->
-    <div class="math-column" style="border-left: 1px solid #333; padding-left: 15px;">
+    <div class="math-column" style="border-left: 1px solid var(--border); padding-left: 15px;">
         <div class="math-title" id="limit-title">Limit (λ ≈ 700/400)</div>
         <div>7n > 4(n+1)</div>
         <div style="color:var(--accent); font-weight:bold; margin-top:4px;">n > 1.33</div>
@@ -490,11 +490,26 @@
     function draw() {
         ctx.clearRect(0, 0, width, height);
 
+        // Light canvas background with subtle grid
+        const bgGrad = ctx.createLinearGradient(0, 0, 0, height);
+        bgGrad.addColorStop(0, '#ffffff');
+        bgGrad.addColorStop(1, '#f8f9fa');
+        ctx.fillStyle = bgGrad;
+        ctx.fillRect(0, 0, width, height);
+        ctx.strokeStyle = 'rgba(0,0,0,0.04)';
+        ctx.lineWidth = 1;
+        for (let gx = 0; gx < width; gx += 40) {
+            ctx.beginPath(); ctx.moveTo(gx, 0); ctx.lineTo(gx, height); ctx.stroke();
+        }
+        for (let gy = 0; gy < height; gy += 40) {
+            ctx.beginPath(); ctx.moveTo(0, gy); ctx.lineTo(width, gy); ctx.stroke();
+        }
+
         // 1. Draw Grating & Source
         drawSetup();
 
         // 2. Draw Spectra
-        ctx.globalCompositeOperation = 'screen'; 
+        ctx.globalCompositeOperation = 'source-over';
 
         if (config.nOrder.visible) {
             drawOrder(2, config.nOrder.opacity, dict[currentLang].nOrderMax);
@@ -503,22 +518,20 @@
             drawOrder(3, config.n1Order.opacity, dict[currentLang].n1OrderMax);
         }
 
-        ctx.globalCompositeOperation = 'source-over'; 
+        ctx.globalCompositeOperation = 'source-over';
 
         // 3. Draw Indicators
         if (config.nOrder.visible) {
-            // Red Angle: Outer radius (180), label at ~10 degrees
-            drawAngleLine(2, config.lambdaR, 10 * (Math.PI/180), "θ(red)", "#ff4444", 180);
+            drawAngleLine(2, config.lambdaR, 10 * (Math.PI/180), "θ(red)", "#dc2626", 180);
         }
         if (config.n1Order.visible) {
-            // Violet Angle: Inner radius (100), label at ~5 degrees
-            drawAngleLine(3, config.lambdaV, 5 * (Math.PI/180), "θ(violet)", "#aa44ff", 100);
+            drawAngleLine(3, config.lambdaV, 5 * (Math.PI/180), "θ(violet)", "#7c3aed", 100);
         }
     }
 
     function drawSetup() {
         // Grating Line
-        ctx.strokeStyle = "#444";
+        ctx.strokeStyle = "#495057";
         ctx.lineWidth = 4;
         ctx.beginPath();
         ctx.moveTo(origin.x, 0);
@@ -526,19 +539,19 @@
         ctx.stroke();
 
         // Dashes
-        ctx.strokeStyle = "#666";
+        ctx.strokeStyle = "#adb5bd";
         ctx.lineWidth = 1;
         for(let y=0; y<height; y+=10) {
             ctx.beginPath(); ctx.moveTo(origin.x - 5, y); ctx.lineTo(origin.x + 5, y); ctx.stroke();
         }
 
         // Source Light
-        ctx.strokeStyle = "#fff";
+        ctx.strokeStyle = "#2c3e50";
         ctx.lineWidth = 3;
         ctx.beginPath(); ctx.moveTo(0, origin.y); ctx.lineTo(origin.x, origin.y); ctx.stroke();
 
         // Central Axis
-        ctx.strokeStyle = "rgba(255, 255, 255, 0.1)";
+        ctx.strokeStyle = "rgba(0, 0, 0, 0.12)";
         ctx.setLineDash([5, 5]);
         ctx.beginPath(); ctx.moveTo(origin.x, origin.y); ctx.lineTo(width, origin.y); ctx.stroke();
         ctx.setLineDash([]);
@@ -572,7 +585,7 @@
             ctx.save();
             ctx.translate(lx, ly);
             ctx.rotate(-midAngle);
-            ctx.fillStyle = `rgba(255,255,255, ${opacity > 0.3 ? opacity : 0.3})`;
+            ctx.fillStyle = `rgba(44, 62, 80, ${opacity > 0.3 ? opacity : 0.3})`;
             ctx.font = "bold 14px Inter";
             ctx.fillText(label, 0, 0);
             ctx.restore();
@@ -611,10 +624,13 @@
         const labelY = origin.y + Math.sin(labelAngle) * labelDist;
         
         // Label Background (Small Pill)
-        ctx.fillStyle = "rgba(0,0,0,0.85)";
+        ctx.fillStyle = "rgba(255,255,255,0.95)";
+        ctx.strokeStyle = color;
+        ctx.lineWidth = 1.5;
         ctx.beginPath();
         ctx.arc(labelX, labelY, 18, 0, Math.PI*2);
         ctx.fill();
+        ctx.stroke();
 
         // Label Text
         ctx.fillStyle = color;

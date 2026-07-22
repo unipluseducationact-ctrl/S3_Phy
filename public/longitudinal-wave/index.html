@@ -10,10 +10,22 @@
         html.s3phy-embed body { padding: 12px; }
         html.s3phy-embed .lang-btn { display: none; }
         * { box-sizing: border-box; }
+        :root {
+            --bg: #f8f9fa;
+            --panel: #ffffff;
+            --text: #2c3e50;
+            --text-muted: #6b7280;
+            --border: #e8eaed;
+            --btn-bg: #e9ecef;
+            --btn-text: #495057;
+            --btn-hover: #dee2e6;
+            --active-bg: #0284c7;
+            --accent: #0284c7;
+        }
         body {
             font-family: 'Segoe UI', 'Noto Sans TC', sans-serif;
-            background-color: #121212;
-            color: #e0e0e0;
+            background-color: var(--bg);
+            color: var(--text);
             display: flex;
             flex-direction: column;
             align-items: center;
@@ -22,10 +34,11 @@
         }
 
         .container {
-            background: #1e1e1e;
+            background: var(--panel);
             padding: 24px;
             border-radius: 12px;
-            box-shadow: 0 10px 30px rgba(0,0,0,0.6);
+            border: 1px solid var(--border);
+            box-shadow: 0 4px 12px rgba(0,0,0,0.05);
             max-width: 980px;
             width: 100%;
         }
@@ -38,15 +51,15 @@
             margin-bottom: 8px;
         }
         h2 {
-            border-left: 5px solid #4db8ff;
+            border-left: 5px solid var(--accent);
             padding-left: 15px;
-            color: #fff;
+            color: var(--text);
             margin: 0;
         }
         .lang-btn {
-            background: rgba(255,255,255,0.05);
-            color: #aaa;
-            border: 1px solid #444;
+            background: var(--btn-bg);
+            color: var(--btn-text);
+            border: 1px solid var(--border);
             padding: 6px 12px;
             border-radius: 6px;
             cursor: pointer;
@@ -54,50 +67,55 @@
             font-weight: 700;
             flex-shrink: 0;
         }
-        .lang-btn:hover { color: #fff; border-color: #666; background: rgba(255,255,255,0.1); }
+        .lang-btn:hover { color: #1a1c2c; border-color: #ced4da; background: var(--btn-hover); }
 
         .wave-banner {
-            background: rgba(255, 255, 255, 0.05);
-            border: 1px solid #444;
-            border-radius: 8px;
+            background: #eef6fc;
+            border: 2px solid #93c5fd;
+            border-radius: 12px;
             margin: 16px 0;
-            padding: 10px;
+            padding: 16px 20px;
             text-align: center;
-            color: #fff;
-            font-weight: bold;
-            font-size: 17px;
+            color: var(--text);
+            font-weight: 800;
+            font-size: 22px;
+            letter-spacing: 0.02em;
             display: flex;
             align-items: center;
             justify-content: center;
-            gap: 12px;
+            gap: 18px;
         }
         .banner-arrow {
-            width: 36px;
-            height: 28px;
+            width: 88px;
+            height: 64px;
+            flex-shrink: 0;
             animation: waveFlow 1.5s infinite ease-in-out;
             transition: transform 0.25s ease;
         }
+        .banner-arrow path {
+            stroke-width: 5.5;
+        }
         .banner-arrow.dir-right { transform: scaleX(-1); }
         @keyframes waveFlow {
-            0% { transform: translateX(5px); }
-            50% { transform: translateX(-5px); }
-            100% { transform: translateX(5px); }
+            0% { transform: translateX(8px); }
+            50% { transform: translateX(-8px); }
+            100% { transform: translateX(8px); }
         }
         .banner-arrow.dir-right {
             animation-name: waveFlowRight;
         }
         @keyframes waveFlowRight {
-            0% { transform: scaleX(-1) translateX(5px); }
-            50% { transform: scaleX(-1) translateX(-5px); }
-            100% { transform: scaleX(-1) translateX(5px); }
+            0% { transform: scaleX(-1) translateX(8px); }
+            50% { transform: scaleX(-1) translateX(-8px); }
+            100% { transform: scaleX(-1) translateX(8px); }
         }
 
         .controls {
             display: flex;
             flex-direction: column;
             gap: 12px;
-            background: #252525;
-            border: 1px solid #333;
+            background: #f8f9fa;
+            border: 1px solid var(--border);
             border-radius: 10px;
             padding: 12px 14px;
             margin-bottom: 14px;
@@ -112,40 +130,40 @@
         }
         .btn-row { display: flex; gap: 8px; flex-wrap: wrap; align-items: center; }
         button.ctrl {
-            border: none;
+            border: 1px solid var(--border);
             border-radius: 8px;
             padding: 8px 14px;
             font-weight: 700;
             cursor: pointer;
-            background: #334155;
-            color: #fff;
+            background: var(--btn-bg);
+            color: var(--btn-text);
             font-size: 13px;
         }
-        button.ctrl:hover { background: #475569; }
-        button.ctrl.primary { background: #0284c7; }
+        button.ctrl:hover { background: var(--btn-hover); color: #1a1c2c; }
+        button.ctrl.primary { background: var(--active-bg); color: #fff; border-color: var(--active-bg); }
         button.ctrl.primary:hover { background: #0369a1; }
 
         .toggle-container {
             display: flex;
-            background: #1a1a1a;
+            background: var(--btn-bg);
             border-radius: 8px;
             padding: 3px;
-            border: 1px solid #444;
+            border: 1px solid var(--border);
         }
         .toggle-btn {
             background: transparent;
             border: none;
             padding: 7px 12px;
             border-radius: 6px;
-            color: #94a3b8;
+            color: var(--btn-text);
             font-size: 12px;
             font-weight: 700;
             cursor: pointer;
         }
         .toggle-btn.active {
-            background: #0284c7;
+            background: var(--active-bg);
             color: #fff;
-            box-shadow: 0 2px 4px rgba(0,0,0,0.25);
+            box-shadow: 0 2px 4px rgba(0,0,0,0.1);
         }
 
         .slider-group {
@@ -157,7 +175,7 @@
         }
         .slider-group label {
             font-size: 12px;
-            color: #94a3b8;
+            color: var(--text-muted);
             font-weight: 700;
             display: flex;
             justify-content: space-between;
@@ -176,21 +194,21 @@
         }
         .dir-group > span {
             font-size: 12px;
-            color: #94a3b8;
+            color: var(--text-muted);
             font-weight: 700;
         }
 
         .hint {
             font-size: 12px;
-            color: #888;
+            color: var(--text-muted);
             margin: 0 0 10px;
             text-align: center;
         }
 
         .canvas-wrap {
-            background: #252525;
+            background: #ffffff;
             border-radius: 8px;
-            border: 1px solid #333;
+            border: 1px solid var(--border);
             overflow: hidden;
             touch-action: none;
         }
@@ -205,8 +223,8 @@
         .particle-info {
             margin-top: 12px;
             padding: 10px 14px;
-            background: rgba(77, 184, 255, 0.08);
-            border: 1px solid rgba(77, 184, 255, 0.25);
+            background: #eff6ff;
+            border: 1px solid #bfdbfe;
             border-radius: 8px;
             font-size: 14px;
             min-height: 44px;
@@ -214,27 +232,28 @@
             align-items: center;
             justify-content: center;
             text-align: center;
-            color: #cbd5e1;
+            color: var(--text);
         }
-        .particle-info strong { color: #fff; }
+        .particle-info strong { color: #1a1c2c; }
 
         .conclusion-box {
             margin-top: 18px;
             padding: 18px;
-            background: #2a2a2a;
-            border-left: 5px solid #00e676;
+            background: #ecfdf5;
+            border: 1px solid #a7f3d0;
+            border-left: 5px solid #10b981;
             border-radius: 4px;
         }
         .conclusion-title {
-            color: #00e676;
+            color: #059669;
             font-weight: bold;
             margin-bottom: 10px;
             display: block;
             font-size: 1.1em;
         }
-        .conclusion-text { line-height: 1.6; color: #ddd; }
-        .highlight-same { color: #4db8ff; font-weight: bold; }
-        .highlight-opp { color: #ff4d4d; font-weight: bold; }
+        .conclusion-text { line-height: 1.6; color: var(--text); }
+        .highlight-same { color: #0284c7; font-weight: bold; }
+        .highlight-opp { color: #dc2626; font-weight: bold; }
     </style>
 </head>
 <body>
@@ -247,7 +266,7 @@
 
     <div class="wave-banner">
         <svg class="banner-arrow" id="banner-arrow" viewBox="0 0 40 30" aria-hidden="true">
-            <path d="M35,15 L5,15 L15,5 M5,15 L15,25" fill="none" stroke="#fff" stroke-width="4" stroke-linecap="round" stroke-linejoin="round"/>
+            <path d="M35,15 L5,15 L15,5 M5,15 L15,25" fill="none" stroke="#2c3e50" stroke-width="4" stroke-linecap="round" stroke-linejoin="round"/>
         </svg>
         <span id="label-banner">波傳播方向（向左）</span>
     </div>
@@ -552,7 +571,7 @@
         ctx.arc(xCenter, Y_PART, 5, 0, Math.PI * 2);
         ctx.fillStyle = color.replace('1)', '1)');
         ctx.fill();
-        ctx.strokeStyle = '#fff';
+        ctx.strokeStyle = '#ffffff';
         ctx.lineWidth = 1.5;
         ctx.stroke();
 
@@ -600,8 +619,8 @@
         const y = Y_PART - 48;
 
         // Guide from equilibrium to displaced position
-        ctx.strokeStyle = 'rgba(255, 204, 0, 0.9)';
-        ctx.fillStyle = 'rgba(255, 204, 0, 0.95)';
+        ctx.strokeStyle = 'rgba(202, 138, 4, 0.9)';
+        ctx.fillStyle = 'rgba(202, 138, 4, 0.95)';
         ctx.lineWidth = 2;
         ctx.setLineDash([]);
         ctx.beginPath();
@@ -635,7 +654,7 @@
 
         // Equilibrium tick on particle row
         ctx.setLineDash([3, 3]);
-        ctx.strokeStyle = 'rgba(255, 204, 0, 0.45)';
+        ctx.strokeStyle = 'rgba(202, 138, 4, 0.45)';
         ctx.beginPath();
         ctx.moveTo(xEq, Y_EQ + 10);
         ctx.lineTo(xEq, Y_PART);
@@ -644,7 +663,7 @@
 
         // Label
         const mid = (xEq + xPart) / 2;
-        ctx.fillStyle = '#ffcc00';
+        ctx.fillStyle = '#ca8a04';
         ctx.font = 'bold 12px Segoe UI, sans-serif';
         ctx.textAlign = 'center';
         ctx.fillText(title, mid, y - 10);
@@ -668,22 +687,39 @@
         const W = canvas.width;
         ctx.clearRect(0, 0, W, canvas.height);
 
+        // Light canvas background
+        const bgGrad = ctx.createLinearGradient(0, 0, 0, canvas.height);
+        bgGrad.addColorStop(0, '#ffffff');
+        bgGrad.addColorStop(1, '#f8f9fa');
+        ctx.fillStyle = bgGrad;
+        ctx.fillRect(0, 0, W, canvas.height);
+
+        // Subtle grid
+        ctx.strokeStyle = 'rgba(0,0,0,0.05)';
+        ctx.lineWidth = 1;
+        for (let x = 0; x < W; x += 40) {
+            ctx.beginPath(); ctx.moveTo(x, 0); ctx.lineTo(x, canvas.height); ctx.stroke();
+        }
+        for (let y = 0; y < canvas.height; y += 40) {
+            ctx.beginPath(); ctx.moveTo(0, y); ctx.lineTo(W, y); ctx.stroke();
+        }
+
         const { xComp, xRare } = centreMods(phase);
         const xc = placeZone(xComp);
         const xr = placeZone(xRare);
 
-        drawZone(xc, zoneWidth(170), 'rgba(77,184,255,1)');
-        drawZone(xr, zoneWidth(260), 'rgba(255,77,77,1)');
+        drawZone(xc, zoneWidth(170), 'rgba(2,132,199,1)');
+        drawZone(xr, zoneWidth(260), 'rgba(220,38,38,1)');
 
         const xc2 = xc + LAMBDA;
         const xr2 = xr + LAMBDA;
-        if (xc2 < 900) drawZone(xc2, zoneWidth(170), 'rgba(77,184,255,1)');
-        if (xr2 < 900) drawZone(xr2, zoneWidth(260), 'rgba(255,77,77,1)');
+        if (xc2 < 900) drawZone(xc2, zoneWidth(170), 'rgba(2,132,199,1)');
+        if (xr2 < 900) drawZone(xr2, zoneWidth(260), 'rgba(220,38,38,1)');
 
-        drawCentreMarker(xc, 'rgba(77,184,255,1)', tr.centreCompression, tr.highDensity);
-        drawCentreMarker(xr, 'rgba(255,77,77,1)', tr.centreRarefaction, tr.lowDensity);
-        if (xc2 < 900) drawCentreMarker(xc2, 'rgba(77,184,255,1)', tr.centreCompression, '');
-        if (xr2 < 900) drawCentreMarker(xr2, 'rgba(255,77,77,1)', tr.centreRarefaction, '');
+        drawCentreMarker(xc, 'rgba(2,132,199,1)', tr.centreCompression, tr.highDensity);
+        drawCentreMarker(xr, 'rgba(220,38,38,1)', tr.centreRarefaction, tr.lowDensity);
+        if (xc2 < 900) drawCentreMarker(xc2, 'rgba(2,132,199,1)', tr.centreCompression, '');
+        if (xr2 < 900) drawCentreMarker(xr2, 'rgba(220,38,38,1)', tr.centreRarefaction, '');
 
         // Amplitude points (+A and −A) — track with the wave
         const { xPlus, xMinus } = amplitudeMods(phase);
@@ -697,7 +733,7 @@
         if (xaMinus2 < 900) drawAmplitudeMarker(xaMinus2, -1, tr.amplitudeA);
 
         // Equilibrium label
-        ctx.fillStyle = '#666';
+        ctx.fillStyle = '#6b7280';
         ctx.font = '12px Segoe UI, sans-serif';
         ctx.textAlign = 'center';
         ctx.fillText(`--- ${tr.equilibrium} ---`, W / 2, 28);
@@ -705,7 +741,7 @@
         // Guide lines + top dots
         for (let i = 0; i < IDS.length; i++) {
             const x = eqX(i);
-            ctx.strokeStyle = 'rgba(68,68,68,0.35)';
+            ctx.strokeStyle = 'rgba(0,0,0,0.1)';
             ctx.setLineDash([3, 3]);
             ctx.beginPath();
             ctx.moveTo(x, Y_EQ);
@@ -713,7 +749,7 @@
             ctx.stroke();
             ctx.setLineDash([]);
 
-            ctx.fillStyle = '#666';
+            ctx.fillStyle = '#6b7280';
             ctx.beginPath();
             ctx.arc(x, Y_EQ, 4, 0, Math.PI * 2);
             ctx.fill();
@@ -730,8 +766,8 @@
             const atAmp = phaseCosAbs(i, phase) < 0.12;
             const isSel = selected === i;
 
-            let fill = dens > 0.02 ? '#4db8ff' : dens < -0.02 ? '#ff4d4d' : '#94a3b8';
-            if (atAmp) fill = '#ffcc00';
+            let fill = dens > 0.02 ? '#0284c7' : dens < -0.02 ? '#dc2626' : '#94a3b8';
+            if (atAmp) fill = '#ca8a04';
 
             const r = atAmp ? 11 : (isSel ? 11 : 9);
             ctx.beginPath();
@@ -739,18 +775,18 @@
             ctx.fillStyle = fill;
             ctx.fill();
             if (atAmp || isSel) {
-                ctx.strokeStyle = '#fff';
+                ctx.strokeStyle = isSel ? '#1a1c2c' : '#ffffff';
                 ctx.lineWidth = isSel ? 2.5 : 2;
                 ctx.stroke();
             }
 
-            ctx.fillStyle = atAmp ? '#ffcc00' : '#fff';
+            ctx.fillStyle = atAmp ? '#92400e' : '#2c3e50';
             ctx.font = 'bold 15px Segoe UI, sans-serif';
             ctx.textAlign = 'center';
             ctx.fillText(IDS[i], x, Y_PART + 35);
 
             if (atAmp || vs === 0) {
-                ctx.fillStyle = '#ffcc00';
+                ctx.fillStyle = '#92400e';
                 ctx.font = 'bold 12px Segoe UI, sans-serif';
                 ctx.fillText(tr.amplitudePoint, x, Y_PART + 62);
                 ctx.font = '12px Segoe UI, sans-serif';

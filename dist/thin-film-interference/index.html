@@ -9,30 +9,36 @@
     <link href="https://fonts.googleapis.com/css2?family=Noto+Sans+TC:wght@400;500;700;900&family=Rajdhani:wght@500;700;800&display=swap" rel="stylesheet">
     <style>
         :root {
-            --bg-dark: #0f172a; --panel-bg: #1e293b; --border: #334155;
-            --text-main: #f8fafc; --text-muted: #94a3b8;
-            --highlight: #fbbf24; --accent: #38bdf8;
+            --bg: #f8f9fa;
+            --panel-bg: #ffffff;
+            --border: #e8eaed;
+            --text-main: #2c3e50;
+            --text-muted: #6b7280;
+            --highlight: #b45309;
+            --accent: #0284c7;
+            --btn-bg: #e9ecef;
+            --btn-text: #495057;
         }
         html.s3phy-embed, html.s3phy-embed body { height: 100%; }
         html.s3phy-embed .lang-btn { display: none; }
-        body { margin: 0; padding: 0; background-color: var(--bg-dark); color: var(--text-main); font-family: 'Noto Sans TC', sans-serif; display: flex; height: 100vh; overflow: hidden; }
+        body { margin: 0; padding: 0; background-color: var(--bg); color: var(--text-main); font-family: 'Noto Sans TC', sans-serif; display: flex; height: 100vh; overflow: hidden; }
         
         /* 左側圖表區 */
         .graph-container { flex: 1; padding: 20px; display: flex; flex-direction: column; position: relative; }
-        .canvas-wrapper { flex: 1; position: relative; background: #070b14; border: 1px solid var(--border); border-radius: 16px; overflow: hidden; box-shadow: inset 0 0 40px rgba(0,0,0,0.9), 0 10px 30px rgba(0,0,0,0.5); }
+        .canvas-wrapper { flex: 1; position: relative; background: linear-gradient(180deg, #ffffff 0%, #f8f9fa 100%); border: 1px solid var(--border); border-radius: 16px; overflow: hidden; box-shadow: 0 4px 12px rgba(0,0,0,0.05); }
         canvas { display: block; width: 100%; height: 100%; }
         
         /* 右側控制區 */
-        .control-panel { width: 450px; background: var(--panel-bg); border-left: 1px solid var(--border); padding: 25px; display: flex; flex-direction: column; gap: 15px; overflow-y: auto; box-shadow: -5px 0 25px rgba(0,0,0,0.5); z-index: 10; }
+        .control-panel { width: 450px; background: var(--panel-bg); border-left: 1px solid var(--border); padding: 25px; display: flex; flex-direction: column; gap: 15px; overflow-y: auto; box-shadow: -2px 0 12px rgba(0,0,0,0.04); z-index: 10; }
         
         .header-top { display: flex; justify-content: space-between; align-items: flex-start; margin-bottom: 5px; }
-        h1 { margin: 0; font-size: 20px; color: #fff; line-height: 1.3; }
-        h1 span { color: var(--accent); font-family: 'Rajdhani', sans-serif; font-size: 24px; font-weight: 800; text-shadow: 0 0 10px rgba(56,189,248,0.4); }
-        .lang-btn { background: rgba(255,255,255,0.05); color: var(--text-muted); border: 1px solid var(--border); padding: 6px 12px; border-radius: 6px; cursor: pointer; font-size: 13px; font-weight: 700; transition: all 0.2s; }
-        .lang-btn:hover { color: #fff; border-color: #94a3b8; background: rgba(255,255,255,0.1); }
+        h1 { margin: 0; font-size: 20px; color: var(--text-main); line-height: 1.3; }
+        h1 span { color: var(--accent); font-family: 'Rajdhani', sans-serif; font-size: 24px; font-weight: 800; }
+        .lang-btn { background: var(--btn-bg); color: var(--text-muted); border: 1px solid var(--border); padding: 6px 12px; border-radius: 6px; cursor: pointer; font-size: 13px; font-weight: 700; transition: all 0.2s; }
+        .lang-btn:hover { color: var(--text-main); border-color: #ced4da; background: #dee2e6; }
 
         /* 解說面板 */
-        .explanation { background: rgba(15, 23, 42, 0.6); border-left: 4px solid var(--highlight); padding: 15px; border-radius: 0 8px 8px 0; font-size: 14px; line-height: 1.6; color: #e2e8f0; }
+        .explanation { background: #eff6ff; border-left: 4px solid var(--accent); padding: 15px; border-radius: 0 8px 8px 0; font-size: 14px; line-height: 1.6; color: var(--text-main); border: 1px solid #bfdbfe; border-left-width: 4px; }
         
         /* 公式樣式 */
         .formula { 
@@ -40,44 +46,43 @@
             font-size: 17px; 
             font-style: italic; 
             font-weight: bold;
-            color: #fff; 
-            background: linear-gradient(90deg, rgba(56, 189, 248, 0.25) 0%, rgba(56, 189, 248, 0.02) 100%);
+            color: var(--text-main); 
+            background: rgba(2, 132, 199, 0.08);
             border-left: 4px solid var(--accent);
             padding: 8px 12px;
             margin: 8px 0; 
             display: block; 
             border-radius: 4px;
             letter-spacing: 0.5px;
-            text-shadow: 0 1px 2px rgba(0,0,0,0.8);
         }
 
-        .highlight-yellow { color: #fbbf24; background: rgba(251, 191, 36, 0.15); padding: 2px 6px; border-radius: 4px; font-weight: 900; }
-        .highlight-red { color: #ff4d4f; background: rgba(255, 77, 79, 0.15); padding: 2px 6px; border-radius: 4px; font-weight: 900; }
-        .highlight-green { color: #10b981; background: rgba(16, 185, 129, 0.15); padding: 2px 6px; border-radius: 4px; font-weight: 900; }
+        .highlight-yellow { color: #b45309; background: rgba(251, 191, 36, 0.15); padding: 2px 6px; border-radius: 4px; font-weight: 900; }
+        .highlight-red { color: #dc2626; background: rgba(220, 38, 38, 0.1); padding: 2px 6px; border-radius: 4px; font-weight: 900; }
+        .highlight-green { color: #059669; background: rgba(16, 185, 129, 0.1); padding: 2px 6px; border-radius: 4px; font-weight: 900; }
 
         /* 控制卡片 */
-        .card { background: rgba(0,0,0,0.2); border: 1px solid var(--border); padding: 15px 20px; border-radius: 12px; }
+        .card { background: #f8f9fa; border: 1px solid var(--border); padding: 15px 20px; border-radius: 12px; }
         .slider-group { margin-bottom: 12px; }
         .slider-group:last-child { margin-bottom: 0; }
         .slider-header { display: flex; justify-content: space-between; font-size: 14px; margin-bottom: 8px; color: var(--text-muted); font-weight: 700;}
-        .val-display { font-family: 'Rajdhani', sans-serif; font-size: 16px; font-weight: 700; color: #fff; }
+        .val-display { font-family: 'Rajdhani', sans-serif; font-size: 16px; font-weight: 700; color: var(--text-main); }
         input[type=range] { width: 100%; cursor: pointer; accent-color: var(--accent); }
 
         /* 情境按鈕 */
         .scenario-btns { display: flex; flex-direction: column; gap: 8px; }
-        button.scenario { background: #334155; color: #fff; border: 1px solid #475569; padding: 10px; border-radius: 8px; cursor: pointer; font-size: 13px; font-weight: 700; transition: all 0.2s; text-align: left; }
-        button.scenario:hover { background: #475569; border-color: #94a3b8; }
-        button.scenario.active { background: rgba(56, 189, 248, 0.15); border-color: var(--accent); color: var(--accent); box-shadow: 0 0 10px rgba(56,189,248,0.2); }
+        button.scenario { background: var(--btn-bg); color: var(--text-main); border: 1px solid var(--border); padding: 10px; border-radius: 8px; cursor: pointer; font-size: 13px; font-weight: 700; transition: all 0.2s; text-align: left; }
+        button.scenario:hover { background: #dee2e6; border-color: #ced4da; }
+        button.scenario.active { background: rgba(2, 132, 199, 0.1); border-color: var(--accent); color: var(--accent); box-shadow: 0 0 0 1px rgba(2,132,199,0.15); }
 
         /* 觀察結果框 */
-        .result-box { display: flex; align-items: center; gap: 15px; background: #0f172a; padding: 12px; border-radius: 8px; border: 1px solid var(--border); margin-top: 5px;}
-        .color-preview { width: 40px; height: 40px; border-radius: 50%; border: 2px solid #fff; box-shadow: 0 0 15px rgba(255,255,255,0.3); transition: background 0.2s, box-shadow 0.2s; }
+        .result-box { display: flex; align-items: center; gap: 15px; background: #f1f3f5; padding: 12px; border-radius: 8px; border: 1px solid var(--border); margin-top: 5px;}
+        .color-preview { width: 40px; height: 40px; border-radius: 50%; border: 2px solid #dee2e6; box-shadow: 0 2px 8px rgba(0,0,0,0.08); transition: background 0.2s, box-shadow 0.2s; }
         .result-text { flex: 1; font-size: 15px; font-weight: 700; }
         .result-sub { font-size: 12px; color: var(--text-muted); font-weight: normal; margin-top: 2px;}
 
         /* 浮動標籤 */
-        .floating-label { position: absolute; font-size: 15px; font-weight: 700; color: rgba(255,255,255,0.5); pointer-events: none; letter-spacing: 1px; }
-        #label-film { left: 25px; transform: translateY(-50%); color: #38bdf8; text-shadow: 0 0 8px rgba(56,189,248,0.5); transition: opacity 0.2s ease; }
+        .floating-label { position: absolute; font-size: 15px; font-weight: 700; color: var(--text-muted); pointer-events: none; letter-spacing: 1px; }
+        #label-film { left: 25px; transform: translateY(-50%); color: var(--accent); transition: opacity 0.2s ease; }
     </style>
 </head>
 <body>
@@ -295,7 +300,7 @@
             isConst = false;
         } else {
             resStatus.innerText = t_dict.resPartial;
-            resStatus.style.color = "#fff";
+            resStatus.style.color = "#2c3e50";
             phaseDiffStr += currentLang === 'zh' ? " (非整數倍 ➔ 部分干涉)" : " (Intermediate)";
             isConst = intensity > 0.5;
         }
@@ -321,7 +326,7 @@
     }
 
     function drawGrid(ctx, w, h) {
-        ctx.strokeStyle = 'rgba(255, 255, 255, 0.04)';
+        ctx.strokeStyle = 'rgba(0, 0, 0, 0.05)';
         ctx.lineWidth = 1;
         ctx.beginPath();
         for (let x = 0; x <= w; x += 40) { ctx.moveTo(x, 0); ctx.lineTo(x, h); }
@@ -361,20 +366,20 @@
         ctx.moveTo(-16, 0);
         ctx.quadraticCurveTo(0, -12, 16, 0);
         ctx.quadraticCurveTo(0, 12, -16, 0);
-        ctx.strokeStyle = 'rgba(255,255,255,0.9)';
+        ctx.strokeStyle = 'rgba(44, 62, 80, 0.85)';
         ctx.lineWidth = 2;
         ctx.stroke();
-        ctx.fillStyle = 'rgba(255,255,255,0.1)';
+        ctx.fillStyle = 'rgba(2, 132, 199, 0.08)';
         ctx.fill();
 
         ctx.beginPath();
         ctx.arc(0, 0, 6, 0, Math.PI * 2);
-        ctx.fillStyle = '#38bdf8';
+        ctx.fillStyle = '#0284c7';
         ctx.fill();
 
         ctx.beginPath();
         ctx.arc(0, 0, 2.5, 0, Math.PI * 2);
-        ctx.fillStyle = '#0f172a';
+        ctx.fillStyle = '#1a1c2c';
         ctx.fill();
 
         ctx.beginPath();
@@ -410,7 +415,7 @@
         
         ctx.shadowBlur = 0;
         ctx.beginPath();
-        ctx.strokeStyle = 'rgba(255,255,255,0.15)';
+        ctx.strokeStyle = 'rgba(0,0,0,0.12)';
         ctx.lineWidth = 1;
         ctx.setLineDash([4, 4]);
         ctx.moveTo(0, 0);
@@ -449,17 +454,17 @@
         // 玻璃質感薄膜
         if (visualTh > 0) {
             const filmGrad = ctx.createLinearGradient(0, filmTopY, 0, filmBotY);
-            filmGrad.addColorStop(0, 'rgba(56, 189, 248, 0.25)');
-            filmGrad.addColorStop(0.5, 'rgba(56, 189, 248, 0.05)');
-            filmGrad.addColorStop(1, 'rgba(56, 189, 248, 0.25)');
+            filmGrad.addColorStop(0, 'rgba(2, 132, 199, 0.18)');
+            filmGrad.addColorStop(0.5, 'rgba(2, 132, 199, 0.06)');
+            filmGrad.addColorStop(1, 'rgba(2, 132, 199, 0.18)');
             ctx.fillStyle = filmGrad;
             ctx.fillRect(0, filmTopY, canvas.width, visualTh);
         }
 
         // 邊界線
-        ctx.shadowBlur = 8;
-        ctx.shadowColor = '#38bdf8';
-        ctx.strokeStyle = '#38bdf8';
+        ctx.shadowBlur = 4;
+        ctx.shadowColor = 'rgba(2, 132, 199, 0.2)';
+        ctx.strokeStyle = '#0284c7';
         ctx.lineWidth = 2;
         ctx.setLineDash([]);
         ctx.beginPath(); ctx.moveTo(0, filmTopY); ctx.lineTo(canvas.width, filmTopY); ctx.stroke();
@@ -489,8 +494,8 @@
         ctx.save();
         ctx.fillStyle = colorStr;
         ctx.font = 'bold 15px sans-serif';
-        ctx.shadowBlur = 4;
-        ctx.shadowColor = 'rgba(0,0,0,0.8)';
+        ctx.shadowBlur = 2;
+        ctx.shadowColor = 'rgba(0,0,0,0.15)';
         ctx.textAlign = 'right';
         ctx.fillText(`λ = ${wl} nm`, hitX - 80, filmTopY - 50);
         ctx.restore();
@@ -498,7 +503,7 @@
         // 2. 反射光 p 
         drawWaveLine(ctx, hitX, filmTopY, pEndX, pEndY, Math.PI, k_inc, amp, colorStr);
         
-        ctx.fillStyle = '#fff'; ctx.font = 'italic 18px serif';
+        ctx.fillStyle = '#2c3e50'; ctx.font = 'italic 18px serif';
         ctx.fillText('p', hitX + 30, filmTopY - 40);
         drawBadge(ctx, t_dict.antiphaseMark, hitX, filmTopY - 15, 'rgba(255, 77, 79, 1)');
 
@@ -519,7 +524,7 @@
                 ctx.fillStyle = colorStr;
                 ctx.font = 'bold 15px sans-serif';
                 ctx.shadowBlur = 4;
-                ctx.shadowColor = 'rgba(0,0,0,0.8)';
+                ctx.shadowColor = 'rgba(0,0,0,0.15)';
                 ctx.textAlign = 'left';
                 ctx.textBaseline = 'middle';
                 ctx.fillText(`λ' ≈ ${Math.round(wl/n_film)} nm`, hitX - 0, filmTopY + visualTh+10);
@@ -533,13 +538,13 @@
             const phaseQ_exit = k_film * 2 * distIn1;
             drawWaveLine(ctx, exitX, filmTopY, qEndX, qEndY, phaseQ_exit, k_inc, amp, colorStr);
 
-            ctx.fillStyle = '#fff'; ctx.font = 'italic 18px serif';
+            ctx.fillStyle = '#2c3e50'; ctx.font = 'italic 18px serif';
             ctx.fillText('q', exitX + 30, filmTopY - 40);
             drawEye(ctx, qEndX + 20, qEndY + 10, Math.PI/6);
 
             // 繪製厚度 (Thickness t) 標示線
             const dimX = hitX - 120;
-            ctx.strokeStyle = 'rgba(56, 189, 248, 0.6)';
+            ctx.strokeStyle = 'rgba(2, 132, 199, 0.5)';
             ctx.lineWidth = 1.5;
             ctx.beginPath();
             ctx.moveTo(dimX, filmTopY);
@@ -550,12 +555,12 @@
             ctx.lineTo(dimX + 8, filmBotY);
             ctx.stroke();
 
-            ctx.fillStyle = '#38bdf8';
+            ctx.fillStyle = '#0284c7';
             ctx.font = 'bold 15px sans-serif';
             ctx.textAlign = 'right';
             ctx.textBaseline = 'middle';
             ctx.shadowBlur = 4;
-            ctx.shadowColor = 'rgba(0,0,0,0.8)';
+            ctx.shadowColor = 'rgba(0,0,0,0.15)';
             ctx.fillText(`t = ${th} nm`, dimX - 12, filmTopY + visualTh / 2);
             ctx.shadowBlur = 0; 
 
@@ -566,7 +571,7 @@
             const pdLineEndX = exitX + 60;
             
             ctx.beginPath();
-            ctx.strokeStyle = 'rgba(251, 191, 36, 0.6)';
+            ctx.strokeStyle = 'rgba(180, 83, 9, 0.5)';
             ctx.lineWidth = 1.5;
             ctx.setLineDash([4, 4]);
             ctx.moveTo(pdLineStartX, midY);
@@ -577,25 +582,25 @@
             const wl_prime_draw = wl / n_film;
             const pdLambda = ((2 * th) / wl_prime_draw).toFixed(2);
 
-            ctx.fillStyle = '#fbbf24';
+            ctx.fillStyle = '#b45309';
             ctx.textAlign = 'left';
             ctx.textBaseline = 'middle';
             ctx.font = 'bold 15px sans-serif';
             ctx.shadowBlur = 4;
-            ctx.shadowColor = 'rgba(0,0,0,0.8)';
+            ctx.shadowColor = 'rgba(0,0,0,0.15)';
             ctx.fillText(`${t_dict.pathDiffMark} Δx ≈ 2t = ${2 * th} nm = ${pdLambda} λ'`, pdLineEndX + 8, midY);
             ctx.shadowBlur = 0; 
             ctx.textAlign = 'left'; 
 
         } else {
-            drawWaveLine(ctx, hitX, filmTopY, pEndX, pEndY, 0, k_inc, amp, 'rgba(255,255,255,0.4)');
-            ctx.fillStyle = '#fff'; ctx.font = 'italic 18px serif';
+            drawWaveLine(ctx, hitX, filmTopY, pEndX, pEndY, 0, k_inc, amp, 'rgba(44,62,80,0.35)');
+            ctx.fillStyle = '#2c3e50'; ctx.font = 'italic 18px serif';
             ctx.fillText('q', hitX + 50, filmTopY - 20);
             drawEye(ctx, pEndX + 20, pEndY + 10, Math.PI/6);
         }
 
         // 畫布底部註解
-        ctx.fillStyle = 'rgba(255, 255, 255, 0.5)'; 
+        ctx.fillStyle = 'rgba(44, 62, 80, 0.55)'; 
         ctx.font = '14px sans-serif';
         ctx.textBaseline = 'alphabetic';
         ctx.fillText(t_dict.remark, 25, canvas.height - 25);

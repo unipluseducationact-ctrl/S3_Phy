@@ -56,7 +56,7 @@ export function initRefractionLab(root, t) {
             </div>
             <div style="margin-top: 8px; margin-bottom: 8px; display: flex; gap: 8px; align-items: center;">
               <input type="range" data-n1-slider min="1.00" max="2.00" step="0.01" value="1.00" style="flex: 1; accent-color: #ffea00; margin: 0;" />
-              <input type="number" data-n1-input min="1.00" max="2.00" step="0.01" value="1.00" style="width: 60px; background: #161a29; border: 1px solid var(--reflab-border); color: #fff; border-radius: 6px; padding: 4px; font-size: 0.85rem; text-align: center; font-weight: bold;" />
+              <input type="number" data-n1-input min="1.00" max="2.00" step="0.01" value="1.00" style="width: 60px; background: #ffffff; border: 1px solid var(--reflab-border); color: #1a1c2c; border-radius: 6px; padding: 4px; font-size: 0.85rem; text-align: center; font-weight: bold;" />
             </div>
             <div class="reflab-readout">
               <span>${t('tools.refraction.nLabel')}₁ = <strong data-n="1">1.00</strong></span>
@@ -74,7 +74,7 @@ export function initRefractionLab(root, t) {
             </div>
             <div style="margin-top: 8px; margin-bottom: 8px; display: flex; gap: 8px; align-items: center;">
               <input type="range" data-n2-slider min="1.00" max="2.00" step="0.01" value="1.33" style="flex: 1; accent-color: var(--reflab-cyan); margin: 0;" />
-              <input type="number" data-n2-input min="1.00" max="2.00" step="0.01" value="1.33" style="width: 60px; background: #161a29; border: 1px solid var(--reflab-border); color: #fff; border-radius: 6px; padding: 4px; font-size: 0.85rem; text-align: center; font-weight: bold;" />
+              <input type="number" data-n2-input min="1.00" max="2.00" step="0.01" value="1.33" style="width: 60px; background: #ffffff; border: 1px solid var(--reflab-border); color: #1a1c2c; border-radius: 6px; padding: 4px; font-size: 0.85rem; text-align: center; font-weight: bold;" />
             </div>
             <div class="reflab-readout">
               <span>${t('tools.refraction.nLabel')}₂ = <strong data-n="2">1.33</strong></span>
@@ -92,7 +92,7 @@ export function initRefractionLab(root, t) {
             </div>
             <div style="display: flex; gap: 8px; align-items: center;">
               <input type="range" data-theta1 min="0" max="89" step="0.5" value="40" style="flex: 1; margin: 0;" />
-              <input type="number" data-theta1-input min="0" max="89" step="0.1" value="40" style="width: 60px; background: #161a29; border: 1px solid var(--reflab-border); color: #fff; border-radius: 6px; padding: 4px; font-size: 0.85rem; text-align: center; font-weight: bold;" />
+              <input type="number" data-theta1-input min="0" max="89" step="0.1" value="40" style="width: 60px; background: #ffffff; border: 1px solid var(--reflab-border); color: #1a1c2c; border-radius: 6px; padding: 4px; font-size: 0.85rem; text-align: center; font-weight: bold;" />
             </div>
           </div>
           <div class="reflab-cg">
@@ -102,7 +102,7 @@ export function initRefractionLab(root, t) {
             </div>
             <div style="display: flex; gap: 8px; align-items: center;">
               <input type="range" data-theta2 min="0" max="89" step="0.5" value="29" style="flex: 1; margin: 0;" />
-              <input type="number" data-theta2-input min="0" max="89" step="0.1" value="29" style="width: 60px; background: #161a29; border: 1px solid var(--reflab-border); color: #fff; border-radius: 6px; padding: 4px; font-size: 0.85rem; text-align: center; font-weight: bold;" />
+              <input type="number" data-theta2-input min="0" max="89" step="0.1" value="29" style="width: 60px; background: #ffffff; border: 1px solid var(--reflab-border); color: #1a1c2c; border-radius: 6px; padding: 4px; font-size: 0.85rem; text-align: center; font-weight: bold;" />
             </div>
           </div>
           <div class="reflab-formula">${t('tools.refraction.snell')}</div>
@@ -384,7 +384,7 @@ export function initRefractionLab(root, t) {
     ctx.font = font;
     ctx.textAlign = align;
     ctx.textBaseline = baseline;
-    ctx.strokeStyle = '#161a29';
+    ctx.strokeStyle = '#ffffff';
     ctx.lineWidth = 5;
     ctx.lineJoin = 'round';
     ctx.miterLimit = 2;
@@ -454,7 +454,7 @@ export function initRefractionLab(root, t) {
     ctx.moveTo(30, cy);
     ctx.lineTo(W - 30, cy);
     ctx.stroke();
-    drawTextWithOutline(t('tools.refraction.canvas.interface'), W - 130, cy - 12, '#bac4d6', 'start', 'bottom', 'bold 14px system-ui, sans-serif');
+    drawTextWithOutline(t('tools.refraction.canvas.interface'), W - 130, cy - 12, '#6b7280', 'start', 'bottom', 'bold 14px system-ui, sans-serif');
 
     // Normal (dashed vertical)
     ctx.beginPath();
@@ -465,7 +465,7 @@ export function initRefractionLab(root, t) {
     ctx.lineTo(cx, H - 20);
     ctx.stroke();
     ctx.setLineDash([]);
-    drawTextWithOutline(t('tools.refraction.canvas.normal'), cx + 10, 48, '#bac4d6', 'start', 'alphabetic', 'bold 14px system-ui, sans-serif');
+    drawTextWithOutline(t('tools.refraction.canvas.normal'), cx + 10, 48, '#6b7280', 'start', 'alphabetic', 'bold 14px system-ui, sans-serif');
 
     // Medium labels
     ctx.font = 'bold 17px system-ui, sans-serif'; // Larger font for projector readability
