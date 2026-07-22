@@ -262,6 +262,7 @@ export const en = {
   'strand.mechanics.desc': 'Force and motion: position, speed, acceleration, projectile motion, and Newton\'s laws.',
   'strand.mechanics.subtitle': 'Mechanics — force and motion',
   'mechanics.section.empty': 'Mechanics strand content is coming soon.',
+  'tools.vectorTool.title': 'Vector lab — decomposition',
   'tools.projectileMotion.title': 'Projectile motion',
   // Gas and kinetic theory translations
   'strand.gas.title': 'Gas & Kinetic Theory',

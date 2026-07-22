@@ -99,15 +99,17 @@ const MECHANICS_SUMMARY_ROWS = MECHANICS_TOPICS.map((r) => {
   };
 });
 
-const TOOL_ORDER = ['projectileMotion'];
+const TOOL_ORDER = ['vectorTool', 'projectileMotion'];
 
 const TOOL_LOADERS = {
+  vectorTool: () => import('../tools/vectorToolLab.js').then((m) => m.createVectorToolLab),
   projectileMotion: () =>
     import('../tools/projectileMotionLab.js').then((m) => m.createProjectileMotionLab),
 };
 
 function toolLabel(id) {
   const map = {
+    vectorTool: 'tools.vectorTool.title',
     projectileMotion: 'tools.projectileMotion.title',
   };
   return t(map[id] || id);

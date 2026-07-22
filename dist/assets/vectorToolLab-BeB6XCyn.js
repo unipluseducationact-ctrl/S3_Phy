@@ -1,0 +1,1 @@
+import{c as t}from"./createLabIframe-t_Ch3wq-.js";import"./index-Dhh5Sf2F.js";function a(o){return t(o,{slug:"vector-tool",titleKey:"tools.vectorTool.title",className:"tool-vector-tool-lab",extraParams:()=>"&v=20260722_vector_v1"})}export{a as createVectorToolLab};
