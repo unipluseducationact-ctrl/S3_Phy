@@ -1,0 +1,512 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Wave Phase Analysis</title>
+    <link rel="stylesheet" href="../shared/s3phy-embed.css">
+    <script src="../shared/s3phy-embed-init.js"></script>
+    <style>
+        html.s3phy-embed .logo { display: none; }
+        html.s3phy-embed body { padding: 12px; }
+        /* --- Global Reset & Variables --- */
+        * { box-sizing: border-box; }
+
+        :root {
+            --primary: #8e44ad;
+            --ghost: #bdc3c7;
+            --dark: #2c3e50;
+            --light: #ecf0f1;
+        }
+
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background-color: #ffffff;
+            color: var(--dark);
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            margin: 0;
+            padding: 20px;
+        }
+
+        .logo { width: 180px; height: auto; margin-bottom: 10px; }
+        h1 { margin-bottom: 5px; margin-top: 0; text-align: center; }
+        p { margin-top: 0; color: #7f8c8d; text-align: center; margin-bottom: 20px; }
+
+        .container {
+            width: 95%;
+            max-width: 900px;
+            display: flex;
+            flex-direction: column;
+            gap: 15px;
+        }
+
+        .card {
+            background: white;
+            border: 1px solid #e0e0e0;
+            border-radius: 12px;
+            padding: 15px;
+            box-shadow: 0 4px 10px rgba(0,0,0,0.03);
+            position: relative;
+        }
+
+        .card-header {
+            font-weight: bold;
+            margin-bottom: 10px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            color: var(--dark);
+        }
+
+        canvas {
+            background: #fafafa;
+            border: 1px solid #ddd;
+            border-radius: 8px;
+            width: 100%;
+            cursor: grab;
+            touch-action: none;
+        }
+        canvas:active { cursor: grabbing; }
+
+        /* --- Controls --- */
+        .controls-area {
+            display: flex;
+            flex-direction: column;
+            gap: 15px;
+            background: #f8f9fa;
+            padding: 15px;
+            border-radius: 12px;
+            border: 1px solid #eee;
+        }
+
+        .particle-selector-container {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 8px;
+            justify-content: center;
+        }
+
+        .p-btn {
+            border: 2px solid transparent;
+            background: white;
+            padding: 6px 12px;
+            border-radius: 20px;
+            cursor: pointer;
+            font-weight: bold;
+            font-size: 13px;
+            box-shadow: 0 2px 4px rgba(0,0,0,0.05);
+            transition: all 0.2s;
+            display: flex;
+            align-items: center;
+            gap: 5px;
+        }
+        .p-btn:hover { transform: translateY(-1px); box-shadow: 0 4px 6px rgba(0,0,0,0.1); }
+        .p-btn.active { border-color: var(--dark); background: #e9ecef; }
+        
+        .color-dot { width: 10px; height: 10px; border-radius: 50%; }
+
+        .slider-row {
+            display: flex;
+            align-items: center;
+            gap: 15px;
+            width: 100%;
+        }
+
+        .slider-container {
+            flex-grow: 1;
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+        }
+        
+        .progress-badge {
+            background: var(--dark);
+            color: white;
+            padding: 4px 12px;
+            border-radius: 12px;
+            font-size: 14px;
+            font-weight: bold;
+            min-width: 80px;
+            text-align: center;
+        }
+
+        label { font-size: 12px; font-weight: bold; margin-bottom: 5px; color: #7f8c8d; }
+        input[type=range] { width: 100%; cursor: pointer; accent-color: var(--primary); }
+
+    </style>
+</head>
+<body>
+
+    <img src="https://d41chssnpqdne.cloudfront.net/user_upload_by_module/chat_bot/files/176719383/sfgv3HH8yBECOBJy.png?Expires=1767077373&Signature=abqh80kgShCXtZgdHgjCuYgy7FUKd2dD6QSKdzcz1djb4Y4CJ-PBbbcUpZLxCVDu2JGY5usZfpXMgyJc3pAjTOpt2VkV2MlAVv0e6dMs668D1wUC8jyqaDzzzOnBX6V8eaYPtJphD0B8LU7CKBfdPgAIl2pwN8QsIdCVDPNDbTk3fOXXHV8fOvfrN4HjpfqcHaTfDLYsNvDhh82MTxCmMlbAG3JvZSxAO0mwnAHxILJb-9-KhYXYeqUL70BybeRmr9BnJfIt8jqkIhhkv38QqIdCi0YF1h2~TjQG9W6zOtN6Nu1wqkrZzwoPd6ttmXDan6gHZfSYmZ~vf6PgR1LWSw__&Key-Pair-Id=K3USGZIKWMDCSX" class="logo" alt="Unit Education Logo">
+
+    <h1>🌊 Wave Phase Analysis</h1>
+    <p>Particles are placed at Crests, Troughs, and Equilibrium points.</p>
+
+    <div class="container">
+        
+        <!-- Controls -->
+        <div class="controls-area">
+            <label style="text-align:center">Select Particle to Graph:</label>
+            <div class="particle-selector-container" id="p-buttons">
+                <!-- Buttons generated by JS -->
+            </div>
+
+            <div class="slider-row">
+                <div class="slider-container">
+                    <div style="display:flex; justify-content:space-between; align-items:center;">
+                        <label style="margin:0;">Time Shift (Drag Left/Right)</label>
+                    </div>
+                    <input type="range" id="time-slider" min="-400" max="400" value="0" step="2">
+                </div>
+                <div class="progress-badge" id="progress-text">0.00 λ</div>
+            </div>
+        </div>
+
+        <!-- Top Canvas: Wave Profile -->
+        <div class="card">
+            <div class="card-header">
+                <span>🌊 Wave Profile (y vs x)</span>
+                <span style="font-size:12px; color:#999">Click dots to select</span>
+            </div>
+            <canvas id="waveCanvas" width="850" height="220"></canvas>
+        </div>
+
+        <!-- Bottom Canvas: Displacement-Time Graph -->
+        <div class="card">
+            <div class="card-header">
+                <span id="graph-title">📉 Displacement-Time Graph</span>
+                <span style="font-size:12px; color:#999">Center Line = t(0)</span>
+            </div>
+            <canvas id="graphCanvas" width="850" height="200"></canvas>
+        </div>
+
+    </div>
+
+    <script>
+        // --- Setup ---
+        const waveCanvas = document.getElementById('waveCanvas');
+        const waveCtx = waveCanvas.getContext('2d');
+        
+        const graphCanvas = document.getElementById('graphCanvas');
+        const graphCtx = graphCanvas.getContext('2d');
+        
+        const slider = document.getElementById('time-slider');
+        const graphTitle = document.getElementById('graph-title');
+        const progressText = document.getElementById('progress-text');
+        const pBtnContainer = document.getElementById('p-buttons');
+
+        // --- Physics Variables ---
+        let time = 0; 
+        const wavelength = 300; 
+        const amplitude = 60;
+        const waveCenterY = waveCanvas.height / 2;
+        const graphCenterY = graphCanvas.height / 2;
+        const tOrigin = graphCanvas.width / 2; 
+
+        // --- Aligned Particle Data ---
+        // Wavelength = 300px
+        // Crest = 0.25 * 300 = 75
+        // Eq    = 0.50 * 300 = 150
+        // Trough= 0.75 * 300 = 225
+        // Eq    = 1.00 * 300 = 300
+        const particles = [
+            { id: 'A', x: 75,  color: '#e74c3c', label: 'Crest' },      // Red
+            { id: 'B', x: 150, color: '#e67e22', label: 'Eq' },         // Orange
+            { id: 'C', x: 225, color: '#f1c40f', label: 'Trough' },     // Yellow
+            { id: 'D', x: 300, color: '#2ecc71', label: 'Eq' },         // Green
+            { id: 'E', x: 375, color: '#1abc9c', label: 'Crest' },      // Teal
+            { id: 'F', x: 450, color: '#3498db', label: 'Eq' },         // Blue
+            { id: 'G', x: 525, color: '#9b59b6', label: 'Trough' },     // Purple
+            { id: 'H', x: 600, color: '#34495e', label: 'Eq' }          // Dark Blue
+        ];
+        
+        let selectedPIndex = 0; 
+
+        // --- Initialization ---
+
+        function initControls() {
+            pBtnContainer.innerHTML = '';
+            particles.forEach((p, idx) => {
+                const btn = document.createElement('div');
+                btn.className = `p-btn ${idx === selectedPIndex ? 'active' : ''}`;
+                // Optional: Add (Crest/Trough) to button text? Kept simple for now.
+                btn.innerHTML = `<div class="color-dot" style="background:${p.color}"></div> ${p.id}`;
+                btn.onclick = () => selectParticle(idx);
+                pBtnContainer.appendChild(btn);
+            });
+        }
+
+        function selectParticle(index) {
+            selectedPIndex = index;
+            
+            // Update Buttons UI
+            const buttons = document.querySelectorAll('.p-btn');
+            buttons.forEach((b, i) => {
+                if (i === index) b.classList.add('active');
+                else b.classList.remove('active');
+            });
+
+            // Update Graph Title
+            graphTitle.innerText = `📉 Displacement-Time Graph for Particle ${particles[index].id}`;
+            graphTitle.style.color = particles[index].color;
+            
+            update();
+        }
+
+        // --- Interaction ---
+
+        slider.addEventListener('input', (e) => {
+            time = parseInt(e.target.value);
+            update();
+        });
+
+        // Canvas Dragging & Clicking
+        let isDragging = false;
+        let startX = 0;
+        let startTime = 0;
+        let isClick = false;
+
+        waveCanvas.addEventListener('mousedown', (e) => {
+            isDragging = true;
+            isClick = true; 
+            startX = e.clientX;
+            startTime = time;
+            
+            const rect = waveCanvas.getBoundingClientRect();
+            const mouseX = e.clientX - rect.left;
+            
+            particles.forEach((p, idx) => {
+                if (Math.abs(mouseX - p.x) < 20) {
+                    selectParticle(idx);
+                }
+            });
+
+            waveCanvas.style.cursor = 'grabbing';
+        });
+
+        window.addEventListener('mouseup', () => {
+            isDragging = false;
+            waveCanvas.style.cursor = 'grab';
+        });
+
+        window.addEventListener('mousemove', (e) => {
+            if (!isDragging) return;
+            
+            const dx = e.clientX - startX;
+            if (Math.abs(dx) > 2) isClick = false; 
+
+            let newTime = startTime + dx;
+            const min = parseInt(slider.min);
+            const max = parseInt(slider.max);
+            
+            if (newTime < min) newTime = min;
+            if (newTime > max) newTime = max;
+            
+            time = newTime;
+            slider.value = time;
+            update();
+        });
+
+        // --- Drawing Logic ---
+
+        function drawWaveProfile() {
+            waveCtx.clearRect(0, 0, waveCanvas.width, waveCanvas.height);
+            
+            // Grid Line
+            waveCtx.beginPath();
+            waveCtx.strokeStyle = '#eee';
+            waveCtx.moveTo(0, waveCenterY);
+            waveCtx.lineTo(waveCanvas.width, waveCenterY);
+            waveCtx.stroke();
+
+            // 1. Draw Ghost Wave (t=0)
+            waveCtx.beginPath();
+            waveCtx.strokeStyle = '#bdc3c7'; 
+            waveCtx.lineWidth = 2;
+            waveCtx.setLineDash([5, 5]); 
+            for (let x = 0; x < waveCanvas.width; x++) {
+                const k = (2 * Math.PI) / wavelength;
+                const y = waveCenterY - amplitude * Math.sin(k * x);
+                if (x === 0) waveCtx.moveTo(x, y);
+                else waveCtx.lineTo(x, y);
+            }
+            waveCtx.stroke();
+            waveCtx.setLineDash([]); 
+
+            // 2. Draw Active Wave
+            waveCtx.beginPath();
+            waveCtx.strokeStyle = '#8e44ad';
+            waveCtx.lineWidth = 3;
+            for (let x = 0; x < waveCanvas.width; x++) {
+                const k = (2 * Math.PI) / wavelength;
+                const y = waveCenterY - amplitude * Math.sin(k * (x - time));
+                if (x === 0) waveCtx.moveTo(x, y);
+                else waveCtx.lineTo(x, y);
+            }
+            waveCtx.stroke();
+
+            // 3. Draw Progress Arrow
+            const startCrestX = wavelength / 4; // 75
+            const startCrestY = waveCenterY - amplitude;
+            const currentCrestX = startCrestX + time;
+
+            if (Math.abs(time) > 10) {
+                waveCtx.beginPath();
+                waveCtx.strokeStyle = '#2c3e50';
+                waveCtx.lineWidth = 2;
+                waveCtx.moveTo(startCrestX, startCrestY - 25);
+                waveCtx.lineTo(currentCrestX, startCrestY - 25);
+                waveCtx.stroke();
+
+                // Arrowhead
+                waveCtx.beginPath();
+                waveCtx.fillStyle = '#2c3e50';
+                if (time > 0) {
+                    waveCtx.moveTo(currentCrestX, startCrestY - 25);
+                    waveCtx.lineTo(currentCrestX - 8, startCrestY - 30);
+                    waveCtx.lineTo(currentCrestX - 8, startCrestY - 20);
+                } else {
+                    waveCtx.moveTo(currentCrestX, startCrestY - 25);
+                    waveCtx.lineTo(currentCrestX + 8, startCrestY - 30);
+                    waveCtx.lineTo(currentCrestX + 8, startCrestY - 20);
+                }
+                waveCtx.fill();
+                
+                // Start Dot
+                waveCtx.beginPath();
+                waveCtx.fillStyle = '#bdc3c7';
+                waveCtx.arc(startCrestX, startCrestY, 4, 0, Math.PI*2);
+                waveCtx.fill();
+            }
+
+            // 4. Draw Particles
+            particles.forEach((p, index) => {
+                const k = (2 * Math.PI) / wavelength;
+                const y = waveCenterY - amplitude * Math.sin(k * (p.x - time));
+
+                waveCtx.beginPath();
+                waveCtx.fillStyle = p.color;
+                
+                const isSelected = (index === selectedPIndex);
+                const radius = isSelected ? 12 : 7;
+                
+                waveCtx.arc(p.x, y, radius, 0, Math.PI * 2);
+                waveCtx.fill();
+                
+                // Selection Ring & Label
+                if (isSelected) {
+                    waveCtx.lineWidth = 3;
+                    waveCtx.strokeStyle = 'rgba(0,0,0,0.5)';
+                    waveCtx.stroke();
+                    
+                    waveCtx.fillStyle = 'black';
+                    waveCtx.font = 'bold 14px Arial';
+                    waveCtx.textAlign = 'center';
+                    waveCtx.fillText(p.id, p.x, y - 22);
+                } else {
+                    // Small label
+                    waveCtx.fillStyle = 'rgba(0,0,0,0.5)';
+                    waveCtx.font = '10px Arial';
+                    waveCtx.textAlign = 'center';
+                    waveCtx.fillText(p.id, p.x, y - 12);
+                }
+            });
+        }
+
+        function drawDisplacementTimeGraph() {
+            graphCtx.clearRect(0, 0, graphCanvas.width, graphCanvas.height);
+            
+            const p = particles[selectedPIndex];
+            
+            // Axes
+            graphCtx.beginPath();
+            graphCtx.strokeStyle = '#ccc';
+            graphCtx.lineWidth = 1;
+            graphCtx.moveTo(0, graphCenterY);
+            graphCtx.lineTo(graphCanvas.width, graphCenterY);
+            graphCtx.stroke();
+
+            graphCtx.beginPath();
+            graphCtx.strokeStyle = '#95a5a6';
+            graphCtx.lineWidth = 2;
+            graphCtx.moveTo(tOrigin, 10);
+            graphCtx.lineTo(tOrigin, graphCanvas.height - 10);
+            graphCtx.stroke();
+
+            // Labels
+            graphCtx.fillStyle = '#7f8c8d';
+            graphCtx.font = '12px Arial';
+            graphCtx.textAlign = 'left';
+            graphCtx.fillText("Displacement (y)", 10, 20);
+            graphCtx.fillText("Time (t) →", graphCanvas.width - 60, graphCenterY + 20);
+            graphCtx.fillText("t = 0", tOrigin + 5, graphCanvas.height - 15);
+
+            // Curve Logic
+            const k = (2 * Math.PI) / wavelength;
+            const markerX = tOrigin + time;
+            
+            // 1. Draw Faint Full Curve
+            graphCtx.beginPath();
+            graphCtx.strokeStyle = p.color; 
+            graphCtx.lineWidth = 2;
+            graphCtx.globalAlpha = 0.2; 
+            for (let px = 0; px < graphCanvas.width; px++) {
+                const t_val = px - tOrigin;
+                const y = graphCenterY - amplitude * Math.sin(k * (p.x - t_val));
+                if (px === 0) graphCtx.moveTo(px, y);
+                else graphCtx.lineTo(px, y);
+            }
+            graphCtx.stroke();
+            graphCtx.globalAlpha = 1.0;
+
+            // 2. Draw History Trace (Solid)
+            graphCtx.beginPath();
+            graphCtx.strokeStyle = p.color;
+            graphCtx.lineWidth = 3;
+            const startDraw = Math.min(tOrigin, markerX);
+            const endDraw = Math.max(tOrigin, markerX);
+            for (let px = startDraw; px <= endDraw; px++) {
+                const t_val = px - tOrigin;
+                const y = graphCenterY - amplitude * Math.sin(k * (p.x - t_val));
+                if (px === startDraw) graphCtx.moveTo(px, y);
+                else graphCtx.lineTo(px, y);
+            }
+            graphCtx.stroke();
+
+            // 3. Current Time Marker
+            const currentY = graphCenterY - amplitude * Math.sin(k * (p.x - time));
+            
+            graphCtx.beginPath();
+            graphCtx.strokeStyle = '#333';
+            graphCtx.setLineDash([4, 4]);
+            graphCtx.moveTo(markerX, 20);
+            graphCtx.lineTo(markerX, graphCanvas.height - 20);
+            graphCtx.stroke();
+            graphCtx.setLineDash([]);
+
+            graphCtx.beginPath();
+            graphCtx.fillStyle = p.color;
+            graphCtx.arc(markerX, currentY, 8, 0, Math.PI * 2);
+            graphCtx.fill();
+            
+            graphCtx.fillStyle = '#333';
+            graphCtx.font = 'bold 12px Arial';
+            graphCtx.fillText("Now", markerX + 10, currentY);
+        }
+
+        function update() {
+            const waves = (time / wavelength).toFixed(2);
+            progressText.innerText = `${waves} λ`;
+            drawWaveProfile();
+            drawDisplacementTimeGraph();
+        }
+
+        // Init
+        initControls();
+        selectParticle(0); // Select A by default
+
+    </script>
+</body>
+</html>

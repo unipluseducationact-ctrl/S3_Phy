@@ -1,4 +1,4 @@
-﻿import { t, getLang } from '../i18n.js';
+import { t, getLang } from '../i18n.js';
 import { hydrateNoteCards, hydrateSummaryCards } from './hubHelpers.js';
 import { mountHubShell } from '../hubShell.js';
 
