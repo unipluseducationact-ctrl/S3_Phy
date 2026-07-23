@@ -542,16 +542,12 @@
 
         function accel() {
             if (stopped) return 0;
-            const s = scenario();
-            if (s.id === 'fullUp') {
-                if (phase === 'accel') return aMag();
-                if (phase === 'coast' || phase === 'rest') return 0;
-                if (phase === 'decel') return -aMag();
-                return 0;
+            if (phase === 'accel') return aMag();
+            if (phase === 'decel') {
+                // Braking: up trips → a down; down trip → a up
+                return scenarioId === 'downDecel' ? aMag() : -aMag();
             }
-            if (s.aSign === 'g') return -G;
-            if (s.aSign === 0) return 0;
-            return s.aSign * aMag();
+            return 0; // coast / rest — a only in the timed windows
         }
 
         function weight() { return mass() * G; }
@@ -560,11 +556,33 @@
             return Math.max(0, mass() * (G + accel()));
         }
 
+        function forcePx(F, basePx) {
+            return F > 0.5 ? Math.max(8, (F / FORCE_REF) * basePx) : 0;
+        }
+        function aPx(a, maxPx) {
+            return Math.min(maxPx, (Math.abs(a) / A_REF) * maxPx);
+        }
+        function vPx(v, maxPx) {
+            return Math.min(maxPx, (Math.abs(v) / CRUISE) * maxPx);
+        }
+
+        function targetY() {
+            return scenarioId === 'downDecel' ? 0.1 : 0.9;
+        }
+
         function currentPhaseKey() {
             if (stopped) return 'stopped';
             if (scenarioId === 'fullUp') return phase === 'rest' ? 'rest' : phase;
-            if (scenarioId === 'upDecel') return 'upDecel';
-            if (scenarioId === 'downDecel') return 'downDecel';
+            if (scenarioId === 'upDecel') {
+                if (phase === 'decel') return 'upDecel';
+                if (phase === 'coast') return 'coast';
+                return 'stopped';
+            }
+            if (scenarioId === 'downDecel') {
+                if (phase === 'decel') return 'downDecel';
+                if (phase === 'coast') return 'coast';
+                return 'stopped';
+            }
             return 'rest';
         }
 
@@ -588,24 +606,26 @@
         function applyScenarioStart() {
             const s = scenario();
             stopped = false;
+            phaseTimer = 0;
+            brakeV0 = 0;
             clearHistory();
             if (s.id === 'fullUp') {
                 cabinY = 0.1;
-                velSign = 1;
+                velocity = 0;
                 phase = 'accel';
+                whyMode = 'heavy';
             } else if (s.id === 'upDecel') {
                 cabinY = 0.12;
-                velSign = 1;
-                phase = 'upDecel';
+                velocity = CRUISE;
+                phase = 'coast';
                 whyMode = 'light';
-                whyT = 0;
             } else {
                 cabinY = 0.88;
-                velSign = -1;
-                phase = 'downDecel';
+                velocity = -CRUISE;
+                phase = 'coast';
                 whyMode = 'heavy';
-                whyT = 0;
             }
+            whyT = 0;
             pushHistory();
             buildWhyButtons();
         }
@@ -693,6 +713,8 @@
             document.getElementById('leg-n').innerText = d.legN;
             document.getElementById('leg-w').innerText = d.legW;
             document.getElementById('leg-a').innerText = d.legA;
+            const legV = document.getElementById('leg-v');
+            if (legV) legV.innerText = d.legV;
             document.getElementById('leg-nt-n').innerText = d.legNtN;
             document.getElementById('leg-nt-mg').innerText = d.legNtMg;
             playBtn.innerText = playing ? d.pause : d.play;
@@ -841,16 +863,16 @@
             ctx.font = 'bold 11px "Noto Sans TC", sans-serif';
             ctx.fillText(d.man, px + 16, py - 48);
 
-            // Forces: mg is fixed reference length; N length = (N/mg) × that
+            // Forces & kinematics: arrow lengths track live magnitudes
             const N = normal();
             const W = weight();
             const a = accel();
-            const baseLen = 58; // pixels for mg
-            const nLen = W > 0 ? Math.max(4, (N / W) * baseLen) : 0;
-            const wLen = baseLen;
+            const baseLen = 58;
+            const nLen = forcePx(N, baseLen);
+            const wLen = forcePx(W, baseLen);
 
-            // N up from feet — length shows magnitude vs mg
-            if (N > 0.5) {
+            // N up from feet
+            if (nLen > 0) {
                 drawArrow(ctx, px - 26, py, px - 26, py - nLen, '#059669', 4.5);
                 ctx.fillStyle = '#059669';
                 ctx.font = 'bold 12px "Noto Sans TC", sans-serif';
@@ -862,7 +884,7 @@
                 ctx.font = 'bold 11px "Noto Sans TC", sans-serif';
                 ctx.fillText('N = 0', px - 48, py - 8);
             }
-            // W down from COM (fixed reference arrow)
+            // W down from COM — length grows/shrinks with mass
             drawArrow(ctx, px + 26, py - 30, px + 26, py - 30 + wLen, '#dc2626', 4.5);
             ctx.fillStyle = '#dc2626';
             ctx.font = 'bold 12px "Noto Sans TC", sans-serif';
@@ -873,31 +895,36 @@
             // N magnitude gauge (arrow indicator vs mg tick)
             drawNormalGauge(ctx, sx + sw + 18, cabinTop + 8, cabinH - 16, N, W, d);
 
-            // Acceleration arrow further right of gauge
+            // Acceleration arrow — length ∝ |a|
             const ax = sx + sw + 78;
             const ay = cabinTop + cabinH / 2;
-            if (Math.abs(a) > 0.05) {
-                const aLen = Math.min(55, 18 + Math.abs(a) * 5);
+            const aLen = aPx(a, 55);
+            if (aLen > 2) {
                 if (a > 0) drawArrow(ctx, ax, ay + aLen / 2, ax, ay - aLen / 2, '#7c3aed', 3);
                 else drawArrow(ctx, ax, ay - aLen / 2, ax, ay + aLen / 2, '#7c3aed', 3);
                 ctx.fillStyle = '#7c3aed';
                 ctx.font = 'bold 12px sans-serif';
-                ctx.fillText('a', ax + 10, ay + 4);
+                ctx.fillText(`a ${a.toFixed(1)}`, ax + 10, ay + 4);
             } else {
                 ctx.fillStyle = '#7c3aed';
                 ctx.font = 'bold 12px sans-serif';
                 ctx.fillText('a = 0', ax - 6, ay);
             }
 
-            // Velocity hint
-            if (velSign !== 0 && playing && !stopped) {
-                const vx = sx - 24;
+            // Speed arrow — length ∝ |v|, shrinks as cabin brakes
+            const vLen = vPx(velocity, 48);
+            if (vLen > 2) {
+                const vx = sx - 28;
                 const vy = cabinTop + cabinH / 2;
-                if (velSign > 0) drawArrow(ctx, vx, vy + 20, vx, vy - 20, '#0369a1', 2.5);
-                else drawArrow(ctx, vx, vy - 20, vx, vy + 20, '#0369a1', 2.5);
+                if (velocity > 0) drawArrow(ctx, vx, vy + vLen / 2, vx, vy - vLen / 2, '#0369a1', 2.5);
+                else drawArrow(ctx, vx, vy - vLen / 2, vx, vy + vLen / 2, '#0369a1', 2.5);
                 ctx.fillStyle = '#0369a1';
                 ctx.font = 'bold 11px sans-serif';
                 ctx.fillText('v', vx - 14, vy + 4);
+            } else if (stopped) {
+                ctx.fillStyle = '#0369a1';
+                ctx.font = 'bold 11px sans-serif';
+                ctx.fillText('v = 0', sx - 42, cabinTop + cabinH / 2);
             }
         }
 
@@ -961,10 +988,9 @@
             const N = normal();
             const W = weight();
             const a = accel();
-            // Fixed mg reference so N arrow length tracks magnitude clearly
             const baseLen = 88;
-            const nLen = W > 0 ? Math.max(6, (N / W) * baseLen) : 0;
-            const wLen = baseLen;
+            const nLen = forcePx(N, baseLen);
+            const wLen = forcePx(W, baseLen);
 
             ctx.fillStyle = '#e2e8f0';
             ctx.beginPath();
@@ -979,7 +1005,7 @@
             ctx.fillText('m', cx, cy + 4);
             ctx.textAlign = 'left';
 
-            if (N > 0.5) {
+            if (nLen > 0) {
                 drawArrow(ctx, cx, cy, cx, cy - nLen, '#059669', 5);
                 ctx.fillStyle = '#059669';
                 ctx.font = 'bold 13px "Noto Sans TC", sans-serif';
@@ -997,10 +1023,23 @@
             ctx.fillStyle = '#7c3aed';
             ctx.font = 'bold 13px sans-serif';
             ctx.fillText(`a = ${a.toFixed(2)} m/s²`, 16, 24);
-            if (Math.abs(a) > 0.05) {
-                const al = Math.min(40, 12 + Math.abs(a) * 3);
+            const al = aPx(a, 48);
+            if (al > 2) {
                 if (a > 0) drawArrow(ctx, 36, 70, 36, 70 - al, '#7c3aed', 3);
                 else drawArrow(ctx, 36, 50, 36, 50 + al, '#7c3aed', 3);
+            }
+
+            // Speed magnitude on FBD
+            const vl = vPx(velocity, 42);
+            ctx.fillStyle = '#0369a1';
+            ctx.font = 'bold 13px sans-serif';
+            if (vl > 2) {
+                const vx = w - 40;
+                ctx.fillText('v', vx - 14, 40);
+                if (velocity > 0) drawArrow(ctx, vx, 90, vx, 90 - vl, '#0369a1', 3);
+                else drawArrow(ctx, vx, 48, vx, 48 + vl, '#0369a1', 3);
+            } else {
+                ctx.fillText('v = 0', w - 70, 40);
             }
         }
 
@@ -1290,11 +1329,26 @@
 
         function stopCabin() {
             stopped = true;
-            velSign = 0;
+            velocity = 0;
             phase = 'rest';
+            phaseTimer = 0;
             playing = false;
+            cabinY = targetY();
             pushHistory();
             updateUI();
+        }
+
+        function beginDecel() {
+            phase = 'decel';
+            phaseTimer = 0;
+            brakeV0 = velocity;
+            if (scenarioId === 'downDecel') {
+                whyMode = 'heavy';
+            } else {
+                whyMode = 'light';
+            }
+            whyT = 0;
+            buildWhyButtons();
         }
 
         function tick(ts) {
@@ -1304,53 +1358,49 @@
 
             if (playing && !stopped) {
                 simTime += dt;
-                const s = scenario();
-                const base = 0.0035 + aMag() * 0.00045;
+                const tgt = targetY();
+                const rem = Math.abs(tgt - cabinY);
+                const dStop = Math.abs(velocity) * DECEL_DUR * 0.5;
 
-                if (s.id === 'fullUp') {
-                    velSign = 1;
-                    let nextWhy = whyMode;
-                    if (phase === 'accel') {
-                        cabinY += base * 1.15;
-                        if (cabinY >= 0.38) phase = 'coast';
-                        nextWhy = 'heavy';
-                    } else if (phase === 'coast') {
-                        cabinY += base * 0.95;
-                        if (cabinY >= 0.68) phase = 'decel';
-                    } else if (phase === 'decel') {
-                        nextWhy = 'light';
-                        const dist = Math.max(0, 0.9 - cabinY);
-                        const slow = Math.max(0.2, Math.min(1, dist / 0.28));
-                        cabinY += base * slow * 0.85;
-                        if (cabinY >= 0.9) {
-                            cabinY = 0.9;
-                            stopCabin();
-                        }
+                if (phase === 'accel') {
+                    // fullUp: ramp speed to cruise over ACCEL_DUR
+                    phaseTimer += dt;
+                    const u = Math.min(1, phaseTimer / ACCEL_DUR);
+                    velocity = CRUISE * u;
+                    cabinY += velocity * dt;
+                    if (phaseTimer >= ACCEL_DUR || rem <= dStop + 0.02) {
+                        velocity = CRUISE;
+                        phase = 'coast';
+                        phaseTimer = 0;
                     }
-                    if (nextWhy !== whyMode) {
-                        whyMode = nextWhy;
-                        whyT = 0;
-                        buildWhyButtons();
+                } else if (phase === 'coast') {
+                    velocity = scenarioId === 'downDecel' ? -CRUISE : CRUISE;
+                    // Start braking when remaining distance matches 1.5 s stop distance
+                    if (rem <= Math.abs(velocity) * DECEL_DUR * 0.5 + 1e-4) {
+                        beginDecel();
+                    } else {
+                        cabinY += velocity * dt;
                     }
-                } else if (s.id === 'upDecel') {
-                    velSign = 1;
-                    const dist = Math.abs(0.9 - cabinY);
-                    const slow = Math.max(0.15, Math.min(1, dist / 0.35));
-                    cabinY += base * slow;
-                    if (cabinY >= 0.9) {
-                        cabinY = 0.9;
-                        stopCabin();
-                    }
-                } else {
-                    velSign = -1;
-                    const dist = Math.abs(cabinY - 0.1);
-                    const slow = Math.max(0.15, Math.min(1, dist / 0.35));
-                    cabinY -= base * slow;
-                    if (cabinY <= 0.1) {
-                        cabinY = 0.1;
+                }
+
+                if (phase === 'decel' && !stopped) {
+                    phaseTimer += dt;
+                    const u = Math.min(1, phaseTimer / DECEL_DUR);
+                    velocity = brakeV0 * (1 - u);
+                    cabinY += velocity * dt;
+                    const remNow = Math.abs(tgt - cabinY);
+                    if (
+                        phaseTimer >= DECEL_DUR ||
+                        remNow <= 0.002 ||
+                        (brakeV0 > 0 && cabinY >= tgt) ||
+                        (brakeV0 < 0 && cabinY <= tgt)
+                    ) {
                         stopCabin();
                     }
                 }
+
+                // Clamp within shaft
+                cabinY = Math.max(0.05, Math.min(0.95, cabinY));
                 pushHistory();
                 updateUI();
             }
