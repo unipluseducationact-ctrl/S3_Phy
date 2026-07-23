@@ -282,6 +282,7 @@
         <div class="controls-row">
             <div class="btn-row">
                 <button class="ctrl primary" id="btn-play" type="button">⏸ 暫停</button>
+                <button class="ctrl" id="btn-center-cr" type="button">密／疏部置中</button>
                 <button class="ctrl" id="btn-reset" type="button">↺ 重設</button>
             </div>
             <div class="dir-group">
@@ -332,6 +333,7 @@
             play: '▶ 播放',
             pause: '⏸ 暫停',
             reset: '↺ 重設',
+            centerCR: '密／疏部置中',
             phase: '相位 / 時間',
             speed: '波速',
             wavelength: '波長 λ',
@@ -340,7 +342,7 @@
             direction: '傳播方向',
             dirLeft: '← 向左',
             dirRight: '→ 向右',
-            hint: '拖曳畫面或滑桿改變相位；撳粒子可睇位移同速度方向。可用控制調波長、方向同波速。',
+            hint: '拖曳畫面或滑桿改變相位；撳「密／疏部置中」可令密部與疏部中心對稱出現於畫面中央。撳粒子可睇位移同速度方向。',
             equilibrium: '平衡位置（等距）',
             compression: '密部',
             highDensity: '高密度',
@@ -373,6 +375,7 @@
             play: '▶ Play',
             pause: '⏸ Pause',
             reset: '↺ Reset',
+            centerCR: 'Centre C & R',
             phase: 'Phase / Time',
             speed: 'Wave speed',
             wavelength: 'Wavelength λ',
@@ -381,7 +384,7 @@
             direction: 'Travel direction',
             dirLeft: '← Left',
             dirRight: '→ Right',
-            hint: 'Drag the canvas or slider to change phase; click a particle to see displacement and velocity. Use controls for wavelength, direction and wave speed.',
+            hint: 'Drag the canvas or slider to change phase; click “Centre C & R” to place compression and rarefaction centres symmetrically in the middle. Click a particle for details.',
             equilibrium: 'Equilibrium positions (uniform spacing)',
             compression: 'Compression',
             highDensity: 'High Density',
@@ -458,6 +461,7 @@
     const wavelengthSlider = document.getElementById('wavelength-slider');
     const btnPlay = document.getElementById('btn-play');
     const btnReset = document.getElementById('btn-reset');
+    const btnCenterCR = document.getElementById('btn-center-cr');
     const btnLang = document.getElementById('lang-toggle');
     const btnDirLeft = document.getElementById('btn-dir-left');
     const btnDirRight = document.getElementById('btn-dir-right');
@@ -548,6 +552,7 @@
         document.getElementById('label-conclusion-title').innerText = tr.conclusionTitle;
         document.getElementById('label-conclusion-body').innerHTML = tr.conclusionHtml();
         btnReset.innerText = tr.reset;
+        btnCenterCR.innerText = tr.centerCR;
         btnPlay.innerText = isPlaying ? tr.pause : tr.play;
         wavelengthVal.innerText = tr.wavelengthVal(lambdaSpacings);
         updateDirectionUI();
@@ -613,6 +618,40 @@
         const xComp = ((Math.PI - travelDir * ph) / K + 10 * LAMBDA) % LAMBDA;
         const xRare = ((0 - travelDir * ph) / K + 10 * LAMBDA) % LAMBDA;
         return { xComp, xRare };
+    }
+
+    function particleMidX() {
+        return (eqX(0) + eqX(IDS.length - 1)) / 2;
+    }
+
+    /** Snap phase so compression & rarefaction centres straddle the particle-row middle. */
+    function centerCompressionRarefaction() {
+        const mid = particleMidX();
+        // Place compression at mid − λ/4 and rarefaction at mid + λ/4
+        const xComp = mid - LAMBDA / 4;
+        // Kx + travelDir·φ = π  →  φ = travelDir · (π − Kx)
+        phase = travelDir * (Math.PI - K * xComp);
+        // Normalize to [0, 2π)
+        phase = ((phase % (2 * Math.PI)) + 2 * Math.PI) % (2 * Math.PI);
+
+        // Select the particle nearest the compression centre (at equilibrium x)
+        let bestI = 0;
+        let bestD = Infinity;
+        for (let i = 0; i < IDS.length; i++) {
+            const d = Math.abs(eqX(i) - xComp);
+            if (d < bestD) {
+                bestD = d;
+                bestI = i;
+            }
+        }
+        selected = bestI;
+
+        isPlaying = false;
+        btnPlay.innerText = t().play;
+        lastTs = 0;
+        syncPhaseSlider();
+        updateParticleInfo();
+        draw();
     }
 
     function placeZone(xMod) {
@@ -897,6 +936,7 @@
 
     btnDirLeft.addEventListener('click', () => setTravelDir(-1));
     btnDirRight.addEventListener('click', () => setTravelDir(1));
+    btnCenterCR.addEventListener('click', () => centerCompressionRarefaction());
 
     btnPlay.addEventListener('click', () => {
         isPlaying = !isPlaying;
