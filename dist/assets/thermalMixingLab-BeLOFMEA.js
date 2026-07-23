@@ -1,0 +1,1 @@
+import{c as e}from"./createLabIframe-D2A5hQEC.js";import"./index-bQI3fiS5.js";function i(t){return e(t,{slug:"thermal-mixing",titleKey:"tools.thermalMixing.title",className:"tool-thermal-mixing",extraParams:()=>"&v=3"})}export{i as createThermalMixingLab};

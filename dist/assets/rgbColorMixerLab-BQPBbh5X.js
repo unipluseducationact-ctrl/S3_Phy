@@ -1,0 +1,1 @@
+import{c as e}from"./createLabIframe-D2A5hQEC.js";import"./index-bQI3fiS5.js";function i(r){return e(r,{slug:"rgb-color-mixer",titleKey:"tools.rgbMixer.title",className:"tool-rgb-color-mixer"})}export{i as createRgbColorMixerLab};
