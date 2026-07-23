@@ -89,22 +89,9 @@ html.s3phy-embed #app {
   margin: 0 auto;
   align-items: stretch;
 }
-.reflab-graphs {
-  display: flex;
-  flex-direction: row;
-  gap: 16px;
-  width: 100%;
-  align-items: stretch;
-}
-@media (max-width: 768px) {
-  .reflab-graphs {
-    flex-direction: column;
-  }
-}
 .reflab-viz {
   position: relative;
-  flex: 1.8;
-  min-width: 0;
+  width: 100%;
   background: var(--reflab-panel);
   padding: 10px;
   border-radius: 16px;
@@ -112,31 +99,35 @@ html.s3phy-embed #app {
   display: flex;
   justify-content: center;
   align-items: center;
-}
-
-.reflab-micro-side {
-  flex: 1;
-  display: flex;
-  flex-direction: column;
-  gap: 16px;
-  min-width: 0;
+  box-shadow: 0 2px 12px rgba(26, 28, 44, 0.04);
 }
 
 .reflab-micro-box {
-  background: var(--reflab-panel);
+  background: #f8f9fa;
   border: 1px solid var(--reflab-border);
-  border-radius: 16px;
-  padding: 12px;
+  border-radius: 12px;
+  padding: 10px;
   display: flex;
   flex-direction: column;
   align-items: stretch;
   justify-content: center;
+  gap: 8px;
+  margin-top: 4px;
 }
+
+.reflab-micro-title {
+  font-weight: 800;
+  font-size: 0.9rem;
+  text-align: center;
+}
+
+.reflab-micro-title--1 { color: #a16207; }
+.reflab-micro-title--2 { color: var(--reflab-cyan); }
 
 .reflab-particle-canvas-1,
 .reflab-particle-canvas-2 {
-  background: #f8f9fa;
-  border-radius: 12px;
+  background: #ffffff;
+  border-radius: 10px;
   width: 100%;
   max-width: 100%;
   height: auto;
