@@ -624,21 +624,40 @@
         return (eqX(0) + eqX(IDS.length - 1)) / 2;
     }
 
+    /** λ-periodic copy of xMod nearest to target (absolute canvas x). */
+    function nearestLambdaCopy(xMod, target) {
+        const base = ((xMod % LAMBDA) + LAMBDA) % LAMBDA;
+        return base + Math.round((target - base) / LAMBDA) * LAMBDA;
+    }
+
+    /**
+     * Absolute C/R centres for drawing: pick the λ-copies closest to the
+     * particle-row middle so the pair straddles mid (separation λ/2).
+     */
+    function absoluteCentres(ph) {
+        const { xComp, xRare } = centreMods(ph);
+        const mid = particleMidX();
+        return {
+            xc: nearestLambdaCopy(xComp, mid),
+            xr: nearestLambdaCopy(xRare, mid),
+        };
+    }
+
     /** Snap phase so compression & rarefaction centres straddle the particle-row middle. */
     function centerCompressionRarefaction() {
         const mid = particleMidX();
-        // Place compression at mid − λ/4 and rarefaction at mid + λ/4
+        // Separation between C and R is λ/2; place them at mid ± λ/4
         const xComp = mid - LAMBDA / 4;
         // Kx + travelDir·φ = π  →  φ = travelDir · (π − Kx)
         phase = travelDir * (Math.PI - K * xComp);
-        // Normalize to [0, 2π)
         phase = ((phase % (2 * Math.PI)) + 2 * Math.PI) % (2 * Math.PI);
 
-        // Select the particle nearest the compression centre (at equilibrium x)
+        // Select the particle nearest the (absolute) compression centre
+        const { xc } = absoluteCentres(phase);
         let bestI = 0;
         let bestD = Infinity;
         for (let i = 0; i < IDS.length; i++) {
-            const d = Math.abs(eqX(i) - xComp);
+            const d = Math.abs(eqX(i) - xc);
             if (d < bestD) {
                 bestD = d;
                 bestI = i;
@@ -655,11 +674,8 @@
     }
 
     function placeZone(xMod) {
-        let best = xMod;
-        while (best < 80) best += LAMBDA;
-        while (best > cssW - 90) best -= LAMBDA;
-        if (best < 80) best += LAMBDA;
-        return best;
+        // Fallback single-zone placement (kept for any legacy call sites)
+        return nearestLambdaCopy(xMod, particleMidX());
     }
 
     function drawWavelengthIndicator(x1, x2, label) {
@@ -753,17 +769,19 @@
             ctx.beginPath(); ctx.moveTo(0, y); ctx.lineTo(W, y); ctx.stroke();
         }
 
-        const { xComp, xRare } = centreMods(phase);
-        const xc = placeZone(xComp);
-        const xr = placeZone(xRare);
-
-        const xc2 = xc + LAMBDA;
-        const xr2 = xr + LAMBDA;
+        const { xc, xr } = absoluteCentres(phase);
 
         drawCentreMarker(xc, 'rgba(2,132,199,1)', tr.centreCompression);
         drawCentreMarker(xr, 'rgba(220,38,38,1)', tr.centreRarefaction);
-        if (xc2 < 900) drawCentreMarker(xc2, 'rgba(2,132,199,1)', tr.centreCompression);
-        if (xr2 < 900) drawCentreMarker(xr2, 'rgba(220,38,38,1)', tr.centreRarefaction);
+        // Extra copies one λ away when they still fall on the canvas
+        const xc2 = xc + LAMBDA;
+        const xr2 = xr + LAMBDA;
+        const xc0 = xc - LAMBDA;
+        const xr0 = xr - LAMBDA;
+        if (xc2 > 40 && xc2 < cssW - 40) drawCentreMarker(xc2, 'rgba(2,132,199,1)', tr.centreCompression);
+        if (xr2 > 40 && xr2 < cssW - 40) drawCentreMarker(xr2, 'rgba(220,38,38,1)', tr.centreRarefaction);
+        if (xc0 > 40 && xc0 < cssW - 40) drawCentreMarker(xc0, 'rgba(2,132,199,1)', tr.centreCompression);
+        if (xr0 > 40 && xr0 < cssW - 40) drawCentreMarker(xr0, 'rgba(220,38,38,1)', tr.centreRarefaction);
 
         // Wavelength span between consecutive compression centres
         drawWavelengthIndicator(xc, xc + LAMBDA, tr.wavelengthMark);
