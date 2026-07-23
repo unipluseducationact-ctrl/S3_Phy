@@ -46,6 +46,7 @@ const TOOL_ORDER = [
   'waveMotion',
   'longitudinalWave',
   'waveInterference',
+  'waveDiffraction',
   'thinFilmInterference',
   'diffractionGratingCompare',
   'spectralOverlap',
@@ -58,6 +59,8 @@ const TOOL_LOADERS = {
   longitudinalWave: () =>
     import('../tools/longitudinalWaveLab.js').then((m) => m.createLongitudinalWaveLab),
   waveInterference: () => import('../tools/waveInterferenceLab.js').then((m) => m.createWaveInterferenceLab),
+  waveDiffraction: () =>
+    import('../tools/waveDiffractionLab.js').then((m) => m.createWaveDiffractionLab),
   thinFilmInterference: () =>
     import('../tools/thinFilmInterferenceLab.js').then((m) => m.createThinFilmInterferenceLab),
   diffractionGratingCompare: () =>
@@ -75,6 +78,7 @@ function toolLabel(id) {
     waveMotion: 'tools.waveMotion.title',
     longitudinalWave: 'tools.longitudinalWave.title',
     waveInterference: 'tools.waveInterference.title',
+    waveDiffraction: 'tools.waveDiffraction.title',
     thinFilmInterference: 'tools.thinFilmInterference.title',
     diffractionGratingCompare: 'tools.diffractionGratingCompare.title',
     spectralOverlap: 'tools.spectralOverlap.title',

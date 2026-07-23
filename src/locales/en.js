@@ -89,6 +89,7 @@ export const en = {
   'tools.longitudinalWave.title': 'Longitudinal Wave — Compression & Rarefaction',
   'tools.ultrasoundReflection.title': 'Ultrasound Reflection',
   'tools.waveInterference.title': 'Spatial Wave Interference',
+  'tools.waveDiffraction.title': 'Wave Diffraction — gap & wavelength',
   'tools.thinFilmInterference.title': 'Thin-film Interference — Soap Film',
   'tools.diffractionGratingCompare.title': 'Double Slit & Diffraction Grating Compare',
   'tools.spectralOverlap.title': 'Spectral Overlap — Diffraction Orders',
