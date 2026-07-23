@@ -1,0 +1,1 @@
+import{c as t}from"./createLabIframe-CxNjt_0R.js";import"./index-BDXJBQu4.js";function i(a){return t(a,{slug:"wave-diffraction",titleKey:"tools.waveDiffraction.title",className:"tool-wave-diffraction-lab",extraParams:()=>"&v=20260723_wave_diffraction_v1"})}export{i as createWaveDiffractionLab};

@@ -81,7 +81,31 @@
         }
         #waveCanvas { cursor: grab; min-height: 300px; }
         #waveCanvas:active { cursor: grabbing; }
-        #graphCanvas { min-height: 240px; }
+        #graphCanvas { min-height: 400px; }
+
+        .graph-inline-controls {
+            display: flex;
+            flex-direction: column;
+            gap: 8px;
+            margin-bottom: 8px;
+            padding: 8px 10px;
+            background: #f8f9fa;
+            border: 1px solid #eee;
+            border-radius: 8px;
+        }
+        .graph-inline-controls .graph-ctrl-label {
+            font-size: 11px;
+            font-weight: 700;
+            color: #7f8c8d;
+            margin: 0 0 4px;
+            text-align: center;
+        }
+        .graph-inline-controls .highlight-row {
+            justify-content: center;
+        }
+        .card.graph-card.dt-graph-card {
+            padding-bottom: 12px;
+        }
 
         input[type=range] {
             width: 100%;
@@ -389,24 +413,11 @@
                 <button type="button" class="controls-toggle-btn" id="btn-toggle-controls" aria-expanded="true">隱藏面板</button>
             </div>
             <div class="controls-body" id="controls-body">
-            <label id="label-select-particle" style="text-align:center">選擇要繪製圖像的粒子：</label>
-            <div class="particle-selector-container" id="p-buttons"></div>
-
             <div class="travel-card">
                 <p class="travel-card-label" id="label-travel">波傳播方向</p>
                 <div class="travel-btns">
                     <button type="button" class="hl-btn" id="dir-left" data-dir="-1">← 向左</button>
                     <button type="button" class="hl-btn active right" id="dir-right" data-dir="1">向右 →</button>
-                </div>
-            </div>
-
-            <div class="controls-compact-row">
-                <div class="highlight-row">
-                    <span id="label-highlight">標示相位關係：</span>
-                    <button type="button" class="hl-btn active off" id="hl-off" data-mode="off">關閉</button>
-                    <button type="button" class="hl-btn" id="hl-in" data-mode="in">同相</button>
-                    <button type="button" class="hl-btn" id="hl-anti" data-mode="anti">反相</button>
-                    <button type="button" class="hl-btn" id="hl-out" data-mode="out">不同相</button>
                 </div>
             </div>
 
@@ -466,12 +477,25 @@
             <canvas id="waveCanvas" width="1000" height="360"></canvas>
         </div>
 
-        <div class="card graph-card">
+        <div class="card graph-card dt-graph-card">
             <div class="card-header">
                 <span id="graph-title">📉 位移–時間圖</span>
                 <span id="label-center-line" style="font-size:12px; color:#999">中線 = t(0)</span>
             </div>
-            <canvas id="graphCanvas" width="1000" height="280"></canvas>
+            <div class="graph-inline-controls">
+                <div>
+                    <p class="graph-ctrl-label" id="label-select-particle">選擇要繪製圖像的粒子：</p>
+                    <div class="particle-selector-container" id="p-buttons"></div>
+                </div>
+                <div class="highlight-row">
+                    <span id="label-highlight">標示相位關係：</span>
+                    <button type="button" class="hl-btn active off" id="hl-off" data-mode="off">關閉</button>
+                    <button type="button" class="hl-btn" id="hl-in" data-mode="in">同相</button>
+                    <button type="button" class="hl-btn" id="hl-anti" data-mode="anti">反相</button>
+                    <button type="button" class="hl-btn" id="hl-out" data-mode="out">不同相</button>
+                </div>
+            </div>
+            <canvas id="graphCanvas" width="1000" height="420"></canvas>
         </div>
 
     </div>
@@ -612,10 +636,10 @@
         let waveW = 1000;
         let waveH = 360;
         let graphW = 1000;
-        let graphH = 280;
+        let graphH = 420;
         let amplitude = 78;
         let waveCenterY = 180;
-        let graphCenterY = 140;
+        let graphCenterY = 210;
         let tOrigin = 500;
         const PX_PER_UNIT = 220; // preferred canvas px per unit of λ (may shrink to fit A–H)
         const ORIGIN_X = 48;
@@ -660,7 +684,7 @@
             waveCenterY = Math.round(waveH / 2);
             amplitude = Math.round(waveH * (78 / 360));
 
-            const graph = fitHiDpiCanvas(graphCanvas, graphCtx, 1000, 280);
+            const graph = fitHiDpiCanvas(graphCanvas, graphCtx, 1000, 420);
             graphW = graph.w;
             graphH = graph.h;
             graphCenterY = Math.round(graphH / 2);
