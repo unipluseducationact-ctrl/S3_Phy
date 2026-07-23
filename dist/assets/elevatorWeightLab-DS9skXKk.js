@@ -1,1 +1,0 @@
-import{c as t}from"./createLabIframe-DgsK3lE1.js";import"./index-B31cp28G.js";function o(e){return t(e,{slug:"elevator-weight",titleKey:"tools.elevatorWeight.title",className:"tool-elevator-weight-lab",extraParams:()=>"&v=20260723_elevator_v2"})}export{o as createElevatorWeightLab};

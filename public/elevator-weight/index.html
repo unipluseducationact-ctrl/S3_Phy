@@ -747,7 +747,7 @@
             }
 
             // Velocity hint
-            if (velSign !== 0 && playing) {
+            if (velSign !== 0 && playing && !stopped) {
                 const vx = sx - 24;
                 const vy = cabinTop + cabinH / 2;
                 if (velSign > 0) drawArrow(ctx, vx, vy + 20, vx, vy - 20, '#0369a1', 2.5);
@@ -861,9 +861,82 @@
             }
         }
 
+        function drawNtGraph() {
+            const ctx = ntCtx;
+            const w = ntCanvas.width;
+            const h = ntCanvas.height;
+            ctx.clearRect(0, 0, w, h);
+
+            const pad = { l: 52, r: 18, t: 18, b: 36 };
+            const plotW = w - pad.l - pad.r;
+            const plotH = h - pad.t - pad.b;
+            const W = weight();
+            const maxN = Math.max(W * 1.85, ...(history.map((p) => p.N)), normal());
+            const t0 = history.length ? history[0].t : 0;
+            const t1 = Math.max(t0 + 4, history.length ? history[history.length - 1].t : 4, simTime);
+            const span = Math.max(0.001, t1 - t0);
+
+            const xOf = (t) => pad.l + ((t - t0) / span) * plotW;
+            const yOf = (N) => pad.t + plotH - (N / maxN) * plotH;
+
+            // Axes
+            ctx.strokeStyle = '#94a3b8';
+            ctx.lineWidth = 1.5;
+            ctx.beginPath();
+            ctx.moveTo(pad.l, pad.t);
+            ctx.lineTo(pad.l, pad.t + plotH);
+            ctx.lineTo(pad.l + plotW, pad.t + plotH);
+            ctx.stroke();
+
+            // mg reference
+            ctx.strokeStyle = '#dc2626';
+            ctx.lineWidth = 1.5;
+            ctx.setLineDash([6, 5]);
+            ctx.beginPath();
+            ctx.moveTo(pad.l, yOf(W));
+            ctx.lineTo(pad.l + plotW, yOf(W));
+            ctx.stroke();
+            ctx.setLineDash([]);
+            ctx.fillStyle = '#dc2626';
+            ctx.font = 'bold 11px "Noto Sans TC", sans-serif';
+            ctx.fillText('mg', pad.l + 4, yOf(W) - 6);
+
+            // N(t) polyline
+            if (history.length >= 1) {
+                ctx.strokeStyle = '#059669';
+                ctx.lineWidth = 2.5;
+                ctx.beginPath();
+                history.forEach((p, i) => {
+                    const x = xOf(p.t);
+                    const y = yOf(p.N);
+                    if (i === 0) ctx.moveTo(x, y);
+                    else ctx.lineTo(x, y);
+                });
+                ctx.stroke();
+
+                // Current marker
+                const cur = history[history.length - 1];
+                ctx.fillStyle = '#059669';
+                ctx.beginPath();
+                ctx.arc(xOf(cur.t), yOf(cur.N), 5, 0, Math.PI * 2);
+                ctx.fill();
+            }
+
+            // Labels
+            ctx.fillStyle = '#64748b';
+            ctx.font = 'bold 11px "Noto Sans TC", sans-serif';
+            ctx.fillText('N (N)', 8, pad.t + 10);
+            ctx.fillText('t (s)', pad.l + plotW - 28, h - 10);
+            ctx.fillText(t0.toFixed(1), pad.l, h - 10);
+            ctx.fillText(t1.toFixed(1), pad.l + plotW - 8, h - 10);
+            ctx.fillText('0', 28, pad.t + plotH + 4);
+            ctx.fillText(maxN.toFixed(0), 8, pad.t + 22);
+        }
+
         function draw() {
             drawScene();
             drawFbd();
+            drawNtGraph();
         }
 
         function resize() {
@@ -873,45 +946,96 @@
             const fParent = fbdCanvas.parentElement;
             fbdCanvas.width = Math.max(280, fParent.clientWidth - 32);
             fbdCanvas.height = 280;
+            const nParent = ntCanvas.parentElement;
+            ntCanvas.width = Math.max(320, nParent.clientWidth - 32);
+            ntCanvas.height = 220;
             draw();
         }
 
-        function tick() {
-            if (playing) {
+        function stopCabin() {
+            stopped = true;
+            velSign = 0;
+            phase = 'rest';
+            playing = false;
+            pushHistory();
+            updateUI();
+        }
+
+        function tick(ts) {
+            if (!lastTs) lastTs = ts;
+            const dt = Math.min(0.05, (ts - lastTs) / 1000);
+            lastTs = ts;
+
+            if (playing && !stopped) {
+                simTime += dt;
                 const s = scenario();
-                const target = s.id === 'upDecel' ? 0.9 : 0.1;
-                const dist = Math.abs(target - cabinY);
-                const slow = Math.max(0.15, Math.min(1, dist / 0.35));
-                const step = (0.0035 + aMag() * 0.00045) * slow;
-                cabinY += s.moving * step;
-                if (s.id === 'upDecel' && cabinY >= 0.9) {
-                    cabinY = 0.9;
-                    playing = false;
-                    updateUI();
+                const base = 0.0035 + aMag() * 0.00045;
+
+                if (s.id === 'fullUp') {
+                    velSign = 1;
+                    if (phase === 'accel') {
+                        cabinY += base * 1.15;
+                        if (cabinY >= 0.38) phase = 'coast';
+                    } else if (phase === 'coast') {
+                        cabinY += base * 0.95;
+                        if (cabinY >= 0.68) phase = 'decel';
+                    } else if (phase === 'decel') {
+                        const dist = Math.max(0, 0.9 - cabinY);
+                        const slow = Math.max(0.2, Math.min(1, dist / 0.28));
+                        cabinY += base * slow * 0.85;
+                        if (cabinY >= 0.9) {
+                            cabinY = 0.9;
+                            stopCabin();
+                        }
+                    }
+                } else if (s.id === 'upDecel') {
+                    velSign = 1;
+                    const dist = Math.abs(0.9 - cabinY);
+                    const slow = Math.max(0.15, Math.min(1, dist / 0.35));
+                    cabinY += base * slow;
+                    if (cabinY >= 0.9) {
+                        cabinY = 0.9;
+                        stopCabin();
+                    }
+                } else {
+                    velSign = -1;
+                    const dist = Math.abs(cabinY - 0.1);
+                    const slow = Math.max(0.15, Math.min(1, dist / 0.35));
+                    cabinY -= base * slow;
+                    if (cabinY <= 0.1) {
+                        cabinY = 0.1;
+                        stopCabin();
+                    }
                 }
-                if (s.id === 'downDecel' && cabinY <= 0.1) {
-                    cabinY = 0.1;
-                    playing = false;
-                    updateUI();
-                }
+                pushHistory();
+                updateUI();
             }
             draw();
             requestAnimationFrame(tick);
         }
 
-        massSlider.addEventListener('input', () => { updateUI(); draw(); });
-        accelSlider.addEventListener('input', () => { updateUI(); draw(); });
+        massSlider.addEventListener('input', () => {
+            pushHistory();
+            updateUI();
+            draw();
+        });
+        accelSlider.addEventListener('input', () => {
+            pushHistory();
+            updateUI();
+            draw();
+        });
         playBtn.addEventListener('click', () => {
-            const s = scenario();
-            if (!playing && ((s.id === 'upDecel' && cabinY >= 0.89) || (s.id === 'downDecel' && cabinY <= 0.11))) {
+            if (!playing && stopped) {
                 applyScenarioStart();
             }
             playing = !playing;
+            lastTs = 0;
             updateUI();
         });
         document.getElementById('resetBtn').addEventListener('click', () => {
             applyScenarioStart();
             playing = true;
+            lastTs = 0;
             updateUI();
             draw();
         });
@@ -941,7 +1065,7 @@
         updateLanguageUI();
         applyScenarioStart();
         resize();
-        tick();
+        requestAnimationFrame(tick);
     </script>
 </body>
 </html>
