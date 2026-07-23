@@ -143,33 +143,6 @@
             font-size: 0.95rem;
             font-variant-numeric: tabular-nums;
         }
-        .bend-pill {
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            padding: 10px 14px;
-            border-radius: 10px;
-            font-weight: 800;
-            font-size: 0.9rem;
-            flex: 1 1 140px;
-            text-align: center;
-            border: 1px solid transparent;
-        }
-        .bend-pill.more {
-            background: #fff7ed;
-            color: var(--warn);
-            border-color: #fed7aa;
-        }
-        .bend-pill.less {
-            background: #ecfeff;
-            color: var(--accent);
-            border-color: #a5f3fc;
-        }
-        .bend-pill.mid {
-            background: #f8f9fa;
-            color: var(--text);
-            border-color: var(--border);
-        }
         .canvas-card { padding: 14px; }
         .canvas-label {
             font-size: 0.8rem;
@@ -240,7 +213,6 @@
                     <span class="k" id="label-ratio">Ratio λ / a</span>
                     <span class="v" id="ratioVal">0.51</span>
                 </div>
-                <div class="bend-pill mid" id="bendPill">Moderate bend</div>
             </div>
         </div>
 
@@ -273,9 +245,6 @@
                 invTitle: '衍射過程中',
                 invBody: '<strong>不變</strong>：波速、波長、頻率。改變嘅係波嘅傳播方向同波紋樣式。',
                 factor: '<strong>衍射程度增加</strong>：波長 λ 愈大，或者縫寬 a 愈細。',
-                bendMore: '彎曲較多',
-                bendLess: '彎曲較少',
-                bendMid: '中等彎曲',
                 barrier: '障礙物',
                 gapLabel: '縫 a',
                 plane: '入射平面波',
@@ -294,9 +263,6 @@
                 invTitle: 'During diffraction',
                 invBody: '<strong>No change</strong> in speed, wavelength or frequency. Only the direction of wave travel and the wave pattern change.',
                 factor: '<strong>Degree of diffraction increases</strong> with larger wavelength λ and smaller gap width a.',
-                bendMore: 'Bend more',
-                bendLess: 'Bend less',
-                bendMid: 'Moderate bend',
                 barrier: 'Barrier',
                 gapLabel: 'Gap a',
                 plane: 'Incident plane waves',
@@ -318,7 +284,6 @@
         const ctx = canvas.getContext('2d');
         const lambdaSlider = document.getElementById('lambdaSlider');
         const gapSlider = document.getElementById('gapSlider');
-        const bendPill = document.getElementById('bendPill');
 
         let phase = 0;
 
@@ -350,25 +315,12 @@
         }
 
         function updateReadouts() {
-            const t = dict[currentLang];
             const L = lambda();
             const a = gap();
             const r = L / a;
-            const b = bendAmount();
             document.getElementById('lambdaVal').textContent = L.toFixed(0);
             document.getElementById('gapVal').textContent = a.toFixed(0);
             document.getElementById('ratioVal').textContent = r.toFixed(2);
-
-            if (b >= 0.62) {
-                bendPill.textContent = t.bendMore;
-                bendPill.className = 'bend-pill more';
-            } else if (b <= 0.28) {
-                bendPill.textContent = t.bendLess;
-                bendPill.className = 'bend-pill less';
-            } else {
-                bendPill.textContent = t.bendMid;
-                bendPill.className = 'bend-pill mid';
-            }
         }
 
         function layout() {

@@ -6,6 +6,6 @@ export function createWaveDiffractionLab(t) {
     slug: 'wave-diffraction',
     titleKey: 'tools.waveDiffraction.title',
     className: 'tool-wave-diffraction-lab',
-    extraParams: () => '&v=20260723_wave_diffraction_v2',
+    extraParams: () => '&v=20260723_wave_diffraction_v3',
   });
 }
