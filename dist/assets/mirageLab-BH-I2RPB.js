@@ -1,0 +1,1 @@
+import{c as e}from"./createLabIframe-DH_1jPXM.js";import"./index-CjISFCpI.js";function i(a){return e(a,{slug:"mirage",titleKey:"tools.mirage.title",className:"tool-mirage-lab",extraParams:()=>"&v=20260723_mirage_v2"})}export{i as createMirageLab};
