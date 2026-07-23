@@ -345,22 +345,22 @@
 
     <script>
         const G = 9.81;
-        const DECEL_DUR = 1.5; // non-zero |a| only in this window before stop
         const ACCEL_DUR = 1.5; // fullUp start accel window
-        const CRUISE = 0.26; // cabinY units / s while coasting
+        const DECEL_DUR = 1.5; // fullUp end brake window
+        const CRUISE = 0.28; // cabinY units / s (cruise / focus start speed)
         const FORCE_REF = 70 * G; // pixel scale reference (70 kg · g)
         const A_REF = 8; // max |a| on slider
-        // Focus cases + full trip that shows N changing through time
+        // Focus cases keep opposite v & a for the whole trip; fullUp shows N(t) phases
         const SCENARIOS = [
+            { id: 'upDecel', aSign: -1, moving: 1, needA: true },   // v↑ a↓ until stop
+            { id: 'downDecel', aSign: 1, moving: -1, needA: true }, // v↓ a↑ until stop
             { id: 'fullUp', needA: true },                          // accel → coast → decel → rest
-            { id: 'upDecel', aSign: -1, moving: 1, needA: true },   // coast ↑ then last 1.5s a↓
-            { id: 'downDecel', aSign: 1, moving: -1, needA: true }, // coast ↓ then last 1.5s a↑
         ];
 
         const dict = {
             zh: {
                 title: '電梯中的受力',
-                desc: '看法向力 N 如何隨時間改變：完整上行（加速→勻速→減速），以及兩個減速至停的重點情境。',
+                desc: '兩個重點：向上行但向下加速（減速至停）；向下行但向上加速（減速至停）。亦可睇完整上行（加速→勻速→減速）。',
                 mass: '質量 m',
                 accel: '|a| 大小',
                 play: '▶ 播放',
@@ -389,9 +389,9 @@
                     upDecel: '上行 · a 向下（減速至停）',
                     downDecel: '下行 · a 向上（減速至停）',
                 },
-                cueFullUp: '先加速 1.5 s（N↑）→ 勻速（N = mg）→ 停車前 1.5 s 減速（N↓）',
-                cueUpDecel: '先勻速上行（N = mg）→ 停車前 1.5 s 加速度向下（N < mg）',
-                cueDownDecel: '先勻速下行（N = mg）→ 停車前 1.5 s 加速度向上（N > mg）',
+                cueFullUp: '加速（N↑）→ 勻速（N = mg）→ 減速（N↓）',
+                cueUpDecel: '全程向上行但向下加速 → 減速至停（N < mg）',
+                cueDownDecel: '全程向下行但向上加速 → 減速至停（N > mg）',
                 why: '點解減速至停會變輕／變重？',
                 whyLight: '上行減速 → 變輕',
                 whyHeavy: '下行減速 → 變重',
@@ -430,7 +430,7 @@
             },
             en: {
                 title: 'Forces in an elevator',
-                desc: 'See how normal force N changes with time: a full upward trip (accel → coast → decel), plus two slow-to-stop focus cases.',
+                desc: 'Two focus cases: moving up with a down (slow to stop), and moving down with a up. Also a full upward trip (accel → coast → decel).',
                 mass: 'Mass m',
                 accel: '|a| magnitude',
                 play: '▶ Play',
@@ -459,9 +459,9 @@
                     upDecel: 'Going up · a down (slow to stop)',
                     downDecel: 'Going down · a up (slow to stop)',
                 },
-                cueFullUp: 'Accel 1.5 s (N↑) → coast (N = mg) → last 1.5 s decel (N↓)',
-                cueUpDecel: 'Coast up (N = mg) → last 1.5 s a downward (N < mg)',
-                cueDownDecel: 'Coast down (N = mg) → last 1.5 s a upward (N > mg)',
+                cueFullUp: 'Accel (N↑) → coast (N = mg) → brake (N↓)',
+                cueUpDecel: 'Moving UP with a DOWN the whole way → slows to a stop (N < mg)',
+                cueDownDecel: 'Moving DOWN with a UP the whole way → slows to a stop (N > mg)',
                 why: 'Why slowing to a stop feels lighter / heavier',
                 whyLight: 'Up & slowing → lighter',
                 whyHeavy: 'Down & slowing → heavier',
@@ -506,14 +506,14 @@
 
         const params = new URLSearchParams(location.search);
         let currentLang = hubLangToLocal(params.get('lang') || 'zh');
-        let scenarioId = 'fullUp';
+        let scenarioId = 'upDecel';
         let playing = true;
-        let cabinY = 0.1;
-        let velocity = 0; // signed cabinY / s (arrow magnitude)
+        let cabinY = 0.12;
+        let velocity = 0; // signed cabinY / s
         let brakeV0 = 0;
-        let phaseTimer = 0; // seconds in current accel/decel phase
+        let phaseTimer = 0; // seconds in current accel/decel phase (fullUp)
         let stopped = false;
-        let phase = 'accel'; // accel | coast | decel | rest
+        let phase = 'decel'; // accel | coast | decel | rest
         let simTime = 0;
         let history = []; // { t, N, a }
         let lastTs = 0;
@@ -541,19 +541,25 @@
         function aMag() { return parseFloat(accelSlider.value); }
 
         function accel() {
-            if (stopped) return 0;
+            if (stopped || phase === 'rest') return 0;
+            // Focus cases: opposite v & a for the whole moving trip
+            if (scenarioId === 'upDecel') return -aMag();
+            if (scenarioId === 'downDecel') return aMag();
+            // fullUp: timed phases
             if (phase === 'accel') return aMag();
-            if (phase === 'decel') {
-                // Braking: up trips → a down; down trip → a up
-                return scenarioId === 'downDecel' ? aMag() : -aMag();
-            }
-            return 0; // coast / rest — a only in the timed windows
+            if (phase === 'decel') return -aMag();
+            return 0; // coast
         }
 
         function weight() { return mass() * G; }
         function normal() {
             // N - mg = ma  (up +)  →  N = m(g+a)
             return Math.max(0, mass() * (G + accel()));
+        }
+
+        /** Map SI |a| → cabinY/s² so the slider changes stopping rate. */
+        function aVisual() {
+            return 0.035 + aMag() * 0.022;
         }
 
         function forcePx(F, basePx) {
@@ -572,17 +578,9 @@
 
         function currentPhaseKey() {
             if (stopped) return 'stopped';
+            if (scenarioId === 'upDecel') return 'upDecel';
+            if (scenarioId === 'downDecel') return 'downDecel';
             if (scenarioId === 'fullUp') return phase === 'rest' ? 'rest' : phase;
-            if (scenarioId === 'upDecel') {
-                if (phase === 'decel') return 'upDecel';
-                if (phase === 'coast') return 'coast';
-                return 'stopped';
-            }
-            if (scenarioId === 'downDecel') {
-                if (phase === 'decel') return 'downDecel';
-                if (phase === 'coast') return 'coast';
-                return 'stopped';
-            }
             return 'rest';
         }
 
@@ -615,14 +613,16 @@
                 phase = 'accel';
                 whyMode = 'heavy';
             } else if (s.id === 'upDecel') {
+                // Start near bottom, moving up, a down for the whole trip
                 cabinY = 0.12;
                 velocity = CRUISE;
-                phase = 'coast';
+                phase = 'decel';
                 whyMode = 'light';
             } else {
+                // Start near top, moving down, a up for the whole trip
                 cabinY = 0.88;
                 velocity = -CRUISE;
-                phase = 'coast';
+                phase = 'decel';
                 whyMode = 'heavy';
             }
             whyT = 0;
@@ -1359,50 +1359,67 @@
             if (playing && !stopped) {
                 simTime += dt;
                 const tgt = targetY();
-                const rem = Math.abs(tgt - cabinY);
-                const dStop = Math.abs(velocity) * DECEL_DUR * 0.5;
 
-                if (phase === 'accel') {
-                    // fullUp: ramp speed to cruise over ACCEL_DUR
-                    phaseTimer += dt;
-                    const u = Math.min(1, phaseTimer / ACCEL_DUR);
-                    velocity = CRUISE * u;
+                if (scenarioId === 'upDecel' || scenarioId === 'downDecel') {
+                    // Integrate so |a| slider changes how fast the cabin slows
+                    const aVis = scenarioId === 'upDecel' ? -aVisual() : aVisual();
+                    velocity += aVis * dt;
                     cabinY += velocity * dt;
-                    if (phaseTimer >= ACCEL_DUR || rem <= dStop + 0.02) {
-                        velocity = CRUISE;
-                        phase = 'coast';
-                        phaseTimer = 0;
-                    }
-                } else if (phase === 'coast') {
-                    velocity = scenarioId === 'downDecel' ? -CRUISE : CRUISE;
-                    // Start braking when remaining distance matches 1.5 s stop distance
-                    if (rem <= Math.abs(velocity) * DECEL_DUR * 0.5 + 1e-4) {
-                        beginDecel();
-                    } else {
-                        cabinY += velocity * dt;
-                    }
-                }
-
-                if (phase === 'decel' && !stopped) {
-                    phaseTimer += dt;
-                    const u = Math.min(1, phaseTimer / DECEL_DUR);
-                    velocity = brakeV0 * (1 - u);
-                    cabinY += velocity * dt;
-                    const remNow = Math.abs(tgt - cabinY);
-                    if (
-                        phaseTimer >= DECEL_DUR ||
-                        remNow <= 0.002 ||
-                        (brakeV0 > 0 && cabinY >= tgt) ||
-                        (brakeV0 < 0 && cabinY <= tgt)
-                    ) {
+                    if (scenarioId === 'upDecel') {
+                        if (velocity <= 0 || cabinY >= tgt) {
+                            cabinY = Math.min(cabinY, tgt);
+                            stopCabin();
+                        }
+                    } else if (velocity >= 0 || cabinY <= tgt) {
+                        cabinY = Math.max(cabinY, tgt);
                         stopCabin();
                     }
+                } else {
+                    // fullUp: accel → coast → timed brake
+                    const rem = Math.abs(tgt - cabinY);
+                    const dStop = Math.abs(velocity) * DECEL_DUR * 0.5;
+
+                    if (phase === 'accel') {
+                        phaseTimer += dt;
+                        const u = Math.min(1, phaseTimer / ACCEL_DUR);
+                        velocity = CRUISE * u;
+                        cabinY += velocity * dt;
+                        if (phaseTimer >= ACCEL_DUR || rem <= dStop + 0.02) {
+                            velocity = CRUISE;
+                            phase = 'coast';
+                            phaseTimer = 0;
+                        }
+                    } else if (phase === 'coast') {
+                        velocity = CRUISE;
+                        if (rem <= Math.abs(velocity) * DECEL_DUR * 0.5 + 1e-4) {
+                            beginDecel();
+                        } else {
+                            cabinY += velocity * dt;
+                        }
+                    }
+
+                    if (phase === 'decel' && !stopped) {
+                        phaseTimer += dt;
+                        const u = Math.min(1, phaseTimer / DECEL_DUR);
+                        velocity = brakeV0 * (1 - u);
+                        cabinY += velocity * dt;
+                        const remNow = Math.abs(tgt - cabinY);
+                        if (
+                            phaseTimer >= DECEL_DUR ||
+                            remNow <= 0.002 ||
+                            (brakeV0 > 0 && cabinY >= tgt) ||
+                            (brakeV0 < 0 && cabinY <= tgt)
+                        ) {
+                            stopCabin();
+                        }
+                    }
                 }
 
-                // Clamp within shaft
                 cabinY = Math.max(0.05, Math.min(0.95, cabinY));
-                pushHistory();
-                updateUI();
+                if (!stopped) {
+                    pushHistory();
+                    updateUI();
+                }
             }
             whyT += dt;
             updateWhyCaption();
