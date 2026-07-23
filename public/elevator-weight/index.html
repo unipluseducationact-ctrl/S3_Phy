@@ -225,6 +225,7 @@
         .legend .ln::before { background: var(--n); }
         .legend .lw::before { background: var(--w); }
         .legend .la::before { background: var(--a); }
+        .legend .lv::before { background: #0369a1; }
         #ntCanvas { height: 220px; background: #fafafa; }
         .phase-tag {
             display: inline-block;
@@ -236,6 +237,31 @@
             background: #ecfdf5;
             color: #047857;
             border: 1px solid #a7f3d0;
+        }
+        #whyCanvas { height: 260px; background: #f8fafc; }
+        .why-modes {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 8px;
+            margin-bottom: 10px;
+        }
+        #whyCaption {
+            margin: 10px 0 0;
+            min-height: 2.6em;
+            font-size: 0.92rem;
+            font-weight: 700;
+            color: #0f766e;
+            line-height: 1.45;
+        }
+        .why-eq {
+            margin-top: 8px;
+            font-family: "Roboto Mono", Consolas, monospace;
+            font-size: 0.82rem;
+            color: #475569;
+            background: #f1f5f9;
+            border-radius: 8px;
+            padding: 8px 10px;
+            line-height: 1.5;
         }
     </style>
 </head>
@@ -280,6 +306,7 @@
                     <span class="ln" id="leg-n">N (normal)</span>
                     <span class="lw" id="leg-w">W = mg (weight)</span>
                     <span class="la" id="leg-a">a (acceleration)</span>
+                    <span class="lv" id="leg-v">v (speed)</span>
                 </div>
             </div>
             <div class="card">
@@ -297,6 +324,15 @@
         </div>
 
         <div class="card">
+            <div class="canvas-label" id="label-why">Why it feels lighter / heavier</div>
+            <div class="why-modes" id="why-modes"></div>
+            <canvas id="whyCanvas" width="900" height="260"></canvas>
+            <p id="whyCaption"></p>
+            <div class="why-eq" id="whyEq"></div>
+            <button type="button" class="play-btn" id="whyReplay" style="margin-top:10px;background:#475569">↺ Replay</button>
+        </div>
+
+        <div class="card">
             <div class="canvas-label" id="label-nt">N vs time</div>
             <canvas id="ntCanvas" width="900" height="220"></canvas>
             <div class="legend">
@@ -309,11 +345,16 @@
 
     <script>
         const G = 9.81;
+        const DECEL_DUR = 1.5; // non-zero |a| only in this window before stop
+        const ACCEL_DUR = 1.5; // fullUp start accel window
+        const CRUISE = 0.26; // cabinY units / s while coasting
+        const FORCE_REF = 70 * G; // pixel scale reference (70 kg · g)
+        const A_REF = 8; // max |a| on slider
         // Focus cases + full trip that shows N changing through time
         const SCENARIOS = [
             { id: 'fullUp', needA: true },                          // accel → coast → decel → rest
-            { id: 'upDecel', aSign: -1, moving: 1, needA: true },   // v↑ a↓ → lighter, slows to stop
-            { id: 'downDecel', aSign: 1, moving: -1, needA: true }, // v↓ a↑ → heavier, slows to stop
+            { id: 'upDecel', aSign: -1, moving: 1, needA: true },   // coast ↑ then last 1.5s a↓
+            { id: 'downDecel', aSign: 1, moving: -1, needA: true }, // coast ↓ then last 1.5s a↑
         ];
 
         const dict = {
@@ -335,6 +376,7 @@
                 legN: 'N（法向力）',
                 legW: 'W = mg（重量）',
                 legA: 'a（加速度）',
+                legV: 'v（速度）',
                 legNtN: 'N(t)',
                 legNtMg: 'mg（參考）',
                 feelHeavy: '感覺變重（N > mg）— a 向上',
@@ -347,9 +389,31 @@
                     upDecel: '上行 · a 向下（減速至停）',
                     downDecel: '下行 · a 向上（減速至停）',
                 },
-                cueFullUp: '加速 N↑ → 勻速 N = mg → 減速 N↓ → 停下 N = mg',
-                cueUpDecel: '速度向上，加速度向下 → N < mg；停下後 N = mg',
-                cueDownDecel: '速度向下，加速度向上 → N > mg；停下後 N = mg',
+                cueFullUp: '先加速 1.5 s（N↑）→ 勻速（N = mg）→ 停車前 1.5 s 減速（N↓）',
+                cueUpDecel: '先勻速上行（N = mg）→ 停車前 1.5 s 加速度向下（N < mg）',
+                cueDownDecel: '先勻速下行（N = mg）→ 停車前 1.5 s 加速度向上（N > mg）',
+                why: '點解減速至停會變輕／變重？',
+                whyLight: '上行減速 → 變輕',
+                whyHeavy: '下行減速 → 變重',
+                whyReplay: '↺ 重播解說',
+                whyStepsLight: [
+                    '① 電梯同人一齊向上行。',
+                    '② 電梯減速至停：加速度向下（a↓）。',
+                    '③ 身體有慣性，傾向繼續向上 → 對地板壓得較少。',
+                    '④ 地板托力 N 變細（N < mg）→ 感覺變輕。',
+                ],
+                whyStepsHeavy: [
+                    '① 電梯同人一齊向下行。',
+                    '② 電梯減速至停：加速度向上（a↑）。',
+                    '③ 身體有慣性，傾向繼續向下 → 對地板壓得較多。',
+                    '④ 地板托力 N 變大（N > mg）→ 感覺變重。',
+                ],
+                whyEqLight: 'ΣF = N − mg = ma\na 向下為負 → N = m(g + a) < mg',
+                whyEqHeavy: 'ΣF = N − mg = ma\na 向上為正 → N = m(g + a) > mg',
+                whyFloor: '地板',
+                whyBody: '人',
+                whyGhost: '慣性方向',
+                whyInertia: '慣性',
                 phases: {
                     rest: '階段：靜止（a = 0）',
                     accel: '階段：向上加速（N > mg）',
@@ -382,6 +446,7 @@
                 legN: 'N (normal)',
                 legW: 'W = mg (weight)',
                 legA: 'a (acceleration)',
+                legV: 'v (speed)',
                 legNtN: 'N(t)',
                 legNtMg: 'mg (reference)',
                 feelHeavy: 'Feels heavier (N > mg) — a upward',
@@ -394,9 +459,31 @@
                     upDecel: 'Going up · a down (slow to stop)',
                     downDecel: 'Going down · a up (slow to stop)',
                 },
-                cueFullUp: 'Accel N↑ → coast N = mg → decel N↓ → rest N = mg',
-                cueUpDecel: 'v upward, a downward → N < mg; after stop N = mg',
-                cueDownDecel: 'v downward, a upward → N > mg; after stop N = mg',
+                cueFullUp: 'Accel 1.5 s (N↑) → coast (N = mg) → last 1.5 s decel (N↓)',
+                cueUpDecel: 'Coast up (N = mg) → last 1.5 s a downward (N < mg)',
+                cueDownDecel: 'Coast down (N = mg) → last 1.5 s a upward (N > mg)',
+                why: 'Why slowing to a stop feels lighter / heavier',
+                whyLight: 'Up & slowing → lighter',
+                whyHeavy: 'Down & slowing → heavier',
+                whyReplay: '↺ Replay explanation',
+                whyStepsLight: [
+                    '① Cabin and person move upward together.',
+                    '② Cabin slows to a stop: acceleration is downward (a↓).',
+                    '③ Inertia keeps the body tending upward → less push on the floor.',
+                    '④ Floor push N shrinks (N < mg) → you feel lighter.',
+                ],
+                whyStepsHeavy: [
+                    '① Cabin and person move downward together.',
+                    '② Cabin slows to a stop: acceleration is upward (a↑).',
+                    '③ Inertia keeps the body tending downward → more push on the floor.',
+                    '④ Floor push N grows (N > mg) → you feel heavier.',
+                ],
+                whyEqLight: 'ΣF = N − mg = ma\na downward (negative) → N = m(g + a) < mg',
+                whyEqHeavy: 'ΣF = N − mg = ma\na upward (positive) → N = m(g + a) > mg',
+                whyFloor: 'Floor',
+                whyBody: 'Person',
+                whyGhost: 'Inertia path',
+                whyInertia: 'Inertia',
                 phases: {
                     rest: 'Phase: at rest (a = 0)',
                     accel: 'Phase: accelerating up (N > mg)',
@@ -429,6 +516,9 @@
         let history = []; // { t, N, a }
         let lastTs = 0;
         const HISTORY_MAX_T = 14;
+        let whyMode = 'light'; // light = up decelerating; heavy = down decelerating
+        let whyT = 0;
+        const WHY_CYCLE = 8;
 
         const sceneCanvas = document.getElementById('sceneCanvas');
         const sceneCtx = sceneCanvas.getContext('2d');
@@ -436,6 +526,8 @@
         const fbdCtx = fbdCanvas.getContext('2d');
         const ntCanvas = document.getElementById('ntCanvas');
         const ntCtx = ntCanvas.getContext('2d');
+        const whyCanvas = document.getElementById('whyCanvas');
+        const whyCtx = whyCanvas.getContext('2d');
         const massSlider = document.getElementById('massSlider');
         const accelSlider = document.getElementById('accelSlider');
         const playBtn = document.getElementById('playBtn');
@@ -503,12 +595,40 @@
                 cabinY = 0.12;
                 velSign = 1;
                 phase = 'upDecel';
+                whyMode = 'light';
+                whyT = 0;
             } else {
                 cabinY = 0.88;
                 velSign = -1;
                 phase = 'downDecel';
+                whyMode = 'heavy';
+                whyT = 0;
             }
             pushHistory();
+            buildWhyButtons();
+        }
+
+        function buildWhyButtons() {
+            const box = document.getElementById('why-modes');
+            box.innerHTML = '';
+            const d = t();
+            [
+                { id: 'light', label: d.whyLight },
+                { id: 'heavy', label: d.whyHeavy },
+            ].forEach((opt) => {
+                const b = document.createElement('button');
+                b.type = 'button';
+                b.className = 'sc-btn' + (whyMode === opt.id ? ' active' : '');
+                b.textContent = opt.label;
+                b.addEventListener('click', () => {
+                    whyMode = opt.id;
+                    whyT = 0;
+                    buildWhyButtons();
+                    updateWhyCaption();
+                    drawWhy();
+                });
+                box.appendChild(b);
+            });
         }
 
         function buildScenarioButtons() {
@@ -533,6 +653,23 @@
             });
         }
 
+        function whyStepIndex() {
+            const u = whyT % WHY_CYCLE;
+            if (u < 1.8) return 0;
+            if (u < 3.6) return 1;
+            if (u < 5.4) return 2;
+            return 3;
+        }
+
+        function updateWhyCaption() {
+            const d = t();
+            const steps = whyMode === 'light' ? d.whyStepsLight : d.whyStepsHeavy;
+            const i = whyStepIndex();
+            document.getElementById('whyCaption').textContent = steps[i];
+            document.getElementById('whyEq').textContent =
+                whyMode === 'light' ? d.whyEqLight : d.whyEqHeavy;
+        }
+
         function updateLanguageUI() {
             const d = t();
             document.documentElement.lang = currentLang === 'zh' ? 'zh-HK' : 'en';
@@ -545,6 +682,8 @@
             document.getElementById('label-scene').innerText = d.scene;
             document.getElementById('label-fbd').innerText = d.fbd;
             document.getElementById('label-nt').innerText = d.nt;
+            document.getElementById('label-why').innerText = d.why;
+            document.getElementById('whyReplay').innerText = d.whyReplay;
             document.getElementById('k-a').innerText = d.ka;
             document.getElementById('k-n').innerText = d.kn;
             document.getElementById('k-w').innerText = d.kw;
@@ -556,7 +695,9 @@
             document.getElementById('leg-nt-mg').innerText = d.legNtMg;
             playBtn.innerText = playing ? d.pause : d.play;
             buildScenarioButtons();
+            buildWhyButtons();
             updateUI();
+            updateWhyCaption();
             draw();
         }
 
@@ -933,10 +1074,200 @@
             ctx.fillText(maxN.toFixed(0), 8, pad.t + 22);
         }
 
+        function drawPersonFigure(ctx, px, footY, alpha, fill) {
+            ctx.save();
+            ctx.globalAlpha = alpha;
+            ctx.fillStyle = fill;
+            ctx.beginPath();
+            ctx.arc(px, footY - 52, 10, 0, Math.PI * 2);
+            ctx.fill();
+            ctx.fillRect(px - 9, footY - 42, 18, 28);
+            ctx.fillRect(px - 12, footY - 14, 8, 14);
+            ctx.fillRect(px + 4, footY - 14, 8, 14);
+            ctx.restore();
+        }
+
+        function drawWhy() {
+            const ctx = whyCtx;
+            const w = whyCanvas.width;
+            const h = whyCanvas.height;
+            const d = t();
+            ctx.clearRect(0, 0, w, h);
+
+            const step = whyStepIndex();
+            const light = whyMode === 'light';
+            const u = whyT % WHY_CYCLE;
+
+            // Progress through decelerating after step 0
+            const decelProg = step === 0 ? 0 : Math.min(1, (u - 1.8) / 3.6);
+
+            // Cabin motion: starts moving, then slows
+            const travel = light ? -1 : 1; // screen y: up is negative
+            const baseY = h * 0.55;
+            const moveAmp = 28;
+            const cabinShift = travel * moveAmp * (1 - decelProg) * Math.sin(Math.min(u, 1.8) / 1.8 * Math.PI * 0.5);
+            // After decelerating starts, cabin almost stops shifting
+            const cabinYPos = baseY + (step === 0 ? cabinShift : travel * moveAmp * 0.15 * (1 - decelProg));
+
+            // Inertia ghost drifts away from floor when decelerating
+            const ghostSep = (step >= 2 ? 1 : step === 1 ? Math.max(0, (u - 1.8) / 1.8) : 0);
+            const ghostOff = (light ? -1 : 1) * ghostSep * 36;
+
+            // Contact spring compression: light → less, heavy → more
+            const restSpring = 18;
+            let springH = restSpring;
+            if (step >= 2) {
+                springH = light
+                    ? restSpring * (1 - 0.55 * Math.min(1, (u - 3.6) / 1.8))
+                    : restSpring * (1 + 0.7 * Math.min(1, (u - 3.6) / 1.8));
+            }
+
+            // N arrow length vs mg
+            const mgLen = 50;
+            let nLen = mgLen;
+            if (step >= 3 || (step === 2 && u > 4.2)) {
+                nLen = light ? mgLen * 0.55 : mgLen * 1.45;
+            } else if (step >= 2) {
+                const p = Math.min(1, (u - 3.6) / 1.8);
+                nLen = light ? mgLen * (1 - 0.45 * p) : mgLen * (1 + 0.45 * p);
+            }
+
+            // Shaft panel
+            const panelX = w * 0.08;
+            const panelW = w * 0.52;
+            ctx.fillStyle = '#e2e8f0';
+            ctx.strokeStyle = '#94a3b8';
+            ctx.lineWidth = 2;
+            ctx.beginPath();
+            ctx.roundRect(panelX, 20, panelW, h - 40, 12);
+            ctx.fill();
+            ctx.stroke();
+
+            // Floor
+            const floorY = cabinYPos;
+            const floorX = panelX + 24;
+            const floorW = panelW - 48;
+            ctx.fillStyle = '#64748b';
+            ctx.fillRect(floorX, floorY, floorW, 14);
+            ctx.fillStyle = '#334155';
+            ctx.font = 'bold 11px "Noto Sans TC", sans-serif';
+            ctx.fillText(d.whyFloor, floorX + 8, floorY + 11);
+
+            // Spring (contact) between feet and floor
+            const px = panelX + panelW / 2;
+            const springTop = floorY - springH;
+            ctx.strokeStyle = '#0f766e';
+            ctx.lineWidth = 2.5;
+            ctx.beginPath();
+            const coils = 5;
+            for (let i = 0; i <= coils; i++) {
+                const yy = floorY - (i / coils) * springH;
+                const xx = px + ((i % 2 === 0) ? -10 : 10);
+                if (i === 0) ctx.moveTo(px, floorY);
+                else ctx.lineTo(xx, yy);
+            }
+            ctx.lineTo(px, springTop);
+            ctx.stroke();
+
+            // Ghost (inertia)
+            if (ghostSep > 0.05) {
+                drawPersonFigure(ctx, px, springTop + ghostOff, 0.35, '#64748b');
+                ctx.strokeStyle = '#0369a1';
+                ctx.setLineDash([5, 4]);
+                ctx.lineWidth = 2;
+                ctx.beginPath();
+                ctx.moveTo(px + 28, springTop - 20);
+                ctx.lineTo(px + 28, springTop + ghostOff - 20);
+                ctx.stroke();
+                ctx.setLineDash([]);
+                if (light) {
+                    drawArrow(ctx, px + 28, springTop - 8, px + 28, springTop + ghostOff - 28, '#0369a1', 2);
+                } else {
+                    drawArrow(ctx, px + 28, springTop - 8, px + 28, springTop + ghostOff + 8, '#0369a1', 2);
+                }
+                ctx.fillStyle = '#0369a1';
+                ctx.font = 'bold 11px "Noto Sans TC", sans-serif';
+                ctx.fillText(d.whyInertia, px + 36, springTop + ghostOff / 2 - 10);
+            }
+
+            // Real person on spring
+            drawPersonFigure(ctx, px, springTop, 1, '#1e293b');
+            ctx.fillStyle = '#0f766e';
+            ctx.font = 'bold 11px "Noto Sans TC", sans-serif';
+            ctx.fillText(d.whyBody, px + 16, springTop - 48);
+
+            // Velocity / acceleration labels on left of panel
+            const lx = panelX + 16;
+            if (step === 0) {
+                if (light) drawArrow(ctx, lx, floorY - 10, lx, floorY - 50, '#0369a1', 2.5);
+                else drawArrow(ctx, lx, floorY - 50, lx, floorY - 10, '#0369a1', 2.5);
+                ctx.fillStyle = '#0369a1';
+                ctx.font = 'bold 12px sans-serif';
+                ctx.fillText('v', lx + 10, floorY - 28);
+            } else {
+                // a opposite to v for decelerating stop
+                if (light) {
+                    drawArrow(ctx, lx, floorY - 50, lx, floorY - 10, '#7c3aed', 2.5); // a down
+                    drawArrow(ctx, lx + 28, floorY - 10, lx + 28, floorY - 40, '#0369a1', 2); // v still up but fading
+                } else {
+                    drawArrow(ctx, lx, floorY - 10, lx, floorY - 50, '#7c3aed', 2.5); // a up
+                    drawArrow(ctx, lx + 28, floorY - 40, lx + 28, floorY - 10, '#0369a1', 2);
+                }
+                ctx.fillStyle = '#7c3aed';
+                ctx.font = 'bold 12px sans-serif';
+                ctx.fillText('a', lx + 10, floorY - 28);
+                ctx.fillStyle = '#0369a1';
+                ctx.fillText('v', lx + 38, floorY - 28);
+            }
+
+            // Force comparison panel on the right
+            const fx = panelX + panelW + 28;
+            const fy = h * 0.42;
+            ctx.fillStyle = '#1e293b';
+            ctx.font = 'bold 13px "Noto Sans TC", sans-serif';
+            ctx.fillText(light ? d.whyLight : d.whyHeavy, fx, 36);
+
+            // mg
+            drawArrow(ctx, fx + 40, fy, fx + 40, fy + mgLen, '#dc2626', 4);
+            ctx.fillStyle = '#dc2626';
+            ctx.font = 'bold 12px "Noto Sans TC", sans-serif';
+            ctx.fillText('mg', fx + 52, fy + mgLen / 2);
+
+            // N
+            drawArrow(ctx, fx + 100, fy, fx + 100, fy - nLen, '#059669', 4);
+            ctx.fillStyle = '#059669';
+            ctx.fillText('N', fx + 112, fy - nLen / 2);
+
+            // Feel badge
+            if (step >= 3) {
+                ctx.fillStyle = light ? '#fff7ed' : '#ecfdf5';
+                ctx.strokeStyle = light ? '#fed7aa' : '#a7f3d0';
+                ctx.lineWidth = 1.5;
+                const bx = fx;
+                const by = fy + mgLen + 24;
+                ctx.beginPath();
+                ctx.roundRect(bx, by, 168, 36, 8);
+                ctx.fill();
+                ctx.stroke();
+                ctx.fillStyle = light ? '#c2410c' : '#047857';
+                ctx.font = 'bold 13px "Noto Sans TC", sans-serif';
+                ctx.fillText(light ? d.feelLight : d.feelHeavy, bx + 10, by + 23);
+            }
+
+            // Step dots
+            for (let i = 0; i < 4; i++) {
+                ctx.beginPath();
+                ctx.arc(w - 28, 40 + i * 22, 5, 0, Math.PI * 2);
+                ctx.fillStyle = i === step ? '#0f766e' : '#cbd5e1';
+                ctx.fill();
+            }
+        }
+
         function draw() {
             drawScene();
             drawFbd();
             drawNtGraph();
+            drawWhy();
         }
 
         function resize() {
@@ -949,6 +1280,9 @@
             const nParent = ntCanvas.parentElement;
             ntCanvas.width = Math.max(320, nParent.clientWidth - 32);
             ntCanvas.height = 220;
+            const wParent = whyCanvas.parentElement;
+            whyCanvas.width = Math.max(320, wParent.clientWidth - 32);
+            whyCanvas.height = 260;
             draw();
         }
 
@@ -976,10 +1310,12 @@
                     if (phase === 'accel') {
                         cabinY += base * 1.15;
                         if (cabinY >= 0.38) phase = 'coast';
+                        whyMode = 'heavy';
                     } else if (phase === 'coast') {
                         cabinY += base * 0.95;
                         if (cabinY >= 0.68) phase = 'decel';
                     } else if (phase === 'decel') {
+                        whyMode = 'light';
                         const dist = Math.max(0, 0.9 - cabinY);
                         const slow = Math.max(0.2, Math.min(1, dist / 0.28));
                         cabinY += base * slow * 0.85;
@@ -1010,6 +1346,8 @@
                 pushHistory();
                 updateUI();
             }
+            whyT += dt;
+            updateWhyCaption();
             draw();
             requestAnimationFrame(tick);
         }
@@ -1038,6 +1376,11 @@
             lastTs = 0;
             updateUI();
             draw();
+        });
+        document.getElementById('whyReplay').addEventListener('click', () => {
+            whyT = 0;
+            updateWhyCaption();
+            drawWhy();
         });
         document.getElementById('lang-toggle').addEventListener('click', () => {
             currentLang = currentLang === 'zh' ? 'en' : 'zh';
