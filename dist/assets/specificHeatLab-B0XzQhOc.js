@@ -1,0 +1,1 @@
+import{c as t}from"./createLabIframe-Dnzn_9Mp.js";import"./index-Da9gE9ch.js";function i(e){return t(e,{slug:"specific-heat",titleKey:"tools.specificHeat.title",className:"tool-specific-heat",extraParams:()=>"&v=3"})}export{i as createSpecificHeatLab};

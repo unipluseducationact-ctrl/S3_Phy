@@ -186,7 +186,6 @@ export function mountRefractionHub(root) {
     const cards = [
       ['refraction', 'topic.refractionSnell'],
       ['refractionTir', 'topic.refractionTir'],
-      ['mirage', 'topic.mirage'],
     ];
     return `
       <section class="panel panel--topic-hub">
