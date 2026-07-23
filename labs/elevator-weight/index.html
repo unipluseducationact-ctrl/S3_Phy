@@ -255,7 +255,9 @@
                     </div>
                 </div>
                 <button type="button" class="play-btn" id="playBtn">▶ Play</button>
+                <button type="button" class="play-btn" id="resetBtn" style="background:#475569">↺ Reset</button>
             </div>
+            <p id="case-cue" style="margin:12px 0 0;font-weight:700;color:#0f766e;font-size:0.92rem;"></p>
         </div>
 
         <div class="main-grid">
@@ -285,25 +287,21 @@
 
     <script>
         const G = 9.81;
+        // Two focus cases: velocity and acceleration in opposite directions
         const SCENARIOS = [
-            { id: 'rest', aSign: 0, moving: 0, needA: false },
-            { id: 'upAccel', aSign: 1, moving: 1, needA: true },
-            { id: 'upConst', aSign: 0, moving: 1, needA: false },
-            { id: 'upDecel', aSign: -1, moving: 1, needA: true },
-            { id: 'downAccel', aSign: -1, moving: -1, needA: true },
-            { id: 'downConst', aSign: 0, moving: -1, needA: false },
-            { id: 'downDecel', aSign: 1, moving: -1, needA: true },
-            { id: 'freeFall', aSign: 'g', moving: -1, needA: false },
+            { id: 'upDecel', aSign: -1, moving: 1, needA: true },   // v↑ a↓ → lighter, slows to stop
+            { id: 'downDecel', aSign: 1, moving: -1, needA: true }, // v↓ a↑ → heavier, slows to stop
         ];
 
         const dict = {
             zh: {
                 title: '電梯中的受力',
-                desc: '電梯上落時，人嘅法向力 N、重量 mg 同加速度 a 點樣變。',
+                desc: '兩個重點：向上行但向下加速（減速至停）；向下行但向上加速（減速至停）。',
                 mass: '質量 m',
                 accel: '|a| 大小',
                 play: '▶ 播放',
                 pause: '⏸ 暫停',
+                reset: '↺ 重設位置',
                 scene: '電梯井（側視）',
                 fbd: '受力圖（自由體圖）',
                 ka: '加速度 a（向上為正）',
@@ -313,21 +311,17 @@
                 legN: 'N（法向力）',
                 legW: 'W = mg（重量）',
                 legA: 'a（加速度）',
-                feelHeavy: '感覺變重（N > mg）',
+                feelHeavy: '感覺變重（N > mg）— a 向上',
                 feelNormal: '感覺正常體重（N = mg）',
-                feelLight: '感覺變輕（N < mg）',
+                feelLight: '感覺變輕（N < mg）— a 向下',
                 feelZero: '失重（N = 0）',
                 eq: (n, mg, a) => `ΣF = N − mg = ma\nN − ${mg} = m(${a})\nN = ${n} N`,
                 scenarios: {
-                    rest: '靜止',
-                    upAccel: '向上加速',
-                    upConst: '向上勻速',
-                    upDecel: '向上減速',
-                    downAccel: '向下加速',
-                    downConst: '向下勻速',
-                    downDecel: '向下減速',
-                    freeFall: '自由落體／纜斷',
+                    upDecel: '上行 · a 向下（減速至停）',
+                    downDecel: '下行 · a 向上（減速至停）',
                 },
+                cueUpDecel: '速度向上，加速度向下 → N < mg',
+                cueDownDecel: '速度向下，加速度向上 → N > mg',
                 man: '人',
                 floor: '地板',
                 cable: '纜',
@@ -335,11 +329,12 @@
             },
             en: {
                 title: 'Forces in an elevator',
-                desc: 'How normal force N, weight mg and acceleration a change as a lift goes up or down.',
+                desc: 'Two focus cases: moving up while accelerating down (to a stop); moving down while accelerating up (to a stop).',
                 mass: 'Mass m',
                 accel: '|a| magnitude',
                 play: '▶ Play',
                 pause: '⏸ Pause',
+                reset: '↺ Reset position',
                 scene: 'Elevator shaft (side view)',
                 fbd: 'Free-body diagram',
                 ka: 'Acceleration a (up +)',
@@ -349,21 +344,17 @@
                 legN: 'N (normal)',
                 legW: 'W = mg (weight)',
                 legA: 'a (acceleration)',
-                feelHeavy: 'Feels heavier (N > mg)',
+                feelHeavy: 'Feels heavier (N > mg) — a upward',
                 feelNormal: 'Feels normal weight (N = mg)',
-                feelLight: 'Feels lighter (N < mg)',
+                feelLight: 'Feels lighter (N < mg) — a downward',
                 feelZero: 'Weightless (N = 0)',
                 eq: (n, mg, a) => `ΣF = N − mg = ma\nN − ${mg} = m(${a})\nN = ${n} N`,
                 scenarios: {
-                    rest: 'At rest',
-                    upAccel: 'Accel. up',
-                    upConst: 'Const. up',
-                    upDecel: 'Decel. up',
-                    downAccel: 'Accel. down',
-                    downConst: 'Const. down',
-                    downDecel: 'Decel. down',
-                    freeFall: 'Free fall / cable cut',
+                    upDecel: 'Going up · a down (slow to stop)',
+                    downDecel: 'Going down · a up (slow to stop)',
                 },
+                cueUpDecel: 'v upward, a downward → N < mg',
+                cueDownDecel: 'v downward, a upward → N > mg',
                 man: 'Person',
                 floor: 'Floor',
                 cable: 'Cable',
@@ -377,10 +368,11 @@
 
         const params = new URLSearchParams(location.search);
         let currentLang = hubLangToLocal(params.get('lang') || 'zh');
-        let scenarioId = 'rest';
+        let scenarioId = 'upDecel';
         let playing = true;
-        let cabinY = 0.45; // 0 bottom .. 1 top of shaft travel
-        let velSign = 0;
+        let cabinY = 0.15; // start low for up-decel case
+        let speed = 0.012; // visual speed along shaft (fraction / frame scale)
+        let velSign = 1;
 
         const sceneCanvas = document.getElementById('sceneCanvas');
         const sceneCtx = sceneCanvas.getContext('2d');
@@ -409,6 +401,17 @@
             return Math.max(0, mass() * (G + accel()));
         }
 
+        function applyScenarioStart() {
+            const s = scenario();
+            velSign = s.moving;
+            if (s.id === 'upDecel') {
+                cabinY = 0.12;
+            } else {
+                cabinY = 0.88;
+            }
+            speed = 0.014;
+        }
+
         function buildScenarioButtons() {
             const box = document.getElementById('scenario-btns');
             box.innerHTML = '';
@@ -421,7 +424,8 @@
                 b.dataset.id = s.id;
                 b.addEventListener('click', () => {
                     scenarioId = s.id;
-                    velSign = s.moving;
+                    applyScenarioStart();
+                    playing = true;
                     buildScenarioButtons();
                     updateUI();
                     draw();
@@ -494,6 +498,9 @@
                 a.toFixed(2)
             );
             playBtn.innerText = playing ? d.pause : d.play;
+            document.getElementById('resetBtn').innerText = d.reset;
+            document.getElementById('case-cue').textContent =
+                scenarioId === 'upDecel' ? d.cueUpDecel : d.cueDownDecel;
         }
 
         function drawArrow(ctx, x0, y0, x1, y1, color, width = 3) {
@@ -707,17 +714,20 @@
         function tick() {
             if (playing) {
                 const s = scenario();
-                const speed = 0.0045 + Math.abs(accel()) * 0.00035;
-                if (s.moving !== 0) {
-                    cabinY += s.moving * speed;
-                    if (cabinY > 0.92) {
-                        cabinY = 0.92;
-                        if (s.id.includes('Accel') || s.id === 'freeFall') cabinY = 0.08;
-                    }
-                    if (cabinY < 0.08) {
-                        cabinY = 0.08;
-                        if (s.moving < 0) cabinY = 0.9;
-                    }
+                const target = s.id === 'upDecel' ? 0.9 : 0.1;
+                const dist = Math.abs(target - cabinY);
+                const slow = Math.max(0.15, Math.min(1, dist / 0.35));
+                const step = (0.0035 + aMag() * 0.00045) * slow;
+                cabinY += s.moving * step;
+                if (s.id === 'upDecel' && cabinY >= 0.9) {
+                    cabinY = 0.9;
+                    playing = false;
+                    updateUI();
+                }
+                if (s.id === 'downDecel' && cabinY <= 0.1) {
+                    cabinY = 0.1;
+                    playing = false;
+                    updateUI();
                 }
             }
             draw();
@@ -727,8 +737,18 @@
         massSlider.addEventListener('input', () => { updateUI(); draw(); });
         accelSlider.addEventListener('input', () => { updateUI(); draw(); });
         playBtn.addEventListener('click', () => {
+            const s = scenario();
+            if (!playing && ((s.id === 'upDecel' && cabinY >= 0.89) || (s.id === 'downDecel' && cabinY <= 0.11))) {
+                applyScenarioStart();
+            }
             playing = !playing;
             updateUI();
+        });
+        document.getElementById('resetBtn').addEventListener('click', () => {
+            applyScenarioStart();
+            playing = true;
+            updateUI();
+            draw();
         });
         document.getElementById('lang-toggle').addEventListener('click', () => {
             currentLang = currentLang === 'zh' ? 'en' : 'zh';
@@ -741,7 +761,6 @@
         });
         window.addEventListener('resize', resize);
 
-        // Polyfill roundRect if needed
         if (!CanvasRenderingContext2D.prototype.roundRect) {
             CanvasRenderingContext2D.prototype.roundRect = function (x, y, w, h, r) {
                 const rr = Math.min(r, w / 2, h / 2);
@@ -755,6 +774,7 @@
         }
 
         updateLanguageUI();
+        applyScenarioStart();
         resize();
         tick();
     </script>
