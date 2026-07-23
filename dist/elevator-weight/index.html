@@ -225,6 +225,18 @@
         .legend .ln::before { background: var(--n); }
         .legend .lw::before { background: var(--w); }
         .legend .la::before { background: var(--a); }
+        #ntCanvas { height: 220px; background: #fafafa; }
+        .phase-tag {
+            display: inline-block;
+            margin-top: 8px;
+            padding: 4px 10px;
+            border-radius: 999px;
+            font-size: 0.78rem;
+            font-weight: 700;
+            background: #ecfdf5;
+            color: #047857;
+            border: 1px solid #a7f3d0;
+        }
     </style>
 </head>
 <body>
@@ -283,12 +295,23 @@
                 <div class="eq-box" id="eqBox">ΣF = N − mg = ma</div>
             </div>
         </div>
+
+        <div class="card">
+            <div class="canvas-label" id="label-nt">N vs time</div>
+            <canvas id="ntCanvas" width="900" height="220"></canvas>
+            <div class="legend">
+                <span class="ln" id="leg-nt-n">N(t)</span>
+                <span class="lw" id="leg-nt-mg">mg (reference)</span>
+            </div>
+            <span class="phase-tag" id="phaseTag"></span>
+        </div>
     </div>
 
     <script>
         const G = 9.81;
-        // Two focus cases: velocity and acceleration in opposite directions
+        // Focus cases + full trip that shows N changing through time
         const SCENARIOS = [
+            { id: 'fullUp', needA: true },                          // accel → coast → decel → rest
             { id: 'upDecel', aSign: -1, moving: 1, needA: true },   // v↑ a↓ → lighter, slows to stop
             { id: 'downDecel', aSign: 1, moving: -1, needA: true }, // v↓ a↑ → heavier, slows to stop
         ];
@@ -296,7 +319,7 @@
         const dict = {
             zh: {
                 title: '電梯中的受力',
-                desc: '兩個重點：向上行但向下加速（減速至停）；向下行但向上加速（減速至停）。',
+                desc: '看法向力 N 如何隨時間改變：完整上行（加速→勻速→減速），以及兩個減速至停的重點情境。',
                 mass: '質量 m',
                 accel: '|a| 大小',
                 play: '▶ 播放',
@@ -304,6 +327,7 @@
                 reset: '↺ 重設位置',
                 scene: '電梯井（側視）',
                 fbd: '受力圖（自由體圖）',
+                nt: '法向力 N 對時間',
                 ka: '加速度 a（向上為正）',
                 kn: '法向力 N（地板托力）',
                 kw: '重量 mg',
@@ -311,17 +335,30 @@
                 legN: 'N（法向力）',
                 legW: 'W = mg（重量）',
                 legA: 'a（加速度）',
+                legNtN: 'N(t)',
+                legNtMg: 'mg（參考）',
                 feelHeavy: '感覺變重（N > mg）— a 向上',
                 feelNormal: '感覺正常體重（N = mg）',
                 feelLight: '感覺變輕（N < mg）— a 向下',
                 feelZero: '失重（N = 0）',
                 eq: (n, mg, a) => `ΣF = N − mg = ma\nN − ${mg} = m(${a})\nN = ${n} N`,
                 scenarios: {
+                    fullUp: '完整上行（加速→勻速→減速）',
                     upDecel: '上行 · a 向下（減速至停）',
                     downDecel: '下行 · a 向上（減速至停）',
                 },
-                cueUpDecel: '速度向上，加速度向下 → N < mg',
-                cueDownDecel: '速度向下，加速度向上 → N > mg',
+                cueFullUp: '加速 N↑ → 勻速 N = mg → 減速 N↓ → 停下 N = mg',
+                cueUpDecel: '速度向上，加速度向下 → N < mg；停下後 N = mg',
+                cueDownDecel: '速度向下，加速度向上 → N > mg；停下後 N = mg',
+                phases: {
+                    rest: '階段：靜止（a = 0）',
+                    accel: '階段：向上加速（N > mg）',
+                    coast: '階段：勻速（N = mg）',
+                    decel: '階段：減速（N < mg）',
+                    upDecel: '階段：上行減速（N < mg）',
+                    downDecel: '階段：下行減速（N > mg）',
+                    stopped: '階段：已停下（N = mg）',
+                },
                 man: '人',
                 floor: '地板',
                 cable: '纜',
@@ -329,7 +366,7 @@
             },
             en: {
                 title: 'Forces in an elevator',
-                desc: 'Two focus cases: moving up while accelerating down (to a stop); moving down while accelerating up (to a stop).',
+                desc: 'See how normal force N changes with time: a full upward trip (accel → coast → decel), plus two slow-to-stop focus cases.',
                 mass: 'Mass m',
                 accel: '|a| magnitude',
                 play: '▶ Play',
@@ -337,6 +374,7 @@
                 reset: '↺ Reset position',
                 scene: 'Elevator shaft (side view)',
                 fbd: 'Free-body diagram',
+                nt: 'Normal force N vs time',
                 ka: 'Acceleration a (up +)',
                 kn: 'Normal N (floor push)',
                 kw: 'Weight mg',
@@ -344,17 +382,30 @@
                 legN: 'N (normal)',
                 legW: 'W = mg (weight)',
                 legA: 'a (acceleration)',
+                legNtN: 'N(t)',
+                legNtMg: 'mg (reference)',
                 feelHeavy: 'Feels heavier (N > mg) — a upward',
                 feelNormal: 'Feels normal weight (N = mg)',
                 feelLight: 'Feels lighter (N < mg) — a downward',
                 feelZero: 'Weightless (N = 0)',
                 eq: (n, mg, a) => `ΣF = N − mg = ma\nN − ${mg} = m(${a})\nN = ${n} N`,
                 scenarios: {
+                    fullUp: 'Full trip up (accel → coast → decel)',
                     upDecel: 'Going up · a down (slow to stop)',
                     downDecel: 'Going down · a up (slow to stop)',
                 },
-                cueUpDecel: 'v upward, a downward → N < mg',
-                cueDownDecel: 'v downward, a upward → N > mg',
+                cueFullUp: 'Accel N↑ → coast N = mg → decel N↓ → rest N = mg',
+                cueUpDecel: 'v upward, a downward → N < mg; after stop N = mg',
+                cueDownDecel: 'v downward, a upward → N > mg; after stop N = mg',
+                phases: {
+                    rest: 'Phase: at rest (a = 0)',
+                    accel: 'Phase: accelerating up (N > mg)',
+                    coast: 'Phase: constant speed (N = mg)',
+                    decel: 'Phase: decelerating (N < mg)',
+                    upDecel: 'Phase: up & slowing (N < mg)',
+                    downDecel: 'Phase: down & slowing (N > mg)',
+                    stopped: 'Phase: stopped (N = mg)',
+                },
                 man: 'Person',
                 floor: 'Floor',
                 cable: 'Cable',
@@ -368,16 +419,23 @@
 
         const params = new URLSearchParams(location.search);
         let currentLang = hubLangToLocal(params.get('lang') || 'zh');
-        let scenarioId = 'upDecel';
+        let scenarioId = 'fullUp';
         let playing = true;
-        let cabinY = 0.15; // start low for up-decel case
-        let speed = 0.012; // visual speed along shaft (fraction / frame scale)
+        let cabinY = 0.1;
         let velSign = 1;
+        let stopped = false;
+        let phase = 'accel'; // fullUp: accel | coast | decel | rest
+        let simTime = 0;
+        let history = []; // { t, N, a }
+        let lastTs = 0;
+        const HISTORY_MAX_T = 14;
 
         const sceneCanvas = document.getElementById('sceneCanvas');
         const sceneCtx = sceneCanvas.getContext('2d');
         const fbdCanvas = document.getElementById('fbdCanvas');
         const fbdCtx = fbdCanvas.getContext('2d');
+        const ntCanvas = document.getElementById('ntCanvas');
+        const ntCtx = ntCanvas.getContext('2d');
         const massSlider = document.getElementById('massSlider');
         const accelSlider = document.getElementById('accelSlider');
         const playBtn = document.getElementById('playBtn');
@@ -389,7 +447,14 @@
         function aMag() { return parseFloat(accelSlider.value); }
 
         function accel() {
+            if (stopped) return 0;
             const s = scenario();
+            if (s.id === 'fullUp') {
+                if (phase === 'accel') return aMag();
+                if (phase === 'coast' || phase === 'rest') return 0;
+                if (phase === 'decel') return -aMag();
+                return 0;
+            }
             if (s.aSign === 'g') return -G;
             if (s.aSign === 0) return 0;
             return s.aSign * aMag();
@@ -401,15 +466,49 @@
             return Math.max(0, mass() * (G + accel()));
         }
 
+        function currentPhaseKey() {
+            if (stopped) return 'stopped';
+            if (scenarioId === 'fullUp') return phase === 'rest' ? 'rest' : phase;
+            if (scenarioId === 'upDecel') return 'upDecel';
+            if (scenarioId === 'downDecel') return 'downDecel';
+            return 'rest';
+        }
+
+        function clearHistory() {
+            simTime = 0;
+            history = [];
+            lastTs = 0;
+        }
+
+        function pushHistory() {
+            const N = normal();
+            const a = accel();
+            const last = history[history.length - 1];
+            if (last && Math.abs(last.t - simTime) < 0.02 && Math.abs(last.N - N) < 0.5) return;
+            history.push({ t: simTime, N, a });
+            while (history.length > 1 && history[history.length - 1].t - history[0].t > HISTORY_MAX_T) {
+                history.shift();
+            }
+        }
+
         function applyScenarioStart() {
             const s = scenario();
-            velSign = s.moving;
-            if (s.id === 'upDecel') {
+            stopped = false;
+            clearHistory();
+            if (s.id === 'fullUp') {
+                cabinY = 0.1;
+                velSign = 1;
+                phase = 'accel';
+            } else if (s.id === 'upDecel') {
                 cabinY = 0.12;
+                velSign = 1;
+                phase = 'upDecel';
             } else {
                 cabinY = 0.88;
+                velSign = -1;
+                phase = 'downDecel';
             }
-            speed = 0.014;
+            pushHistory();
         }
 
         function buildScenarioButtons() {
@@ -445,6 +544,7 @@
             document.getElementById('label-accel').innerText = d.accel;
             document.getElementById('label-scene').innerText = d.scene;
             document.getElementById('label-fbd').innerText = d.fbd;
+            document.getElementById('label-nt').innerText = d.nt;
             document.getElementById('k-a').innerText = d.ka;
             document.getElementById('k-n').innerText = d.kn;
             document.getElementById('k-w').innerText = d.kw;
@@ -452,6 +552,8 @@
             document.getElementById('leg-n').innerText = d.legN;
             document.getElementById('leg-w').innerText = d.legW;
             document.getElementById('leg-a').innerText = d.legA;
+            document.getElementById('leg-nt-n').innerText = d.legNtN;
+            document.getElementById('leg-nt-mg').innerText = d.legNtMg;
             playBtn.innerText = playing ? d.pause : d.play;
             buildScenarioButtons();
             updateUI();
@@ -499,8 +601,9 @@
             );
             playBtn.innerText = playing ? d.pause : d.play;
             document.getElementById('resetBtn').innerText = d.reset;
-            document.getElementById('case-cue').textContent =
-                scenarioId === 'upDecel' ? d.cueUpDecel : d.cueDownDecel;
+            const cues = { fullUp: d.cueFullUp, upDecel: d.cueUpDecel, downDecel: d.cueDownDecel };
+            document.getElementById('case-cue').textContent = cues[scenarioId] || '';
+            document.getElementById('phaseTag').textContent = d.phases[currentPhaseKey()] || '';
         }
 
         function drawArrow(ctx, x0, y0, x1, y1, color, width = 3) {
@@ -595,30 +698,40 @@
             ctx.font = 'bold 11px "Noto Sans TC", sans-serif';
             ctx.fillText(d.man, px + 16, py - 48);
 
-            // Forces on person (scale by max of N, W)
+            // Forces: mg is fixed reference length; N length = (N/mg) × that
             const N = normal();
             const W = weight();
             const a = accel();
-            const maxF = Math.max(N, W, 1);
-            const scale = 70 / maxF;
-            const nLen = N * scale;
-            const wLen = W * scale;
+            const baseLen = 58; // pixels for mg
+            const nLen = W > 0 ? Math.max(4, (N / W) * baseLen) : 0;
+            const wLen = baseLen;
 
-            // N up from feet
+            // N up from feet — length shows magnitude vs mg
             if (N > 0.5) {
-                drawArrow(ctx, px - 22, py, px - 22, py - nLen, '#059669', 3.5);
+                drawArrow(ctx, px - 26, py, px - 26, py - nLen, '#059669', 4.5);
                 ctx.fillStyle = '#059669';
-                ctx.font = 'bold 12px sans-serif';
-                ctx.fillText('N', px - 38, py - nLen / 2);
+                ctx.font = 'bold 12px "Noto Sans TC", sans-serif';
+                ctx.fillText('N', px - 48, py - nLen / 2);
+                ctx.font = 'bold 11px "Noto Sans TC", sans-serif';
+                ctx.fillText(`${N.toFixed(0)} N`, px - 52, py - nLen / 2 + 14);
+            } else {
+                ctx.fillStyle = '#059669';
+                ctx.font = 'bold 11px "Noto Sans TC", sans-serif';
+                ctx.fillText('N = 0', px - 48, py - 8);
             }
-            // W down from COM
-            drawArrow(ctx, px + 22, py - 30, px + 22, py - 30 + wLen, '#dc2626', 3.5);
+            // W down from COM (fixed reference arrow)
+            drawArrow(ctx, px + 26, py - 30, px + 26, py - 30 + wLen, '#dc2626', 4.5);
             ctx.fillStyle = '#dc2626';
-            ctx.font = 'bold 12px sans-serif';
-            ctx.fillText('mg', px + 28, py - 30 + wLen / 2);
+            ctx.font = 'bold 12px "Noto Sans TC", sans-serif';
+            ctx.fillText('mg', px + 32, py - 30 + wLen / 2);
+            ctx.font = 'bold 11px "Noto Sans TC", sans-serif';
+            ctx.fillText(`${W.toFixed(0)} N`, px + 32, py - 30 + wLen / 2 + 14);
 
-            // Acceleration arrow beside cabin
-            const ax = sx + sw + 28;
+            // N magnitude gauge (arrow indicator vs mg tick)
+            drawNormalGauge(ctx, sx + sw + 18, cabinTop + 8, cabinH - 16, N, W, d);
+
+            // Acceleration arrow further right of gauge
+            const ax = sx + sw + 78;
             const ay = cabinTop + cabinH / 2;
             if (Math.abs(a) > 0.05) {
                 const aLen = Math.min(55, 18 + Math.abs(a) * 5);
@@ -645,6 +758,55 @@
             }
         }
 
+        function drawNormalGauge(ctx, x, yTop, height, N, W, d) {
+            const yBot = yTop + height;
+            const maxRatio = 1.8; // gauge top = 1.8 mg
+            const mgY = yBot - (1 / maxRatio) * height;
+            const nRatio = W > 0 ? Math.min(maxRatio, N / W) : 0;
+            const nY = yBot - (nRatio / maxRatio) * height;
+
+            // Track
+            ctx.strokeStyle = '#cbd5e1';
+            ctx.lineWidth = 8;
+            ctx.lineCap = 'round';
+            ctx.beginPath();
+            ctx.moveTo(x, yTop);
+            ctx.lineTo(x, yBot);
+            ctx.stroke();
+
+            // Fill up to N
+            ctx.strokeStyle = '#059669';
+            ctx.lineWidth = 8;
+            ctx.beginPath();
+            ctx.moveTo(x, yBot);
+            ctx.lineTo(x, nY);
+            ctx.stroke();
+
+            // mg reference tick
+            ctx.strokeStyle = '#dc2626';
+            ctx.lineWidth = 2;
+            ctx.beginPath();
+            ctx.moveTo(x - 12, mgY);
+            ctx.lineTo(x + 12, mgY);
+            ctx.stroke();
+            ctx.fillStyle = '#dc2626';
+            ctx.font = 'bold 10px "Noto Sans TC", sans-serif';
+            ctx.fillText('mg', x + 14, mgY + 3);
+
+            // Arrow head at N level (magnitude indicator)
+            ctx.fillStyle = '#059669';
+            ctx.beginPath();
+            ctx.moveTo(x, nY);
+            ctx.lineTo(x - 9, nY + 8);
+            ctx.lineTo(x + 9, nY + 8);
+            ctx.closePath();
+            ctx.fill();
+
+            ctx.font = 'bold 11px "Noto Sans TC", sans-serif';
+            ctx.fillText('N', x - 4, yTop - 6);
+            ctx.fillText(`${N.toFixed(0)}`, x + 14, nY + 4);
+        }
+
         function drawFbd() {
             const ctx = fbdCtx;
             const w = fbdCanvas.width;
@@ -656,10 +818,11 @@
             const N = normal();
             const W = weight();
             const a = accel();
-            const maxF = Math.max(N, W, 1);
-            const scale = 90 / maxF;
+            // Fixed mg reference so N arrow length tracks magnitude clearly
+            const baseLen = 88;
+            const nLen = W > 0 ? Math.max(6, (N / W) * baseLen) : 0;
+            const wLen = baseLen;
 
-            // Person blob
             ctx.fillStyle = '#e2e8f0';
             ctx.beginPath();
             ctx.arc(cx, cy, 22, 0, Math.PI * 2);
@@ -674,21 +837,23 @@
             ctx.textAlign = 'left';
 
             if (N > 0.5) {
-                drawArrow(ctx, cx, cy, cx, cy - N * scale, '#059669', 4);
+                drawArrow(ctx, cx, cy, cx, cy - nLen, '#059669', 5);
                 ctx.fillStyle = '#059669';
-                ctx.font = 'bold 13px sans-serif';
-                ctx.fillText(`N = ${N.toFixed(0)} N`, cx + 16, cy - N * scale / 2);
+                ctx.font = 'bold 13px "Noto Sans TC", sans-serif';
+                ctx.fillText(`N = ${N.toFixed(0)} N`, cx + 18, cy - nLen / 2);
+            } else {
+                ctx.fillStyle = '#059669';
+                ctx.font = 'bold 13px "Noto Sans TC", sans-serif';
+                ctx.fillText('N = 0', cx + 28, cy - 10);
             }
-            drawArrow(ctx, cx, cy, cx, cy + W * scale, '#dc2626', 4);
+            drawArrow(ctx, cx, cy, cx, cy + wLen, '#dc2626', 5);
             ctx.fillStyle = '#dc2626';
-            ctx.font = 'bold 13px sans-serif';
-            ctx.fillText(`mg = ${W.toFixed(0)} N`, cx + 16, cy + W * scale / 2);
+            ctx.font = 'bold 13px "Noto Sans TC", sans-serif';
+            ctx.fillText(`mg = ${W.toFixed(0)} N`, cx + 18, cy + wLen / 2);
 
-            // a label
             ctx.fillStyle = '#7c3aed';
             ctx.font = 'bold 13px sans-serif';
-            const aTxt = `a = ${a.toFixed(2)} m/s²`;
-            ctx.fillText(aTxt, 16, 24);
+            ctx.fillText(`a = ${a.toFixed(2)} m/s²`, 16, 24);
             if (Math.abs(a) > 0.05) {
                 const al = Math.min(40, 12 + Math.abs(a) * 3);
                 if (a > 0) drawArrow(ctx, 36, 70, 36, 70 - al, '#7c3aed', 3);
