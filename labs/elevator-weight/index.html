@@ -1,0 +1,762 @@
+<!DOCTYPE html>
+<html lang="zh-HK">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>電梯中的受力</title>
+    <link rel="stylesheet" href="../shared/s3phy-embed.css">
+    <script src="../shared/s3phy-embed-init.js"></script>
+    <style>
+        html.s3phy-embed .lang-btn { display: none; }
+        html.s3phy-embed body { padding: 12px; }
+        :root {
+            --bg: #f8f9fa;
+            --panel: #ffffff;
+            --text: #1a1c2c;
+            --muted: #6b7280;
+            --border: #e8eaed;
+            --n: #059669;
+            --w: #dc2626;
+            --a: #7c3aed;
+            --accent: #0f766e;
+            --btn: #e9ecef;
+            --btn-text: #374151;
+            --active: #0f766e;
+        }
+        * { box-sizing: border-box; }
+        body {
+            margin: 0;
+            padding: 16px;
+            font-family: "Noto Sans TC", "Segoe UI", system-ui, sans-serif;
+            background: var(--bg);
+            color: var(--text);
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+        }
+        .header-top {
+            width: 100%;
+            max-width: 980px;
+            display: flex;
+            justify-content: space-between;
+            align-items: flex-start;
+            gap: 12px;
+            margin-bottom: 10px;
+        }
+        h2 { margin: 0 0 4px; color: var(--accent); font-size: 1.35rem; font-weight: 800; }
+        #page-desc { margin: 0; color: var(--muted); font-size: 0.92rem; line-height: 1.4; }
+        .lang-btn {
+            background: var(--btn);
+            border: 1px solid var(--border);
+            color: var(--btn-text);
+            padding: 6px 12px;
+            border-radius: 8px;
+            font-weight: 700;
+            font-size: 13px;
+            cursor: pointer;
+            flex-shrink: 0;
+        }
+        .container {
+            width: 100%;
+            max-width: 980px;
+            display: flex;
+            flex-direction: column;
+            gap: 14px;
+        }
+        .card {
+            background: var(--panel);
+            border: 1px solid var(--border);
+            border-radius: 14px;
+            box-shadow: 0 2px 8px rgba(26, 28, 44, 0.04);
+            padding: 14px 16px;
+        }
+        .scenarios {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 8px;
+        }
+        .sc-btn {
+            border: 1.5px solid var(--border);
+            background: #fff;
+            color: var(--btn-text);
+            padding: 7px 12px;
+            border-radius: 999px;
+            font-size: 0.82rem;
+            font-weight: 700;
+            cursor: pointer;
+            transition: 0.15s;
+        }
+        .sc-btn:hover { border-color: #94a3b8; }
+        .sc-btn.active {
+            background: var(--active);
+            border-color: var(--active);
+            color: #fff;
+        }
+        .controls-row {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 14px 20px;
+            align-items: flex-end;
+            margin-top: 12px;
+        }
+        .control-group {
+            display: flex;
+            flex-direction: column;
+            gap: 5px;
+            min-width: 160px;
+            flex: 1 1 160px;
+        }
+        .slider-label {
+            font-size: 0.75rem;
+            font-weight: 700;
+            color: var(--muted);
+            letter-spacing: 0.03em;
+        }
+        .slider-row { display: flex; align-items: center; gap: 8px; }
+        input[type=range] { flex: 1; accent-color: var(--accent); cursor: pointer; }
+        .val {
+            font-variant-numeric: tabular-nums;
+            font-weight: 700;
+            min-width: 4.5rem;
+            text-align: right;
+            font-size: 0.88rem;
+        }
+        .play-btn {
+            background: var(--accent);
+            color: #fff;
+            border: none;
+            border-radius: 10px;
+            padding: 10px 16px;
+            font-weight: 800;
+            cursor: pointer;
+            font-size: 0.88rem;
+        }
+        .main-grid {
+            display: grid;
+            grid-template-columns: 1.15fr 0.85fr;
+            gap: 14px;
+        }
+        @media (max-width: 820px) {
+            .main-grid { grid-template-columns: 1fr; }
+        }
+        .canvas-label {
+            font-size: 0.78rem;
+            font-weight: 700;
+            color: var(--muted);
+            margin-bottom: 8px;
+        }
+        canvas {
+            width: 100%;
+            display: block;
+            border-radius: 12px;
+            border: 1px solid var(--border);
+            background: #eef2f6;
+        }
+        #sceneCanvas { height: 420px; }
+        #fbdCanvas { height: 280px; background: #fafafa; }
+        .readouts {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(120px, 1fr));
+            gap: 8px;
+            margin-top: 10px;
+        }
+        .stat {
+            background: #f8fafc;
+            border: 1px solid var(--border);
+            border-radius: 10px;
+            padding: 8px 10px;
+        }
+        .stat .k {
+            display: block;
+            font-size: 0.7rem;
+            font-weight: 700;
+            color: var(--muted);
+            margin-bottom: 2px;
+        }
+        .stat .v {
+            font-weight: 800;
+            font-size: 1rem;
+            font-variant-numeric: tabular-nums;
+        }
+        .stat.n .v { color: var(--n); }
+        .stat.w .v { color: var(--w); }
+        .stat.a .v { color: var(--a); }
+        .feel {
+            margin-top: 10px;
+            padding: 10px 12px;
+            border-radius: 10px;
+            font-weight: 700;
+            font-size: 0.9rem;
+            text-align: center;
+            border: 1px solid transparent;
+        }
+        .feel.heavy { background: #ecfdf5; color: #047857; border-color: #a7f3d0; }
+        .feel.normal { background: #f1f5f9; color: #334155; border-color: #e2e8f0; }
+        .feel.light { background: #fff7ed; color: #c2410c; border-color: #fed7aa; }
+        .feel.zero { background: #f5f3ff; color: #6d28d9; border-color: #ddd6fe; }
+        .eq-box {
+            margin-top: 10px;
+            font-family: "Roboto Mono", Consolas, monospace;
+            font-size: 0.84rem;
+            background: #f0fdfa;
+            border-radius: 8px;
+            padding: 10px 12px;
+            color: #0f766e;
+            line-height: 1.55;
+        }
+        .legend {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 12px;
+            margin-top: 8px;
+            font-size: 0.8rem;
+            font-weight: 700;
+            color: var(--muted);
+        }
+        .legend span::before {
+            content: "";
+            display: inline-block;
+            width: 12px;
+            height: 3px;
+            margin-right: 6px;
+            vertical-align: middle;
+            border-radius: 2px;
+        }
+        .legend .ln::before { background: var(--n); }
+        .legend .lw::before { background: var(--w); }
+        .legend .la::before { background: var(--a); }
+    </style>
+</head>
+<body>
+    <div class="header-top">
+        <div>
+            <h2 id="page-title">Forces in an elevator</h2>
+            <p id="page-desc">Normal force, weight and acceleration when a lift goes up or down.</p>
+        </div>
+        <button type="button" class="lang-btn" id="lang-toggle">🌐 English</button>
+    </div>
+
+    <div class="container">
+        <div class="card">
+            <div class="scenarios" id="scenario-btns"></div>
+            <div class="controls-row">
+                <div class="control-group">
+                    <span class="slider-label" id="label-mass">Mass m</span>
+                    <div class="slider-row">
+                        <input type="range" id="massSlider" min="40" max="100" step="1" value="70">
+                        <span class="val" id="massVal">70 kg</span>
+                    </div>
+                </div>
+                <div class="control-group" id="accel-group">
+                    <span class="slider-label" id="label-accel">|a| magnitude</span>
+                    <div class="slider-row">
+                        <input type="range" id="accelSlider" min="0.5" max="8" step="0.1" value="2.5">
+                        <span class="val" id="accelVal">2.5 m/s²</span>
+                    </div>
+                </div>
+                <button type="button" class="play-btn" id="playBtn">▶ Play</button>
+            </div>
+        </div>
+
+        <div class="main-grid">
+            <div class="card">
+                <div class="canvas-label" id="label-scene">Elevator shaft (side view)</div>
+                <canvas id="sceneCanvas" width="560" height="420"></canvas>
+                <div class="legend">
+                    <span class="ln" id="leg-n">N (normal)</span>
+                    <span class="lw" id="leg-w">W = mg (weight)</span>
+                    <span class="la" id="leg-a">a (acceleration)</span>
+                </div>
+            </div>
+            <div class="card">
+                <div class="canvas-label" id="label-fbd">Free-body diagram</div>
+                <canvas id="fbdCanvas" width="400" height="280"></canvas>
+                <div class="readouts">
+                    <div class="stat a"><span class="k" id="k-a">Acceleration a</span><span class="v" id="v-a">0</span></div>
+                    <div class="stat n"><span class="k" id="k-n">Normal N</span><span class="v" id="v-n">0</span></div>
+                    <div class="stat w"><span class="k" id="k-w">Weight mg</span><span class="v" id="v-w">0</span></div>
+                    <div class="stat"><span class="k" id="k-ratio">N / mg</span><span class="v" id="v-ratio">1.00</span></div>
+                </div>
+                <div class="feel normal" id="feelBox">Feels normal weight</div>
+                <div class="eq-box" id="eqBox">ΣF = N − mg = ma</div>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        const G = 9.81;
+        const SCENARIOS = [
+            { id: 'rest', aSign: 0, moving: 0, needA: false },
+            { id: 'upAccel', aSign: 1, moving: 1, needA: true },
+            { id: 'upConst', aSign: 0, moving: 1, needA: false },
+            { id: 'upDecel', aSign: -1, moving: 1, needA: true },
+            { id: 'downAccel', aSign: -1, moving: -1, needA: true },
+            { id: 'downConst', aSign: 0, moving: -1, needA: false },
+            { id: 'downDecel', aSign: 1, moving: -1, needA: true },
+            { id: 'freeFall', aSign: 'g', moving: -1, needA: false },
+        ];
+
+        const dict = {
+            zh: {
+                title: '電梯中的受力',
+                desc: '電梯上落時，人嘅法向力 N、重量 mg 同加速度 a 點樣變。',
+                mass: '質量 m',
+                accel: '|a| 大小',
+                play: '▶ 播放',
+                pause: '⏸ 暫停',
+                scene: '電梯井（側視）',
+                fbd: '受力圖（自由體圖）',
+                ka: '加速度 a（向上為正）',
+                kn: '法向力 N（地板托力）',
+                kw: '重量 mg',
+                kratio: 'N / mg',
+                legN: 'N（法向力）',
+                legW: 'W = mg（重量）',
+                legA: 'a（加速度）',
+                feelHeavy: '感覺變重（N > mg）',
+                feelNormal: '感覺正常體重（N = mg）',
+                feelLight: '感覺變輕（N < mg）',
+                feelZero: '失重（N = 0）',
+                eq: (n, mg, a) => `ΣF = N − mg = ma\nN − ${mg} = m(${a})\nN = ${n} N`,
+                scenarios: {
+                    rest: '靜止',
+                    upAccel: '向上加速',
+                    upConst: '向上勻速',
+                    upDecel: '向上減速',
+                    downAccel: '向下加速',
+                    downConst: '向下勻速',
+                    downDecel: '向下減速',
+                    freeFall: '自由落體／纜斷',
+                },
+                man: '人',
+                floor: '地板',
+                cable: '纜',
+                langBtn: '🌐 English',
+            },
+            en: {
+                title: 'Forces in an elevator',
+                desc: 'How normal force N, weight mg and acceleration a change as a lift goes up or down.',
+                mass: 'Mass m',
+                accel: '|a| magnitude',
+                play: '▶ Play',
+                pause: '⏸ Pause',
+                scene: 'Elevator shaft (side view)',
+                fbd: 'Free-body diagram',
+                ka: 'Acceleration a (up +)',
+                kn: 'Normal N (floor push)',
+                kw: 'Weight mg',
+                kratio: 'N / mg',
+                legN: 'N (normal)',
+                legW: 'W = mg (weight)',
+                legA: 'a (acceleration)',
+                feelHeavy: 'Feels heavier (N > mg)',
+                feelNormal: 'Feels normal weight (N = mg)',
+                feelLight: 'Feels lighter (N < mg)',
+                feelZero: 'Weightless (N = 0)',
+                eq: (n, mg, a) => `ΣF = N − mg = ma\nN − ${mg} = m(${a})\nN = ${n} N`,
+                scenarios: {
+                    rest: 'At rest',
+                    upAccel: 'Accel. up',
+                    upConst: 'Const. up',
+                    upDecel: 'Decel. up',
+                    downAccel: 'Accel. down',
+                    downConst: 'Const. down',
+                    downDecel: 'Decel. down',
+                    freeFall: 'Free fall / cable cut',
+                },
+                man: 'Person',
+                floor: 'Floor',
+                cable: 'Cable',
+                langBtn: '🌐 中文',
+            },
+        };
+
+        function hubLangToLocal(lang) {
+            return lang === 'en' ? 'en' : 'zh';
+        }
+
+        const params = new URLSearchParams(location.search);
+        let currentLang = hubLangToLocal(params.get('lang') || 'zh');
+        let scenarioId = 'rest';
+        let playing = true;
+        let cabinY = 0.45; // 0 bottom .. 1 top of shaft travel
+        let velSign = 0;
+
+        const sceneCanvas = document.getElementById('sceneCanvas');
+        const sceneCtx = sceneCanvas.getContext('2d');
+        const fbdCanvas = document.getElementById('fbdCanvas');
+        const fbdCtx = fbdCanvas.getContext('2d');
+        const massSlider = document.getElementById('massSlider');
+        const accelSlider = document.getElementById('accelSlider');
+        const playBtn = document.getElementById('playBtn');
+        const accelGroup = document.getElementById('accel-group');
+
+        function t() { return dict[currentLang]; }
+        function scenario() { return SCENARIOS.find((s) => s.id === scenarioId); }
+        function mass() { return parseFloat(massSlider.value); }
+        function aMag() { return parseFloat(accelSlider.value); }
+
+        function accel() {
+            const s = scenario();
+            if (s.aSign === 'g') return -G;
+            if (s.aSign === 0) return 0;
+            return s.aSign * aMag();
+        }
+
+        function weight() { return mass() * G; }
+        function normal() {
+            // N - mg = ma  (up +)  →  N = m(g+a)
+            return Math.max(0, mass() * (G + accel()));
+        }
+
+        function buildScenarioButtons() {
+            const box = document.getElementById('scenario-btns');
+            box.innerHTML = '';
+            const labels = t().scenarios;
+            SCENARIOS.forEach((s) => {
+                const b = document.createElement('button');
+                b.type = 'button';
+                b.className = 'sc-btn' + (s.id === scenarioId ? ' active' : '');
+                b.textContent = labels[s.id];
+                b.dataset.id = s.id;
+                b.addEventListener('click', () => {
+                    scenarioId = s.id;
+                    velSign = s.moving;
+                    buildScenarioButtons();
+                    updateUI();
+                    draw();
+                });
+                box.appendChild(b);
+            });
+        }
+
+        function updateLanguageUI() {
+            const d = t();
+            document.documentElement.lang = currentLang === 'zh' ? 'zh-HK' : 'en';
+            document.title = d.title;
+            document.getElementById('lang-toggle').innerText = d.langBtn;
+            document.getElementById('page-title').innerText = d.title;
+            document.getElementById('page-desc').innerText = d.desc;
+            document.getElementById('label-mass').innerText = d.mass;
+            document.getElementById('label-accel').innerText = d.accel;
+            document.getElementById('label-scene').innerText = d.scene;
+            document.getElementById('label-fbd').innerText = d.fbd;
+            document.getElementById('k-a').innerText = d.ka;
+            document.getElementById('k-n').innerText = d.kn;
+            document.getElementById('k-w').innerText = d.kw;
+            document.getElementById('k-ratio').innerText = d.kratio;
+            document.getElementById('leg-n').innerText = d.legN;
+            document.getElementById('leg-w').innerText = d.legW;
+            document.getElementById('leg-a').innerText = d.legA;
+            playBtn.innerText = playing ? d.pause : d.play;
+            buildScenarioButtons();
+            updateUI();
+            draw();
+        }
+
+        function updateUI() {
+            const d = t();
+            const s = scenario();
+            const m = mass();
+            const a = accel();
+            const N = normal();
+            const W = weight();
+            const ratio = W > 0 ? N / W : 0;
+
+            document.getElementById('massVal').textContent = `${m.toFixed(0)} kg`;
+            document.getElementById('accelVal').textContent = `${aMag().toFixed(1)} m/s²`;
+            accelGroup.style.opacity = s.needA ? '1' : '0.45';
+            accelSlider.disabled = !s.needA;
+
+            document.getElementById('v-a').textContent = `${a.toFixed(2)} m/s²`;
+            document.getElementById('v-n').textContent = `${N.toFixed(0)} N`;
+            document.getElementById('v-w').textContent = `${W.toFixed(0)} N`;
+            document.getElementById('v-ratio').textContent = ratio.toFixed(2);
+
+            const feel = document.getElementById('feelBox');
+            if (N < 1) {
+                feel.className = 'feel zero';
+                feel.textContent = d.feelZero;
+            } else if (ratio > 1.02) {
+                feel.className = 'feel heavy';
+                feel.textContent = d.feelHeavy;
+            } else if (ratio < 0.98) {
+                feel.className = 'feel light';
+                feel.textContent = d.feelLight;
+            } else {
+                feel.className = 'feel normal';
+                feel.textContent = d.feelNormal;
+            }
+
+            document.getElementById('eqBox').textContent = d.eq(
+                N.toFixed(0),
+                W.toFixed(0),
+                a.toFixed(2)
+            );
+            playBtn.innerText = playing ? d.pause : d.play;
+        }
+
+        function drawArrow(ctx, x0, y0, x1, y1, color, width = 3) {
+            const ang = Math.atan2(y1 - y0, x1 - x0);
+            ctx.strokeStyle = color;
+            ctx.fillStyle = color;
+            ctx.lineWidth = width;
+            ctx.beginPath();
+            ctx.moveTo(x0, y0);
+            ctx.lineTo(x1, y1);
+            ctx.stroke();
+            ctx.beginPath();
+            ctx.moveTo(x1, y1);
+            ctx.lineTo(x1 - 10 * Math.cos(ang - 0.4), y1 - 10 * Math.sin(ang - 0.4));
+            ctx.lineTo(x1 - 10 * Math.cos(ang + 0.4), y1 - 10 * Math.sin(ang + 0.4));
+            ctx.closePath();
+            ctx.fill();
+        }
+
+        function drawScene() {
+            const ctx = sceneCtx;
+            const w = sceneCanvas.width;
+            const h = sceneCanvas.height;
+            const d = t();
+            ctx.clearRect(0, 0, w, h);
+
+            // Shaft
+            const sx = w * 0.28;
+            const sw = w * 0.44;
+            ctx.fillStyle = '#dbe3ec';
+            ctx.fillRect(sx, 20, sw, h - 40);
+            ctx.strokeStyle = '#94a3b8';
+            ctx.lineWidth = 3;
+            ctx.strokeRect(sx, 20, sw, h - 40);
+
+            // Floors marks
+            ctx.strokeStyle = 'rgba(100,116,139,0.35)';
+            ctx.lineWidth = 1;
+            for (let i = 0; i < 6; i++) {
+                const y = 40 + i * ((h - 80) / 5);
+                ctx.beginPath();
+                ctx.moveTo(sx, y);
+                ctx.lineTo(sx + sw, y);
+                ctx.stroke();
+            }
+
+            // Cabin
+            const travel = h - 160;
+            const cabinTop = 40 + (1 - cabinY) * travel;
+            const cabinH = 110;
+            const cabinW = sw - 24;
+            const cx = sx + 12;
+
+            // Cable
+            ctx.strokeStyle = '#64748b';
+            ctx.lineWidth = 2;
+            ctx.beginPath();
+            ctx.moveTo(sx + sw / 2, 20);
+            ctx.lineTo(sx + sw / 2, cabinTop);
+            ctx.stroke();
+            ctx.fillStyle = '#64748b';
+            ctx.font = 'bold 10px "Noto Sans TC", sans-serif';
+            ctx.fillText(d.cable, sx + sw / 2 + 8, 36);
+
+            // Cabin body
+            ctx.fillStyle = '#f8fafc';
+            ctx.strokeStyle = '#334155';
+            ctx.lineWidth = 2;
+            ctx.beginPath();
+            ctx.roundRect(cx, cabinTop, cabinW, cabinH, 8);
+            ctx.fill();
+            ctx.stroke();
+
+            // Floor of cabin
+            ctx.fillStyle = '#cbd5e1';
+            ctx.fillRect(cx + 4, cabinTop + cabinH - 14, cabinW - 8, 10);
+            ctx.fillStyle = '#475569';
+            ctx.font = 'bold 10px "Noto Sans TC", sans-serif';
+            ctx.fillText(d.floor, cx + 8, cabinTop + cabinH - 4);
+
+            // Person (simple)
+            const px = cx + cabinW / 2;
+            const py = cabinTop + cabinH - 18;
+            ctx.fillStyle = '#1e293b';
+            ctx.beginPath();
+            ctx.arc(px, py - 52, 10, 0, Math.PI * 2); // head
+            ctx.fill();
+            ctx.fillRect(px - 9, py - 42, 18, 28); // torso
+            ctx.fillRect(px - 12, py - 14, 8, 14); // legs
+            ctx.fillRect(px + 4, py - 14, 8, 14);
+            ctx.fillStyle = '#0f766e';
+            ctx.font = 'bold 11px "Noto Sans TC", sans-serif';
+            ctx.fillText(d.man, px + 16, py - 48);
+
+            // Forces on person (scale by max of N, W)
+            const N = normal();
+            const W = weight();
+            const a = accel();
+            const maxF = Math.max(N, W, 1);
+            const scale = 70 / maxF;
+            const nLen = N * scale;
+            const wLen = W * scale;
+
+            // N up from feet
+            if (N > 0.5) {
+                drawArrow(ctx, px - 22, py, px - 22, py - nLen, '#059669', 3.5);
+                ctx.fillStyle = '#059669';
+                ctx.font = 'bold 12px sans-serif';
+                ctx.fillText('N', px - 38, py - nLen / 2);
+            }
+            // W down from COM
+            drawArrow(ctx, px + 22, py - 30, px + 22, py - 30 + wLen, '#dc2626', 3.5);
+            ctx.fillStyle = '#dc2626';
+            ctx.font = 'bold 12px sans-serif';
+            ctx.fillText('mg', px + 28, py - 30 + wLen / 2);
+
+            // Acceleration arrow beside cabin
+            const ax = sx + sw + 28;
+            const ay = cabinTop + cabinH / 2;
+            if (Math.abs(a) > 0.05) {
+                const aLen = Math.min(55, 18 + Math.abs(a) * 5);
+                if (a > 0) drawArrow(ctx, ax, ay + aLen / 2, ax, ay - aLen / 2, '#7c3aed', 3);
+                else drawArrow(ctx, ax, ay - aLen / 2, ax, ay + aLen / 2, '#7c3aed', 3);
+                ctx.fillStyle = '#7c3aed';
+                ctx.font = 'bold 12px sans-serif';
+                ctx.fillText('a', ax + 10, ay + 4);
+            } else {
+                ctx.fillStyle = '#7c3aed';
+                ctx.font = 'bold 12px sans-serif';
+                ctx.fillText('a = 0', ax - 6, ay);
+            }
+
+            // Velocity hint
+            if (velSign !== 0 && playing) {
+                const vx = sx - 24;
+                const vy = cabinTop + cabinH / 2;
+                if (velSign > 0) drawArrow(ctx, vx, vy + 20, vx, vy - 20, '#0369a1', 2.5);
+                else drawArrow(ctx, vx, vy - 20, vx, vy + 20, '#0369a1', 2.5);
+                ctx.fillStyle = '#0369a1';
+                ctx.font = 'bold 11px sans-serif';
+                ctx.fillText('v', vx - 14, vy + 4);
+            }
+        }
+
+        function drawFbd() {
+            const ctx = fbdCtx;
+            const w = fbdCanvas.width;
+            const h = fbdCanvas.height;
+            ctx.clearRect(0, 0, w, h);
+
+            const cx = w / 2;
+            const cy = h / 2 + 10;
+            const N = normal();
+            const W = weight();
+            const a = accel();
+            const maxF = Math.max(N, W, 1);
+            const scale = 90 / maxF;
+
+            // Person blob
+            ctx.fillStyle = '#e2e8f0';
+            ctx.beginPath();
+            ctx.arc(cx, cy, 22, 0, Math.PI * 2);
+            ctx.fill();
+            ctx.strokeStyle = '#334155';
+            ctx.lineWidth = 2;
+            ctx.stroke();
+            ctx.fillStyle = '#1e293b';
+            ctx.font = 'bold 12px "Noto Sans TC", sans-serif';
+            ctx.textAlign = 'center';
+            ctx.fillText('m', cx, cy + 4);
+            ctx.textAlign = 'left';
+
+            if (N > 0.5) {
+                drawArrow(ctx, cx, cy, cx, cy - N * scale, '#059669', 4);
+                ctx.fillStyle = '#059669';
+                ctx.font = 'bold 13px sans-serif';
+                ctx.fillText(`N = ${N.toFixed(0)} N`, cx + 16, cy - N * scale / 2);
+            }
+            drawArrow(ctx, cx, cy, cx, cy + W * scale, '#dc2626', 4);
+            ctx.fillStyle = '#dc2626';
+            ctx.font = 'bold 13px sans-serif';
+            ctx.fillText(`mg = ${W.toFixed(0)} N`, cx + 16, cy + W * scale / 2);
+
+            // a label
+            ctx.fillStyle = '#7c3aed';
+            ctx.font = 'bold 13px sans-serif';
+            const aTxt = `a = ${a.toFixed(2)} m/s²`;
+            ctx.fillText(aTxt, 16, 24);
+            if (Math.abs(a) > 0.05) {
+                const al = Math.min(40, 12 + Math.abs(a) * 3);
+                if (a > 0) drawArrow(ctx, 36, 70, 36, 70 - al, '#7c3aed', 3);
+                else drawArrow(ctx, 36, 50, 36, 50 + al, '#7c3aed', 3);
+            }
+        }
+
+        function draw() {
+            drawScene();
+            drawFbd();
+        }
+
+        function resize() {
+            const sParent = sceneCanvas.parentElement;
+            sceneCanvas.width = Math.max(320, sParent.clientWidth - 32);
+            sceneCanvas.height = 420;
+            const fParent = fbdCanvas.parentElement;
+            fbdCanvas.width = Math.max(280, fParent.clientWidth - 32);
+            fbdCanvas.height = 280;
+            draw();
+        }
+
+        function tick() {
+            if (playing) {
+                const s = scenario();
+                const speed = 0.0045 + Math.abs(accel()) * 0.00035;
+                if (s.moving !== 0) {
+                    cabinY += s.moving * speed;
+                    if (cabinY > 0.92) {
+                        cabinY = 0.92;
+                        if (s.id.includes('Accel') || s.id === 'freeFall') cabinY = 0.08;
+                    }
+                    if (cabinY < 0.08) {
+                        cabinY = 0.08;
+                        if (s.moving < 0) cabinY = 0.9;
+                    }
+                }
+            }
+            draw();
+            requestAnimationFrame(tick);
+        }
+
+        massSlider.addEventListener('input', () => { updateUI(); draw(); });
+        accelSlider.addEventListener('input', () => { updateUI(); draw(); });
+        playBtn.addEventListener('click', () => {
+            playing = !playing;
+            updateUI();
+        });
+        document.getElementById('lang-toggle').addEventListener('click', () => {
+            currentLang = currentLang === 'zh' ? 'en' : 'zh';
+            updateLanguageUI();
+        });
+        window.addEventListener('message', (ev) => {
+            if (ev.data?.type !== 's3phy:lang') return;
+            currentLang = hubLangToLocal(ev.data.lang);
+            updateLanguageUI();
+        });
+        window.addEventListener('resize', resize);
+
+        // Polyfill roundRect if needed
+        if (!CanvasRenderingContext2D.prototype.roundRect) {
+            CanvasRenderingContext2D.prototype.roundRect = function (x, y, w, h, r) {
+                const rr = Math.min(r, w / 2, h / 2);
+                this.moveTo(x + rr, y);
+                this.arcTo(x + w, y, x + w, y + h, rr);
+                this.arcTo(x + w, y + h, x, y + h, rr);
+                this.arcTo(x, y + h, x, y, rr);
+                this.arcTo(x, y, x + w, y, rr);
+                this.closePath();
+            };
+        }
+
+        updateLanguageUI();
+        resize();
+        tick();
+    </script>
+</body>
+</html>

@@ -264,6 +264,7 @@ export const zhHant = {
   'strand.mechanics.subtitle': '力學 — 力與運動',
   'mechanics.section.empty': '力學單元內容即將推出。',
   'tools.vectorTool.title': '矢量實驗室 — 分解',
+  'tools.elevatorWeight.title': '電梯 — 法向力與加速度',
   'tools.projectileMotion.title': '拋體運動',
   // Gas and kinetic theory translations
   'strand.gas.title': '\u6c23\u9ad4\u8207\u5206\u5b50\u904b\u52d5\u8ad6',

@@ -41,6 +41,7 @@ const MECHANICS_TOPICS = [
     titleKey: 'topic.forceII',
     fileEn: 'force-ii-en.pdf',
     fileZh: 'force-ii-zhHant.pdf',
+    tool: 'elevatorWeight',
   },
   {
     id: 'forceIII',
@@ -113,10 +114,12 @@ const MECHANICS_SUMMARY_ROWS = MECHANICS_TOPICS.map((r) => {
   };
 });
 
-const TOOL_ORDER = ['vectorTool', 'projectileMotion'];
+const TOOL_ORDER = ['vectorTool', 'elevatorWeight', 'projectileMotion'];
 
 const TOOL_LOADERS = {
   vectorTool: () => import('../tools/vectorToolLab.js').then((m) => m.createVectorToolLab),
+  elevatorWeight: () =>
+    import('../tools/elevatorWeightLab.js').then((m) => m.createElevatorWeightLab),
   projectileMotion: () =>
     import('../tools/projectileMotionLab.js').then((m) => m.createProjectileMotionLab),
 };
@@ -124,6 +127,7 @@ const TOOL_LOADERS = {
 function toolLabel(id) {
   const map = {
     vectorTool: 'tools.vectorTool.title',
+    elevatorWeight: 'tools.elevatorWeight.title',
     projectileMotion: 'tools.projectileMotion.title',
   };
   return t(map[id] || id);

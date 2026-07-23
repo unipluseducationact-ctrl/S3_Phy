@@ -264,6 +264,7 @@ export const en = {
   'strand.mechanics.subtitle': 'Mechanics — force and motion',
   'mechanics.section.empty': 'Mechanics strand content is coming soon.',
   'tools.vectorTool.title': 'Vector lab — decomposition',
+  'tools.elevatorWeight.title': 'Elevator — normal force & acceleration',
   'tools.projectileMotion.title': 'Projectile motion',
   // Gas and kinetic theory translations
   'strand.gas.title': 'Gas & Kinetic Theory',

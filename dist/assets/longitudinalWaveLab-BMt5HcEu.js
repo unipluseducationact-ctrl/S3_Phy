@@ -1,0 +1,1 @@
+import{c as t}from"./createLabIframe-BkBwjP1P.js";import"./index-BFwfiq-7.js";function l(a){return t(a,{slug:"longitudinal-wave",titleKey:"tools.longitudinalWave.title",className:"tool-longitudinal-wave-lab",extraParams:()=>"&v=20260723_longitudinal_hidpi_v12"})}export{l as createLongitudinalWaveLab};
