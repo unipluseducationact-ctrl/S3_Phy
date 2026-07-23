@@ -509,9 +509,11 @@
         let scenarioId = 'fullUp';
         let playing = true;
         let cabinY = 0.1;
-        let velSign = 1;
+        let velocity = 0; // signed cabinY / s (arrow magnitude)
+        let brakeV0 = 0;
+        let phaseTimer = 0; // seconds in current accel/decel phase
         let stopped = false;
-        let phase = 'accel'; // fullUp: accel | coast | decel | rest
+        let phase = 'accel'; // accel | coast | decel | rest
         let simTime = 0;
         let history = []; // { t, N, a }
         let lastTs = 0;
@@ -1307,15 +1309,16 @@
 
                 if (s.id === 'fullUp') {
                     velSign = 1;
+                    let nextWhy = whyMode;
                     if (phase === 'accel') {
                         cabinY += base * 1.15;
                         if (cabinY >= 0.38) phase = 'coast';
-                        whyMode = 'heavy';
+                        nextWhy = 'heavy';
                     } else if (phase === 'coast') {
                         cabinY += base * 0.95;
                         if (cabinY >= 0.68) phase = 'decel';
                     } else if (phase === 'decel') {
-                        whyMode = 'light';
+                        nextWhy = 'light';
                         const dist = Math.max(0, 0.9 - cabinY);
                         const slow = Math.max(0.2, Math.min(1, dist / 0.28));
                         cabinY += base * slow * 0.85;
@@ -1323,6 +1326,11 @@
                             cabinY = 0.9;
                             stopCabin();
                         }
+                    }
+                    if (nextWhy !== whyMode) {
+                        whyMode = nextWhy;
+                        whyT = 0;
+                        buildWhyButtons();
                     }
                 } else if (s.id === 'upDecel') {
                     velSign = 1;
