@@ -5,7 +5,7 @@ import { renderToolsShell, hydrateToolsShell } from '../tools/toolsShell.js';
 import { mountFlashcardStudy } from '../flashcards/flashcardStudy.js';
 import { buildOpticsDeck } from '../flashcards/flashcardDeck.js';
 
-const TOOL_ORDER = ['rotatingMirror', 'planeMirrorLab', 'reflection3d', 'refraction', 'refractionTir', 'mirage', 'lens', 'rgbMixer', 'em'];
+const TOOL_ORDER = ['rotatingMirror', 'planeMirrorLab', 'reflection3d', 'refraction', 'refractionTir', 'lens', 'rgbMixer', 'em'];
 const TOOL_STORAGE_KEY = 's3phy.optics.tool';
 const WORKSHEET_ORDER = ['lightLens', 'emWave'];
 const SUMMARY_ASSET_VERSION = '20260627-em-v2';
@@ -41,7 +41,6 @@ const TOOL_LOADERS = {
   reflection3d: () => import('../tools/reflection3dLab.js').then((m) => m.createReflection3dLab),
   refraction: () => import('../tools/refractionLab.js').then((m) => m.createRefractionLab),
   refractionTir: () => import('../tools/tirEscapeLab.js').then((m) => m.createTirEscapeLab),
-  mirage: () => import('../tools/mirageLab.js').then((m) => m.createMirageLab),
   lens: () => import('../tools/lensLab.js').then((m) => m.createLensLab),
   rgbMixer: () => import('../tools/rgbColorMixerLab.js').then((m) => m.createRgbColorMixerLab),
   em: () => import('../tools/emLab.js').then((m) => m.createEmLab),
@@ -54,7 +53,6 @@ function toolLabel(id) {
     reflection3d: 'tools.reflection3d.title',
     refraction: 'tools.refraction.title',
     refractionTir: 'tools.refractionTir.title',
-    mirage: 'tools.mirage.title',
     lens: 'tools.lens.title',
     rgbMixer: 'tools.rgbMixer.title',
     em: 'tools.em.title',
@@ -231,7 +229,6 @@ export function mountOpticsHub(root) {
       ['planeMirrorLab', 'topic.reflection'],
       ['refraction', 'topic.refractionSnell'],
       ['tir', 'topic.tir'],
-      ['mirage', 'topic.mirage'],
       ['convex', 'topic.convex'],
       ['concave', 'topic.concave'],
       ['em', 'topic.em'],
@@ -250,11 +247,9 @@ export function mountOpticsHub(root) {
                     ? 'refraction'
                     : id === 'tir'
                       ? 'refractionTir'
-                      : id === 'mirage'
-                        ? 'mirage'
-                        : id === 'em'
-                          ? 'em'
-                          : id;
+                      : id === 'em'
+                        ? 'em'
+                        : id;
               const lensKind =
                 id === 'convex' ? 'convex' : id === 'concave' ? 'concave' : '';
               return `
