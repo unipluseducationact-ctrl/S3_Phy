@@ -36,7 +36,7 @@
         }
         .header-top {
             width: 100%;
-            max-width: 980px;
+            max-width: 1080px;
             display: flex;
             justify-content: space-between;
             align-items: flex-start;
@@ -58,7 +58,7 @@
         }
         .container {
             width: 100%;
-            max-width: 980px;
+            max-width: 1080px;
             display: flex;
             flex-direction: column;
             gap: 14px;
@@ -133,8 +133,9 @@
         }
         .main-grid {
             display: grid;
-            grid-template-columns: 1.15fr 0.85fr;
+            grid-template-columns: 1.7fr 0.55fr;
             gap: 14px;
+            align-items: start;
         }
         @media (max-width: 820px) {
             .main-grid { grid-template-columns: 1fr; }
@@ -152,8 +153,9 @@
             border: 1px solid var(--border);
             background: #eef2f6;
         }
-        #sceneCanvas { height: 420px; }
+        #sceneCanvas { height: 580px; }
         #fbdCanvas { height: 280px; background: #fafafa; }
+        #ntCanvas { height: 260px; background: #fafafa; }
         .readouts {
             display: grid;
             grid-template-columns: repeat(auto-fit, minmax(120px, 1fr));
@@ -181,6 +183,7 @@
         .stat.n .v { color: var(--n); }
         .stat.w .v { color: var(--w); }
         .stat.a .v { color: var(--a); }
+        .stat.vstat .v { color: #0369a1; }
         .feel {
             margin-top: 10px;
             padding: 10px 12px;
@@ -226,7 +229,6 @@
         .legend .lw::before { background: var(--w); }
         .legend .la::before { background: var(--a); }
         .legend .lv::before { background: #0369a1; }
-        #ntCanvas { height: 220px; background: #fafafa; }
         .phase-tag {
             display: inline-block;
             margin-top: 8px;
@@ -238,7 +240,6 @@
             color: #047857;
             border: 1px solid #a7f3d0;
         }
-        #whyCanvas { height: 260px; background: #f8fafc; }
         .why-modes {
             display: flex;
             flex-wrap: wrap;
@@ -289,7 +290,14 @@
                     <span class="slider-label" id="label-accel">|a| magnitude</span>
                     <div class="slider-row">
                         <input type="range" id="accelSlider" min="0.5" max="8" step="0.1" value="2.5">
-                        <span class="val" id="accelVal">2.5 m/s²</span>
+                        <span class="val" id="accelVal">2.5 ms⁻²</span>
+                    </div>
+                </div>
+                <div class="control-group">
+                    <span class="slider-label" id="label-anim">Animation speed</span>
+                    <div class="slider-row">
+                        <input type="range" id="animSpeedSlider" min="0.35" max="2.5" step="0.05" value="1">
+                        <span class="val" id="animSpeedVal">×1.00</span>
                     </div>
                 </div>
                 <button type="button" class="play-btn" id="playBtn">▶ Play</button>
@@ -301,7 +309,7 @@
         <div class="main-grid">
             <div class="card">
                 <div class="canvas-label" id="label-scene">Elevator shaft (side view)</div>
-                <canvas id="sceneCanvas" width="560" height="420"></canvas>
+                <canvas id="sceneCanvas" width="640" height="580"></canvas>
                 <div class="legend">
                     <span class="ln" id="leg-n">N (normal)</span>
                     <span class="lw" id="leg-w">W = mg (weight)</span>
@@ -311,9 +319,10 @@
             </div>
             <div class="card">
                 <div class="canvas-label" id="label-fbd">Free-body diagram</div>
-                <canvas id="fbdCanvas" width="400" height="280"></canvas>
+                <canvas id="fbdCanvas" width="320" height="280"></canvas>
                 <div class="readouts">
                     <div class="stat a"><span class="k" id="k-a">Acceleration a</span><span class="v" id="v-a">0</span></div>
+                    <div class="stat vstat"><span class="k" id="k-v">Speed |v|</span><span class="v" id="v-v">0</span></div>
                     <div class="stat n"><span class="k" id="k-n">Normal N</span><span class="v" id="v-n">0</span></div>
                     <div class="stat w"><span class="k" id="k-w">Weight mg</span><span class="v" id="v-w">0</span></div>
                     <div class="stat"><span class="k" id="k-ratio">N / mg</span><span class="v" id="v-ratio">1.00</span></div>
@@ -324,17 +333,8 @@
         </div>
 
         <div class="card">
-            <div class="canvas-label" id="label-why">Why it feels lighter / heavier</div>
-            <div class="why-modes" id="why-modes"></div>
-            <canvas id="whyCanvas" width="900" height="260"></canvas>
-            <p id="whyCaption"></p>
-            <div class="why-eq" id="whyEq"></div>
-            <button type="button" class="play-btn" id="whyReplay" style="margin-top:10px;background:#475569">↺ Replay</button>
-        </div>
-
-        <div class="card">
             <div class="canvas-label" id="label-nt">N vs time</div>
-            <canvas id="ntCanvas" width="900" height="220"></canvas>
+            <canvas id="ntCanvas" width="900" height="260"></canvas>
             <div class="legend">
                 <span class="ln" id="leg-nt-n">N(t)</span>
                 <span class="lw" id="leg-nt-mg">mg (reference)</span>
@@ -345,24 +345,25 @@
 
     <script>
         const G = 9.81;
-        const ACCEL_DUR = 1.5; // fullUp start accel window
-        const DECEL_DUR = 1.5; // fullUp end brake window
-        const CRUISE = 0.28; // cabinY units / s (cruise / focus start speed)
+        // Physical shaft height so cabinY∈[0,1] maps to metres
+        const SHAFT_H = 55; // m — room for BRAKE_T=3 s even at |a|=8
+        const BRAKE_T = 3; // seconds of non-zero a just before stop
+        const V_REF = 24; // m/s — scale for v arrow (≈ max cruise = 8×3)
         const FORCE_REF = 70 * G; // pixel scale reference (70 kg · g)
         const A_REF = 8; // max |a| on slider
-        // Focus cases keep opposite v & a for the whole trip; fullUp shows N(t) phases
+        // Focus cases: coast, then decelerate only in the last BRAKE_T seconds
         const SCENARIOS = [
-            { id: 'upDecel', aSign: -1, moving: 1, needA: true },   // v↑ a↓ until stop
-            { id: 'downDecel', aSign: 1, moving: -1, needA: true }, // v↓ a↑ until stop
-            { id: 'fullUp', needA: true },                          // accel → coast → decel → rest
+            { id: 'upDecel', aSign: -1, moving: 1, needA: true },   // v↑ then a↓ to stop
+            { id: 'downDecel', aSign: 1, moving: -1, needA: true }, // v↓ then a↑ to stop
         ];
 
         const dict = {
             zh: {
                 title: '電梯中的受力',
-                desc: '兩個重點：向上行但向下加速（減速至停）；向下行但向上加速（減速至停）。亦可睇完整上行（加速→勻速→減速）。',
+                desc: '兩個重點：向上行時先勻速，停車前向下加速（減速至停）；向下行時先勻速，停車前向上加速（減速至停）。',
                 mass: '質量 m',
-                accel: '|a| 大小',
+                accel: '|a| 大小（減速階段）',
+                animSpeed: '動畫速度',
                 play: '▶ 播放',
                 pause: '⏸ 暫停',
                 reset: '↺ 重設位置',
@@ -370,6 +371,7 @@
                 fbd: '受力圖（自由體圖）',
                 nt: '法向力 N 對時間',
                 ka: '加速度 a（向上為正）',
+                kv: '速率 |v|',
                 kn: '法向力 N（地板托力）',
                 kw: '重量 mg',
                 kratio: 'N / mg',
@@ -385,13 +387,11 @@
                 feelZero: '失重（N = 0）',
                 eq: (n, mg, a) => `ΣF = N − mg = ma\nN − ${mg} = m(${a})\nN = ${n} N`,
                 scenarios: {
-                    fullUp: '完整上行（加速→勻速→減速）',
-                    upDecel: '上行 · a 向下（減速至停）',
-                    downDecel: '下行 · a 向上（減速至停）',
+                    upDecel: '上行 · 停車前 a 向下',
+                    downDecel: '下行 · 停車前 a 向上',
                 },
-                cueFullUp: '加速（N↑）→ 勻速（N = mg）→ 減速（N↓）',
-                cueUpDecel: '全程向上行但向下加速 → 減速至停（N < mg）',
-                cueDownDecel: '全程向下行但向上加速 → 減速至停（N > mg）',
+                cueUpDecel: '先勻速上行（a = 0，N = mg）→ 停車前約 3 秒向下加速減速（N < mg）',
+                cueDownDecel: '先勻速下行（a = 0，N = mg）→ 停車前約 3 秒向上加速減速（N > mg）',
                 why: '點解減速至停會變輕／變重？',
                 whyLight: '上行減速 → 變輕',
                 whyHeavy: '下行減速 → 變重',
@@ -430,9 +430,10 @@
             },
             en: {
                 title: 'Forces in an elevator',
-                desc: 'Two focus cases: moving up with a down (slow to stop), and moving down with a up. Also a full upward trip (accel → coast → decel).',
+                desc: 'Two focus cases: coast upward, then accelerate downward only to stop; coast downward, then accelerate upward only to stop.',
                 mass: 'Mass m',
-                accel: '|a| magnitude',
+                accel: '|a| magnitude (braking)',
+                animSpeed: 'Animation speed',
                 play: '▶ Play',
                 pause: '⏸ Pause',
                 reset: '↺ Reset position',
@@ -440,6 +441,7 @@
                 fbd: 'Free-body diagram',
                 nt: 'Normal force N vs time',
                 ka: 'Acceleration a (up +)',
+                kv: 'Speed |v|',
                 kn: 'Normal N (floor push)',
                 kw: 'Weight mg',
                 kratio: 'N / mg',
@@ -455,13 +457,11 @@
                 feelZero: 'Weightless (N = 0)',
                 eq: (n, mg, a) => `ΣF = N − mg = ma\nN − ${mg} = m(${a})\nN = ${n} N`,
                 scenarios: {
-                    fullUp: 'Full trip up (accel → coast → decel)',
-                    upDecel: 'Going up · a down (slow to stop)',
-                    downDecel: 'Going down · a up (slow to stop)',
+                    upDecel: 'Going up · a down before stop',
+                    downDecel: 'Going down · a up before stop',
                 },
-                cueFullUp: 'Accel (N↑) → coast (N = mg) → brake (N↓)',
-                cueUpDecel: 'Moving UP with a DOWN the whole way → slows to a stop (N < mg)',
-                cueDownDecel: 'Moving DOWN with a UP the whole way → slows to a stop (N > mg)',
+                cueUpDecel: 'Coast UP (a = 0, N = mg) → about 3 s before stop, a DOWN to brake (N < mg)',
+                cueDownDecel: 'Coast DOWN (a = 0, N = mg) → about 3 s before stop, a UP to brake (N > mg)',
                 why: 'Why slowing to a stop feels lighter / heavier',
                 whyLight: 'Up & slowing → lighter',
                 whyHeavy: 'Down & slowing → heavier',
@@ -509,18 +509,17 @@
         let scenarioId = 'upDecel';
         let playing = true;
         let cabinY = 0.12;
-        let velocity = 0; // signed cabinY / s
-        let brakeV0 = 0;
-        let phaseTimer = 0; // seconds in current accel/decel phase (fullUp)
+        let startY = 0.12;
+        let posM = 0.12 * SHAFT_H; // cabin height from bottom (m)
+        let velocity = 0; // signed SI speed (m/s), up +
         let stopped = false;
-        let phase = 'decel'; // accel | coast | decel | rest
+        let phase = 'coast'; // coast | decel | rest
         let simTime = 0;
         let history = []; // { t, N, a }
         let lastTs = 0;
-        const HISTORY_MAX_T = 14;
-        let whyMode = 'light'; // light = up decelerating; heavy = down decelerating
-        let whyT = 0;
-        const WHY_CYCLE = 8;
+        const HISTORY_MAX_T = 40;
+        /** Instantaneous SI acceleration (up +). Non-zero only while braking. */
+        let instantA = 0;
 
         const sceneCanvas = document.getElementById('sceneCanvas');
         const sceneCtx = sceneCanvas.getContext('2d');
@@ -528,10 +527,9 @@
         const fbdCtx = fbdCanvas.getContext('2d');
         const ntCanvas = document.getElementById('ntCanvas');
         const ntCtx = ntCanvas.getContext('2d');
-        const whyCanvas = document.getElementById('whyCanvas');
-        const whyCtx = whyCanvas.getContext('2d');
         const massSlider = document.getElementById('massSlider');
         const accelSlider = document.getElementById('accelSlider');
+        const animSpeedSlider = document.getElementById('animSpeedSlider');
         const playBtn = document.getElementById('playBtn');
         const accelGroup = document.getElementById('accel-group');
 
@@ -539,27 +537,16 @@
         function scenario() { return SCENARIOS.find((s) => s.id === scenarioId); }
         function mass() { return parseFloat(massSlider.value); }
         function aMag() { return parseFloat(accelSlider.value); }
+        function animSpeed() { return parseFloat(animSpeedSlider.value); }
 
         function accel() {
-            if (stopped || phase === 'rest') return 0;
-            // Focus cases: opposite v & a for the whole moving trip
-            if (scenarioId === 'upDecel') return -aMag();
-            if (scenarioId === 'downDecel') return aMag();
-            // fullUp: timed phases
-            if (phase === 'accel') return aMag();
-            if (phase === 'decel') return -aMag();
-            return 0; // coast
+            return stopped ? 0 : instantA;
         }
 
         function weight() { return mass() * G; }
         function normal() {
             // N - mg = ma  (up +)  →  N = m(g+a)
             return Math.max(0, mass() * (G + accel()));
-        }
-
-        /** Map SI |a| → cabinY/s² so the slider changes stopping rate. */
-        function aVisual() {
-            return 0.035 + aMag() * 0.022;
         }
 
         function forcePx(F, basePx) {
@@ -569,18 +556,44 @@
             return Math.min(maxPx, (Math.abs(a) / A_REF) * maxPx);
         }
         function vPx(v, maxPx) {
-            return Math.min(maxPx, (Math.abs(v) / CRUISE) * maxPx);
+            return Math.min(maxPx, (Math.abs(v) / V_REF) * maxPx);
         }
 
         function targetY() {
             return scenarioId === 'downDecel' ? 0.1 : 0.9;
         }
 
+        function signedA() {
+            return scenarioId === 'upDecel' ? -aMag() : aMag();
+        }
+
+        /** Cruise speed so constant |a| brakes to rest in exactly BRAKE_T seconds. */
+        function cruiseSpeed() {
+            return aMag() * BRAKE_T;
+        }
+
+        /** Distance covered while braking at |a| for BRAKE_T (from cruise to rest). */
+        function brakeDistanceM() {
+            return 0.5 * aMag() * BRAKE_T * BRAKE_T;
+        }
+
+        function remainingM() {
+            return Math.abs(targetY() * SHAFT_H - posM);
+        }
+
+        function syncCabinFromPos() {
+            cabinY = Math.min(1, Math.max(0, posM / SHAFT_H));
+        }
+
+        function syncCruiseVelocity() {
+            velocity = scenarioId === 'upDecel' ? cruiseSpeed() : -cruiseSpeed();
+        }
+
         function currentPhaseKey() {
-            if (stopped) return 'stopped';
+            if (stopped || phase === 'rest') return 'stopped';
+            if (phase === 'coast') return 'coast';
             if (scenarioId === 'upDecel') return 'upDecel';
             if (scenarioId === 'downDecel') return 'downDecel';
-            if (scenarioId === 'fullUp') return phase === 'rest' ? 'rest' : phase;
             return 'rest';
         }
 
@@ -594,7 +607,12 @@
             const N = normal();
             const a = accel();
             const last = history[history.length - 1];
-            if (last && Math.abs(last.t - simTime) < 0.02 && Math.abs(last.N - N) < 0.5) return;
+            // Record densely so N(t) shows every-instance change
+            if (last && Math.abs(last.t - simTime) < 0.008) {
+                last.N = N;
+                last.a = a;
+                return;
+            }
             history.push({ t: simTime, N, a });
             while (history.length > 1 && history[history.length - 1].t - history[0].t > HISTORY_MAX_T) {
                 history.shift();
@@ -604,53 +622,19 @@
         function applyScenarioStart() {
             const s = scenario();
             stopped = false;
-            phaseTimer = 0;
-            brakeV0 = 0;
             clearHistory();
-            if (s.id === 'fullUp') {
-                cabinY = 0.1;
-                velocity = 0;
-                phase = 'accel';
-                whyMode = 'heavy';
-            } else if (s.id === 'upDecel') {
-                // Start near bottom, moving up, a down for the whole trip
-                cabinY = 0.12;
-                velocity = CRUISE;
+            startY = s.id === 'upDecel' ? 0.12 : 0.88;
+            posM = startY * SHAFT_H;
+            syncCabinFromPos();
+            syncCruiseVelocity();
+            instantA = 0;
+            phase = 'coast';
+            // If already inside the last BRAKE_T seconds of travel, brake immediately
+            if (remainingM() <= brakeDistanceM() + 0.05) {
                 phase = 'decel';
-                whyMode = 'light';
-            } else {
-                // Start near top, moving down, a up for the whole trip
-                cabinY = 0.88;
-                velocity = -CRUISE;
-                phase = 'decel';
-                whyMode = 'heavy';
+                instantA = signedA();
             }
-            whyT = 0;
             pushHistory();
-            buildWhyButtons();
-        }
-
-        function buildWhyButtons() {
-            const box = document.getElementById('why-modes');
-            box.innerHTML = '';
-            const d = t();
-            [
-                { id: 'light', label: d.whyLight },
-                { id: 'heavy', label: d.whyHeavy },
-            ].forEach((opt) => {
-                const b = document.createElement('button');
-                b.type = 'button';
-                b.className = 'sc-btn' + (whyMode === opt.id ? ' active' : '');
-                b.textContent = opt.label;
-                b.addEventListener('click', () => {
-                    whyMode = opt.id;
-                    whyT = 0;
-                    buildWhyButtons();
-                    updateWhyCaption();
-                    drawWhy();
-                });
-                box.appendChild(b);
-            });
         }
 
         function buildScenarioButtons() {
@@ -675,23 +659,6 @@
             });
         }
 
-        function whyStepIndex() {
-            const u = whyT % WHY_CYCLE;
-            if (u < 1.8) return 0;
-            if (u < 3.6) return 1;
-            if (u < 5.4) return 2;
-            return 3;
-        }
-
-        function updateWhyCaption() {
-            const d = t();
-            const steps = whyMode === 'light' ? d.whyStepsLight : d.whyStepsHeavy;
-            const i = whyStepIndex();
-            document.getElementById('whyCaption').textContent = steps[i];
-            document.getElementById('whyEq').textContent =
-                whyMode === 'light' ? d.whyEqLight : d.whyEqHeavy;
-        }
-
         function updateLanguageUI() {
             const d = t();
             document.documentElement.lang = currentLang === 'zh' ? 'zh-HK' : 'en';
@@ -701,12 +668,12 @@
             document.getElementById('page-desc').innerText = d.desc;
             document.getElementById('label-mass').innerText = d.mass;
             document.getElementById('label-accel').innerText = d.accel;
+            document.getElementById('label-anim').innerText = d.animSpeed;
             document.getElementById('label-scene').innerText = d.scene;
             document.getElementById('label-fbd').innerText = d.fbd;
             document.getElementById('label-nt').innerText = d.nt;
-            document.getElementById('label-why').innerText = d.why;
-            document.getElementById('whyReplay').innerText = d.whyReplay;
             document.getElementById('k-a').innerText = d.ka;
+            document.getElementById('k-v').innerText = d.kv;
             document.getElementById('k-n').innerText = d.kn;
             document.getElementById('k-w').innerText = d.kw;
             document.getElementById('k-ratio').innerText = d.kratio;
@@ -719,9 +686,7 @@
             document.getElementById('leg-nt-mg').innerText = d.legNtMg;
             playBtn.innerText = playing ? d.pause : d.play;
             buildScenarioButtons();
-            buildWhyButtons();
             updateUI();
-            updateWhyCaption();
             draw();
         }
 
@@ -735,14 +700,16 @@
             const ratio = W > 0 ? N / W : 0;
 
             document.getElementById('massVal').textContent = `${m.toFixed(0)} kg`;
-            document.getElementById('accelVal').textContent = `${aMag().toFixed(1)} m/s²`;
+            document.getElementById('accelVal').textContent = `${aMag().toFixed(1)} ms⁻²`;
+            document.getElementById('animSpeedVal').textContent = `×${animSpeed().toFixed(2)}`;
             accelGroup.style.opacity = s.needA ? '1' : '0.45';
             accelSlider.disabled = !s.needA;
 
-            document.getElementById('v-a').textContent = `${a.toFixed(2)} m/s²`;
-            document.getElementById('v-n').textContent = `${N.toFixed(0)} N`;
-            document.getElementById('v-w').textContent = `${W.toFixed(0)} N`;
-            document.getElementById('v-ratio').textContent = ratio.toFixed(2);
+            document.getElementById('v-a').textContent = `${a.toFixed(2)} ms⁻²`;
+            document.getElementById('v-v').textContent = `${Math.abs(velocity).toFixed(2)} ms⁻¹`;
+            document.getElementById('v-n').textContent = `${N.toFixed(1)} N`;
+            document.getElementById('v-w').textContent = `${W.toFixed(1)} N`;
+            document.getElementById('v-ratio').textContent = ratio.toFixed(3);
 
             const feel = document.getElementById('feelBox');
             if (N < 1) {
@@ -760,13 +727,13 @@
             }
 
             document.getElementById('eqBox').textContent = d.eq(
-                N.toFixed(0),
-                W.toFixed(0),
+                N.toFixed(1),
+                W.toFixed(1),
                 a.toFixed(2)
             );
             playBtn.innerText = playing ? d.pause : d.play;
             document.getElementById('resetBtn').innerText = d.reset;
-            const cues = { fullUp: d.cueFullUp, upDecel: d.cueUpDecel, downDecel: d.cueDownDecel };
+            const cues = { upDecel: d.cueUpDecel, downDecel: d.cueDownDecel };
             document.getElementById('case-cue').textContent = cues[scenarioId] || '';
             document.getElementById('phaseTag').textContent = d.phases[currentPhaseKey()] || '';
         }
@@ -790,14 +757,14 @@
 
         function drawScene() {
             const ctx = sceneCtx;
-            const w = sceneCanvas.width;
-            const h = sceneCanvas.height;
+            const w = sceneCanvas.clientWidth || sceneCanvas.width;
+            const h = sceneCanvas.clientHeight || sceneCanvas.height;
             const d = t();
             ctx.clearRect(0, 0, w, h);
 
-            // Shaft
-            const sx = w * 0.28;
-            const sw = w * 0.44;
+            // Shaft — leave left margin for v / a arrows
+            const sx = w * 0.34;
+            const sw = w * 0.40;
             ctx.fillStyle = '#dbe3ec';
             ctx.fillRect(sx, 20, sw, h - 40);
             ctx.strokeStyle = '#94a3b8';
@@ -878,7 +845,7 @@
                 ctx.font = 'bold 12px "Noto Sans TC", sans-serif';
                 ctx.fillText('N', px - 48, py - nLen / 2);
                 ctx.font = 'bold 11px "Noto Sans TC", sans-serif';
-                ctx.fillText(`${N.toFixed(0)} N`, px - 52, py - nLen / 2 + 14);
+                ctx.fillText(`${N.toFixed(1)} N`, px - 52, py - nLen / 2 + 14);
             } else {
                 ctx.fillStyle = '#059669';
                 ctx.font = 'bold 11px "Noto Sans TC", sans-serif';
@@ -890,97 +857,95 @@
             ctx.font = 'bold 12px "Noto Sans TC", sans-serif';
             ctx.fillText('mg', px + 32, py - 30 + wLen / 2);
             ctx.font = 'bold 11px "Noto Sans TC", sans-serif';
-            ctx.fillText(`${W.toFixed(0)} N`, px + 32, py - 30 + wLen / 2 + 14);
+            ctx.fillText(`${W.toFixed(1)} N`, px + 32, py - 30 + wLen / 2 + 14);
 
-            // N magnitude gauge (arrow indicator vs mg tick)
-            drawNormalGauge(ctx, sx + sw + 18, cabinTop + 8, cabinH - 16, N, W, d);
+            // N magnitude gauge (green fill vs red mg tick) — right of shaft only
+            drawNormalGauge(ctx, sx + sw + 22, cabinTop + 8, cabinH - 16, N, W, d);
 
-            // Acceleration arrow — length ∝ |a|
-            const ax = sx + sw + 78;
-            const ay = cabinTop + cabinH / 2;
-            const aLen = aPx(a, 55);
-            if (aLen > 2) {
-                if (a > 0) drawArrow(ctx, ax, ay + aLen / 2, ax, ay - aLen / 2, '#7c3aed', 3);
-                else drawArrow(ctx, ax, ay - aLen / 2, ax, ay + aLen / 2, '#7c3aed', 3);
-                ctx.fillStyle = '#7c3aed';
-                ctx.font = 'bold 12px sans-serif';
-                ctx.fillText(`a ${a.toFixed(1)}`, ax + 10, ay + 4);
+            // v and a on the LEFT so opposite directions are obvious while braking
+            const kvx = sx - 34;
+            const kvy = cabinTop + cabinH / 2;
+            const speed = Math.abs(velocity);
+            const vLen = vPx(velocity, 52);
+            if (vLen > 2) {
+                if (velocity > 0) drawArrow(ctx, kvx, kvy + vLen / 2, kvx, kvy - vLen / 2, '#0369a1', 3);
+                else drawArrow(ctx, kvx, kvy - vLen / 2, kvx, kvy + vLen / 2, '#0369a1', 3);
+                ctx.fillStyle = '#0369a1';
+                ctx.font = 'bold 11px sans-serif';
+                ctx.fillText(`|v| ${speed.toFixed(2)} ms⁻¹`, Math.max(4, kvx - 78), kvy - vLen / 2 - 6);
             } else {
-                ctx.fillStyle = '#7c3aed';
-                ctx.font = 'bold 12px sans-serif';
-                ctx.fillText('a = 0', ax - 6, ay);
+                ctx.fillStyle = '#0369a1';
+                ctx.font = 'bold 11px sans-serif';
+                ctx.fillText('|v| 0.00 ms⁻¹', Math.max(4, sx - 90), kvy);
             }
 
-            // Speed arrow — length ∝ |v|, shrinks as cabin brakes
-            const vLen = vPx(velocity, 48);
-            if (vLen > 2) {
-                const vx = sx - 28;
-                const vy = cabinTop + cabinH / 2;
-                if (velocity > 0) drawArrow(ctx, vx, vy + vLen / 2, vx, vy - vLen / 2, '#0369a1', 2.5);
-                else drawArrow(ctx, vx, vy - vLen / 2, vx, vy + vLen / 2, '#0369a1', 2.5);
-                ctx.fillStyle = '#0369a1';
+            // Acceleration: tip toward top of screen ⇔ a > 0 (up +)
+            const kax = sx - 68;
+            const kay = cabinTop + cabinH / 2;
+            const aLen = aPx(a, 58);
+            if (aLen > 2) {
+                if (a > 0) drawArrow(ctx, kax, kay + aLen / 2, kax, kay - aLen / 2, '#7c3aed', 3.5);
+                else drawArrow(ctx, kax, kay - aLen / 2, kax, kay + aLen / 2, '#7c3aed', 3.5);
+                ctx.fillStyle = '#7c3aed';
                 ctx.font = 'bold 11px sans-serif';
-                ctx.fillText('v', vx - 14, vy + 4);
-            } else if (stopped) {
-                ctx.fillStyle = '#0369a1';
+                ctx.fillText(`a ${a.toFixed(1)} ms⁻²`, Math.max(4, kax - 72), kay - aLen / 2 - 6);
+            } else {
+                ctx.fillStyle = '#7c3aed';
                 ctx.font = 'bold 11px sans-serif';
-                ctx.fillText('v = 0', sx - 42, cabinTop + cabinH / 2);
+                ctx.fillText('a = 0 ms⁻²', Math.max(4, kax - 52), kay + 4);
             }
         }
 
         function drawNormalGauge(ctx, x, yTop, height, N, W, d) {
             const yBot = yTop + height;
+            const barW = 10;
             const maxRatio = 1.8; // gauge top = 1.8 mg
             const mgY = yBot - (1 / maxRatio) * height;
             const nRatio = W > 0 ? Math.min(maxRatio, N / W) : 0;
             const nY = yBot - (nRatio / maxRatio) * height;
 
-            // Track
-            ctx.strokeStyle = '#cbd5e1';
-            ctx.lineWidth = 8;
-            ctx.lineCap = 'round';
-            ctx.beginPath();
-            ctx.moveTo(x, yTop);
-            ctx.lineTo(x, yBot);
-            ctx.stroke();
+            // Track (butt edges so fill lines up exactly with ticks)
+            ctx.fillStyle = '#e2e8f0';
+            ctx.fillRect(x - barW / 2, yTop, barW, height);
 
-            // Fill up to N
-            ctx.strokeStyle = '#059669';
-            ctx.lineWidth = 8;
-            ctx.beginPath();
-            ctx.moveTo(x, yBot);
-            ctx.lineTo(x, nY);
-            ctx.stroke();
+            // Green N fill — top edge is exactly nY
+            ctx.fillStyle = '#059669';
+            ctx.fillRect(x - barW / 2, nY, barW, yBot - nY);
 
-            // mg reference tick
+            ctx.strokeStyle = '#94a3b8';
+            ctx.lineWidth = 1;
+            ctx.strokeRect(x - barW / 2, yTop, barW, height);
+
+            // Red mg reference line across the bar
             ctx.strokeStyle = '#dc2626';
             ctx.lineWidth = 2;
             ctx.beginPath();
-            ctx.moveTo(x - 12, mgY);
-            ctx.lineTo(x + 12, mgY);
+            ctx.moveTo(x - 14, mgY);
+            ctx.lineTo(x + 14, mgY);
             ctx.stroke();
             ctx.fillStyle = '#dc2626';
             ctx.font = 'bold 10px "Noto Sans TC", sans-serif';
-            ctx.fillText('mg', x + 14, mgY + 3);
+            ctx.fillText('mg', x + 16, mgY + 3);
 
-            // Arrow head at N level (magnitude indicator)
+            // Side marker at N level (tip on the bar edge at nY — aligns with red line when N = mg)
             ctx.fillStyle = '#059669';
             ctx.beginPath();
-            ctx.moveTo(x, nY);
-            ctx.lineTo(x - 9, nY + 8);
-            ctx.lineTo(x + 9, nY + 8);
+            ctx.moveTo(x + barW / 2, nY);          // tip touches bar at N height
+            ctx.lineTo(x + barW / 2 + 11, nY - 7);
+            ctx.lineTo(x + barW / 2 + 11, nY + 7);
             ctx.closePath();
             ctx.fill();
 
             ctx.font = 'bold 11px "Noto Sans TC", sans-serif';
             ctx.fillText('N', x - 4, yTop - 6);
-            ctx.fillText(`${N.toFixed(0)}`, x + 14, nY + 4);
+            ctx.fillStyle = '#059669';
+            ctx.fillText(`${N.toFixed(1)}`, x + 18, nY + 4);
         }
 
         function drawFbd() {
             const ctx = fbdCtx;
-            const w = fbdCanvas.width;
-            const h = fbdCanvas.height;
+            const w = fbdCanvas.clientWidth || fbdCanvas.width;
+            const h = fbdCanvas.clientHeight || fbdCanvas.height;
             ctx.clearRect(0, 0, w, h);
 
             const cx = w / 2;
@@ -1009,7 +974,7 @@
                 drawArrow(ctx, cx, cy, cx, cy - nLen, '#059669', 5);
                 ctx.fillStyle = '#059669';
                 ctx.font = 'bold 13px "Noto Sans TC", sans-serif';
-                ctx.fillText(`N = ${N.toFixed(0)} N`, cx + 18, cy - nLen / 2);
+                ctx.fillText(`N = ${N.toFixed(1)} N`, cx + 18, cy - nLen / 2);
             } else {
                 ctx.fillStyle = '#059669';
                 ctx.font = 'bold 13px "Noto Sans TC", sans-serif';
@@ -1018,35 +983,37 @@
             drawArrow(ctx, cx, cy, cx, cy + wLen, '#dc2626', 5);
             ctx.fillStyle = '#dc2626';
             ctx.font = 'bold 13px "Noto Sans TC", sans-serif';
-            ctx.fillText(`mg = ${W.toFixed(0)} N`, cx + 18, cy + wLen / 2);
+            ctx.fillText(`mg = ${W.toFixed(1)} N`, cx + 18, cy + wLen / 2);
 
             ctx.fillStyle = '#7c3aed';
             ctx.font = 'bold 13px sans-serif';
-            ctx.fillText(`a = ${a.toFixed(2)} m/s²`, 16, 24);
+            ctx.fillText(`a = ${a.toFixed(2)} ms⁻²`, 16, 24);
             const al = aPx(a, 48);
+            const aMidY = 78;
             if (al > 2) {
-                if (a > 0) drawArrow(ctx, 36, 70, 36, 70 - al, '#7c3aed', 3);
-                else drawArrow(ctx, 36, 50, 36, 50 + al, '#7c3aed', 3);
+                // Same convention as the scene: tip toward top ⇔ a > 0
+                if (a > 0) drawArrow(ctx, 40, aMidY + al / 2, 40, aMidY - al / 2, '#7c3aed', 3);
+                else drawArrow(ctx, 40, aMidY - al / 2, 40, aMidY + al / 2, '#7c3aed', 3);
             }
 
             // Speed magnitude on FBD
             const vl = vPx(velocity, 42);
+            const speed = Math.abs(velocity);
             ctx.fillStyle = '#0369a1';
             ctx.font = 'bold 13px sans-serif';
+            ctx.fillText(`|v| = ${speed.toFixed(2)} ms⁻¹`, w - 150, 24);
             if (vl > 2) {
                 const vx = w - 40;
-                ctx.fillText('v', vx - 14, 40);
-                if (velocity > 0) drawArrow(ctx, vx, 90, vx, 90 - vl, '#0369a1', 3);
-                else drawArrow(ctx, vx, 48, vx, 48 + vl, '#0369a1', 3);
-            } else {
-                ctx.fillText('v = 0', w - 70, 40);
+                const vMidY = 78;
+                if (velocity > 0) drawArrow(ctx, vx, vMidY + vl / 2, vx, vMidY - vl / 2, '#0369a1', 3);
+                else drawArrow(ctx, vx, vMidY - vl / 2, vx, vMidY + vl / 2, '#0369a1', 3);
             }
         }
 
         function drawNtGraph() {
             const ctx = ntCtx;
-            const w = ntCanvas.width;
-            const h = ntCanvas.height;
+            const w = ntCanvas.clientWidth || ntCanvas.width;
+            const h = ntCanvas.clientHeight || ntCanvas.height;
             ctx.clearRect(0, 0, w, h);
 
             const pad = { l: 52, r: 18, t: 18, b: 36 };
@@ -1115,314 +1082,90 @@
             ctx.fillText(maxN.toFixed(0), 8, pad.t + 22);
         }
 
-        function drawPersonFigure(ctx, px, footY, alpha, fill) {
-            ctx.save();
-            ctx.globalAlpha = alpha;
-            ctx.fillStyle = fill;
-            ctx.beginPath();
-            ctx.arc(px, footY - 52, 10, 0, Math.PI * 2);
-            ctx.fill();
-            ctx.fillRect(px - 9, footY - 42, 18, 28);
-            ctx.fillRect(px - 12, footY - 14, 8, 14);
-            ctx.fillRect(px + 4, footY - 14, 8, 14);
-            ctx.restore();
-        }
-
-        function drawWhy() {
-            const ctx = whyCtx;
-            const w = whyCanvas.width;
-            const h = whyCanvas.height;
-            const d = t();
-            ctx.clearRect(0, 0, w, h);
-
-            const step = whyStepIndex();
-            const light = whyMode === 'light';
-            const u = whyT % WHY_CYCLE;
-
-            // Progress through decelerating after step 0
-            const decelProg = step === 0 ? 0 : Math.min(1, (u - 1.8) / 3.6);
-
-            // Cabin motion: starts moving, then slows
-            const travel = light ? -1 : 1; // screen y: up is negative
-            const baseY = h * 0.55;
-            const moveAmp = 28;
-            const cabinShift = travel * moveAmp * (1 - decelProg) * Math.sin(Math.min(u, 1.8) / 1.8 * Math.PI * 0.5);
-            // After decelerating starts, cabin almost stops shifting
-            const cabinYPos = baseY + (step === 0 ? cabinShift : travel * moveAmp * 0.15 * (1 - decelProg));
-
-            // Inertia ghost drifts away from floor when decelerating
-            const ghostSep = (step >= 2 ? 1 : step === 1 ? Math.max(0, (u - 1.8) / 1.8) : 0);
-            const ghostOff = (light ? -1 : 1) * ghostSep * 36;
-
-            // Contact spring compression: light → less, heavy → more
-            const restSpring = 18;
-            let springH = restSpring;
-            if (step >= 2) {
-                springH = light
-                    ? restSpring * (1 - 0.55 * Math.min(1, (u - 3.6) / 1.8))
-                    : restSpring * (1 + 0.7 * Math.min(1, (u - 3.6) / 1.8));
-            }
-
-            // N arrow length vs mg
-            const mgLen = 50;
-            let nLen = mgLen;
-            if (step >= 3 || (step === 2 && u > 4.2)) {
-                nLen = light ? mgLen * 0.55 : mgLen * 1.45;
-            } else if (step >= 2) {
-                const p = Math.min(1, (u - 3.6) / 1.8);
-                nLen = light ? mgLen * (1 - 0.45 * p) : mgLen * (1 + 0.45 * p);
-            }
-
-            // Shaft panel
-            const panelX = w * 0.08;
-            const panelW = w * 0.52;
-            ctx.fillStyle = '#e2e8f0';
-            ctx.strokeStyle = '#94a3b8';
-            ctx.lineWidth = 2;
-            ctx.beginPath();
-            ctx.roundRect(panelX, 20, panelW, h - 40, 12);
-            ctx.fill();
-            ctx.stroke();
-
-            // Floor
-            const floorY = cabinYPos;
-            const floorX = panelX + 24;
-            const floorW = panelW - 48;
-            ctx.fillStyle = '#64748b';
-            ctx.fillRect(floorX, floorY, floorW, 14);
-            ctx.fillStyle = '#334155';
-            ctx.font = 'bold 11px "Noto Sans TC", sans-serif';
-            ctx.fillText(d.whyFloor, floorX + 8, floorY + 11);
-
-            // Spring (contact) between feet and floor
-            const px = panelX + panelW / 2;
-            const springTop = floorY - springH;
-            ctx.strokeStyle = '#0f766e';
-            ctx.lineWidth = 2.5;
-            ctx.beginPath();
-            const coils = 5;
-            for (let i = 0; i <= coils; i++) {
-                const yy = floorY - (i / coils) * springH;
-                const xx = px + ((i % 2 === 0) ? -10 : 10);
-                if (i === 0) ctx.moveTo(px, floorY);
-                else ctx.lineTo(xx, yy);
-            }
-            ctx.lineTo(px, springTop);
-            ctx.stroke();
-
-            // Ghost (inertia)
-            if (ghostSep > 0.05) {
-                drawPersonFigure(ctx, px, springTop + ghostOff, 0.35, '#64748b');
-                ctx.strokeStyle = '#0369a1';
-                ctx.setLineDash([5, 4]);
-                ctx.lineWidth = 2;
-                ctx.beginPath();
-                ctx.moveTo(px + 28, springTop - 20);
-                ctx.lineTo(px + 28, springTop + ghostOff - 20);
-                ctx.stroke();
-                ctx.setLineDash([]);
-                if (light) {
-                    drawArrow(ctx, px + 28, springTop - 8, px + 28, springTop + ghostOff - 28, '#0369a1', 2);
-                } else {
-                    drawArrow(ctx, px + 28, springTop - 8, px + 28, springTop + ghostOff + 8, '#0369a1', 2);
-                }
-                ctx.fillStyle = '#0369a1';
-                ctx.font = 'bold 11px "Noto Sans TC", sans-serif';
-                ctx.fillText(d.whyInertia, px + 36, springTop + ghostOff / 2 - 10);
-            }
-
-            // Real person on spring
-            drawPersonFigure(ctx, px, springTop, 1, '#1e293b');
-            ctx.fillStyle = '#0f766e';
-            ctx.font = 'bold 11px "Noto Sans TC", sans-serif';
-            ctx.fillText(d.whyBody, px + 16, springTop - 48);
-
-            // Velocity / acceleration labels on left of panel
-            const lx = panelX + 16;
-            if (step === 0) {
-                if (light) drawArrow(ctx, lx, floorY - 10, lx, floorY - 50, '#0369a1', 2.5);
-                else drawArrow(ctx, lx, floorY - 50, lx, floorY - 10, '#0369a1', 2.5);
-                ctx.fillStyle = '#0369a1';
-                ctx.font = 'bold 12px sans-serif';
-                ctx.fillText('v', lx + 10, floorY - 28);
-            } else {
-                // a opposite to v for decelerating stop
-                if (light) {
-                    drawArrow(ctx, lx, floorY - 50, lx, floorY - 10, '#7c3aed', 2.5); // a down
-                    drawArrow(ctx, lx + 28, floorY - 10, lx + 28, floorY - 40, '#0369a1', 2); // v still up but fading
-                } else {
-                    drawArrow(ctx, lx, floorY - 10, lx, floorY - 50, '#7c3aed', 2.5); // a up
-                    drawArrow(ctx, lx + 28, floorY - 40, lx + 28, floorY - 10, '#0369a1', 2);
-                }
-                ctx.fillStyle = '#7c3aed';
-                ctx.font = 'bold 12px sans-serif';
-                ctx.fillText('a', lx + 10, floorY - 28);
-                ctx.fillStyle = '#0369a1';
-                ctx.fillText('v', lx + 38, floorY - 28);
-            }
-
-            // Force comparison panel on the right
-            const fx = panelX + panelW + 28;
-            const fy = h * 0.42;
-            ctx.fillStyle = '#1e293b';
-            ctx.font = 'bold 13px "Noto Sans TC", sans-serif';
-            ctx.fillText(light ? d.whyLight : d.whyHeavy, fx, 36);
-
-            // mg
-            drawArrow(ctx, fx + 40, fy, fx + 40, fy + mgLen, '#dc2626', 4);
-            ctx.fillStyle = '#dc2626';
-            ctx.font = 'bold 12px "Noto Sans TC", sans-serif';
-            ctx.fillText('mg', fx + 52, fy + mgLen / 2);
-
-            // N
-            drawArrow(ctx, fx + 100, fy, fx + 100, fy - nLen, '#059669', 4);
-            ctx.fillStyle = '#059669';
-            ctx.fillText('N', fx + 112, fy - nLen / 2);
-
-            // Feel badge
-            if (step >= 3) {
-                ctx.fillStyle = light ? '#fff7ed' : '#ecfdf5';
-                ctx.strokeStyle = light ? '#fed7aa' : '#a7f3d0';
-                ctx.lineWidth = 1.5;
-                const bx = fx;
-                const by = fy + mgLen + 24;
-                ctx.beginPath();
-                ctx.roundRect(bx, by, 168, 36, 8);
-                ctx.fill();
-                ctx.stroke();
-                ctx.fillStyle = light ? '#c2410c' : '#047857';
-                ctx.font = 'bold 13px "Noto Sans TC", sans-serif';
-                ctx.fillText(light ? d.feelLight : d.feelHeavy, bx + 10, by + 23);
-            }
-
-            // Step dots
-            for (let i = 0; i < 4; i++) {
-                ctx.beginPath();
-                ctx.arc(w - 28, 40 + i * 22, 5, 0, Math.PI * 2);
-                ctx.fillStyle = i === step ? '#0f766e' : '#cbd5e1';
-                ctx.fill();
-            }
-        }
-
         function draw() {
             drawScene();
             drawFbd();
             drawNtGraph();
-            drawWhy();
+        }
+
+        function fitCanvas(canvas, cssW, cssH) {
+            const dpr = Math.min(window.devicePixelRatio || 1, 3);
+            const w = Math.max(1, Math.floor(cssW));
+            const h = Math.max(1, Math.floor(cssH));
+            canvas.style.width = `${w}px`;
+            canvas.style.height = `${h}px`;
+            canvas.width = Math.round(w * dpr);
+            canvas.height = Math.round(h * dpr);
+            const ctx = canvas.getContext('2d');
+            ctx.setTransform(dpr, 0, 0, dpr, 0, 0);
+            // Prefer crisp geometry/text on HiDPI
+            ctx.imageSmoothingEnabled = true;
+            ctx.imageSmoothingQuality = 'high';
         }
 
         function resize() {
             const sParent = sceneCanvas.parentElement;
-            sceneCanvas.width = Math.max(320, sParent.clientWidth - 32);
-            sceneCanvas.height = 420;
             const fParent = fbdCanvas.parentElement;
-            fbdCanvas.width = Math.max(280, fParent.clientWidth - 32);
-            fbdCanvas.height = 280;
             const nParent = ntCanvas.parentElement;
-            ntCanvas.width = Math.max(320, nParent.clientWidth - 32);
-            ntCanvas.height = 220;
-            const wParent = whyCanvas.parentElement;
-            whyCanvas.width = Math.max(320, wParent.clientWidth - 32);
-            whyCanvas.height = 260;
+            fitCanvas(sceneCanvas, Math.max(320, sParent.clientWidth - 32), 580);
+            fitCanvas(fbdCanvas, Math.max(220, fParent.clientWidth - 32), 280);
+            fitCanvas(ntCanvas, Math.max(320, nParent.clientWidth - 32), 260);
             draw();
         }
 
         function stopCabin() {
             stopped = true;
             velocity = 0;
+            instantA = 0;
             phase = 'rest';
-            phaseTimer = 0;
             playing = false;
-            cabinY = targetY();
+            posM = targetY() * SHAFT_H;
+            syncCabinFromPos();
             pushHistory();
             updateUI();
         }
 
-        function beginDecel() {
-            phase = 'decel';
-            phaseTimer = 0;
-            brakeV0 = velocity;
-            if (scenarioId === 'downDecel') {
-                whyMode = 'heavy';
-            } else {
-                whyMode = 'light';
-            }
-            whyT = 0;
-            buildWhyButtons();
-        }
-
         function tick(ts) {
             if (!lastTs) lastTs = ts;
-            const dt = Math.min(0.05, (ts - lastTs) / 1000);
+            const dt = Math.min(0.04, (ts - lastTs) / 1000);
             lastTs = ts;
 
             if (playing && !stopped) {
-                simTime += dt;
-                const tgt = targetY();
+                const dtSim = dt * animSpeed();
+                simTime += dtSim;
 
-                if (scenarioId === 'upDecel' || scenarioId === 'downDecel') {
-                    // Integrate so |a| slider changes how fast the cabin slows
-                    const aVis = scenarioId === 'upDecel' ? -aVisual() : aVisual();
-                    velocity += aVis * dt;
-                    cabinY += velocity * dt;
-                    if (scenarioId === 'upDecel') {
-                        if (velocity <= 0 || cabinY >= tgt) {
-                            cabinY = Math.min(cabinY, tgt);
-                            stopCabin();
-                        }
-                    } else if (velocity >= 0 || cabinY <= tgt) {
-                        cabinY = Math.max(cabinY, tgt);
-                        stopCabin();
-                    }
+                // Enter braking for the last BRAKE_T seconds before stop
+                if (phase === 'coast' && remainingM() <= brakeDistanceM() + 1e-4) {
+                    phase = 'decel';
+                    syncCruiseVelocity(); // lock v so |a|×BRAKE_T → rest in ~3 s
+                }
+
+                if (phase === 'coast') {
+                    instantA = 0;
+                    syncCruiseVelocity();
+                    posM += velocity * dtSim;
+                    syncCabinFromPos();
                 } else {
-                    // fullUp: accel → coast → timed brake
-                    const rem = Math.abs(tgt - cabinY);
-                    const dStop = Math.abs(velocity) * DECEL_DUR * 0.5;
+                    // Constant SI deceleration at slider |a| for ~BRAKE_T seconds
+                    instantA = signedA();
+                    posM += velocity * dtSim + 0.5 * instantA * dtSim * dtSim;
+                    velocity += instantA * dtSim;
+                    syncCabinFromPos();
 
-                    if (phase === 'accel') {
-                        phaseTimer += dt;
-                        const u = Math.min(1, phaseTimer / ACCEL_DUR);
-                        velocity = CRUISE * u;
-                        cabinY += velocity * dt;
-                        if (phaseTimer >= ACCEL_DUR || rem <= dStop + 0.02) {
-                            velocity = CRUISE;
-                            phase = 'coast';
-                            phaseTimer = 0;
-                        }
-                    } else if (phase === 'coast') {
-                        velocity = CRUISE;
-                        if (rem <= Math.abs(velocity) * DECEL_DUR * 0.5 + 1e-4) {
-                            beginDecel();
-                        } else {
-                            cabinY += velocity * dt;
-                        }
-                    }
-
-                    if (phase === 'decel' && !stopped) {
-                        phaseTimer += dt;
-                        const u = Math.min(1, phaseTimer / DECEL_DUR);
-                        velocity = brakeV0 * (1 - u);
-                        cabinY += velocity * dt;
-                        const remNow = Math.abs(tgt - cabinY);
-                        if (
-                            phaseTimer >= DECEL_DUR ||
-                            remNow <= 0.002 ||
-                            (brakeV0 > 0 && cabinY >= tgt) ||
-                            (brakeV0 < 0 && cabinY <= tgt)
-                        ) {
-                            stopCabin();
-                        }
+                    const arrived = scenarioId === 'upDecel'
+                        ? (velocity <= 0 || posM >= targetY() * SHAFT_H)
+                        : (velocity >= 0 || posM <= targetY() * SHAFT_H);
+                    if (arrived) {
+                        stopCabin();
+                        draw();
+                        requestAnimationFrame(tick);
+                        return;
                     }
                 }
 
-                cabinY = Math.max(0.05, Math.min(0.95, cabinY));
-                if (!stopped) {
-                    pushHistory();
-                    updateUI();
-                }
+                pushHistory();
+                updateUI();
             }
-            whyT += dt;
-            updateWhyCaption();
             draw();
             requestAnimationFrame(tick);
         }
@@ -1433,9 +1176,21 @@
             draw();
         });
         accelSlider.addEventListener('input', () => {
+            if (!stopped && phase === 'coast') {
+                syncCruiseVelocity();
+                if (remainingM() <= brakeDistanceM()) {
+                    phase = 'decel';
+                    instantA = signedA();
+                }
+            } else if (!stopped && phase === 'decel') {
+                instantA = signedA();
+            }
             pushHistory();
             updateUI();
             draw();
+        });
+        animSpeedSlider.addEventListener('input', () => {
+            updateUI();
         });
         playBtn.addEventListener('click', () => {
             if (!playing && stopped) {
@@ -1451,11 +1206,6 @@
             lastTs = 0;
             updateUI();
             draw();
-        });
-        document.getElementById('whyReplay').addEventListener('click', () => {
-            whyT = 0;
-            updateWhyCaption();
-            drawWhy();
         });
         document.getElementById('lang-toggle').addEventListener('click', () => {
             currentLang = currentLang === 'zh' ? 'en' : 'zh';

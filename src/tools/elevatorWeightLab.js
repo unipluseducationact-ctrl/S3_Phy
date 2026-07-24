@@ -6,6 +6,6 @@ export function createElevatorWeightLab(t) {
     slug: 'elevator-weight',
     titleKey: 'tools.elevatorWeight.title',
     className: 'tool-elevator-weight-lab',
-    extraParams: () => '&v=20260723_elevator_focus_v7',
+    extraParams: () => '&v=20260724_elevator_speed_mag_v24',
   });
 }

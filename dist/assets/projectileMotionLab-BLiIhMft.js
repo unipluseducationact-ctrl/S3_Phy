@@ -1,1 +1,0 @@
-import{c as e}from"./createLabIframe-Dnzn_9Mp.js";import"./index-Da9gE9ch.js";function i(t){return e(t,{slug:"projectile-motion",titleKey:"tools.projectileMotion.title",className:"tool-projectile-motion-lab",extraParams:()=>"&v=20260722_projectile_v2"})}export{i as createProjectileMotionLab};

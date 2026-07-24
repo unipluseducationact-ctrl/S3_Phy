@@ -231,6 +231,7 @@ export function mountOpticsHub(root) {
       ['planeMirrorLab', 'topic.reflection'],
       ['refraction', 'topic.refractionSnell'],
       ['tir', 'topic.tir'],
+      ['mirage', 'topic.mirage'],
       ['convex', 'topic.convex'],
       ['concave', 'topic.concave'],
       ['em', 'topic.em'],
@@ -249,9 +250,11 @@ export function mountOpticsHub(root) {
                     ? 'refraction'
                     : id === 'tir'
                       ? 'refractionTir'
-                      : id === 'em'
-                        ? 'em'
-                        : id;
+                      : id === 'mirage'
+                        ? 'mirage'
+                        : id === 'em'
+                          ? 'em'
+                          : id;
               const lensKind =
                 id === 'convex' ? 'convex' : id === 'concave' ? 'concave' : '';
               return `
