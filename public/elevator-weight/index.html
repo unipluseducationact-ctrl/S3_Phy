@@ -762,9 +762,9 @@
             const d = t();
             ctx.clearRect(0, 0, w, h);
 
-            // Shaft — leave left margin for v / a arrows
-            const sx = w * 0.34;
-            const sw = w * 0.40;
+            // Shaft — left margin for |v|, right margin for a + N gauge
+            const sx = w * 0.30;
+            const sw = w * 0.38;
             ctx.fillStyle = '#dbe3ec';
             ctx.fillRect(sx, 20, sw, h - 40);
             ctx.strokeStyle = '#94a3b8';
@@ -859,40 +859,36 @@
             ctx.font = 'bold 11px "Noto Sans TC", sans-serif';
             ctx.fillText(`${W.toFixed(1)} N`, px + 32, py - 30 + wLen / 2 + 14);
 
-            // N magnitude gauge (green fill vs red mg tick) — right of shaft only
-            drawNormalGauge(ctx, sx + sw + 22, cabinTop + 8, cabinH - 16, N, W, d);
+            // N magnitude gauge (green fill vs red mg tick) — right of shaft
+            drawNormalGauge(ctx, sx + sw + 20, cabinTop + 8, cabinH - 16, N, W, d);
 
-            // v and a on the LEFT so opposite directions are obvious while braking
-            const kvx = sx - 34;
+            // |v| on the LEFT of the shaft (never share column with a)
+            const kvx = sx - 36;
             const kvy = cabinTop + cabinH / 2;
             const speed = Math.abs(velocity);
             const vLen = vPx(velocity, 52);
+            ctx.fillStyle = '#0369a1';
+            ctx.font = 'bold 11px sans-serif';
             if (vLen > 2) {
                 if (velocity > 0) drawArrow(ctx, kvx, kvy + vLen / 2, kvx, kvy - vLen / 2, '#0369a1', 3);
                 else drawArrow(ctx, kvx, kvy - vLen / 2, kvx, kvy + vLen / 2, '#0369a1', 3);
-                ctx.fillStyle = '#0369a1';
-                ctx.font = 'bold 11px sans-serif';
-                ctx.fillText(`|v| ${speed.toFixed(2)} ms⁻¹`, Math.max(4, kvx - 78), kvy - vLen / 2 - 6);
+                ctx.fillText(`|v| ${speed.toFixed(2)} ms⁻¹`, Math.max(4, kvx - 86), kvy + vLen / 2 + 14);
             } else {
-                ctx.fillStyle = '#0369a1';
-                ctx.font = 'bold 11px sans-serif';
-                ctx.fillText('|v| 0.00 ms⁻¹', Math.max(4, sx - 90), kvy);
+                ctx.fillText('|v| 0.00 ms⁻¹', Math.max(4, kvx - 86), kvy + 4);
             }
 
-            // Acceleration: tip toward top of screen ⇔ a > 0 (up +)
-            const kax = sx - 68;
+            // a on the RIGHT of the N gauge — separate from |v|
+            const kax = sx + sw + 88;
             const kay = cabinTop + cabinH / 2;
             const aLen = aPx(a, 58);
+            ctx.fillStyle = '#7c3aed';
+            ctx.font = 'bold 11px sans-serif';
             if (aLen > 2) {
                 if (a > 0) drawArrow(ctx, kax, kay + aLen / 2, kax, kay - aLen / 2, '#7c3aed', 3.5);
                 else drawArrow(ctx, kax, kay - aLen / 2, kax, kay + aLen / 2, '#7c3aed', 3.5);
-                ctx.fillStyle = '#7c3aed';
-                ctx.font = 'bold 11px sans-serif';
-                ctx.fillText(`a ${a.toFixed(1)} ms⁻²`, Math.max(4, kax - 72), kay - aLen / 2 - 6);
+                ctx.fillText(`a ${a.toFixed(1)} ms⁻²`, kax + 12, kay + 4);
             } else {
-                ctx.fillStyle = '#7c3aed';
-                ctx.font = 'bold 11px sans-serif';
-                ctx.fillText('a = 0 ms⁻²', Math.max(4, kax - 52), kay + 4);
+                ctx.fillText('a = 0 ms⁻²', kax + 8, kay + 4);
             }
         }
 
